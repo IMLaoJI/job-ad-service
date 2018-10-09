@@ -51,13 +51,13 @@ public class JobAdvertisementFromAvamAssembler {
     AvamCreateJobAdvertisementDto createCreateJobAdvertisementAvamDto(WSOsteEgov avamJobAdvertisement) {
         return new AvamCreateJobAdvertisementDto(
                 safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()),
-                avamJobAdvertisement.getBezeichnung(),
-                avamJobAdvertisement.getBeschreibung(),
+                safeTrimOrNull(avamJobAdvertisement.getBezeichnung()),
+                safeTrimOrNull(avamJobAdvertisement.getBeschreibung()),
                 "de", // Not defined in this AVAM version
                 safeTrimOrNull(avamJobAdvertisement.getGleicheOste()),
                 avamJobAdvertisement.isMeldepflicht(),
                 parseToLocalDate(avamJobAdvertisement.getSperrfrist()),
-                avamJobAdvertisement.getArbeitsamtBereich(),
+                safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()),
                 parseToLocalDate(avamJobAdvertisement.getAnmeldeDatum()),
                 createEmploymentDto(avamJobAdvertisement),
                 createApplyChannelDto(avamJobAdvertisement),
@@ -79,13 +79,13 @@ public class JobAdvertisementFromAvamAssembler {
                 parseToLocalDate(avamJobAdvertisement.getSperrfrist()),
                 new UpdateJobAdvertisementFromAvamDto(
                         safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()),
-                        avamJobAdvertisement.getBezeichnung(),
-                        avamJobAdvertisement.getBeschreibung(),
+                        safeTrimOrNull(avamJobAdvertisement.getBezeichnung()),
+                        safeTrimOrNull(avamJobAdvertisement.getBeschreibung()),
                         "de", // Not defined in this AVAM version
-                        avamJobAdvertisement.getGleicheOste(),
+                        safeTrimOrNull(avamJobAdvertisement.getGleicheOste()),
                         avamJobAdvertisement.isMeldepflicht(),
                         parseToLocalDate(avamJobAdvertisement.getSperrfrist()),
-                        avamJobAdvertisement.getArbeitsamtBereich(),
+                        safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()),
                         parseToLocalDate(avamJobAdvertisement.getAnmeldeDatum()),
                         createEmploymentDto(avamJobAdvertisement),
                         createApplyChannelDto(avamJobAdvertisement),
@@ -104,9 +104,9 @@ public class JobAdvertisementFromAvamAssembler {
                 safeTrimOrNull(avamJobAdvertisement.getStellennummerEgov()),
                 safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()),
                 parseToLocalDate(avamJobAdvertisement.getAblehnungDatum()),
-                avamJobAdvertisement.getAblehnungGrundCode(),
-                avamJobAdvertisement.getAblehnungGrund(),
-                avamJobAdvertisement.getArbeitsamtBereich()
+                safeTrimOrNull(avamJobAdvertisement.getAblehnungGrundCode()),
+                safeTrimOrNull(avamJobAdvertisement.getAblehnungGrund()),
+                safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich())
         );
     }
 
@@ -128,8 +128,8 @@ public class JobAdvertisementFromAvamAssembler {
 
             return new ContactDto()
                     .setSalutation(hasText(avamJobAdvertisement.getKpAnredeCode()) ? SALUTATIONS.getRight(avamJobAdvertisement.getKpAnredeCode()) : Salutation.MR)
-                    .setFirstName(avamJobAdvertisement.getKpVorname())
-                    .setLastName(avamJobAdvertisement.getKpName())
+                    .setFirstName(safeTrimOrNull(avamJobAdvertisement.getKpVorname()))
+                    .setLastName(safeTrimOrNull(avamJobAdvertisement.getKpName()))
                     .setPhone(sanitizePhoneNumber(avamJobAdvertisement.getKpTelefonNr(), avamJobAdvertisement))
                     .setEmail(sanitizeEmail(avamJobAdvertisement.getKpEmail(), avamJobAdvertisement))
                     .setLanguageIsoCode(""); // Not defined in this AVAM version
@@ -153,24 +153,24 @@ public class JobAdvertisementFromAvamAssembler {
 
     private CreateLocationDto createCreateLocationDto(WSOsteEgov avamJobAdvertisement) {
         return new CreateLocationDto()
-                .setRemarks(avamJobAdvertisement.getArbeitsOrtText())
-                .setCity(avamJobAdvertisement.getArbeitsOrtOrt())
-                .setPostalCode(avamJobAdvertisement.getArbeitsOrtPlz())
-                .setCountryIsoCode(avamJobAdvertisement.getArbeitsOrtLand());
+                .setRemarks(safeTrimOrNull(avamJobAdvertisement.getArbeitsOrtText()))
+                .setCity(safeTrimOrNull(avamJobAdvertisement.getArbeitsOrtOrt()))
+                .setPostalCode(safeTrimOrNull(avamJobAdvertisement.getArbeitsOrtPlz()))
+                .setCountryIsoCode(safeTrimOrNull(avamJobAdvertisement.getArbeitsOrtLand()));
     }
 
     private CompanyDto createCompanyDto(WSOsteEgov avamJobAdvertisement) {
         // This fields are also used for ApplChannel from AVAM
         return new CompanyDto()
-                .setName(avamJobAdvertisement.getUntName())
-                .setStreet(avamJobAdvertisement.getUntStrasse())
-                .setHouseNumber(avamJobAdvertisement.getUntHausNr())
-                .setPostalCode(avamJobAdvertisement.getUntPlz())
-                .setCity(avamJobAdvertisement.getUntOrt())
-                .setCountryIsoCode(avamJobAdvertisement.getUntLand())
-                .setPostOfficeBoxNumber(avamJobAdvertisement.getUntPostfach())
-                .setPostOfficeBoxPostalCode(avamJobAdvertisement.getUntPostfachPlz())
-                .setPostOfficeBoxCity(avamJobAdvertisement.getUntPostfachOrt())
+                .setName(safeTrimOrNull(avamJobAdvertisement.getUntName()))
+                .setStreet(safeTrimOrNull(avamJobAdvertisement.getUntStrasse()))
+                .setHouseNumber(safeTrimOrNull(avamJobAdvertisement.getUntHausNr()))
+                .setPostalCode(safeTrimOrNull(avamJobAdvertisement.getUntPlz()))
+                .setCity(safeTrimOrNull(avamJobAdvertisement.getUntOrt()))
+                .setCountryIsoCode(safeTrimOrNull(avamJobAdvertisement.getUntLand()))
+                .setPostOfficeBoxNumber(safeTrimOrNull(avamJobAdvertisement.getUntPostfach()))
+                .setPostOfficeBoxPostalCode(safeTrimOrNull(avamJobAdvertisement.getUntPostfachPlz()))
+                .setPostOfficeBoxCity(safeTrimOrNull(avamJobAdvertisement.getUntPostfachOrt()))
                 .setPhone(null) // This is only used for ApplyChannel from AVAM
                 .setEmail(null)// This is only used for ApplyChannel from AVAM
                 .setWebsite(null)// This is only used for ApplyChannel from AVAM
@@ -183,7 +183,7 @@ public class JobAdvertisementFromAvamAssembler {
                 .setEmailAddress(avamJobAdvertisement.isBewerElektronisch() ? sanitizeEmail(avamJobAdvertisement.getUntEmail(), avamJobAdvertisement) : null)
                 .setPhoneNumber(avamJobAdvertisement.isBewerTelefonisch() ? sanitizePhoneNumber(avamJobAdvertisement.getUntTelefon(), avamJobAdvertisement) : null)
                 .setFormUrl(avamJobAdvertisement.isBewerElektronisch() ? sanitizeUrl(avamJobAdvertisement.getUntUrl(), avamJobAdvertisement) : null)
-                .setAdditionalInfo(avamJobAdvertisement.getBewerAngaben());
+                .setAdditionalInfo(safeTrimOrNull(avamJobAdvertisement.getBewerAngaben()));
     }
 
     private List<OccupationDto> createOccupationDtos(WSOsteEgov avamJobAdvertisement) {
@@ -202,9 +202,9 @@ public class JobAdvertisementFromAvamAssembler {
             return null;
         }
         return new OccupationDto()
-                .setAvamOccupationCode(avamBerufNr.toString())
+                .setAvamOccupationCode(safeTrimOrNull(avamBerufNr.toString()))
                 .setWorkExperience(resolveMapping(EXPERIENCES, erfahrungCode, "EXPERIENCES"))
-                .setEducationCode(ausbildungCode);
+                .setEducationCode(safeTrimOrNull(ausbildungCode));
     }
 
     private List<LanguageSkillDto> createLanguageSkillDtos(WSOsteEgov avamJobAdvertisement) {
