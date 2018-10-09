@@ -55,6 +55,8 @@ public class SupportedLanguageIsoCodeValidator implements ConstraintValidator<Su
 		SUPPORTED_LANGUAGES.add("fa");
 		SUPPORTED_LANGUAGES.add("prs");
 		SUPPORTED_LANGUAGES.add("ti");
+		SUPPORTED_LANGUAGES.add("sr-hr");
+		SUPPORTED_LANGUAGES.add("nld");
 	}
 
 	@Override
