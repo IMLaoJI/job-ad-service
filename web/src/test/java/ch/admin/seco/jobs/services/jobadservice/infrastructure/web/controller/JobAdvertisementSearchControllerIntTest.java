@@ -28,6 +28,8 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithoutPublicDisplayAndWithRestrictedDisplay;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithoutPublicDisplayAndWithoutRestrictedDisplay;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJob;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJobWithoutPublicDisplayAndWithoutRestrictedDisplay;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJobWithoutPublicDisplayAndWithRestrictedDisplay;
 import static java.time.LocalDate.now;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
@@ -631,10 +633,14 @@ public class JobAdvertisementSearchControllerIntTest {
     @Test
     public void shouldShowRestrictedJobsForJobSeekers() throws Exception {
         // GIVEN
+        //-----------------------------------------------------------------------------------publicDisplay restrictedDisplay status
         when(this.mockCurrentUserContext.hasRole(Role.JOBSEEKER_CLIENT)).thenReturn(true);
-        index(createRestrictedJob(job01.id()));
-        index(createJob(job02.id()));
-        index(createRestrictedJob(job03.id()));
+        index(createJob(job01.id()));                                                           //1 0 PUBLISHED_PUBLIC
+        index(createRestrictedJob(job02.id()));                                                 //1 0 PUBLISHED_RESTRICTED
+        index(createRestrictedJobWithoutPublicDisplayAndWithoutRestrictedDisplay(job03.id()));  //0 0 PUBLISHED_RESTRICTED
+        index(createRestrictedJobWithoutPublicDisplayAndWithRestrictedDisplay(job04.id()));     //0 1 PUBLISHED_RESTRICTED
+        index(createJobWithoutPublicDisplayAndWithoutRestrictedDisplay(job05.id()));            //0 0 PUBLISHED_PUBLIC
+        index(createJobWithoutPublicDisplayAndWithRestrictedDisplay(job06.id()));               //0 1 PUBLISHED_PUBLIC
 
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
@@ -649,11 +655,12 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(header().string("X-Total-Count", "3"))
+                .andExpect(header().string("X-Total-Count", "5"))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(job01.name())))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(job02.name())))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(job03.name())))
-        ;
+                .andExpect(jsonPath("$.[*].id").value(hasItem(job04.name())))
+                .andExpect(jsonPath("$.[*].id").value(hasItem(job06.name())));
     }
 
     @Test

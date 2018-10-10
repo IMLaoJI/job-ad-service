@@ -213,6 +213,30 @@ public class JobAdvertisementTestFixture {
 
     }
 
+    public static JobAdvertisement createRestrictedJobWithoutPublicDisplayAndWithoutRestrictedDisplay(JobAdvertisementId jobAdvertisementId) {
+        return new JobAdvertisement.Builder()
+                .setId(jobAdvertisementId)
+                .setSourceSystem(JOBROOM)
+                .setStatus(PUBLISHED_RESTRICTED)
+                .setOwner(OwnerFixture.of(jobAdvertisementId).build())
+                .setPublication(testPublication().build())
+                .setJobContent(JobContentFixture.of(jobAdvertisementId).build())
+                .setReportingObligation(true)
+                .build();
+    }
+
+    public static JobAdvertisement createRestrictedJobWithoutPublicDisplayAndWithRestrictedDisplay(JobAdvertisementId jobAdvertisementId) {
+        return new JobAdvertisement.Builder()
+                .setId(jobAdvertisementId)
+                .setSourceSystem(JOBROOM)
+                .setStatus(PUBLISHED_RESTRICTED)
+                .setOwner(OwnerFixture.of(jobAdvertisementId).build())
+                .setPublication(testPublication().setRestrictedDisplay(true).build())
+                .setJobContent(JobContentFixture.of(jobAdvertisementId).build())
+                .setReportingObligation(true)
+                .build();
+    }
+
     public static JobAdvertisement createJobWithContractType(JobAdvertisementId jobAdvertisementId, boolean isPermanent) {
         return testJobAdvertisementWithContent(jobAdvertisementId, JobContentFixture.of(jobAdvertisementId)
                 .setEmployment(
