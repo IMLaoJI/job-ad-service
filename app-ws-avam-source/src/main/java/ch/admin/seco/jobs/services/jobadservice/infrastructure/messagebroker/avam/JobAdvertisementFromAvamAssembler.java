@@ -30,7 +30,6 @@ import java.util.stream.Stream;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.*;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamDateTimeFormatter.parseToLocalDate;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.util.StringUtils.hasText;
 import static org.springframework.util.StringUtils.trimAllWhitespace;
 
@@ -45,7 +44,7 @@ public class JobAdvertisementFromAvamAssembler {
     }
 
     private static String safeTrimOrNull(String value) {
-        return (isNotBlank(value)) ? value.trim() : null;
+        return (hasText(value)) ? value.trim() : null;
     }
 
     AvamCreateJobAdvertisementDto createCreateJobAdvertisementAvamDto(WSOsteEgov avamJobAdvertisement) {
