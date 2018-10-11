@@ -100,6 +100,7 @@ public class JobAdvertisementApplicationServiceForAPITest {
         assertThat(jobAdvertisement.getPublication().isCompanyAnonymous()).isFalse();
         assertThat(jobAdvertisement.isReportingObligation()).isFalse();
         assertThat(jobAdvertisement.getJobContent().getDisplayCompany()).isEqualTo(company);
+        assertThat(jobAdvertisement.getJobCenterCode()).isNull();
 
         domainEventMockUtils.assertSingleDomainEventPublished(JobAdvertisementEvents.JOB_ADVERTISEMENT_CREATED.getDomainEventType());
         verify(locationService, times(1)).isLocationValid(any());
