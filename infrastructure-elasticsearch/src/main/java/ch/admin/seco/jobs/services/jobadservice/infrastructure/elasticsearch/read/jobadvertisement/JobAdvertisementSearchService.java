@@ -315,18 +315,17 @@ public class JobAdvertisementSearchService {
         final BoolQueryBuilder publicationTypeFilter = boolQuery();
 
         if (this.currentUserContext.hasRole(Role.JOBSEEKER_CLIENT)) {
-            final BoolQueryBuilder publicDisplayFilter = boolQuery()
+            final BoolQueryBuilder publishedPublicFilter = boolQuery()
                     .must(termQuery(PATH_PUBLICATION_RESTRICTED_DISPLAY, true))
                     .must(termQuery(PATH_STATUS, PUBLISHED_PUBLIC.toString()));
-            final BoolQueryBuilder publishRestrictedFilter = boolQuery()
-                    .mustNot(termQuery(PATH_STATUS, PUBLISHED_PUBLIC.toString()));
+            final BoolQueryBuilder publishedRestrictedFilter = boolQuery()
+                    .must(termQuery(PATH_STATUS, PUBLISHED_RESTRICTED.toString()));
 
             publicationTypeFilter.must(boolQuery()
                     .should(termQuery(PATH_PUBLICATION_PUBLIC_DISPLAY, true))
-                    .should(boolQuery()
-                            .should(publicDisplayFilter)
-                            .should(publishRestrictedFilter)
-                    ));
+                    .should(publishedPublicFilter)
+                    .should(publishedRestrictedFilter)
+            );
         } else {
             publicationTypeFilter.must(termQuery(PATH_PUBLICATION_PUBLIC_DISPLAY, true));
         }
