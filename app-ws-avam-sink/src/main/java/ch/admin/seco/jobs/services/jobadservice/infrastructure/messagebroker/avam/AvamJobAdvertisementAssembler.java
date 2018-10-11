@@ -17,6 +17,8 @@ import static org.springframework.util.StringUtils.hasText;
 
 public class AvamJobAdvertisementAssembler {
 
+    private static String DEFAULT_JOB_CENTER_CODE = "CHA20";
+
     private static boolean safeBoolean(Boolean value) {
         return (value != null) ? value : false;
     }
@@ -34,10 +36,10 @@ public class AvamJobAdvertisementAssembler {
     public TOsteEgov toOsteEgov(JobAdvertisement jobAdvertisement, AvamAction action) {
         TOsteEgov avamJobAdvertisement = new TOsteEgov();
         avamJobAdvertisement.setDetailangabenCode(AvamCodeResolver.ACTIONS.getLeft(action));
-        avamJobAdvertisement.setArbeitsamtBereich(jobAdvertisement.getJobCenterCode());
         avamJobAdvertisement.setStellennummerEgov(jobAdvertisement.getStellennummerEgov());
         avamJobAdvertisement.setStellennummerAvam(jobAdvertisement.getStellennummerAvam());
-        avamJobAdvertisement.setArbeitsamtBereich(getJobCenterCode(jobAdvertisement.getJobCenterCode()));
+        avamJobAdvertisement.setArbeitsamtBereich(hasText(jobAdvertisement.getJobCenterCode()) ?
+                jobAdvertisement.getJobCenterCode() : DEFAULT_JOB_CENTER_CODE);
 
         avamJobAdvertisement.setAnmeldeDatum(formatLocalDate(jobAdvertisement.getApprovalDate()));
         if (AvamAction.ABMELDUNG.equals(action)) {
@@ -62,13 +64,12 @@ public class AvamJobAdvertisementAssembler {
         //TODO: Review if we need to check nullability
         Assert.notNull(jobContent, "jobAdvertisement.getJobContent can not be null");
 
-        //TODO: Check which description has to be use
         final JobDescription defaultJobDescription = jobContent.getJobDescriptions().stream()
                 .findFirst()
                 .orElse(null);
 
         //TODO: Review if we need to check nullability
-        Assert.notNull(defaultJobDescription, "jobContent.getJobDescriptions can not be empty");
+        Assert.notNull(defaultJobDescription, "jobContent.getJobDescriptions cannot be empty");
 
         avamJobAdvertisement.setBezeichnung(defaultJobDescription.getTitle());
         avamJobAdvertisement.setBeschreibung(defaultJobDescription.getDescription());
@@ -262,11 +263,4 @@ public class AvamJobAdvertisementAssembler {
         }
     }
 
-    private String getJobCenterCode(String jobCenterCode) {
-        if (jobCenterCode != null) {
-            return jobCenterCode;
-        }
-        //TODO define default RAV if information is missing
-        return "BE01";
-    }
-}
+ }
