@@ -291,13 +291,42 @@ public class JobAdvertisementSearchService {
                 companyFilter(jobSearchRequest.getCompanyName()));
     }
 
+    private BoolQueryBuilder visibilityFilter(JobAdvertisementSearchRequest jobSearchRequest) {
+        BoolQueryBuilder visibilityFilter = boolQuery();
+
+        final JobAdvertisementStatus[] visibleStatuses;
+
+        if (this.currentUserContext.hasRole(Role.JOBSEEKER_CLIENT)) {
+            if (Boolean.TRUE.equals(jobSearchRequest.getDisplayRestricted())) {
+                visibleStatuses = toArray(PUBLISHED_RESTRICTED);
+            } else {
+                visibleStatuses = toArray(PUBLISHED_RESTRICTED, PUBLISHED_PUBLIC);
+            }
+        } else {
+            visibleStatuses = toArray(PUBLISHED_PUBLIC);
+        }
+
+        visibilityFilter.must(termsQuery(PATH_STATUS, toStringArray(visibleStatuses)));
+
+        return visibilityFilter;
+    }
+
     private BoolQueryBuilder publicationTypeFilter() {
         final BoolQueryBuilder publicationTypeFilter = boolQuery();
 
         if (this.currentUserContext.hasRole(Role.JOBSEEKER_CLIENT)) {
+            final BoolQueryBuilder publishedPublicFilter = boolQuery()
+                    .must(termQuery(PATH_STATUS, PUBLISHED_PUBLIC.toString()))
+                    .must(boolQuery()
+                            .should(termQuery(PATH_PUBLICATION_PUBLIC_DISPLAY, true))
+                            .should(termQuery(PATH_PUBLICATION_RESTRICTED_DISPLAY, true))
+                    );
+            final BoolQueryBuilder publishedRestrictedFilter = boolQuery()
+                    .must(termQuery(PATH_STATUS, PUBLISHED_RESTRICTED.toString()));
+
             publicationTypeFilter.must(boolQuery()
-                    .should(termQuery(PATH_PUBLICATION_PUBLIC_DISPLAY, true))
-                    .should(termQuery(PATH_PUBLICATION_RESTRICTED_DISPLAY, true))
+                    .should(publishedPublicFilter)
+                    .should(publishedRestrictedFilter)
             );
         } else {
             publicationTypeFilter.must(termQuery(PATH_PUBLICATION_PUBLIC_DISPLAY, true));
@@ -357,26 +386,6 @@ public class JobAdvertisementSearchService {
         }
 
         return localityFilter;
-    }
-
-    private BoolQueryBuilder visibilityFilter(JobAdvertisementSearchRequest jobSearchRequest) {
-        BoolQueryBuilder visibilityFilter = boolQuery();
-
-        final JobAdvertisementStatus[] visibleStatuses;
-
-        if (this.currentUserContext.hasRole(Role.JOBSEEKER_CLIENT)) {
-            if (Boolean.TRUE.equals(jobSearchRequest.getDisplayRestricted())) {
-                visibleStatuses = toArray(PUBLISHED_RESTRICTED);
-            } else {
-                visibleStatuses = toArray(PUBLISHED_RESTRICTED, PUBLISHED_PUBLIC);
-            }
-        } else {
-            visibleStatuses = toArray(PUBLISHED_PUBLIC);
-        }
-
-        visibilityFilter.must(termsQuery(PATH_STATUS, toStringArray(visibleStatuses)));
-
-        return visibilityFilter;
     }
 
     private BoolQueryBuilder workingTimeFilter(JobAdvertisementSearchRequest jobSearchRequest) {
