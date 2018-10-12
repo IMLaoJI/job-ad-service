@@ -316,13 +316,15 @@ public class JobAdvertisementSearchService {
 
         if (this.currentUserContext.hasRole(Role.JOBSEEKER_CLIENT)) {
             final BoolQueryBuilder publishedPublicFilter = boolQuery()
-                    .must(termQuery(PATH_PUBLICATION_RESTRICTED_DISPLAY, true))
-                    .must(termQuery(PATH_STATUS, PUBLISHED_PUBLIC.toString()));
+                    .must(termQuery(PATH_STATUS, PUBLISHED_PUBLIC.toString()))
+                    .must(boolQuery()
+                            .should(termQuery(PATH_PUBLICATION_PUBLIC_DISPLAY, true))
+                            .should(termQuery(PATH_PUBLICATION_RESTRICTED_DISPLAY, true))
+                    );
             final BoolQueryBuilder publishedRestrictedFilter = boolQuery()
                     .must(termQuery(PATH_STATUS, PUBLISHED_RESTRICTED.toString()));
 
             publicationTypeFilter.must(boolQuery()
-                    .should(termQuery(PATH_PUBLICATION_PUBLIC_DISPLAY, true))
                     .should(publishedPublicFilter)
                     .should(publishedRestrictedFilter)
             );
