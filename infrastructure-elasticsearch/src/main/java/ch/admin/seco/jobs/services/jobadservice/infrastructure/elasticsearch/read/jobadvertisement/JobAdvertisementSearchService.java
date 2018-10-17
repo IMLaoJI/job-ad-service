@@ -74,6 +74,7 @@ public class JobAdvertisementSearchService {
     private static final String PATH_PUBLICATION_RESTRICTED_DISPLAY = PATH_CTX + "publication.restrictedDisplay";
     private static final String PATH_PUBLICATION_PUBLIC_DISPLAY = PATH_CTX + "publication.publicDisplay";
     private static final String PATH_PUBLICATION_START_DATE = PATH_CTX + "publication.startDate";
+    private static final String PATH_PUBLICATION_EURES_DISPLAY = PATH_CTX + "publication.euresDisplay";
     private static final String PATH_TITLE = PATH_CTX + "jobContent.jobDescriptions.title";
     private static final String PATH_STATUS = PATH_CTX + "status";
     private static final String PATH_SOURCE_SYSTEM = PATH_CTX + "sourceSystem";
@@ -138,6 +139,32 @@ public class JobAdvertisementSearchService {
         return jobAdvertisementElasticsearchRepository.search(query)
                 .map(JobAdvertisementDocument::getJobAdvertisement)
                 .map(JobAdvertisementDto::toDto);
+    }
+
+    public Page<JobAdvertisementDto> searchEuresJobAdvertisementsMarkedForPublication(Pageable pageable) {
+        SearchQuery query = createEuresMarkedForPublicationSearchQueryBuilder()
+                .withPageable(pageable)
+                .build();
+
+        return jobAdvertisementElasticsearchRepository.search(query)
+                .map(JobAdvertisementDocument::getJobAdvertisement)
+                .map(JobAdvertisementDto::toDto);
+    }
+
+    private NativeSearchQueryBuilder createEuresMarkedForPublicationSearchQueryBuilder() {
+        BoolQueryBuilder publishedPublicStatusFilter = boolQuery().must(
+                termsQuery(PATH_STATUS, PUBLISHED_PUBLIC.name())
+        );
+        BoolQueryBuilder euresDisplayFilter = boolQuery().must(
+                termsQuery(PATH_PUBLICATION_EURES_DISPLAY, true)
+        );
+
+        return new NativeSearchQueryBuilder().withFilter(
+                mustAll(
+                        publishedPublicStatusFilter,
+                        euresDisplayFilter
+                )
+        );
     }
 
     private NativeSearchQueryBuilder createPeaSearchQueryBuilder(PeaJobAdvertisementSearchRequest searchRequest) {

@@ -1,7 +1,9 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.API;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.EXTERN;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture.testJobAdvertisement;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job02;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job03;
@@ -28,18 +30,24 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithoutPublicDisplayAndWithRestrictedDisplay;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithoutPublicDisplayAndWithoutRestrictedDisplay;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJob;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJobWithoutPublicDisplayAndWithoutRestrictedDisplay;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJobWithoutPublicDisplayAndWithRestrictedDisplay;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJobWithoutPublicDisplayAndWithoutRestrictedDisplay;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
 import static java.time.LocalDate.now;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -67,6 +75,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Language
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageSkill;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Location;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.JobAdvertisementSearchRequest;
@@ -699,8 +708,44 @@ public class JobAdvertisementSearchControllerIntTest {
         ;
     }
 
+    @Test
+    public void shouldSearchEuresJobAdvertisementsMarkedForPublication() throws Exception {
+        // GIVEN
+        Stream.of(job01, job02, job03)
+                .map(JobAdvertisementIdFixture::id)
+                .forEach(id -> index(
+                        testJobAdvertisement()
+                                .setId(id)
+                                .setPublication(
+                                        testPublication().setEuresDisplay(true).build()
+                                )
+                                .setStatus(PUBLISHED_PUBLIC)
+                                .build()
+                        )
+                );
+        index(testJobAdvertisement().setId(job04.id()).build());
+
+        // WHEN
+        ResultActions resultActions = mockMvc.perform(
+                get(API_JOB_ADVERTISEMENTS + "/_search/eures")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(new PeaJobAdvertisementSearchRequest()))
+        );
+
+        // THEN
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "3"))
+                .andExpect(jsonPath("$.[*].id").value(
+                        containsInAnyOrder(
+                                job02.name(),
+                                job01.name(),
+                                job03.name())
+                ));
+    }
+
     private void index(JobAdvertisement jobAdvertisement) {
         this.jobAdvertisementElasticsearchRepository.save(new JobAdvertisementDocument(jobAdvertisement));
-
     }
 }
