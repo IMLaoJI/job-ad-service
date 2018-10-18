@@ -13,7 +13,7 @@ import java.util.Objects;
 @Access(AccessType.FIELD)
 public class ApplyChannel implements ValueObject<ApplyChannel> {
 
-    private String mailAddress;
+    private String rawPostAddress;
 
     private Address postAddress;
 
@@ -30,7 +30,7 @@ public class ApplyChannel implements ValueObject<ApplyChannel> {
     }
 
     private ApplyChannel(Builder builder) {
-        this.mailAddress = builder.mailAddress;
+        this.rawPostAddress = builder.rawPostAddress;
         this.postAddress = builder.postAddress;
         this.emailAddress = builder.emailAddress;
         this.phoneNumber = builder.phoneNumber;
@@ -38,8 +38,8 @@ public class ApplyChannel implements ValueObject<ApplyChannel> {
         this.additionalInfo = builder.additionalInfo;
     }
 
-    public String getMailAddress() {
-        return mailAddress;
+    public String getRawPostAddress() {
+        return rawPostAddress;
     }
 
     public Address getPostAddress() {
@@ -71,7 +71,7 @@ public class ApplyChannel implements ValueObject<ApplyChannel> {
             return false;
         }
         ApplyChannel that = (ApplyChannel) o;
-        return Objects.equals(mailAddress, that.mailAddress) &&
+        return Objects.equals(rawPostAddress, that.rawPostAddress) &&
                 Objects.equals(postAddress, that.postAddress) &&
                 Objects.equals(emailAddress, that.emailAddress) &&
                 Objects.equals(phoneNumber, that.phoneNumber) &&
@@ -81,13 +81,13 @@ public class ApplyChannel implements ValueObject<ApplyChannel> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(mailAddress, postAddress, emailAddress, phoneNumber, formUrl, additionalInfo);
+        return Objects.hash(rawPostAddress, postAddress, emailAddress, phoneNumber, formUrl, additionalInfo);
     }
 
     @Override
     public String toString() {
         return "ApplyChannel{" +
-                "mailAddress='" + mailAddress + '\'' +
+                "rawPostAddress='" + rawPostAddress + '\'' +
                 ", postAddress='" + postAddress + '\'' +
                 ", emailAddress='" + emailAddress + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
@@ -97,7 +97,7 @@ public class ApplyChannel implements ValueObject<ApplyChannel> {
     }
 
     public static final class Builder {
-        private String mailAddress;
+        private String rawPostAddress;
         private Address postAddress;
         private String emailAddress;
         private String phoneNumber;
@@ -120,8 +120,8 @@ public class ApplyChannel implements ValueObject<ApplyChannel> {
             return new ApplyChannel(this);
         }
 
-        public Builder setMailAddress(String mailAddress) {
-            this.mailAddress = mailAddress;
+        public Builder setRawPostAddress(String rawPostAddress) {
+            this.rawPostAddress = rawPostAddress;
             return this;
         }
 
