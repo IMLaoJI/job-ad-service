@@ -141,32 +141,6 @@ public class JobAdvertisementSearchService {
                 .map(JobAdvertisementDto::toDto);
     }
 
-    public Page<JobAdvertisementDto> searchEuresJobAdvertisementsMarkedForPublication(Pageable pageable) {
-        SearchQuery query = createEuresMarkedForPublicationSearchQueryBuilder()
-                .withPageable(pageable)
-                .build();
-
-        return jobAdvertisementElasticsearchRepository.search(query)
-                .map(JobAdvertisementDocument::getJobAdvertisement)
-                .map(JobAdvertisementDto::toDto);
-    }
-
-    private NativeSearchQueryBuilder createEuresMarkedForPublicationSearchQueryBuilder() {
-        BoolQueryBuilder publishedPublicStatusFilter = boolQuery().must(
-                termsQuery(PATH_STATUS, PUBLISHED_PUBLIC.name())
-        );
-        BoolQueryBuilder euresDisplayFilter = boolQuery().must(
-                termsQuery(PATH_PUBLICATION_EURES_DISPLAY, true)
-        );
-
-        return new NativeSearchQueryBuilder().withFilter(
-                mustAll(
-                        publishedPublicStatusFilter,
-                        euresDisplayFilter
-                )
-        );
-    }
-
     private NativeSearchQueryBuilder createPeaSearchQueryBuilder(PeaJobAdvertisementSearchRequest searchRequest) {
         BoolQueryBuilder statusFilter = boolQuery()
                 .mustNot(termsQuery(PATH_STATUS, ARCHIVED.toString()));
@@ -310,12 +284,14 @@ public class JobAdvertisementSearchService {
     private QueryBuilder createFilter(JobAdvertisementSearchRequest jobSearchRequest) {
         return mustAll(
                 visibilityFilter(jobSearchRequest),
-                publicationTypeFilter(),
-                publicationStartDateFilter(jobSearchRequest),
+                suppressIfTrue(publicationTypeFilter(), jobSearchRequest.getEuresDisplay()),
+                suppressIfTrue(publicationStartDateFilter(jobSearchRequest), jobSearchRequest.getEuresDisplay()),
                 localityFilter(jobSearchRequest),
                 workingTimeFilter(jobSearchRequest),
                 contractTypeFilter(jobSearchRequest),
-                companyFilter(jobSearchRequest.getCompanyName()));
+                companyFilter(jobSearchRequest.getCompanyName()),
+                euresFilter(jobSearchRequest)
+        );
     }
 
     private BoolQueryBuilder visibilityFilter(JobAdvertisementSearchRequest jobSearchRequest) {
@@ -429,6 +405,15 @@ public class JobAdvertisementSearchService {
         return workingTimeFilter;
     }
 
+    private BoolQueryBuilder euresFilter(JobAdvertisementSearchRequest jobSearchRequest) {
+        return boolQuery().must(termsQuery(PATH_PUBLICATION_EURES_DISPLAY, Boolean.TRUE.equals(jobSearchRequest.getEuresDisplay())));
+    }
+
+    private BoolQueryBuilder suppressIfTrue(BoolQueryBuilder filter, Boolean condition) {
+        return Boolean.TRUE.equals(condition)
+                ? boolQuery()
+                : filter;
+    }
 
     private static BoolQueryBuilder mustAll(BoolQueryBuilder... queryBuilders) {
         return Stream.of(queryBuilders)

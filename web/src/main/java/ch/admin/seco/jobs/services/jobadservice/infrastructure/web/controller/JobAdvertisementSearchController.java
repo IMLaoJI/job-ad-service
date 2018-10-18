@@ -5,6 +5,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.JobAdvertisementSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.JobAdvertisementSearchService;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.PeaJobAdvertisementSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PaginationUtil;
 
 import com.codahale.metrics.annotation.Timed;
 import org.jsoup.Jsoup;
@@ -22,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PaginationUtil.generatePaginationHttpHeaders;
 import static org.springframework.util.StringUtils.hasText;
 
 @RestController
@@ -46,7 +46,7 @@ public class JobAdvertisementSearchController {
         Page<JobAdvertisementDto> resultPage = jobAdvertisementSearchService.search(jobAdvertisementSearchRequest, page, size, sort)
                 //todo: Discuss where to put the HTML cleanup. This is suboptimal concerning performance
                 .map(this::sanitizeJobDescription);
-        HttpHeaders headers = generatePaginationHttpHeaders(resultPage, "/api/_search/jobs");
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(resultPage, "/api/_search/jobs");
         return new ResponseEntity<>(resultPage.getContent(), headers, HttpStatus.OK);
     }
 
@@ -56,7 +56,7 @@ public class JobAdvertisementSearchController {
             @RequestBody @Valid PeaJobAdvertisementSearchRequest searchRequest, Pageable pageable) {
 
         Page<JobAdvertisementDto> resultPage = jobAdvertisementSearchService.searchPeaJobAdvertisements(searchRequest, pageable);
-        HttpHeaders headers = generatePaginationHttpHeaders(resultPage, "/api/_search/pea");
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(resultPage, "/api/_search/pea");
         return new ResponseEntity<>(resultPage.getContent(), headers, HttpStatus.OK);
     }
 
@@ -67,14 +67,6 @@ public class JobAdvertisementSearchController {
 
         long totalCount = jobAdvertisementSearchService.count(jobAdvertisementSearchRequest);
         return new ResponseEntity<>(Collections.singletonMap("totalCount", totalCount), HttpStatus.OK);
-    }
-
-    @GetMapping("/_search/eures")
-    @Timed
-    public ResponseEntity<List<JobAdvertisementDto>> searchEuresJobs(Pageable pageable) {
-        Page<JobAdvertisementDto> resultPage = jobAdvertisementSearchService.searchEuresJobAdvertisementsMarkedForPublication(pageable);
-        HttpHeaders headers = generatePaginationHttpHeaders(resultPage, "/api/_search/eures");
-        return new ResponseEntity<>(resultPage.getContent(), headers, HttpStatus.OK);
     }
 
     private JobAdvertisementDto sanitizeJobDescription(JobAdvertisementDto jobAdvertisementDto) {

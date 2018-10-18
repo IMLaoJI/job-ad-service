@@ -34,13 +34,11 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJobWithoutPublicDisplayAndWithoutRestrictedDisplay;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
 import static java.time.LocalDate.now;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -273,7 +271,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setKeywords(new String[]{"entwickler", "java"});
+        searchRequest.setKeywords(new String[] {"entwickler", "java"});
 
         ResultActions resultActions = mockMvc.perform(
                 post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -303,7 +301,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setKeywords(new String[]{"*extern"});
+        searchRequest.setKeywords(new String[] {"*extern"});
 
         ResultActions resultActions = mockMvc.perform(
                 post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -362,7 +360,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.BFS, DEFAULT_BFS_CODE)});
+        searchRequest.setProfessionCodes(new ProfessionCode[] {new ProfessionCode(ProfessionCodeType.BFS, DEFAULT_BFS_CODE)});
 
         ResultActions resultActions = mockMvc.perform(
                 post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -391,7 +389,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setProfessionCodes(new ProfessionCode[]{
+        searchRequest.setProfessionCodes(new ProfessionCode[] {
                 new ProfessionCode(ProfessionCodeType.X28, "1111"),
                 new ProfessionCode(ProfessionCodeType.X28, "44")
         });
@@ -430,7 +428,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setCantonCodes(new String[]{"BE"});
+        searchRequest.setCantonCodes(new String[] {"BE"});
 
         ResultActions resultActions = mockMvc.perform(
                 post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -690,9 +688,9 @@ public class JobAdvertisementSearchControllerIntTest {
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
         searchRequest.setPermanent(false);
         searchRequest.setWorkloadPercentageMin(70);
-        searchRequest.setCantonCodes(new String[]{"BE"});
-        searchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.AVAM, "avamOccupationCode")});
-        searchRequest.setKeywords(new String[]{"title"});
+        searchRequest.setCantonCodes(new String[] {"BE"});
+        searchRequest.setProfessionCodes(new ProfessionCode[] {new ProfessionCode(ProfessionCodeType.AVAM, "avamOccupationCode")});
+        searchRequest.setKeywords(new String[] {"title"});
 
         ResultActions resultActions = mockMvc.perform(
                 post(API_JOB_ADVERTISEMENTS + "/_count")
@@ -717,7 +715,10 @@ public class JobAdvertisementSearchControllerIntTest {
                         testJobAdvertisement()
                                 .setId(id)
                                 .setPublication(
-                                        testPublication().setEuresDisplay(true).build()
+                                        testPublication()
+                                                .setEuresDisplay(true)
+                                                .setPublicDisplay(true)
+                                                .build()
                                 )
                                 .setStatus(PUBLISHED_PUBLIC)
                                 .build()
@@ -726,10 +727,13 @@ public class JobAdvertisementSearchControllerIntTest {
         index(testJobAdvertisement().setId(job04.id()).build());
 
         // WHEN
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
+        searchRequest.setEuresDisplay(true);
+
         ResultActions resultActions = mockMvc.perform(
-                get(API_JOB_ADVERTISEMENTS + "/_search/eures")
+                post(API_JOB_ADVERTISEMENTS + "/_search")
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(new PeaJobAdvertisementSearchRequest()))
+                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
         );
 
         // THEN
