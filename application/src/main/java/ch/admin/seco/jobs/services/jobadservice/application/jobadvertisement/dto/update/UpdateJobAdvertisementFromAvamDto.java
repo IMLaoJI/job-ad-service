@@ -13,6 +13,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.LanguageIsoCode;
@@ -53,6 +54,8 @@ public class UpdateJobAdvertisementFromAvamDto {
     @NotNull
     private ContactDto contact;
 
+    private PublicContactDto publicContact;
+
     @NotNull
     private CreateLocationDto location;
 
@@ -71,7 +74,7 @@ public class UpdateJobAdvertisementFromAvamDto {
     public UpdateJobAdvertisementFromAvamDto(String stellennummerAvam, String title, String description, String languageIsoCode, String numberOfJobs,
                                              boolean reportingObligation, LocalDate reportingObligationEndDate, String jobCenterCode, LocalDate approvalDate,
                                              EmploymentDto employment, ApplyChannelDto applyChannel, CompanyDto company, ContactDto contact, CreateLocationDto location,
-                                             List<OccupationDto> occupations, List<LanguageSkillDto> languageSkills, PublicationDto publication) {
+                                             List<OccupationDto> occupations, List<LanguageSkillDto> languageSkills, PublicationDto publication, PublicContactDto publicContact) {
         this.stellennummerAvam = stellennummerAvam;
         this.title = title;
         this.description = description;
@@ -89,6 +92,7 @@ public class UpdateJobAdvertisementFromAvamDto {
         this.occupations = occupations;
         this.languageSkills = languageSkills;
         this.publication = publication;
+        this.publicContact = publicContact;
     }
 
     public String getStellennummerAvam() {
@@ -227,4 +231,11 @@ public class UpdateJobAdvertisementFromAvamDto {
         this.publication = publication;
     }
 
+    public PublicContactDto getPublicContact() {
+        return publicContact;
+    }
+
+    public void setPublicContact(PublicContactDto publicContact) {
+        this.publicContact = publicContact;
+    }
 }

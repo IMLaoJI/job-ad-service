@@ -19,6 +19,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
@@ -82,7 +83,13 @@ public class CreateJobAdvertisementFromAvamDtoTestFixture {
                         .setLanguageIsoCode("de")
                         .setSpokenLevel(PROFICIENT)
                         .setWrittenLevel(PROFICIENT)),
-                publicationDto
+                publicationDto,
+                new PublicContactDto()
+                    .setSalutation(Salutation.MR)
+                    .setFirstName("man")
+                    .setLastName("contact")
+                    .setEmail("contact@man.example")
+                    .setPhone("+41319999999")
         );
     }
 

@@ -6,6 +6,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromAvamDto;
@@ -38,7 +39,8 @@ public class UpdateJobAdvertisementFromAvamDtoTestFixture {
                 locationDto,
                 OccupationDto.toDto(jobContent.getOccupations()),
                 LanguageSkillDto.toDto(jobContent.getLanguageSkills()),
-                PublicationDto.toDto(jobAdvertisement.getPublication())
+                PublicationDto.toDto(jobAdvertisement.getPublication()),
+                PublicContactDto.toDto(jobContent.getPublicContact())
         );
     }
 

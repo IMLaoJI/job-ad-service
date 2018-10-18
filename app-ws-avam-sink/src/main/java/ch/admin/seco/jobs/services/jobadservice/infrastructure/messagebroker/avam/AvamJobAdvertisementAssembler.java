@@ -83,6 +83,7 @@ public class AvamJobAdvertisementAssembler {
         fillLocation(avamJobAdvertisement, jobContent.getLocation());
         fillOccupation(avamJobAdvertisement, jobContent.getOccupations());
         fillLangaugeSkills(avamJobAdvertisement, jobContent.getLanguageSkills());
+        fillPublicContact(avamJobAdvertisement, jobContent.getPublicContact());
 
         avamJobAdvertisement.setMeldepflicht(jobAdvertisement.isReportingObligation());
         avamJobAdvertisement.setSperrfrist(formatLocalDate(jobAdvertisement.getReportingObligationEndDate()));
@@ -133,10 +134,10 @@ public class AvamJobAdvertisementAssembler {
         }
         avamJobAdvertisement.setBewerSchriftlich(hasText(applyChannel.getMailAddress()));
         avamJobAdvertisement.setBewerElektronisch(hasText(applyChannel.getEmailAddress()) || hasText(applyChannel.getFormUrl()));
-        avamJobAdvertisement.setUntEmail(applyChannel.getEmailAddress());
-        avamJobAdvertisement.setUntUrl(applyChannel.getFormUrl()); // actually used for 'Online Bewerbung' instead 'home page'
+        avamJobAdvertisement.setBewerUntEmail(applyChannel.getEmailAddress());
+        avamJobAdvertisement.setBewerUntUrl(applyChannel.getFormUrl()); // actually used for 'Online Bewerbung' instead 'home page'
         avamJobAdvertisement.setBewerTelefonisch(hasText(applyChannel.getPhoneNumber()));
-        avamJobAdvertisement.setUntTelefon(applyChannel.getPhoneNumber());
+        avamJobAdvertisement.setBewerUntTelefon(applyChannel.getPhoneNumber());
         avamJobAdvertisement.setBewerAngaben(applyChannel.getAdditionalInfo());
     }
 
@@ -177,6 +178,17 @@ public class AvamJobAdvertisementAssembler {
         // FIXME: Temparory fix for mulitple email-addresses. to be remove after 01.09.2018 or handled otherwise
         avamJobAdvertisement.setKpEmail(fetchFirstEmail(contact.getEmail()));
         //avamJobAdvertisement.setKpEmail(contact.getEmail());
+    }
+
+    private void fillPublicContact(TOsteEgov avamJobAdvertisement, PublicContact contact) {
+        if (contact == null) {
+            return;
+        }
+        avamJobAdvertisement.setKpFragenAnredeCode(AvamCodeResolver.SALUTATIONS.getLeft(contact.getSalutation()));
+        avamJobAdvertisement.setKpFragenVorname(contact.getFirstName());
+        avamJobAdvertisement.setKpFragenName(contact.getLastName());
+        avamJobAdvertisement.setKpFragenTelefonNr(contact.getPhone());
+        avamJobAdvertisement.setKpFragenEmail(fetchFirstEmail(contact.getEmail()));
     }
 
     static String fetchFirstEmail(String email) {
