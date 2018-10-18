@@ -9,21 +9,25 @@ import java.util.Objects;
 @Access(AccessType.FIELD)
 public class Address {
 
+    // TODO @Size(max = 255)
     private String name;
 
+    // TODO @Size(max = 60)
     private String street;
 
     // TODO @Size(max = 10)
     private String houseNumber;
 
+    // TODO @Size(max = 10)
     private String postalCode;
 
     // TODO @Size(max = 100)
     private String city;
 
-    // TODO @Size(max = 10)
+    // TODO @Size(max = 20)
     private String postOfficeBoxNumber;
 
+    // TODO @Size(max = 10)
     private String postOfficeBoxPostalCode;
 
     // TODO @Size(max = 100)
