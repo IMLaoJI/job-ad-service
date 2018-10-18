@@ -130,7 +130,7 @@ public class JobContent implements ValueObject<JobContent> {
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "mailAddress", column = @Column(name = "APPLY_CHANNEL_MAIL_ADDRESS")),
+            @AttributeOverride(name = "rawPostAddress", column = @Column(name = "APPLY_CHANNEL_RAW_POST_ADDRESS")),
             @AttributeOverride(name = "postAddress.name", column = @Column(name = "APPLY_CHANNEL_POST_ADDRESS_NAME")),
             @AttributeOverride(name = "postAddress.street", column = @Column(name = "APPLY_CHANNEL_POST_ADDRESS_STREET")),
             @AttributeOverride(name = "postAddress.houseNumber", column = @Column(name = "APPLY_CHANNEL_POST_ADDRESS_HOUSE_NUMBER")),
@@ -150,7 +150,7 @@ public class JobContent implements ValueObject<JobContent> {
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "mailAddress", column = @Column(name = "DISPLAY_APPLY_CHANNEL_MAIL_ADDRESS")),
+            @AttributeOverride(name = "rawPostAddress", column = @Column(name = "DISPLAY_APPLY_CHANNEL_RAW_POST_ADDRESS")),
             @AttributeOverride(name = "postAddress.name", column = @Column(name = "DISPLAY_APPLY_CHANNEL_POST_ADDRESS_NAME")),
             @AttributeOverride(name = "postAddress.street", column = @Column(name = "DISPLAY_APPLY_CHANNEL_POST_ADDRESS_STREET")),
             @AttributeOverride(name = "postAddress.houseNumber", column = @Column(name = "DISPLAY_APPLY_CHANNEL_POST_ADDRESS_HOUSE_NUMBER")),
