@@ -14,10 +14,15 @@ import java.util.Objects;
 public class ApplyChannel implements ValueObject<ApplyChannel> {
 
     private String mailAddress;
+
     private Address postAddress;
+
     private String emailAddress;
+
     private String phoneNumber;
+
     private String formUrl;
+
     private String additionalInfo;
 
     protected ApplyChannel() {

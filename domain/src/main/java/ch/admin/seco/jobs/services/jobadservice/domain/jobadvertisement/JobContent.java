@@ -151,6 +151,15 @@ public class JobContent implements ValueObject<JobContent> {
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "mailAddress", column = @Column(name = "DISPLAY_APPLY_CHANNEL_MAIL_ADDRESS")),
+            @AttributeOverride(name = "postAddress.name", column = @Column(name = "DISPLAY_APPLY_CHANNEL_POST_ADDRESS_NAME")),
+            @AttributeOverride(name = "postAddress.street", column = @Column(name = "DISPLAY_APPLY_CHANNEL_POST_ADDRESS_STREET")),
+            @AttributeOverride(name = "postAddress.houseNumber", column = @Column(name = "DISPLAY_APPLY_CHANNEL_POST_ADDRESS_HOUSE_NUMBER")),
+            @AttributeOverride(name = "postAddress.postalCode", column = @Column(name = "DISPLAY_APPLY_CHANNEL_POST_ADDRESS_POSTAL_CODE")),
+            @AttributeOverride(name = "postAddress.city", column = @Column(name = "DISPLAY_APPLY_CHANNEL_POST_ADDRESS_CITY")),
+            @AttributeOverride(name = "postAddress.postOfficeBoxNumber", column = @Column(name = "DISPLAY_APPLY_CHANNEL_POST_ADDRESS_POST_OFFICE_BOX_NUMBER")),
+            @AttributeOverride(name = "postAddress.postOfficeBoxPostalCode", column = @Column(name = "DISPLAY_APPLY_CHANNEL_POST_ADDRESS_POST_OFFICE_BOX_POSTAL_CODE")),
+            @AttributeOverride(name = "postAddress.postOfficeBoxCity", column = @Column(name = "DISPLAY_APPLY_CHANNEL_POST_ADDRESS_POST_OFFICE_BOX_CITY")),
+            @AttributeOverride(name = "postAddress.countryIsoCode", column = @Column(name = "DISPLAY_APPLY_CHANNEL_POST_ADDRESS_COUNTRY_ISO_CODE")),
             @AttributeOverride(name = "emailAddress", column = @Column(name = "DISPLAY_APPLY_CHANNEL_EMAIL_ADDRESS")),
             @AttributeOverride(name = "phoneNumber", column = @Column(name = "DISPLAY_APPLY_CHANNEL_PHONE_NUMBER")),
             @AttributeOverride(name = "formUrl", column = @Column(name = "DISPLAY_APPLY_CHANNEL_FORM_URL")),

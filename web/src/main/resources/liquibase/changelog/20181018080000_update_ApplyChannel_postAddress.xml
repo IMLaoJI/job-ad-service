@@ -17,5 +17,19 @@
         </addColumn>
     </changeSet>
 
+    <changeSet author="just" id="20181018080000-2">
+        <addColumn tableName="JOB_ADVERTISEMENT">
+            <column name="DISPLAY_APPLY_CHANNEL_POST_ADDRESS_NAME" type="VARCHAR(255)"/>
+            <column name="DISPLAY_APPLY_CHANNEL_POST_ADDRESS_STREET" type="VARCHAR(60)"/>
+            <column name="DISPLAY_APPLY_CHANNEL_POST_ADDRESS_HOUSE_NUMBER" type="VARCHAR(10)"/>
+            <column name="DISPLAY_APPLY_CHANNEL_POST_ADDRESS_POSTAL_CODE" type="VARCHAR(10)"/>
+            <column name="DISPLAY_APPLY_CHANNEL_POST_ADDRESS_CITY" type="VARCHAR(100)"/>
+            <column name="DISPLAY_APPLY_CHANNEL_POST_ADDRESS_POST_OFFICE_BOX_NUMBER" type="VARCHAR(20)"/>
+            <column name="DISPLAY_APPLY_CHANNEL_POST_ADDRESS_POST_OFFICE_BOX_POSTAL_CODE" type="VARCHAR(10)"/>
+            <column name="DISPLAY_APPLY_CHANNEL_POST_ADDRESS_POST_OFFICE_BOX_CITY" type="VARCHAR(100)"/>
+            <column name="DISPLAY_APPLY_CHANNEL_POST_ADDRESS_COUNTRY_ISO_CODE" type="VARCHAR(2)"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
 
