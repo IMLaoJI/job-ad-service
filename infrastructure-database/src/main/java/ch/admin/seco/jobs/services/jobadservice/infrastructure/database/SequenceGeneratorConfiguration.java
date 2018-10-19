@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.H2SequenceMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.PostgreSQLSequenceMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.PostgresSequenceMaxValueIncrementer;
 
 import javax.sql.DataSource;
 
@@ -38,7 +38,7 @@ public class SequenceGeneratorConfiguration {
         if (driverClassName.toUpperCase().contains("H2")) {
             return new H2SequenceMaxValueIncrementer(dataSource, stellennummerEgovGeneratorSequenceName);
         } else if (driverClassName.toUpperCase().contains("POSTGRESQL")) {
-            return new PostgreSQLSequenceMaxValueIncrementer(dataSource, stellennummerEgovGeneratorSequenceName);
+            return new PostgresSequenceMaxValueIncrementer(dataSource, stellennummerEgovGeneratorSequenceName);
         } else {
             throw new NotImplementedException(String.format("Implementation is not found for: %s", driverClassName));
         }

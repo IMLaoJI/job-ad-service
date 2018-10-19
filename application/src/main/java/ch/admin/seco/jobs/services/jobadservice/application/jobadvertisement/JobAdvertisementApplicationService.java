@@ -718,7 +718,7 @@ public class JobAdvertisementApplicationService {
     private ApplyChannel toApplyChannel(ApplyChannelDto applyChannelDto) {
         if (applyChannelDto != null) {
             return new ApplyChannel.Builder()
-                    .setMailAddress(applyChannelDto.getMailAddress())
+                    .setRawPostAddress(applyChannelDto.getMailAddress())
                     .setEmailAddress(applyChannelDto.getEmailAddress())
                     .setPhoneNumber(applyChannelDto.getPhoneNumber())
                     .setFormUrl(applyChannelDto.getFormUrl())

@@ -64,7 +64,7 @@ public class ApplyChannelDto {
             return null;
         }
         ApplyChannelDto applyChannelDto = new ApplyChannelDto();
-        applyChannelDto.setMailAddress(displayApplyChannel.getMailAddress());
+        applyChannelDto.setMailAddress(displayApplyChannel.getRawPostAddress());
         applyChannelDto.setEmailAddress(displayApplyChannel.getEmailAddress());
         applyChannelDto.setPhoneNumber(displayApplyChannel.getPhoneNumber());
         applyChannelDto.setFormUrl(displayApplyChannel.getFormUrl());

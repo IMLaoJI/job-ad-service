@@ -101,7 +101,7 @@ public class DataSourceConfig {
         return builder
                 .dataSource(jobAdServiceDataSource())
                 .packages(JobAdvertisement.class)
-                .properties(jpaProperties.getHibernateProperties(new HibernateSettings().ddlAuto("none")))
+                .properties(jpaProperties.getHibernateProperties(new HibernateSettings().ddlAuto(() -> "none")))
                 .persistenceUnit("job-ad")
                 .build();
     }
