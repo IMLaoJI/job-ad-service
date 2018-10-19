@@ -23,7 +23,7 @@ public class CompanyFixture {
                 .setStreet("street")
                 .setPostalCode("postalCode")
                 .setCity("city")
-                .setCountryIsoCode("ch")
+                .setCountryIsoCode("CH")
 //                setHouseNumber("houseNumber").
 //                setPostOfficeBoxNumber("postOfficeBoxNumber").
 //                setPostOfficeBoxPostalCode("postOfficeBoxPostalCode").
