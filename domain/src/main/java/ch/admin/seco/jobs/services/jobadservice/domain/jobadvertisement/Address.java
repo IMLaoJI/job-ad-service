@@ -13,7 +13,6 @@ import java.util.Objects;
 public class Address {
 
     // TODO @Size(max = 255)
-    @NotBlank
     private String name;
 
     // TODO @Size(max = 60)
