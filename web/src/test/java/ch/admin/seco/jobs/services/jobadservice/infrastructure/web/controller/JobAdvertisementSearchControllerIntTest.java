@@ -37,6 +37,8 @@ import static java.time.LocalDate.now;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.core.CombinableMatcher.both;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -47,9 +49,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.stream.Stream;
 
+import org.hamcrest.Matchers;
+import org.hamcrest.core.CombinableMatcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import reactor.util.function.Tuples;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -73,7 +78,6 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Language
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageSkill;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Location;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.JobAdvertisementSearchRequest;
@@ -709,22 +713,28 @@ public class JobAdvertisementSearchControllerIntTest {
     @Test
     public void shouldSearchEuresJobAdvertisementsMarkedForPublication() throws Exception {
         // GIVEN
-        Stream.of(job01, job02, job03)
-                .map(JobAdvertisementIdFixture::id)
-                .forEach(id -> index(
+        // id, publicDisplay, restrictedDisplay, euresDisplay
+        Stream.of(
+                Tuples.of(job01, true, true, true),
+                Tuples.of(job02, false, true, true),
+                Tuples.of(job03, true, false, true),
+                Tuples.of(job04, true, true, false),
+                Tuples.of(job05, false, true, false),
+                Tuples.of(job06, true, false, false))
+                .forEach(jobAdParam -> index(
                         testJobAdvertisement()
-                                .setId(id)
+                                .setId(jobAdParam.getT1().id())
                                 .setPublication(
                                         testPublication()
-                                                .setEuresDisplay(true)
-                                                .setPublicDisplay(true)
+                                                .setPublicDisplay(jobAdParam.getT2())
+                                                .setRestrictedDisplay(jobAdParam.getT3())
+                                                .setEuresDisplay(jobAdParam.getT4())
                                                 .build()
                                 )
                                 .setStatus(PUBLISHED_PUBLIC)
                                 .build()
                         )
                 );
-        index(testJobAdvertisement().setId(job04.id()).build());
 
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
@@ -742,11 +752,15 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
                 .andExpect(jsonPath("$.[*].id").value(
-                        containsInAnyOrder(
+                        both(containsInAnyOrder(
                                 job02.name(),
                                 job01.name(),
                                 job03.name())
-                ));
+                        ).and(not(containsInAnyOrder(
+                                job04.name(),
+                                job05.name(),
+                                job06.name())
+                        ))));
     }
 
     private void index(JobAdvertisement jobAdvertisement) {
