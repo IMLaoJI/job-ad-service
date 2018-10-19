@@ -1,8 +1,11 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.CountryIsoCode;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Embeddable;
+import javax.validation.constraints.NotBlank;
 import java.util.Objects;
 
 @Embeddable
@@ -10,6 +13,7 @@ import java.util.Objects;
 public class Address {
 
     // TODO @Size(max = 255)
+    @NotBlank
     private String name;
 
     // TODO @Size(max = 60)
@@ -34,6 +38,7 @@ public class Address {
     private String postOfficeBoxCity;
 
     // TODO @Size(max = 2)
+    @CountryIsoCode
     private String countryIsoCode;
 
     protected Address() {
