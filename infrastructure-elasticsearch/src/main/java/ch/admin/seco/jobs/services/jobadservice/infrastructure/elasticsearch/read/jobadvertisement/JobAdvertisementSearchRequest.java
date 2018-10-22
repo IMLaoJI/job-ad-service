@@ -26,6 +26,7 @@ public class JobAdvertisementSearchRequest {
     @Max(60)
     private Integer onlineSince;
     private Boolean displayRestricted;
+    private Boolean euresDisplay;
 
     public String getLanguage() {
         return language;
@@ -123,6 +124,14 @@ public class JobAdvertisementSearchRequest {
         this.displayRestricted = displayRestricted;
     }
 
+    public Boolean getEuresDisplay() {
+        return euresDisplay;
+    }
+
+    public void setEuresDisplay(Boolean euresDisplay) {
+        this.euresDisplay = euresDisplay;
+    }
+
     @Override
     public String toString() {
         return "JobAdvertisementSearchRequest{" +
@@ -138,6 +147,7 @@ public class JobAdvertisementSearchRequest {
                 ", companyName='" + companyName + '\'' +
                 ", onlineSince=" + onlineSince +
                 ", displayRestricted=" + displayRestricted +
+                ", euresDisplay=" + euresDisplay +
                 '}';
     }
 }

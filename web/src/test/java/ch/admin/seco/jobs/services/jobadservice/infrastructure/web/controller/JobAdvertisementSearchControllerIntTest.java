@@ -1,7 +1,10 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.API;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.EXTERN;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture.testJobAdvertisement;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job02;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job03;
@@ -28,12 +31,16 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithoutPublicDisplayAndWithRestrictedDisplay;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithoutPublicDisplayAndWithoutRestrictedDisplay;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJob;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJobWithoutPublicDisplayAndWithoutRestrictedDisplay;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJobWithoutPublicDisplayAndWithRestrictedDisplay;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJobWithoutPublicDisplayAndWithoutRestrictedDisplay;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createArchivedJob;
 import static java.time.LocalDate.now;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.core.CombinableMatcher.both;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,9 +49,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.stream.Stream;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import reactor.util.function.Tuples;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -266,7 +276,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setKeywords(new String[]{"entwickler", "java"});
+        searchRequest.setKeywords(new String[] {"entwickler", "java"});
 
         ResultActions resultActions = mockMvc.perform(
                 post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -296,7 +306,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setKeywords(new String[]{"*extern"});
+        searchRequest.setKeywords(new String[] {"*extern"});
 
         ResultActions resultActions = mockMvc.perform(
                 post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -423,7 +433,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setCantonCodes(new String[]{"BE"});
+        searchRequest.setCantonCodes(new String[] {"BE"});
 
         ResultActions resultActions = mockMvc.perform(
                 post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -683,9 +693,9 @@ public class JobAdvertisementSearchControllerIntTest {
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
         searchRequest.setPermanent(false);
         searchRequest.setWorkloadPercentageMin(70);
-        searchRequest.setCantonCodes(new String[]{"BE"});
-        searchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.AVAM, "avamOccupationCode")});
-        searchRequest.setKeywords(new String[]{"title"});
+        searchRequest.setCantonCodes(new String[] {"BE"});
+        searchRequest.setProfessionCodes(new ProfessionCode[] {new ProfessionCode(ProfessionCodeType.AVAM, "avamOccupationCode")});
+        searchRequest.setKeywords(new String[] {"title"});
 
         ResultActions resultActions = mockMvc.perform(
                 post(API_JOB_ADVERTISEMENTS + "/_count")
@@ -701,8 +711,123 @@ public class JobAdvertisementSearchControllerIntTest {
         ;
     }
 
+    @Test
+    public void shouldSearchEuresJobAdvertisementsMarkedForPublication() throws Exception {
+        // GIVEN
+        // id, publicDisplay, restrictedDisplay, euresDisplay
+        Stream.of(
+                Tuples.of(job01, true, true, true, PUBLISHED_PUBLIC),
+                Tuples.of(job02, false, true, true, PUBLISHED_PUBLIC),
+                Tuples.of(job03, true, false, true, PUBLISHED_PUBLIC),
+                Tuples.of(job04, true, false, true, PUBLISHED_RESTRICTED),
+                Tuples.of(job05, true, true, false, PUBLISHED_PUBLIC),
+                Tuples.of(job06, false, true, false, PUBLISHED_PUBLIC),
+                Tuples.of(job07, true, false, false, PUBLISHED_PUBLIC),
+                Tuples.of(job08, true, false, false, PUBLISHED_RESTRICTED)
+        )
+                .forEach(jobAdParam -> index(
+                        testJobAdvertisement()
+                                .setId(jobAdParam.getT1().id())
+                                .setPublication(
+                                        testPublication()
+                                                .setPublicDisplay(jobAdParam.getT2())
+                                                .setRestrictedDisplay(jobAdParam.getT3())
+                                                .setEuresDisplay(jobAdParam.getT4())
+                                                .build()
+                                )
+                                .setStatus(jobAdParam.getT5())
+                                .build()
+                        )
+                );
+
+        // WHEN
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
+        searchRequest.setEuresDisplay(true);
+
+        ResultActions resultActions = mockMvc.perform(
+                post(API_JOB_ADVERTISEMENTS + "/_search")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
+        );
+
+        // THEN
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "3"))
+                .andExpect(jsonPath("$.[*].id").value(
+                        both(containsInAnyOrder(
+                                job01.name(),
+                                job02.name(),
+                                job03.name())
+                        ).and(not(containsInAnyOrder(
+                                job04.name(),
+                                job05.name(),
+                                job06.name(),
+                                job07.name(),
+                                job08.name())
+                        ))));
+    }
+
+    @Test
+    public void shouldSearchNotEuresJobAdvertisements() throws Exception {
+        // GIVEN
+        // id, publicDisplay, restrictedDisplay, euresDisplay
+        Stream.of(
+                Tuples.of(job01, true, true, true, PUBLISHED_PUBLIC),
+                Tuples.of(job02, false, true, true, PUBLISHED_PUBLIC),
+                Tuples.of(job03, true, false, true, PUBLISHED_PUBLIC),
+                Tuples.of(job04, true, false, true, PUBLISHED_RESTRICTED),
+                Tuples.of(job05, true, true, false, PUBLISHED_PUBLIC),
+                Tuples.of(job06, false, true, false, PUBLISHED_PUBLIC),
+                Tuples.of(job07, true, false, false, PUBLISHED_PUBLIC),
+                Tuples.of(job08, true, false, false, PUBLISHED_RESTRICTED)
+        )
+                .forEach(jobAdParam -> index(
+                        testJobAdvertisement()
+                                .setId(jobAdParam.getT1().id())
+                                .setPublication(
+                                        testPublication()
+                                                .setPublicDisplay(jobAdParam.getT2())
+                                                .setRestrictedDisplay(jobAdParam.getT3())
+                                                .setEuresDisplay(jobAdParam.getT4())
+                                                .build()
+                                )
+                                .setStatus(jobAdParam.getT5())
+                                .build()
+                        )
+                );
+
+        // WHEN
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
+        searchRequest.setEuresDisplay(false);
+
+        ResultActions resultActions = mockMvc.perform(
+                post(API_JOB_ADVERTISEMENTS + "/_search")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
+        );
+
+        // THEN
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "4"))
+                .andExpect(jsonPath("$.[*].id").value(
+                        both(containsInAnyOrder(
+                                job01.name(),
+                                job03.name(),
+                                job05.name(),
+                                job07.name())
+                        ).and(not(containsInAnyOrder(
+                                job02.name(),
+                                job04.name(),
+                                job06.name(),
+                                job08.name())
+                        ))));
+    }
+
     private void index(JobAdvertisement jobAdvertisement) {
         this.jobAdvertisementElasticsearchRepository.save(new JobAdvertisementDocument(jobAdvertisement));
-
     }
 }
