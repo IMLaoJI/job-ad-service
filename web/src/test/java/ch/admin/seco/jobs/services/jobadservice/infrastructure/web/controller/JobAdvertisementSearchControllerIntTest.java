@@ -1,6 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.API;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.EXTERN;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture.testJobAdvertisement;
@@ -49,8 +50,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.stream.Stream;
 
-import org.hamcrest.Matchers;
-import org.hamcrest.core.CombinableMatcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -305,7 +304,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setKeywords(new String[] {"*extern"});
+        searchRequest.setKeywords(new String[]{"*extern"});
 
         ResultActions resultActions = mockMvc.perform(
                 post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -364,7 +363,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setProfessionCodes(new ProfessionCode[] {new ProfessionCode(ProfessionCodeType.BFS, DEFAULT_BFS_CODE)});
+        searchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.BFS, DEFAULT_BFS_CODE)});
 
         ResultActions resultActions = mockMvc.perform(
                 post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -393,7 +392,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setProfessionCodes(new ProfessionCode[] {
+        searchRequest.setProfessionCodes(new ProfessionCode[]{
                 new ProfessionCode(ProfessionCodeType.X28, "1111"),
                 new ProfessionCode(ProfessionCodeType.X28, "44")
         });
@@ -715,12 +714,13 @@ public class JobAdvertisementSearchControllerIntTest {
         // GIVEN
         // id, publicDisplay, restrictedDisplay, euresDisplay
         Stream.of(
-                Tuples.of(job01, true, true, true),
-                Tuples.of(job02, false, true, true),
-                Tuples.of(job03, true, false, true),
-                Tuples.of(job04, true, true, false),
-                Tuples.of(job05, false, true, false),
-                Tuples.of(job06, true, false, false))
+                Tuples.of(job01, true, true, true, PUBLISHED_PUBLIC),
+                Tuples.of(job02, false, true, true, PUBLISHED_PUBLIC),
+                Tuples.of(job03, true, false, true, PUBLISHED_PUBLIC),
+                Tuples.of(job04, true, true, false, PUBLISHED_PUBLIC),
+                Tuples.of(job05, false, true, false, PUBLISHED_PUBLIC),
+                Tuples.of(job06, true, false, false, PUBLISHED_PUBLIC),
+                Tuples.of(job07, true, false, false, PUBLISHED_RESTRICTED))
                 .forEach(jobAdParam -> index(
                         testJobAdvertisement()
                                 .setId(jobAdParam.getT1().id())
@@ -731,7 +731,7 @@ public class JobAdvertisementSearchControllerIntTest {
                                                 .setEuresDisplay(jobAdParam.getT4())
                                                 .build()
                                 )
-                                .setStatus(PUBLISHED_PUBLIC)
+                                .setStatus(jobAdParam.getT5())
                                 .build()
                         )
                 );
@@ -759,7 +759,8 @@ public class JobAdvertisementSearchControllerIntTest {
                         ).and(not(containsInAnyOrder(
                                 job04.name(),
                                 job05.name(),
-                                job06.name())
+                                job06.name(),
+                                job07.name())
                         ))));
     }
 

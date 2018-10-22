@@ -1,21 +1,13 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.ARCHIVED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.ElasticsearchIndexService.TYPE_JOB_ADVERTISEMENT;
-import static org.apache.commons.lang3.ArrayUtils.*;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.elasticsearch.index.query.QueryBuilders.*;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
+import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
+import ch.admin.seco.jobs.services.jobadservice.application.security.Role;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
@@ -27,7 +19,6 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,14 +32,18 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
-import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
-import ch.admin.seco.jobs.services.jobadservice.application.security.Role;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.ARCHIVED;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.ElasticsearchIndexService.TYPE_JOB_ADVERTISEMENT;
+import static org.apache.commons.lang3.ArrayUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.elasticsearch.index.query.QueryBuilders.*;
 
 @Service
 public class JobAdvertisementSearchService {
@@ -288,18 +283,17 @@ public class JobAdvertisementSearchService {
 
     private QueryBuilder createFilter(JobAdvertisementSearchRequest jobSearchRequest) {
         return mustAll(
-                visibilityFilter(jobSearchRequest),
-                suppressIfTrue(publicationTypeFilter(), jobSearchRequest.getEuresDisplay()),
-                publicationStartDateFilter(jobSearchRequest),
+                statusFilter(jobSearchRequest),
+                displayFilter(jobSearchRequest),
+                startDateFilter(jobSearchRequest),
                 localityFilter(jobSearchRequest),
                 workingTimeFilter(jobSearchRequest),
                 contractTypeFilter(jobSearchRequest),
-                companyFilter(jobSearchRequest.getCompanyName()),
-                euresFilter(jobSearchRequest)
+                companyFilter(jobSearchRequest.getCompanyName())
         );
     }
 
-    private BoolQueryBuilder visibilityFilter(JobAdvertisementSearchRequest jobSearchRequest) {
+    private BoolQueryBuilder statusFilter(JobAdvertisementSearchRequest jobSearchRequest) {
         BoolQueryBuilder visibilityFilter = boolQuery();
 
         final JobAdvertisementStatus[] visibleStatuses;
@@ -319,31 +313,34 @@ public class JobAdvertisementSearchService {
         return visibilityFilter;
     }
 
-    private BoolQueryBuilder publicationTypeFilter() {
-        final BoolQueryBuilder publicationTypeFilter = boolQuery();
+    private BoolQueryBuilder displayFilter(JobAdvertisementSearchRequest jobSearchRequest) {
+        if (jobSearchRequest.getEuresDisplay() != null) {
+            return boolQuery()
+                    .must(termsQuery(PATH_PUBLICATION_EURES_DISPLAY, jobSearchRequest.getEuresDisplay()))
+                    .must(termQuery(PATH_STATUS, PUBLISHED_PUBLIC.name())
+                    );
+        }
 
         if (this.currentUserContext.hasRole(Role.JOBSEEKER_CLIENT)) {
-            final BoolQueryBuilder publishedPublicFilter = boolQuery()
+            BoolQueryBuilder publishedPublicFilter = boolQuery()
                     .must(termQuery(PATH_STATUS, PUBLISHED_PUBLIC.toString()))
                     .must(boolQuery()
                             .should(termQuery(PATH_PUBLICATION_PUBLIC_DISPLAY, true))
                             .should(termQuery(PATH_PUBLICATION_RESTRICTED_DISPLAY, true))
                     );
-            final BoolQueryBuilder publishedRestrictedFilter = boolQuery()
+            BoolQueryBuilder publishedRestrictedFilter = boolQuery()
                     .must(termQuery(PATH_STATUS, PUBLISHED_RESTRICTED.toString()));
 
-            publicationTypeFilter.must(boolQuery()
+            return boolQuery()
                     .should(publishedPublicFilter)
                     .should(publishedRestrictedFilter)
-            );
-        } else {
-            publicationTypeFilter.must(termQuery(PATH_PUBLICATION_PUBLIC_DISPLAY, true));
+            ;
         }
+        return boolQuery().must(termQuery(PATH_PUBLICATION_PUBLIC_DISPLAY, true));
 
-        return publicationTypeFilter;
     }
 
-    private BoolQueryBuilder publicationStartDateFilter(JobAdvertisementSearchRequest jobSearchRequest) {
+    private BoolQueryBuilder startDateFilter(JobAdvertisementSearchRequest jobSearchRequest) {
         int onlineSince = Optional.ofNullable(jobSearchRequest.getOnlineSince()).orElse(ONLINE_SINCE_DAYS);
         String publicationStartDate = String.format("now-%sd/d", onlineSince);
 
@@ -408,20 +405,6 @@ public class JobAdvertisementSearchService {
         }
 
         return workingTimeFilter;
-    }
-
-    private BoolQueryBuilder euresFilter(JobAdvertisementSearchRequest jobSearchRequest) {
-        BoolQueryBuilder euresFilter = boolQuery();
-        if (jobSearchRequest.getEuresDisplay() != null) {
-            return euresFilter.must(termsQuery(PATH_PUBLICATION_EURES_DISPLAY, jobSearchRequest.getEuresDisplay()));
-        }
-        return euresFilter;
-    }
-
-    private BoolQueryBuilder suppressIfTrue(BoolQueryBuilder filter, Boolean condition) {
-        return Boolean.TRUE.equals(condition)
-                ? boolQuery()
-                : filter;
     }
 
     private static BoolQueryBuilder mustAll(BoolQueryBuilder... queryBuilders) {
