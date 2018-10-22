@@ -34,6 +34,7 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJobWithoutPublicDisplayAndWithRestrictedDisplay;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJobWithoutPublicDisplayAndWithoutRestrictedDisplay;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createArchivedJob;
 import static java.time.LocalDate.now;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
@@ -247,6 +248,7 @@ public class JobAdvertisementSearchControllerIntTest {
         index(createJobWithDescriptionAndOwnerCompanyId(job02.id(), "java & javascript developer", "jee entwickler", "company-1"));
         index(createJobWithDescriptionAndOwnerCompanyId(job03.id(), "php programmierer", "php programierer", "company-2"));
         index(createJobWithDescriptionAndOwnerCompanyId(job04.id(), "javascript developer", "javascript developer", "company-3"));
+        index(createArchivedJob(job05.id(), "scala developer", "scala developer", "company-1"));
         PeaJobAdvertisementSearchRequest request = new PeaJobAdvertisementSearchRequest();
         request.setCompanyId("company-1");
         request.setJobTitle("developer");
@@ -262,7 +264,7 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(header().string("X-Total-Count", "2"));
+                .andExpect(header().string("X-Total-Count", "3"));
     }
 
     @Test

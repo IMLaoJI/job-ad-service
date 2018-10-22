@@ -142,14 +142,10 @@ public class JobAdvertisementSearchService {
     }
 
     private NativeSearchQueryBuilder createPeaSearchQueryBuilder(PeaJobAdvertisementSearchRequest searchRequest) {
-        BoolQueryBuilder statusFilter = boolQuery()
-                .mustNot(termsQuery(PATH_STATUS, ARCHIVED.toString()));
-
         QueryBuilder filter = mustAll(
                 titleFilter(searchRequest),
                 publicationStartDatePeaFilter(searchRequest),
-                ownerFilter(searchRequest.getCompanyId()),
-                statusFilter
+                ownerFilter(searchRequest.getCompanyId())
         );
 
         return new NativeSearchQueryBuilder()
