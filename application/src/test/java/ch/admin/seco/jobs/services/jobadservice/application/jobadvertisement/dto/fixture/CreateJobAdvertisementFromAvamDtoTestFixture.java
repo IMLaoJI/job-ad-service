@@ -11,15 +11,9 @@ import static java.time.LocalDate.now;
 import java.time.LocalDate;
 import java.util.Collections;
 
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import org.assertj.core.util.Sets;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Company;
@@ -56,7 +50,18 @@ public class CreateJobAdvertisementFromAvamDtoTestFixture {
                         .setWorkloadPercentageMax(100)
                         .setWorkForms(Sets.newHashSet()),
                 new ApplyChannelDto()
-                        .setMailAddress("mailAddress")
+                        .setRawPostAddress("rawMailAddress")
+                        .setPostAddress(new AddressDto()
+                                .setName("postAddressName")
+                                .setStreet("postAddressStreet")
+                                .setHouseNumber("postAddressHouseNumber")
+                                .setPostalCode("postAddressPostalCode")
+                                .setCity("postAddressCity")
+                                .setPostOfficeBoxNumber("postAddressPostOfficeBoxNumber")
+                                .setPostOfficeBoxPostalCode("postAddressPostOfficeBoxPostalCode")
+                                .setPostOfficeBoxCity("postAddressPostOfficeBoxCity")
+                                .setCountryIsoCode("postAddressCountryIsoCode")
+                        )
                         .setEmailAddress("emailAddress")
                         .setPhoneNumber("phoneNumber")
                         .setFormUrl("formUrl")
