@@ -17,7 +17,7 @@ public class ApplyChannelFixture {
 
     public static Builder testApplyChannel() {
         return testApplyChannelEmpty()
-            .setRawPostAddress("mailAddress")
+            .setRawPostAddress("rawMailAddress")
             .setEmailAddress("emailAddress")
             .setPhoneNumber("phoneNumber")
             .setFormUrl("formUrl")
