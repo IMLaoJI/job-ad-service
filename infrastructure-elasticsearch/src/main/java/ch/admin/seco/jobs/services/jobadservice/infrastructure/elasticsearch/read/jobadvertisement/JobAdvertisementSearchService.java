@@ -314,7 +314,7 @@ public class JobAdvertisementSearchService {
     }
 
     private BoolQueryBuilder displayFilter(JobAdvertisementSearchRequest jobSearchRequest) {
-        if (jobSearchRequest.getEuresDisplay() != null) {
+        if (jobSearchRequest.getEuresDisplay() != null && jobSearchRequest.getEuresDisplay()) {
             return boolQuery()
                     .must(termsQuery(PATH_PUBLICATION_EURES_DISPLAY, jobSearchRequest.getEuresDisplay()))
                     .must(termQuery(PATH_STATUS, PUBLISHED_PUBLIC.name())
@@ -337,7 +337,6 @@ public class JobAdvertisementSearchService {
             ;
         }
         return boolQuery().must(termQuery(PATH_PUBLICATION_PUBLIC_DISPLAY, true));
-
     }
 
     private BoolQueryBuilder startDateFilter(JobAdvertisementSearchRequest jobSearchRequest) {

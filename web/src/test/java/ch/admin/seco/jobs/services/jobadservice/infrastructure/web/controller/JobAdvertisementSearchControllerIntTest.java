@@ -304,7 +304,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setKeywords(new String[]{"*extern"});
+        searchRequest.setKeywords(new String[] {"*extern"});
 
         ResultActions resultActions = mockMvc.perform(
                 post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -717,10 +717,12 @@ public class JobAdvertisementSearchControllerIntTest {
                 Tuples.of(job01, true, true, true, PUBLISHED_PUBLIC),
                 Tuples.of(job02, false, true, true, PUBLISHED_PUBLIC),
                 Tuples.of(job03, true, false, true, PUBLISHED_PUBLIC),
-                Tuples.of(job04, true, true, false, PUBLISHED_PUBLIC),
-                Tuples.of(job05, false, true, false, PUBLISHED_PUBLIC),
-                Tuples.of(job06, true, false, false, PUBLISHED_PUBLIC),
-                Tuples.of(job07, true, false, false, PUBLISHED_RESTRICTED))
+                Tuples.of(job04, true, false, true, PUBLISHED_RESTRICTED),
+                Tuples.of(job05, true, true, false, PUBLISHED_PUBLIC),
+                Tuples.of(job06, false, true, false, PUBLISHED_PUBLIC),
+                Tuples.of(job07, true, false, false, PUBLISHED_PUBLIC),
+                Tuples.of(job08, true, false, false, PUBLISHED_RESTRICTED)
+        )
                 .forEach(jobAdParam -> index(
                         testJobAdvertisement()
                                 .setId(jobAdParam.getT1().id())
@@ -753,14 +755,73 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(header().string("X-Total-Count", "3"))
                 .andExpect(jsonPath("$.[*].id").value(
                         both(containsInAnyOrder(
-                                job02.name(),
                                 job01.name(),
+                                job02.name(),
                                 job03.name())
                         ).and(not(containsInAnyOrder(
                                 job04.name(),
                                 job05.name(),
                                 job06.name(),
+                                job07.name(),
+                                job08.name())
+                        ))));
+    }
+
+    @Test
+    public void shouldSearchNotEuresJobAdvertisements() throws Exception {
+        // GIVEN
+        // id, publicDisplay, restrictedDisplay, euresDisplay
+        Stream.of(
+                Tuples.of(job01, true, true, true, PUBLISHED_PUBLIC),
+                Tuples.of(job02, false, true, true, PUBLISHED_PUBLIC),
+                Tuples.of(job03, true, false, true, PUBLISHED_PUBLIC),
+                Tuples.of(job04, true, false, true, PUBLISHED_RESTRICTED),
+                Tuples.of(job05, true, true, false, PUBLISHED_PUBLIC),
+                Tuples.of(job06, false, true, false, PUBLISHED_PUBLIC),
+                Tuples.of(job07, true, false, false, PUBLISHED_PUBLIC),
+                Tuples.of(job08, true, false, false, PUBLISHED_RESTRICTED)
+        )
+                .forEach(jobAdParam -> index(
+                        testJobAdvertisement()
+                                .setId(jobAdParam.getT1().id())
+                                .setPublication(
+                                        testPublication()
+                                                .setPublicDisplay(jobAdParam.getT2())
+                                                .setRestrictedDisplay(jobAdParam.getT3())
+                                                .setEuresDisplay(jobAdParam.getT4())
+                                                .build()
+                                )
+                                .setStatus(jobAdParam.getT5())
+                                .build()
+                        )
+                );
+
+        // WHEN
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
+        searchRequest.setEuresDisplay(false);
+
+        ResultActions resultActions = mockMvc.perform(
+                post(API_JOB_ADVERTISEMENTS + "/_search")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
+        );
+
+        // THEN
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "4"))
+                .andExpect(jsonPath("$.[*].id").value(
+                        both(containsInAnyOrder(
+                                job01.name(),
+                                job03.name(),
+                                job05.name(),
                                 job07.name())
+                        ).and(not(containsInAnyOrder(
+                                job02.name(),
+                                job04.name(),
+                                job06.name(),
+                                job08.name())
                         ))));
     }
 
