@@ -69,7 +69,7 @@ public class CreateJobAdvertisementDtoTestFixture {
                         .setWrittenLevel(LanguageLevel.PROFICIENT)))
                 .setApplyChannel(
                         new ApplyChannelDto()
-                                .setRawPostAddress("rawMailAddress")
+                                .setRawPostAddress("rawPostAddress")
                                 .setPostAddress(new AddressDto()
                                         .setName("postAddressName")
                                         .setStreet("postAddressStreet")

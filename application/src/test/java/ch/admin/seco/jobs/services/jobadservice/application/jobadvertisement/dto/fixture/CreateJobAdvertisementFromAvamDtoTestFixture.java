@@ -50,7 +50,7 @@ public class CreateJobAdvertisementFromAvamDtoTestFixture {
                         .setWorkloadPercentageMax(100)
                         .setWorkForms(Sets.newHashSet()),
                 new ApplyChannelDto()
-                        .setRawPostAddress("rawMailAddress")
+                        .setRawPostAddress("rawPostAddress")
                         .setPostAddress(new AddressDto()
                                 .setName("postAddressName")
                                 .setStreet("postAddressStreet")
