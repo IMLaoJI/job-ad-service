@@ -4,7 +4,9 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.ApplyCha
 
 public class ApplyChannelDto {
 
-    private String mailAddress;
+    private String rawPostAddress;
+
+    private AddressDto postAddress;
 
     private String emailAddress;
 
@@ -14,12 +16,21 @@ public class ApplyChannelDto {
 
     private String additionalInfo;
 
-    public String getMailAddress() {
-        return mailAddress;
+    public String getRawPostAddress() {
+        return rawPostAddress;
     }
 
-    public ApplyChannelDto setMailAddress(String mailAddress) {
-        this.mailAddress = mailAddress;
+    public ApplyChannelDto setRawPostAddress(String rawPostAddress) {
+        this.rawPostAddress = rawPostAddress;
+        return this;
+    }
+
+    public AddressDto getPostAddress() {
+        return postAddress;
+    }
+
+    public ApplyChannelDto setPostAddress(AddressDto postAddress) {
+        this.postAddress = postAddress;
         return this;
     }
 
@@ -64,7 +75,8 @@ public class ApplyChannelDto {
             return null;
         }
         ApplyChannelDto applyChannelDto = new ApplyChannelDto();
-        applyChannelDto.setMailAddress(displayApplyChannel.getRawPostAddress());
+        applyChannelDto.setRawPostAddress(displayApplyChannel.getRawPostAddress());
+        applyChannelDto.setPostAddress(AddressDto.toDto(displayApplyChannel.getPostAddress()));
         applyChannelDto.setEmailAddress(displayApplyChannel.getEmailAddress());
         applyChannelDto.setPhoneNumber(displayApplyChannel.getPhoneNumber());
         applyChannelDto.setFormUrl(displayApplyChannel.getFormUrl());
