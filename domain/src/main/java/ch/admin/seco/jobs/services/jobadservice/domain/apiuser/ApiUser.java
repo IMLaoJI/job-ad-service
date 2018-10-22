@@ -3,6 +3,7 @@ package ch.admin.seco.jobs.services.jobadservice.domain.apiuser;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.Aggregate;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPublisher;
+import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.apiuser.events.ApiUserUpdatedDetailsEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.apiuser.events.ApiUserUpdatedPasswordEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.apiuser.events.ApiUserUpdatedStatusEvent;
@@ -14,7 +15,7 @@ import javax.persistence.Entity;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -47,11 +48,11 @@ public class ApiUser implements Aggregate<ApiUser, ApiUserId> {
     private boolean active;
 
     @NotNull
-    private LocalDate createDate;
+    private LocalDateTime createDate;
 
-    private LocalDate lastAccessDate;
+    private LocalDateTime lastAccessDate;
 
-    private int countLoginFailure;
+    private int loginFailureCount;
 
     protected ApiUser() {
         // For reflection libs
@@ -66,9 +67,9 @@ public class ApiUser implements Aggregate<ApiUser, ApiUserId> {
         this.technicalContactName = Condition.notBlank(builder.technicalContactName);
         this.technicalContactEmail = Condition.notBlank(builder.technicalContactEmail);
         this.active = builder.active;
-        this.createDate = Condition.notNull(builder.createDate);
-        this.lastAccessDate = null;
-        this.countLoginFailure = 0;
+        this.createDate = TimeMachine.now();
+        this.lastAccessDate = TimeMachine.now();
+        this.loginFailureCount = 0;
     }
 
     public ApiUserId getId() {
@@ -103,16 +104,16 @@ public class ApiUser implements Aggregate<ApiUser, ApiUserId> {
         return active;
     }
 
-    public LocalDate getCreateDate() {
+    public LocalDateTime getCreateDate() {
         return createDate;
     }
 
-    public LocalDate getLastAccessDate() {
+    public LocalDateTime getLastAccessDate() {
         return lastAccessDate;
     }
 
-    public int getCountLoginFailure() {
-        return countLoginFailure;
+    public int getLoginFailureCount() {
+        return loginFailureCount;
     }
 
     @Override
@@ -154,16 +155,18 @@ public class ApiUser implements Aggregate<ApiUser, ApiUserId> {
         DomainEventPublisher.publish(new ApiUserUpdatedPasswordEvent(this));
     }
 
-    public void changeLastAccessDate(LocalDate lastAccessDate) {
-        this.lastAccessDate = lastAccessDate;
+    public void touch() {
+        this.lastAccessDate = TimeMachine.now();
     }
 
     public void resetCountLoginFailure() {
-        this.countLoginFailure = 0;
+        this.loginFailureCount = 0;
+        touch();
     }
 
     public void incrementCountLoginFailure() {
-        this.countLoginFailure++;
+        this.loginFailureCount++;
+        touch();
     }
 
     public static final class Builder {
@@ -175,7 +178,6 @@ public class ApiUser implements Aggregate<ApiUser, ApiUserId> {
         private String technicalContactName;
         private String technicalContactEmail;
         private boolean active;
-        private LocalDate createDate;
 
         public Builder() {
         }
@@ -221,11 +223,6 @@ public class ApiUser implements Aggregate<ApiUser, ApiUserId> {
 
         public Builder setActive(boolean active) {
             this.active = active;
-            return this;
-        }
-
-        public Builder setCreateDate(LocalDate createDate) {
-            this.createDate = createDate;
             return this;
         }
 

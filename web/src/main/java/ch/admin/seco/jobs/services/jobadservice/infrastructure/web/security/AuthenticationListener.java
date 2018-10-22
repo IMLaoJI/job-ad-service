@@ -1,6 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.security;
 
-import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
+import ch.admin.seco.jobs.services.jobadservice.domain.apiuser.ApiUser;
 import ch.admin.seco.jobs.services.jobadservice.domain.apiuser.ApiUserId;
 import ch.admin.seco.jobs.services.jobadservice.domain.apiuser.ApiUserRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.config.JobAdServiceSecurityProperties;
@@ -34,41 +34,35 @@ public class AuthenticationListener implements ApplicationListener<AbstractAuthe
     @Transactional
     public void onApplicationEvent(AbstractAuthenticationEvent event) {
         if (event instanceof AuthenticationFailureBadCredentialsEvent) {
-            onAuthenticationFailureBadCredentialsEvent(event);
+            onAuthenticationFailureBadCredentialsEvent((AuthenticationFailureBadCredentialsEvent)event);
         } else if (event instanceof AuthenticationSuccessEvent) {
-            onAuthenticationSuccessEvent(event);
+            onAuthenticationSuccessEvent((AuthenticationSuccessEvent)event);
         }
     }
 
-    private void onAuthenticationFailureBadCredentialsEvent(AbstractAuthenticationEvent event) {
-        extractApiUserId(event)
-                .flatMap(apiUserRepository::findById)
+    private void onAuthenticationFailureBadCredentialsEvent(AuthenticationFailureBadCredentialsEvent event) {
+        extractApiUser(event)
                 .ifPresent(apiUser -> {
                     LOG.warn("API-User " + apiUser.getUsername() + " with bad credentials");
-                    apiUser.changeLastAccessDate(TimeMachine.now().toLocalDate());
                     apiUser.incrementCountLoginFailure();
-                    if (apiUser.getCountLoginFailure() >= jobAdServiceSecurityProperties.getApiUserMaxLoginAttempts()) {
+                    if (apiUser.getLoginFailureCount() >= jobAdServiceSecurityProperties.getApiUserMaxLoginAttempts()) {
                         LOG.warn("API-User " + apiUser.getUsername() + " is inactivated due to many bad credentials");
                         apiUser.changeStatus(false);
                     }
                 });
     }
 
-    private void onAuthenticationSuccessEvent(AbstractAuthenticationEvent event) {
-        extractApiUserId(event)
-                .flatMap(apiUserRepository::findById)
-                .ifPresent(apiUser -> {
-                    apiUser.changeLastAccessDate(TimeMachine.now().toLocalDate());
-                    apiUser.resetCountLoginFailure();
-                });
+    private void onAuthenticationSuccessEvent(AuthenticationSuccessEvent event) {
+        extractApiUser(event)
+                .ifPresent(ApiUser::resetCountLoginFailure);
     }
 
-    private Optional<ApiUserId> extractApiUserId(AbstractAuthenticationEvent event) {
+    private Optional<ApiUser> extractApiUser(AbstractAuthenticationEvent event) {
         Authentication authentication = event.getAuthentication();
         if (authentication.getPrincipal() instanceof UserDetailsToCurrentUserAdapter) {
             String userId = ((UserDetailsToCurrentUserAdapter) authentication.getPrincipal())
                     .getCurrentUser().getUserId();
-            return Optional.of(new ApiUserId(userId));
+            return apiUserRepository.findById(new ApiUserId(userId));
         }
         return Optional.empty();
     }

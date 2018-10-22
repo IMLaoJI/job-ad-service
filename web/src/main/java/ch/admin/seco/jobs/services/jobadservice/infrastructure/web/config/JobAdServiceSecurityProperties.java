@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "jobadservice.security")
 public class JobAdServiceSecurityProperties {
 
-    private int apiUserMaxLoginAttempts = 5;
+    private int apiUserMaxLoginAttempts = 100;
 
     public int getApiUserMaxLoginAttempts() {
         return apiUserMaxLoginAttempts;

@@ -2,7 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.application.apiuser.dto;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.apiuser.ApiUser;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class ApiUserDto {
     private String id;
@@ -12,14 +12,14 @@ public class ApiUserDto {
     private String technicalContactName;
     private String technicalContactEmail;
     private boolean active;
-    private LocalDate createDate;
-    private LocalDate lastAccessDate;
+    private LocalDateTime createDate;
+    private LocalDateTime lastAccessDate;
 
     protected ApiUserDto() {
         // For reflection libs
     }
 
-    public ApiUserDto(String id, String username, String companyName, String companyEmail, String technicalContactName, String technicalContactEmail, boolean active, LocalDate createDate, LocalDate lastAccessDate) {
+    public ApiUserDto(String id, String username, String companyName, String companyEmail, String technicalContactName, String technicalContactEmail, boolean active, LocalDateTime createDate, LocalDateTime lastAccessDate) {
         this.id = id;
         this.username = username;
         this.companyName = companyName;
@@ -87,19 +87,19 @@ public class ApiUserDto {
         this.active = active;
     }
 
-    public LocalDate getCreateDate() {
+    public LocalDateTime getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(LocalDate createDate) {
+    public void setCreateDate(LocalDateTime createDate) {
         this.createDate = createDate;
     }
 
-    public LocalDate getLastAccessDate() {
+    public LocalDateTime getLastAccessDate() {
         return lastAccessDate;
     }
 
-    public void setLastAccessDate(LocalDate lastAccessDate) {
+    public void setLastAccessDate(LocalDateTime lastAccessDate) {
         this.lastAccessDate = lastAccessDate;
     }
 
