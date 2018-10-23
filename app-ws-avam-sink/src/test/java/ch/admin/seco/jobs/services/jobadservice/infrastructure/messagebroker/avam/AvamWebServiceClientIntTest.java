@@ -2,6 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.av
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +83,12 @@ public class AvamWebServiceClientIntTest {
                                 .setTitle("title")
                                 .setDescription(description)
                                 .build()))
+                        .setLocation(new Location.Builder()
+                                .setPostalCode("3006")
+                                .setCity("Bern")
+                                .setCountryIsoCode("ch")
+                                .build()
+                        )
                         .setCompany(new Company.Builder<>()
                                 .setName("companyName")
                                 .setStreet("companyStreet")

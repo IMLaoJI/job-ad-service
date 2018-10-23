@@ -14,6 +14,14 @@ import java.util.Collections;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import org.assertj.core.util.Sets;
 
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Company;
@@ -87,7 +95,13 @@ public class CreateJobAdvertisementFromAvamDtoTestFixture {
                         .setLanguageIsoCode("de")
                         .setSpokenLevel(PROFICIENT)
                         .setWrittenLevel(PROFICIENT)),
-                publicationDto
+                publicationDto,
+                new PublicContactDto()
+                    .setSalutation(Salutation.MR)
+                    .setFirstName("man")
+                    .setLastName("contact")
+                    .setEmail("contact@man.example")
+                    .setPhone("+41319999999")
         );
     }
 

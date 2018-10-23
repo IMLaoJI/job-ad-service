@@ -3,17 +3,22 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.validation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cglib.core.Local;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -30,117 +35,127 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.Su
 @ActiveProfiles("test")
 public class ValidationMessagesTest {
 
-    @Autowired
-    private Validator validator;
+	@Autowired
+	private Validator validator;
 
-    @Test
-    public void testValidateWithMessage() {
-        // given
-        DummyClass dummyClass = new DummyClass();
-        dummyClass.name = " ";
-        dummyClass.supportedLanguageIsoCode = "xx";
-        dummyClass.number = 99;
-        dummyClass.countryCode = "de";
-        dummyClass.languageIsoCode = "de-ch";
-        BeanPropertyBindingResult ls = new BeanPropertyBindingResult(dummyClass, "ls");
+	@Before
+	public void setUp() {
+		LocaleContextHolder.setLocale(Locale.ENGLISH);
+	}
 
-        // when
-        validator.validate(dummyClass, ls);
+	@After
+	public void tearDown() throws Exception {
+		LocaleContextHolder.resetLocaleContext();
+	}
 
-        // then
-        assertThat(ls.getErrorCount()).isEqualTo(5);
+	@Test
+	public void testValidateWithMessage() {
+		// given
+		DummyClass dummyClass = new DummyClass();
+		dummyClass.name = " ";
+		dummyClass.supportedLanguageIsoCode = "xx";
+		dummyClass.number = 99;
+		dummyClass.countryCode = "de";
+		dummyClass.languageIsoCode = "de-ch";
+		BeanPropertyBindingResult ls = new BeanPropertyBindingResult(dummyClass, "ls");
 
-        FieldError stringFieldError = ls.getFieldError("name");
-        assertThat(stringFieldError).isNotNull();
-        assertThat(stringFieldError.getDefaultMessage()).isEqualTo("must not be blank");
+		// when
+		validator.validate(dummyClass, ls);
 
-        FieldError languageIsoCodeFieldError = ls.getFieldError("supportedLanguageIsoCode");
-        assertThat(languageIsoCodeFieldError).isNotNull();
-        assertThat(languageIsoCodeFieldError.getDefaultMessage()).isEqualTo("'xx' is a unsupported language ISO-Code");
+		// then
+		assertThat(ls.getErrorCount()).isEqualTo(5);
 
-        FieldError numberFieldError = ls.getFieldError("number");
-        assertThat(numberFieldError).isNotNull();
-        assertThat(numberFieldError.getDefaultMessage()).isEqualTo("must be less than or equal to 9");
+		FieldError stringFieldError = ls.getFieldError("name");
+		assertThat(stringFieldError).isNotNull();
+		assertThat(stringFieldError.getDefaultMessage()).isEqualTo("must not be blank");
 
-        FieldError countryFieldError = ls.getFieldError("countryCode");
-        assertThat(countryFieldError).isNotNull();
-        assertThat(countryFieldError.getDefaultMessage()).contains("'de' is a invalid country ISO-Code");
+		FieldError languageIsoCodeFieldError = ls.getFieldError("supportedLanguageIsoCode");
+		assertThat(languageIsoCodeFieldError).isNotNull();
+		assertThat(languageIsoCodeFieldError.getDefaultMessage()).isEqualTo("'xx' is a unsupported language ISO-Code");
 
-        FieldError languageIsoCode = ls.getFieldError("languageIsoCode");
-        assertThat(languageIsoCode).isNotNull();
-        assertThat(languageIsoCode.getDefaultMessage()).contains("'de-ch' is a invalid language ISO-Code");
-    }
+		FieldError numberFieldError = ls.getFieldError("number");
+		assertThat(numberFieldError).isNotNull();
+		assertThat(numberFieldError.getDefaultMessage()).isEqualTo("must be less than or equal to 9");
 
-    @Test
-    public void testPhoneNumberValidationWithMessages() {
-        // given
-        PhoneValidationClass phoneValidationClass = new PhoneValidationClass();
-        phoneValidationClass.shortPhoneNumber = "+4232345";
-        phoneValidationClass.longPhoneNumber =  "+42323456789012345678";
-        phoneValidationClass.withoutPlusSign = "42312345678";
-        phoneValidationClass.containsIllegalCharacter = "+421a4567123";
-        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(phoneValidationClass, "pv");
+		FieldError countryFieldError = ls.getFieldError("countryCode");
+		assertThat(countryFieldError).isNotNull();
+		assertThat(countryFieldError.getDefaultMessage()).contains("'de' is a invalid country ISO-Code");
 
-        // when
-        validator.validate(phoneValidationClass, bindingResult);
+		FieldError languageIsoCode = ls.getFieldError("languageIsoCode");
+		assertThat(languageIsoCode).isNotNull();
+		assertThat(languageIsoCode.getDefaultMessage()).contains("'de-ch' is a invalid language ISO-Code");
+	}
 
-        // then
-        assertThat(bindingResult.getErrorCount()).isEqualTo(5);
+	@Test
+	public void testPhoneNumberValidationWithMessages() {
+		// given
+		PhoneValidationClass phoneValidationClass = new PhoneValidationClass();
+		phoneValidationClass.shortPhoneNumber = "+4232345";
+		phoneValidationClass.longPhoneNumber = "+42323456789012345678";
+		phoneValidationClass.withoutPlusSign = "42312345678";
+		phoneValidationClass.containsIllegalCharacter = "+421a4567123";
+		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(phoneValidationClass, "pv");
 
-        List<FieldError> shortPhoneNumber = bindingResult.getFieldErrors("shortPhoneNumber");
-        assertThat(shortPhoneNumber).isNotEmpty();
-        assertThat(shortPhoneNumber).hasSize(2);
+		// when
+		validator.validate(phoneValidationClass, bindingResult);
 
-        FieldError longPhoneNumber = bindingResult.getFieldError("longPhoneNumber");
-        assertThat(longPhoneNumber).isNotNull();
-        assertThat(longPhoneNumber.getDefaultMessage()).contains("Phone number length must be between 9 and 20");
+		// then
+		assertThat(bindingResult.getErrorCount()).isEqualTo(5);
 
-        FieldError withoutPlusSign = bindingResult.getFieldError("withoutPlusSign");
-        assertThat(withoutPlusSign).isNotNull();
-        assertThat(withoutPlusSign.getDefaultMessage()).contains("42312345678 doesn't match to [+][0-9]{8,} pattern");
+		List<FieldError> shortPhoneNumber = bindingResult.getFieldErrors("shortPhoneNumber");
+		assertThat(shortPhoneNumber).isNotEmpty();
+		assertThat(shortPhoneNumber).hasSize(2);
 
-        FieldError containsIllegalCharacter = bindingResult.getFieldError("containsIllegalCharacter");
-        assertThat(containsIllegalCharacter).isNotNull();
-        assertThat(containsIllegalCharacter.getDefaultMessage()).contains("+421a4567123 doesn't match to [+][0-9]{8,} pattern");
-    }
+		FieldError longPhoneNumber = bindingResult.getFieldError("longPhoneNumber");
+		assertThat(longPhoneNumber).isNotNull();
+		assertThat(longPhoneNumber.getDefaultMessage()).contains("Phone number length must be between 9 and 20");
 
-    @SpringBootApplication
-    static class TestConfig {
+		FieldError withoutPlusSign = bindingResult.getFieldError("withoutPlusSign");
+		assertThat(withoutPlusSign).isNotNull();
+		assertThat(withoutPlusSign.getDefaultMessage()).contains("42312345678 doesn't match to [+][0-9]{8,} pattern");
 
-    }
+		FieldError containsIllegalCharacter = bindingResult.getFieldError("containsIllegalCharacter");
+		assertThat(containsIllegalCharacter).isNotNull();
+		assertThat(containsIllegalCharacter.getDefaultMessage()).contains("+421a4567123 doesn't match to [+][0-9]{8,} pattern");
+	}
 
-    static class DummyClass {
+	@SpringBootApplication
+	static class TestConfig {
 
-        @NotBlank
-        String name;
+	}
 
-        @SupportedLanguageIsoCode
-        String supportedLanguageIsoCode;
+	static class DummyClass {
 
-        @Min(1)
-        @Max(9)
-        int number;
+		@NotBlank
+		String name;
 
-        @NotBlank
-        @CountryIsoCode
-        String countryCode;
+		@SupportedLanguageIsoCode
+		String supportedLanguageIsoCode;
 
-        @NotBlank
-        @LanguageIsoCode
-        String languageIsoCode;
-    }
+		@Min(1)
+		@Max(9)
+		int number;
 
-    static class PhoneValidationClass {
-        @PhoneNumber
-        String shortPhoneNumber;
+		@NotBlank
+		@CountryIsoCode
+		String countryCode;
 
-        @PhoneNumber
-        String longPhoneNumber;
+		@NotBlank
+		@LanguageIsoCode
+		String languageIsoCode;
+	}
 
-        @PhoneNumber
-        String withoutPlusSign;
+	static class PhoneValidationClass {
+		@PhoneNumber
+		String shortPhoneNumber;
 
-        @PhoneNumber
-        String containsIllegalCharacter;
-    }
+		@PhoneNumber
+		String longPhoneNumber;
+
+		@PhoneNumber
+		String withoutPlusSign;
+
+		@PhoneNumber
+		String containsIllegalCharacter;
+	}
 }

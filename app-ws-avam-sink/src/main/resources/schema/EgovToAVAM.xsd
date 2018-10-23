@@ -116,9 +116,18 @@
 			<xs:element name="untPostfachOrt" nillable="true" type="xs:string"/>
 			<xs:element name="untPostfachPlz" nillable="true" type="xs:string"/>
 			<xs:element name="untStrasse" nillable="true" type="xs:string"/>
-			<xs:element name="untTelefon" nillable="true" type="xs:string"/>
-			<xs:element name="untEmail" nillable="true" type="xs:string"/>
-			<xs:element name="untUrl" nillable="true" type="xs:string"/>
+			<xs:element name="bewerUntTelefon" nillable="true" type="xs:string"/>
+			<xs:element name="bewerUntEmail" nillable="true" type="xs:string"/>
+			<xs:element name="bewerUntUrl" nillable="true" type="xs:string"/>
+			<xs:element name="bewerUntName" nillable="true" type="xs:string"/>
+			<xs:element name="bewerUntStrasse" nillable="true" type="xs:string"/>
+			<xs:element name="bewerUntHausNr" nillable="true" type="xs:string"/>
+			<xs:element name="bewerUntPlz" nillable="true" type="xs:string"/>
+			<xs:element name="bewerUntOrt" nillable="true" type="xs:string"/>
+			<xs:element name="bewerUntPostfach" nillable="true" type="xs:string"/>
+			<xs:element name="bewerUntPostfachPlz" nillable="true" type="xs:string"/>
+			<xs:element name="bewerUntPostfachOrt" nillable="true" type="xs:string"/>
+			<xs:element name="bewerUntLand" nillable="true" type="xs:string"/>
 			<xs:element name="vertragsdauer" nillable="true" type="xs:string"/>
 			<xs:element name="waehrungCode" nillable="true" type="xs:string"/>
 			<xs:element name="anonym" nillable="false" type="xs:boolean"/>
@@ -126,14 +135,19 @@
 			<xs:element name="loginAnonym" nillable="false" type="xs:boolean"/>
 			<xs:element name="loginPublikation" nillable="false" type="xs:boolean"/>
 			<xs:element name="quelleCode" nillable="false" type="xs:string"/>
-			<xs:element name="meldepflicht" nillable="false" type="xs:boolean"/>
+			<xs:element name="meldepflicht" nillable="false" type="xs:boolean" />
 			<xs:element name="kurzeinsatz" nillable="true" type="xs:boolean"/>
 			<xs:element name="sperrfrist" nillable="true" type="xs:string"/>
-			<xs:element name="auftraggeber" nillable="false" type="xs:boolean"/>
+			<xs:element name="auftraggeber" nillable="true" type="xs:boolean"/>
 			<xs:element name="auftraggeberName" nillable="true" type="xs:string"/>
 			<xs:element name="auftraggeberPlz" nillable="true" type="xs:string"/>
 			<xs:element name="auftraggeberOrt" nillable="true" type="xs:string"/>
 			<xs:element name="auftraggeberLand" nillable="true" type="xs:string"/>
+			<xs:element name="kpFragenAnredeCode" nillable="true" type="xs:string"/>
+			<xs:element name="kpFragenName" nillable="true" type="xs:string"/>
+			<xs:element name="kpFragenVorname" nillable="true" type="xs:string"/>
+			<xs:element name="kpFragenEmail" nillable="true" type="xs:string"/>
+			<xs:element name="kpFragenTelefonNr" nillable="true" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
 
