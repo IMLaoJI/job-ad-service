@@ -1,42 +1,24 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement;
 
-import java.util.Objects;
-
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Embeddable;
-
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.ValueObject;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenterAddress;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
+import javax.validation.Valid;
+import java.util.Objects;
+
 @Embeddable
 @Access(AccessType.FIELD)
 public class Company implements ValueObject<Company> {
 
-    private String name;
-
-    private String street;
-
-    // TODO @Size(max = 10)
-    private String houseNumber;
-
-    private String postalCode;
-
-    // TODO @Size(max = 100)
-    private String city;
-
-    // TODO @Size(max = 2)
-    private String countryIsoCode;
-
-    // TODO @Size(max = 10)
-    private String postOfficeBoxNumber;
-
-    private String postOfficeBoxPostalCode;
-
-    // TODO @Size(max = 100)
-    private String postOfficeBoxCity;
+    @Embedded
+    @Valid
+    private Address address = new Address();
 
     // TODO @Size(max = 2)
     private String phone;
@@ -47,23 +29,24 @@ public class Company implements ValueObject<Company> {
 
     private boolean surrogate;
 
-
     protected Company() {
         // For reflection libs
     }
 
     private Company(Builder builder) {
-        this.name = Condition.notBlank(builder.name, "Name of a company can't be null");
-        this.street = builder.street;
-        this.houseNumber = builder.houseNumber;
-        this.postalCode = builder.postalCode;
-        this.city = builder.city;
-        //this.countryIsoCode = Condition.notBlank(builder.countryIsoCode, "Country of a company can't be null");
-        //todo: Review the countryIsoCode, because most of the jobs from x28 do not have country.
-        this.countryIsoCode = builder.countryIsoCode;
-        this.postOfficeBoxNumber = builder.postOfficeBoxNumber;
-        this.postOfficeBoxPostalCode = builder.postOfficeBoxPostalCode;
-        this.postOfficeBoxCity = builder.postOfficeBoxCity;
+        this.address = new Address.Builder()
+                .setName(Condition.notBlank(builder.name, "Name of a company can't be null"))
+                .setStreet(builder.street)
+                .setHouseNumber(builder.houseNumber)
+                .setPostalCode(builder.postalCode)
+                .setCity(builder.city)
+                //.setCountryIsoCode(ondition.notBlank(builder.countryIsoCode, "Country of a company can't be null"))
+                //todo: Review the countryIsoCode, because most of the jobs from x28 do not have country.
+                .setCountryIsoCode(builder.countryIsoCode)
+                .setPostOfficeBoxNumber(builder.postOfficeBoxNumber)
+                .setPostOfficeBoxPostalCode(builder.postOfficeBoxPostalCode)
+                .setPostOfficeBoxCity(builder.postOfficeBoxCity)
+                .build();
         this.phone = builder.phone;
         this.email = builder.email;
         this.website = builder.website;
@@ -71,39 +54,39 @@ public class Company implements ValueObject<Company> {
     }
 
     public String getName() {
-        return name;
+        return address.getName();
     }
 
     public String getStreet() {
-        return street;
+        return address.getStreet();
     }
 
     public String getHouseNumber() {
-        return houseNumber;
+        return address.getHouseNumber();
     }
 
     public String getPostalCode() {
-        return postalCode;
+        return address.getPostalCode();
     }
 
     public String getCity() {
-        return city;
-    }
-
-    public String getCountryIsoCode() {
-        return countryIsoCode;
+        return address.getCity();
     }
 
     public String getPostOfficeBoxNumber() {
-        return postOfficeBoxNumber;
+        return address.getPostOfficeBoxNumber();
     }
 
     public String getPostOfficeBoxPostalCode() {
-        return postOfficeBoxPostalCode;
+        return address.getPostOfficeBoxPostalCode();
     }
 
     public String getPostOfficeBoxCity() {
-        return postOfficeBoxCity;
+        return address.getPostOfficeBoxCity();
+    }
+
+    public String getCountryIsoCode() {
+        return address.getCountryIsoCode();
     }
 
     public String getPhone() {
@@ -124,18 +107,14 @@ public class Company implements ValueObject<Company> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Company company = (Company) o;
-        return Objects.equals(name, company.name) &&
-                Objects.equals(street, company.street) &&
-                Objects.equals(houseNumber, company.houseNumber) &&
-                Objects.equals(postalCode, company.postalCode) &&
-                Objects.equals(city, company.city) &&
-                Objects.equals(countryIsoCode, company.countryIsoCode) &&
-                Objects.equals(postOfficeBoxNumber, company.postOfficeBoxNumber) &&
-                Objects.equals(postOfficeBoxPostalCode, company.postOfficeBoxPostalCode) &&
-                Objects.equals(postOfficeBoxCity, company.postOfficeBoxCity) &&
+        return Objects.equals(address, company.address) &&
                 Objects.equals(phone, company.phone) &&
                 Objects.equals(email, company.email) &&
                 Objects.equals(website, company.website) &&
@@ -144,21 +123,13 @@ public class Company implements ValueObject<Company> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, street, houseNumber, postalCode, city, countryIsoCode, postOfficeBoxNumber, postOfficeBoxPostalCode, postOfficeBoxCity, phone, email, website, surrogate);
+        return Objects.hash(address, phone, email, website, surrogate);
     }
 
     @Override
     public String toString() {
         return "Company{" +
-                "name='" + name + '\'' +
-                ", street='" + street + '\'' +
-                ", houseNumber='" + houseNumber + '\'' +
-                ", postalCode='" + postalCode + '\'' +
-                ", city='" + city + '\'' +
-                ", countryIsoCode='" + countryIsoCode + '\'' +
-                ", postOfficeBoxNumber='" + postOfficeBoxNumber + '\'' +
-                ", postOfficeBoxPostalCode='" + postOfficeBoxPostalCode + '\'' +
-                ", postOfficeBoxCity='" + postOfficeBoxCity + '\'' +
+                "address='" + address + '\'' +
                 ", phone='" + phone + '\'' +
                 ", email='" + email + '\'' +
                 ", website='" + website + '\'' +

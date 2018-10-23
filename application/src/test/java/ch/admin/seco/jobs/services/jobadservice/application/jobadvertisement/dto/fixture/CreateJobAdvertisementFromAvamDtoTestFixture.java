@@ -11,6 +11,7 @@ import static java.time.LocalDate.now;
 import java.time.LocalDate;
 import java.util.Collections;
 
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import org.assertj.core.util.Sets;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
@@ -57,7 +58,18 @@ public class CreateJobAdvertisementFromAvamDtoTestFixture {
                         .setWorkloadPercentageMax(100)
                         .setWorkForms(Sets.newHashSet()),
                 new ApplyChannelDto()
-                        .setMailAddress("mailAddress")
+                        .setRawPostAddress("rawPostAddress")
+                        .setPostAddress(new AddressDto()
+                                .setName("postAddressName")
+                                .setStreet("postAddressStreet")
+                                .setHouseNumber("postAddressHouseNumber")
+                                .setPostalCode("postAddressPostalCode")
+                                .setCity("postAddressCity")
+                                .setPostOfficeBoxNumber("postAddressPostOfficeBoxNumber")
+                                .setPostOfficeBoxPostalCode("postAddressPostOfficeBoxPostalCode")
+                                .setPostOfficeBoxCity("postAddressPostOfficeBoxCity")
+                                .setCountryIsoCode("postAddressCountryIsoCode")
+                        )
                         .setEmailAddress("emailAddress")
                         .setPhoneNumber("phoneNumber")
                         .setFormUrl("formUrl")
