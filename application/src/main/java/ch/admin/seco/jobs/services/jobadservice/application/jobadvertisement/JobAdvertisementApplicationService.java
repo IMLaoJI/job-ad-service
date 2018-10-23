@@ -158,7 +158,7 @@ public class JobAdvertisementApplicationService {
                 .setDisplayApplyChannel(determineApplyChannel(createJobAdvertisementFromAvamDto))
                 .setDisplayCompany(determineDisplayCompany(createJobAdvertisementFromAvamDto))
                 .setCompany(company)
-                .setPublicContact(toPublicContact(createJobAdvertisementFromAvamDto.getContact()))
+                .setPublicContact(toPublicContact(createJobAdvertisementFromAvamDto.getPublicContact()))
                 .setLanguageSkills(toLanguageSkills(createJobAdvertisementFromAvamDto.getLanguageSkills()))
                 .build();
 
@@ -389,6 +389,7 @@ public class JobAdvertisementApplicationService {
                 .setApplyChannel(toApplyChannel(createJobAdvertisement.getApplyChannel()))
                 .setDisplayApplyChannel(determineApplyChannel(createJobAdvertisement))
                 .setContact(toContact(createJobAdvertisement.getContact()))
+                .setPublicContact(toPublicContact(createJobAdvertisement.getPublicContact()))
                 .setPublication(toPublication(createJobAdvertisement.getPublication()))
                 .build();
     }
@@ -416,6 +417,7 @@ public class JobAdvertisementApplicationService {
                 .setApplyChannel(toApplyChannel(updateJobAdvertisement.getApplyChannel()))
                 .setDisplayApplyChannel(determineApplyChannel(updateJobAdvertisement))
                 .setContact(toContact(updateJobAdvertisement.getContact()))
+                .setPublicContact(toPublicContact(updateJobAdvertisement.getPublicContact()))
                 .setPublication(toPublication(updateJobAdvertisement.getPublication()))
                 .build();
     }
