@@ -132,12 +132,28 @@ public class AvamJobAdvertisementAssembler {
         if (applyChannel == null) {
             return;
         }
-        avamJobAdvertisement.setBewerSchriftlich(hasText(applyChannel.getRawPostAddress()));
+
+        Address postAddress = applyChannel.getPostAddress();
+        if(postAddress != null) {
+            avamJobAdvertisement.setBewerSchriftlich(true);
+            avamJobAdvertisement.setBewerUntName(postAddress.getName());
+            avamJobAdvertisement.setBewerUntStrasse(postAddress.getStreet());
+            avamJobAdvertisement.setBewerUntHausNr(postAddress.getHouseNumber());
+            avamJobAdvertisement.setBewerUntPlz(postAddress.getPostalCode());
+            avamJobAdvertisement.setBewerUntOrt(postAddress.getCity());
+            avamJobAdvertisement.setBewerUntPostfach(postAddress.getPostOfficeBoxNumber());
+            avamJobAdvertisement.setBewerUntPostfachPlz(postAddress.getPostOfficeBoxPostalCode());
+            avamJobAdvertisement.setBewerUntPostfachOrt(postAddress.getPostOfficeBoxCity());
+            avamJobAdvertisement.setBewerUntLand(postAddress.getCountryIsoCode());
+        }
+
         avamJobAdvertisement.setBewerElektronisch(hasText(applyChannel.getEmailAddress()) || hasText(applyChannel.getFormUrl()));
         avamJobAdvertisement.setBewerUntEmail(applyChannel.getEmailAddress());
-        avamJobAdvertisement.setBewerUntUrl(applyChannel.getFormUrl()); // actually used for 'Online Bewerbung' instead 'home page'
+        avamJobAdvertisement.setBewerUntUrl(applyChannel.getFormUrl());
+
         avamJobAdvertisement.setBewerTelefonisch(hasText(applyChannel.getPhoneNumber()));
         avamJobAdvertisement.setBewerUntTelefon(applyChannel.getPhoneNumber());
+
         avamJobAdvertisement.setBewerAngaben(applyChannel.getAdditionalInfo());
     }
 
