@@ -4,11 +4,10 @@ import ch.admin.seco.jobs.services.jobadservice.application.HtmlToMarkdownConver
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Component;
 
 @Component
 public class JobAdvertisementFromApiAssembler {

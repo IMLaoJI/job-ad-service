@@ -33,32 +33,35 @@ public class JobAdvertisementApiRestController {
 
     private final JobAdvertisementFromApiAssembler jobAdvertisementFromApiAssembler;
 
+    private final JobAdvertisementToApiAssembler jobAdvertisementToApiAssembler;
+
     @Autowired
-    public JobAdvertisementApiRestController(JobAdvertisementApplicationService jobAdvertisementApplicationService, JobAdvertisementFromApiAssembler jobAdvertisementFromApiAssembler) {
+    public JobAdvertisementApiRestController(JobAdvertisementApplicationService jobAdvertisementApplicationService, JobAdvertisementFromApiAssembler jobAdvertisementFromApiAssembler, JobAdvertisementToApiAssembler jobAdvertisementToApiAssembler) {
         this.jobAdvertisementApplicationService = jobAdvertisementApplicationService;
         this.jobAdvertisementFromApiAssembler = jobAdvertisementFromApiAssembler;
+        this.jobAdvertisementToApiAssembler = jobAdvertisementToApiAssembler;
     }
 
     @PostMapping
-    public JobAdvertisementDto createFromApi(@RequestBody @Valid ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto) throws AggregateNotFoundException {
+    public ApiJobAdvertisementDto createFromApi(@RequestBody @Valid ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto) throws AggregateNotFoundException {
         CreateJobAdvertisementDto createJobAdvertisementDto = jobAdvertisementFromApiAssembler.convert(apiCreateJobAdvertisementDto);
         JobAdvertisementId jobAdvertisementId = jobAdvertisementApplicationService.createFromApi(createJobAdvertisementDto);
-        return jobAdvertisementApplicationService.getById(jobAdvertisementId);
+        return jobAdvertisementToApiAssembler.convert(jobAdvertisementApplicationService.getById(jobAdvertisementId));
     }
 
     @GetMapping
-    public PageResource<JobAdvertisementDto> getJobAdvertisements(
+    public PageResource<ApiJobAdvertisementDto> getJobAdvertisements(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "25") int size
     ) {
-        return PageResource.of(jobAdvertisementApplicationService.findOwnJobAdvertisements(PageRequest.of(page, size)));
+        return PageResource.of(jobAdvertisementToApiAssembler.convertPage(jobAdvertisementApplicationService.findOwnJobAdvertisements(PageRequest.of(page, size))));
     }
 
     @GetMapping("/{id}")
-    public JobAdvertisementDto getJobAdvertisement(
+    public ApiJobAdvertisementDto getJobAdvertisement(
             @PathVariable String id
     ) {
-        return jobAdvertisementApplicationService.getById(new JobAdvertisementId(id));
+        return jobAdvertisementToApiAssembler.convert(jobAdvertisementApplicationService.getById(new JobAdvertisementId(id)));
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
