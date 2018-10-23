@@ -164,6 +164,7 @@ public class JobAdvertisementFromApiAssembler {
         }
         return new ApplyChannelDto()
                 .setRawPostAddress(apiApplyChannel.getMailAddress())
+                .setPostAddress(AddressParser.parse(apiApplyChannel.getMailAddress()))
                 .setEmailAddress(apiApplyChannel.getEmailAddress())
                 .setPhoneNumber(apiApplyChannel.getPhoneNumber())
                 .setFormUrl(apiApplyChannel.getFormUrl())

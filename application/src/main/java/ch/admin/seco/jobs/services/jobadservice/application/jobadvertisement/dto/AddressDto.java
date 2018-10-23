@@ -115,16 +115,15 @@ public class AddressDto {
         if (address == null) {
             return null;
         }
-        AddressDto addressDto = new AddressDto();
-        addressDto.setName(address.getName());
-        addressDto.setStreet(address.getStreet());
-        addressDto.setHouseNumber(address.getHouseNumber());
-        addressDto.setPostalCode(address.getPostalCode());
-        addressDto.setCity(address.getCity());
-        addressDto.setPostOfficeBoxNumber(address.getPostOfficeBoxNumber());
-        addressDto.setPostOfficeBoxPostalCode(address.getPostOfficeBoxPostalCode());
-        addressDto.setPostOfficeBoxCity(address.getPostOfficeBoxCity());
-        addressDto.setCountryIsoCode(address.getCountryIsoCode());
-        return addressDto;
+        return new AddressDto()
+                .setName(address.getName())
+                .setStreet(address.getStreet())
+                .setHouseNumber(address.getHouseNumber())
+                .setPostalCode(address.getPostalCode())
+                .setCity(address.getCity())
+                .setPostOfficeBoxNumber(address.getPostOfficeBoxNumber())
+                .setPostOfficeBoxPostalCode(address.getPostOfficeBoxPostalCode())
+                .setPostOfficeBoxCity(address.getPostOfficeBoxCity())
+                .setCountryIsoCode(address.getCountryIsoCode());
     }
 }
