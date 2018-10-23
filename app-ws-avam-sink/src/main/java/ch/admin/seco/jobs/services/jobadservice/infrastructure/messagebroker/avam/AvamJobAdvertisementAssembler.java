@@ -134,7 +134,7 @@ public class AvamJobAdvertisementAssembler {
         }
 
         Address postAddress = applyChannel.getPostAddress();
-        if(postAddress != null) {
+        if (postAddress != null) {
             avamJobAdvertisement.setBewerSchriftlich(true);
             avamJobAdvertisement.setBewerUntName(postAddress.getName());
             avamJobAdvertisement.setBewerUntStrasse(postAddress.getStreet());
@@ -145,6 +145,8 @@ public class AvamJobAdvertisementAssembler {
             avamJobAdvertisement.setBewerUntPostfachPlz(postAddress.getPostOfficeBoxPostalCode());
             avamJobAdvertisement.setBewerUntPostfachOrt(postAddress.getPostOfficeBoxCity());
             avamJobAdvertisement.setBewerUntLand(postAddress.getCountryIsoCode());
+        } else {
+            avamJobAdvertisement.setBewerSchriftlich(hasText(applyChannel.getRawPostAddress()));
         }
 
         avamJobAdvertisement.setBewerElektronisch(hasText(applyChannel.getEmailAddress()) || hasText(applyChannel.getFormUrl()));
@@ -291,4 +293,4 @@ public class AvamJobAdvertisementAssembler {
         }
     }
 
- }
+}
