@@ -199,9 +199,9 @@ public class JobAdvertisementFromAvamAssembler {
     private ApplyChannelDto createApplyChannelDto(WSOsteEgov avamJobAdvertisement) {
         return new ApplyChannelDto()
                 .setRawPostAddress(avamJobAdvertisement.isBewerSchriftlich() ? createApplyMailAddress(avamJobAdvertisement) : null)
-                .setEmailAddress(avamJobAdvertisement.isBewerElektronisch() ? sanitizeEmail(avamJobAdvertisement.getUntEmail(), avamJobAdvertisement) : null)
-                .setPhoneNumber(avamJobAdvertisement.isBewerTelefonisch() ? sanitizePhoneNumber(avamJobAdvertisement.getUntTelefon(), avamJobAdvertisement) : null)
-                .setFormUrl(avamJobAdvertisement.isBewerElektronisch() ? sanitizeUrl(avamJobAdvertisement.getUntUrl(), avamJobAdvertisement) : null)
+                .setEmailAddress(avamJobAdvertisement.isBewerElektronisch() ? sanitizeEmail(avamJobAdvertisement.getBewerUntEmail(), avamJobAdvertisement) : null)
+                .setPhoneNumber(avamJobAdvertisement.isBewerTelefonisch() ? sanitizePhoneNumber(avamJobAdvertisement.getBewerUntTelefon(), avamJobAdvertisement) : null)
+                .setFormUrl(avamJobAdvertisement.isBewerElektronisch() ? sanitizeUrl(avamJobAdvertisement.getBewerUntUrl(), avamJobAdvertisement) : null)
                 .setAdditionalInfo(safeTrimOrNull(avamJobAdvertisement.getBewerAngaben()));
     }
 
