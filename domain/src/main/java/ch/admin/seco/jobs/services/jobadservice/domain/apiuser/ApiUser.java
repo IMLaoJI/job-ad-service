@@ -15,7 +15,7 @@ import javax.persistence.Entity;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
@@ -48,9 +48,9 @@ public class ApiUser implements Aggregate<ApiUser, ApiUserId> {
     private boolean active;
 
     @NotNull
-    private LocalDateTime createDate;
+    private LocalDate createDate;
 
-    private LocalDateTime lastAccessDate;
+    private LocalDate lastAccessDate;
 
     private int loginFailureCount;
 
@@ -67,8 +67,8 @@ public class ApiUser implements Aggregate<ApiUser, ApiUserId> {
         this.technicalContactName = Condition.notBlank(builder.technicalContactName);
         this.technicalContactEmail = Condition.notBlank(builder.technicalContactEmail);
         this.active = builder.active;
-        this.createDate = TimeMachine.now();
-        this.lastAccessDate = TimeMachine.now();
+        this.createDate = TimeMachine.now().toLocalDate();
+        this.lastAccessDate = TimeMachine.now().toLocalDate();
         this.loginFailureCount = 0;
     }
 
@@ -104,11 +104,11 @@ public class ApiUser implements Aggregate<ApiUser, ApiUserId> {
         return active;
     }
 
-    public LocalDateTime getCreateDate() {
+    public LocalDate getCreateDate() {
         return createDate;
     }
 
-    public LocalDateTime getLastAccessDate() {
+    public LocalDate getLastAccessDate() {
         return lastAccessDate;
     }
 
@@ -156,7 +156,7 @@ public class ApiUser implements Aggregate<ApiUser, ApiUserId> {
     }
 
     public void touch() {
-        this.lastAccessDate = TimeMachine.now();
+        this.lastAccessDate = TimeMachine.now().toLocalDate();
     }
 
     public void resetCountLoginFailure() {
