@@ -176,7 +176,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
     }
 
     @Test
-    public void updateFromAvamWithRepublish() {
+    public void updateFromAvamWithRefining() {
         // given
         JobAdvertisement inspectingJobAd = jobAdvertisementRepository.save(
                 testJobAdvertisement()
@@ -206,7 +206,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
 
         // then
         JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
-        assertThat(repoJobAd.getStatus()).isEqualTo(JobAdvertisementStatus.PUBLISHED_PUBLIC);
+        assertThat(repoJobAd.getStatus()).isEqualTo(JobAdvertisementStatus.REFINING);
     }
 
     @Test

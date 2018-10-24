@@ -126,7 +126,7 @@ public class JobAdvertisementApplicationService {
             if (jobAdvertisement.getStatus().equals(JobAdvertisementStatus.ARCHIVED)
                     && (jobAdvertisement.getPublication().getEndDate() != null)
                     && TimeMachine.now().toLocalDate().isBefore(jobAdvertisement.getPublication().getEndDate())) {
-                jobAdvertisement.republish();
+                jobAdvertisement.refining();
             }
             return jobAdvertisement.getId();
         }
