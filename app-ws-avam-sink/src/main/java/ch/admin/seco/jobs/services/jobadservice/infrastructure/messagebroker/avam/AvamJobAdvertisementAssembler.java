@@ -145,8 +145,6 @@ public class AvamJobAdvertisementAssembler {
             avamJobAdvertisement.setBewerUntPostfachPlz(postAddress.getPostOfficeBoxPostalCode());
             avamJobAdvertisement.setBewerUntPostfachOrt(postAddress.getPostOfficeBoxCity());
             avamJobAdvertisement.setBewerUntLand(postAddress.getCountryIsoCode());
-        } else {
-            avamJobAdvertisement.setBewerSchriftlich(hasText(applyChannel.getRawPostAddress()));
         }
 
         avamJobAdvertisement.setBewerElektronisch(hasText(applyChannel.getEmailAddress()) || hasText(applyChannel.getFormUrl()));
