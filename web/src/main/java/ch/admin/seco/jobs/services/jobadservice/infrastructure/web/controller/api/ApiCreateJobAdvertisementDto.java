@@ -62,145 +62,138 @@ public class ApiCreateJobAdvertisementDto {
     @Valid
     private ApiPublicContactDto publicContact;
 
-    protected ApiCreateJobAdvertisementDto() {
-        // For reflection libs
-    }
-
-    public ApiCreateJobAdvertisementDto(boolean reportToAvam, String externalUrl, String externalReference, ApiContactDto contact, ApiPublicationDto publication, String numberOfJobs, List<ApiJobDescriptionDto> jobDescriptions, ApiCompanyDto company, ApiEmployerDto employer, ApiEmploymentDto employment, ApiCreateLocationDto location, ApiOccupationDto occupation, List<ApiLanguageSkillDto> languageSkills, ApiApplyChannelDto applyChannel, ApiPublicContactDto publicContact) {
-        this.reportToAvam = reportToAvam;
-        this.externalUrl = externalUrl;
-        this.externalReference = externalReference;
-        this.contact = contact;
-        this.publication = publication;
-        this.numberOfJobs = numberOfJobs;
-        this.jobDescriptions = jobDescriptions;
-        this.company = company;
-        this.employer = employer;
-        this.employment = employment;
-        this.location = location;
-        this.occupation = occupation;
-        this.languageSkills = languageSkills;
-        this.applyChannel = applyChannel;
-        this.publicContact = publicContact;
-    }
-
     public boolean isReportToAvam() {
         return reportToAvam;
     }
 
-    public void setReportToAvam(boolean reportToAvam) {
+    public ApiCreateJobAdvertisementDto setReportToAvam(boolean reportToAvam) {
         this.reportToAvam = reportToAvam;
+        return this;
     }
 
     public String getExternalUrl() {
         return externalUrl;
     }
 
-    public void setExternalUrl(String externalUrl) {
+    public ApiCreateJobAdvertisementDto setExternalUrl(String externalUrl) {
         this.externalUrl = externalUrl;
+        return this;
     }
 
     public String getExternalReference() {
         return externalReference;
     }
 
-    public void setExternalReference(String externalReference) {
+    public ApiCreateJobAdvertisementDto setExternalReference(String externalReference) {
         this.externalReference = externalReference;
+        return this;
     }
 
     public ApiContactDto getContact() {
         return contact;
     }
 
-    public void setContact(ApiContactDto contact) {
+    public ApiCreateJobAdvertisementDto setContact(ApiContactDto contact) {
         this.contact = contact;
+        return this;
     }
 
     public ApiPublicationDto getPublication() {
         return publication;
     }
 
-    public void setPublication(ApiPublicationDto publication) {
+    public ApiCreateJobAdvertisementDto setPublication(ApiPublicationDto publication) {
         this.publication = publication;
+        return this;
     }
 
     public String getNumberOfJobs() {
         return numberOfJobs;
     }
 
-    public void setNumberOfJobs(String numberOfJobs) {
+    public ApiCreateJobAdvertisementDto setNumberOfJobs(String numberOfJobs) {
         this.numberOfJobs = numberOfJobs;
+        return this;
     }
 
     public List<ApiJobDescriptionDto> getJobDescriptions() {
         return jobDescriptions;
     }
 
-    public void setJobDescriptions(List<ApiJobDescriptionDto> jobDescriptions) {
+    public ApiCreateJobAdvertisementDto setJobDescriptions(List<ApiJobDescriptionDto> jobDescriptions) {
         this.jobDescriptions = jobDescriptions;
+        return this;
     }
 
     public ApiCompanyDto getCompany() {
         return company;
     }
 
-    public void setCompany(ApiCompanyDto company) {
+    public ApiCreateJobAdvertisementDto setCompany(ApiCompanyDto company) {
         this.company = company;
+        return this;
     }
 
     public ApiEmployerDto getEmployer() {
         return employer;
     }
 
-    public void setEmployer(ApiEmployerDto employer) {
+    public ApiCreateJobAdvertisementDto setEmployer(ApiEmployerDto employer) {
         this.employer = employer;
+        return this;
     }
 
     public ApiEmploymentDto getEmployment() {
         return employment;
     }
 
-    public void setEmployment(ApiEmploymentDto employment) {
+    public ApiCreateJobAdvertisementDto setEmployment(ApiEmploymentDto employment) {
         this.employment = employment;
+        return this;
     }
 
     public ApiCreateLocationDto getLocation() {
         return location;
     }
 
-    public void setLocation(ApiCreateLocationDto location) {
+    public ApiCreateJobAdvertisementDto setLocation(ApiCreateLocationDto location) {
         this.location = location;
+        return this;
     }
 
     public ApiOccupationDto getOccupation() {
         return occupation;
     }
 
-    public void setOccupation(ApiOccupationDto occupation) {
+    public ApiCreateJobAdvertisementDto setOccupation(ApiOccupationDto occupation) {
         this.occupation = occupation;
+        return this;
     }
 
     public List<ApiLanguageSkillDto> getLanguageSkills() {
         return languageSkills;
     }
 
-    public void setLanguageSkills(List<ApiLanguageSkillDto> languageSkills) {
+    public ApiCreateJobAdvertisementDto setLanguageSkills(List<ApiLanguageSkillDto> languageSkills) {
         this.languageSkills = languageSkills;
+        return this;
     }
 
     public ApiApplyChannelDto getApplyChannel() {
         return applyChannel;
     }
 
-    public void setApplyChannel(ApiApplyChannelDto applyChannel) {
+    public ApiCreateJobAdvertisementDto setApplyChannel(ApiApplyChannelDto applyChannel) {
         this.applyChannel = applyChannel;
+        return this;
     }
 
     public ApiPublicContactDto getPublicContact() {
         return publicContact;
     }
 
-    public void setPublicContact(ApiPublicContactDto publicContact) {
+    public ApiCreateJobAdvertisementDto setPublicContact(ApiPublicContactDto publicContact) {
         this.publicContact = publicContact;
+        return this;
     }
 }

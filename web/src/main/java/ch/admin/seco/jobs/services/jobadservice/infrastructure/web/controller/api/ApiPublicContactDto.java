@@ -1,10 +1,12 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.api;
 
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.PublicContact;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.PhoneNumber;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 public class ApiPublicContactDto {
 
@@ -12,82 +14,62 @@ public class ApiPublicContactDto {
     private Salutation salutation;
 
     @NotBlank
-    @Size(max=50)
+    @Size(max = 50)
     private String firstName;
 
     @NotBlank
-    @Size(max=50)
+    @Size(max = 50)
     private String lastName;
 
     @PhoneNumber
     private String phone;
 
-    @Size(max=50)
+    @Size(max = 50)
     @Email
     private String email;
-
-    protected ApiPublicContactDto() {
-        // For reflection libs
-    }
-
-    public ApiPublicContactDto(Salutation salutation, String firstName, String lastName, String phone, String email) {
-        this.salutation = salutation;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phone = phone;
-        this.email = email;
-    }
-
-    public static ApiPublicContactDto toDto(PublicContact publicContact) {
-        if (publicContact == null) {
-            return null;
-        }
-        ApiPublicContactDto publicContactDto = new ApiPublicContactDto();
-        publicContactDto.setSalutation(publicContact.getSalutation());
-        publicContactDto.setFirstName(publicContact.getFirstName());
-        publicContactDto.setLastName(publicContact.getLastName());
-        publicContactDto.setPhone(publicContact.getPhone());
-        publicContactDto.setEmail(publicContact.getEmail());
-        return publicContactDto;
-    }
 
     public Salutation getSalutation() {
         return salutation;
     }
 
-    public void setSalutation(Salutation salutation) {
+    public ApiPublicContactDto setSalutation(Salutation salutation) {
         this.salutation = salutation;
+        return this;
     }
 
     public String getFirstName() {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
+    public ApiPublicContactDto setFirstName(String firstName) {
         this.firstName = firstName;
+        return this;
     }
 
     public String getLastName() {
         return lastName;
     }
 
-    public void setLastName(String lastName) {
+    public ApiPublicContactDto setLastName(String lastName) {
         this.lastName = lastName;
+        return this;
     }
 
     public String getPhone() {
         return phone;
     }
 
-    public void setPhone(String phone) {
+    public ApiPublicContactDto setPhone(String phone) {
         this.phone = phone;
+        return this;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
+    public ApiPublicContactDto setEmail(String email) {
         this.email = email;
+        return this;
     }
 }
