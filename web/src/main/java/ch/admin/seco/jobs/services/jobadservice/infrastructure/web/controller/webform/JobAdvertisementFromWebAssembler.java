@@ -18,6 +18,7 @@ public class JobAdvertisementFromWebAssembler {
         createJobAdvertisementFromWebDto.getJobDescriptions()
                 .forEach(jobDescription -> jobDescription.setDescription(this.htmlToMarkdownConverter.convert(jobDescription.getDescription())));
         return new CreateJobAdvertisementDto()
+                .setReportToAvam(true)
                 .setApplyChannel(createJobAdvertisementFromWebDto.getApplyChannel())
                 .setCompany(createJobAdvertisementFromWebDto.getCompany())
                 .setContact(createJobAdvertisementFromWebDto.getContact())

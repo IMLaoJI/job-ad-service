@@ -126,7 +126,7 @@ public class JobAdvertisementApplicationService {
             if (jobAdvertisement.getStatus().equals(JobAdvertisementStatus.ARCHIVED)
                     && (jobAdvertisement.getPublication().getEndDate() != null)
                     && TimeMachine.now().toLocalDate().isBefore(jobAdvertisement.getPublication().getEndDate())) {
-                jobAdvertisement.republish();
+                jobAdvertisement.refining();
             }
             return jobAdvertisement.getId();
         }
@@ -554,7 +554,7 @@ public class JobAdvertisementApplicationService {
                 employment
         );
 
-        String jobCenterCode = jobCenterService.findJobCenterCode(location.getCountryIsoCode(), location.getPostalCode());
+        String jobCenterCode = determineJobCenterCode(reportingObligation, createJobAdvertisementDto.isReportToAvam(), location);
 
         Company company = toCompany(createJobAdvertisementDto.getCompany());
         JobContent jobContent = new JobContent.Builder()
@@ -654,6 +654,12 @@ public class JobAdvertisementApplicationService {
             return reportingObligationService.hasReportingObligation(ProfessionCodeType.AVAM, avamOccupationCode, cantonCode);
         }
         return false;
+    }
+
+    private String determineJobCenterCode(boolean reportingObligation, boolean reportToAvam, Location location) {
+        return reportingObligation || reportToAvam
+                ? jobCenterService.findJobCenterCode(location.getCountryIsoCode(), location.getPostalCode())
+                : null;
     }
 
     private List<JobDescription> toJobDescriptions(List<JobDescriptionDto> jobDescriptionDtos) {

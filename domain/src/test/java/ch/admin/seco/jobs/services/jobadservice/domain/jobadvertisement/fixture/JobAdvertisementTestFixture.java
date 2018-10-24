@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture;
 
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.ARCHIVED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.EXTERN;
@@ -213,6 +214,30 @@ public class JobAdvertisementTestFixture {
 
     }
 
+    public static JobAdvertisement createRestrictedJobWithoutPublicDisplayAndWithoutRestrictedDisplay(JobAdvertisementId jobAdvertisementId) {
+        return new JobAdvertisement.Builder()
+                .setId(jobAdvertisementId)
+                .setSourceSystem(JOBROOM)
+                .setStatus(PUBLISHED_RESTRICTED)
+                .setOwner(OwnerFixture.of(jobAdvertisementId).build())
+                .setPublication(testPublication().build())
+                .setJobContent(JobContentFixture.of(jobAdvertisementId).build())
+                .setReportingObligation(true)
+                .build();
+    }
+
+    public static JobAdvertisement createRestrictedJobWithoutPublicDisplayAndWithRestrictedDisplay(JobAdvertisementId jobAdvertisementId) {
+        return new JobAdvertisement.Builder()
+                .setId(jobAdvertisementId)
+                .setSourceSystem(JOBROOM)
+                .setStatus(PUBLISHED_RESTRICTED)
+                .setOwner(OwnerFixture.of(jobAdvertisementId).build())
+                .setPublication(testPublication().setRestrictedDisplay(true).build())
+                .setJobContent(JobContentFixture.of(jobAdvertisementId).build())
+                .setReportingObligation(true)
+                .build();
+    }
+
     public static JobAdvertisement createJobWithContractType(JobAdvertisementId jobAdvertisementId, boolean isPermanent) {
         return testJobAdvertisementWithContent(jobAdvertisementId, JobContentFixture.of(jobAdvertisementId)
                 .setEmployment(
@@ -270,6 +295,27 @@ public class JobAdvertisementTestFixture {
                                                 : asList(languageSkills))
                                 .build())
                 .build();
+    }
+
+    public static JobAdvertisement createArchivedJob(JobAdvertisementId jobAdvertisementId, String title, String description, String companyId) {
+        final Owner owner = OwnerFixture.of(jobAdvertisementId)
+                .setCompanyId(companyId)
+                .build();
+        return new JobAdvertisement.Builder()
+                .setId(jobAdvertisementId)
+                .setSourceSystem(JOBROOM)
+                .setStatus(ARCHIVED)
+                .setOwner(owner)
+                .setPublication(testPublication().setPublicDisplay(true).build())
+                .setJobContent(
+                        JobContentFixture.of(jobAdvertisementId)
+                                .setJobDescriptions(singletonList(testJobDescription()
+                                        .setDescription(description)
+                                        .setTitle(title)
+                                        .build()))
+                                .setLanguageSkills(singletonList(testLanguageSkill().build()))
+                                .build()
+                ).build();
     }
 
     public static JobAdvertisement createJobWithWorkload(JobAdvertisementId jobAdvertisementId, int workloadPercentageMin, int workloadPercentageMax) {

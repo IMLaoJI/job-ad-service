@@ -6,6 +6,7 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.rea
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.JobAdvertisementSearchService;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.PeaJobAdvertisementSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PaginationUtil;
+
 import com.codahale.metrics.annotation.Timed;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
