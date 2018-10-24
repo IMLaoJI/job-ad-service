@@ -5,7 +5,7 @@
 
     <changeSet author="fago" id="20181005080000-1">
         <addColumn tableName="API_USER">
-            <column name="COUNT_LOGIN_FAILURE" type="INT" defaultValue="0">
+            <column name="LOGIN_FAILURE_COUNT" type="INT" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
