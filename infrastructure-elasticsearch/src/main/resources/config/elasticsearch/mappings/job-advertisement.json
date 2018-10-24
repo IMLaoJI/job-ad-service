@@ -32,8 +32,39 @@
                   "formUrl": {
                     "type": "text"
                   },
-                  "mailAddress": {
+                  "rawPostAddress": {
                     "type": "text"
+                  },
+                  "postAddress": {
+                    "properties": {
+                      "name": {
+                        "type": "text"
+                      },
+                      "street": {
+                        "type": "text"
+                      },
+                      "houseNumber": {
+                        "type": "keyword"
+                      },
+                      "postalCode": {
+                        "type": "keyword"
+                      },
+                      "city": {
+                        "type": "text"
+                      },
+                      "countryIsoCode": {
+                        "type": "keyword"
+                      },
+                      "postOfficeBoxNumber": {
+                        "type": "keyword"
+                      },
+                      "postOfficeBoxPostalCode": {
+                        "type": "keyword"
+                      },
+                      "postOfficeBoxCity": {
+                        "type": "keyword"
+                      }
+                    }
                   },
                   "phoneNumber": {
                     "type": "keyword"
@@ -65,6 +96,9 @@
                     "type": "keyword"
                   },
                   "postOfficeBoxPostalCode": {
+                    "type": "keyword"
+                  },
+                  "postOfficeBoxCity": {
                     "type": "keyword"
                   },
                   "phone": {
