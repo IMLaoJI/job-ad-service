@@ -1,6 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.JOB_AD_EVENT_CHANNEL;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.JOB_AD_INT_EVENT_CHANNEL;
 
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.context.annotation.Bean;
@@ -23,8 +23,8 @@ public class MessageBrokerConfig {
     @Profile(ProfileRegistry.AVAM_MOCK)
     static class MockedMessageBroker {
 
-        @Bean(JOB_AD_EVENT_CHANNEL)
-        MessageChannel jobAdEventChannel() {
+        @Bean(JOB_AD_INT_EVENT_CHANNEL)
+        MessageChannel jobAdEventIntChannel() {
             return new NullChannel();
             // use QueueChannel to catch messages
             // or trigger a mocked response, which will be received by the StreamListener

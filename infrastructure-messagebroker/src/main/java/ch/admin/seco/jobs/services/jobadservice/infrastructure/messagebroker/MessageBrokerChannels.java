@@ -13,11 +13,16 @@ public interface MessageBrokerChannels {
     String CANCEL_CONDITION = "headers['action']=='CANCEL'";
     String CREATE_FROM_AVAM_CONDITION = "headers['action']=='CREATE_FROM_AVAM'";
 
-    String JOB_AD_ACTION_CHANNEL = "job-ad-action";
     String JOB_AD_EVENT_CHANNEL = "job-ad-event";
 
-    @Input(JOB_AD_ACTION_CHANNEL)
-    SubscribableChannel jobAdActionChannel();
+    String JOB_AD_INT_ACTION_CHANNEL = "job-ad-int-action";
+    String JOB_AD_INT_EVENT_CHANNEL = "job-ad-int-event";
+
+    @Input(JOB_AD_INT_ACTION_CHANNEL)
+    SubscribableChannel jobAdIntActionChannel();
+
+    @Output(JOB_AD_INT_EVENT_CHANNEL)
+    MessageChannel jobAdIntEventChannel();
 
     @Output(JOB_AD_EVENT_CHANNEL)
     MessageChannel jobAdEventChannel();

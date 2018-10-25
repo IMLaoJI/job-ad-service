@@ -1,6 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.JOB_AD_EVENT_CHANNEL;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.JOB_AD_INT_EVENT_CHANNEL;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +15,7 @@ public class AvamConfig {
     @Bean
     public AvamService avamService(
             JobAdvertisementApplicationService jobAdvertisementApplicationService,
-            @Qualifier(JOB_AD_EVENT_CHANNEL) MessageChannel jobAdEventChannel) {
+            @Qualifier(JOB_AD_INT_EVENT_CHANNEL) MessageChannel jobAdEventChannel) {
         return new AvamService(jobAdvertisementApplicationService, jobAdEventChannel);
     }
 }
