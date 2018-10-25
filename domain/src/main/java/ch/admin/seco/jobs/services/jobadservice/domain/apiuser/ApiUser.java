@@ -7,6 +7,8 @@ import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.apiuser.events.ApiUserUpdatedDetailsEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.apiuser.events.ApiUserUpdatedPasswordEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.apiuser.events.ApiUserUpdatedStatusEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
@@ -20,6 +22,8 @@ import java.util.Objects;
 
 @Entity
 public class ApiUser implements Aggregate<ApiUser, ApiUserId> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ApiUser.class);
 
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "ID"))
@@ -167,6 +171,15 @@ public class ApiUser implements Aggregate<ApiUser, ApiUserId> {
     public void incrementCountLoginFailure() {
         this.loginFailureCount++;
         touch();
+    }
+
+    public void invalidLoginAttempt(int maxLoginAttempts) {
+        LOG.warn("API-User " + username + " with bad credentials");
+        incrementCountLoginFailure();
+        if (loginFailureCount >= maxLoginAttempts) {
+            LOG.warn("API-User " + username + " is inactivated due to many bad credentials");
+            changeStatus(false);
+        }
     }
 
     public static final class Builder {

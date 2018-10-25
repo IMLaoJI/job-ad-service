@@ -34,22 +34,15 @@ public class AuthenticationListener implements ApplicationListener<AbstractAuthe
     @Transactional
     public void onApplicationEvent(AbstractAuthenticationEvent event) {
         if (event instanceof AuthenticationFailureBadCredentialsEvent) {
-            onAuthenticationFailureBadCredentialsEvent((AuthenticationFailureBadCredentialsEvent)event);
+            onAuthenticationFailureBadCredentialsEvent((AuthenticationFailureBadCredentialsEvent) event);
         } else if (event instanceof AuthenticationSuccessEvent) {
-            onAuthenticationSuccessEvent((AuthenticationSuccessEvent)event);
+            onAuthenticationSuccessEvent((AuthenticationSuccessEvent) event);
         }
     }
 
     private void onAuthenticationFailureBadCredentialsEvent(AuthenticationFailureBadCredentialsEvent event) {
         extractApiUser(event)
-                .ifPresent(apiUser -> {
-                    LOG.warn("API-User " + apiUser.getUsername() + " with bad credentials");
-                    apiUser.incrementCountLoginFailure();
-                    if (apiUser.getLoginFailureCount() >= jobAdServiceSecurityProperties.getApiUserMaxLoginAttempts()) {
-                        LOG.warn("API-User " + apiUser.getUsername() + " is inactivated due to many bad credentials");
-                        apiUser.changeStatus(false);
-                    }
-                });
+                .ifPresent(apiUser -> apiUser.invalidLoginAttempt(jobAdServiceSecurityProperties.getApiUserMaxLoginAttempts()));
     }
 
     private void onAuthenticationSuccessEvent(AuthenticationSuccessEvent event) {
