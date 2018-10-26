@@ -1,16 +1,18 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.events;
 
-import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventType;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.validation.annotation.Validated;
-
-import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-@ConfigurationProperties("domainEventGateway")
+import javax.validation.constraints.NotNull;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
+
+import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventType;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents;
+
+@ConfigurationProperties("domain-event-gateway")
 @Validated
 public class DomainEventGatewayProperties {
 
