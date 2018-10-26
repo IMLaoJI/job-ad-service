@@ -39,8 +39,8 @@ class DomainEventGateway {
         this.messageChannel.send(
                 MessageBuilder
                         .withPayload(jobAdvertisementEventDto)
-                        .setHeader(PARTITION_KEY, jobAdvertisementEventDto.getAggregateId())
-                        .setHeader(RELEVANT_ID, jobAdvertisementEventDto.getAggregateId())
+                        .setHeader(PARTITION_KEY, jobAdvertisementEventDto.getId())
+                        .setHeader(RELEVANT_ID, jobAdvertisementEventDto.getId())
                         .setHeader(EVENT, jobAdvertisementEventDto.getEventType())
                         .setHeader(SOURCE_SYSTEM, JOB_AD_SERVICE.name())
                         .setHeader(PAYLOAD_TYPE, JobAdvertisementEventDto.class.getSimpleName())

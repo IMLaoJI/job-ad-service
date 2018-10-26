@@ -4,7 +4,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 
 public class JobAdvertisementEventDto {
 
-    private String aggregateId;
+    private String id;
 
     private String eventType;
 
@@ -12,17 +12,17 @@ public class JobAdvertisementEventDto {
 
     static JobAdvertisementEventDto from(String id, String eventType, JobAdvertisementStatus status) {
         return new JobAdvertisementEventDto()
-                .setAggregateId(id)
+                .setId(id)
                 .setEventType(eventType)
                 .setStatus(status);
     }
 
-    public String getAggregateId() {
-        return aggregateId;
+    public String getId() {
+        return id;
     }
 
-    public JobAdvertisementEventDto setAggregateId(String aggregateId) {
-        this.aggregateId = aggregateId;
+    public JobAdvertisementEventDto setId(String id) {
+        this.id = id;
         return this;
     }
 
