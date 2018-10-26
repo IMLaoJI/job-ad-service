@@ -1,6 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker;
 
-import ch.admin.seco.jobs.services.jobadservice.application.ProfileRegistry;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,17 +9,19 @@ import org.springframework.integration.channel.NullChannel;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.SubscribableChannel;
 
+import ch.admin.seco.jobs.services.jobadservice.application.ProfileRegistry;
+
 @Configuration
 public class MessageBrokerConfig {
 
     @Configuration
-    @Profile('!' + ProfileRegistry.AVAM_MOCK)
+    @Profile('!' + ProfileRegistry.MESSAGE_BROKER_MOCK)
     @EnableBinding(MessageBrokerChannels.class)
     static class DefaultMessageBroker {
     }
 
     @Configuration
-    @Profile(ProfileRegistry.AVAM_MOCK)
+    @Profile(ProfileRegistry.MESSAGE_BROKER_MOCK)
     static class MockedMessageBroker {
         @Bean
         MessageBrokerChannels messageBrokerChannels() {
