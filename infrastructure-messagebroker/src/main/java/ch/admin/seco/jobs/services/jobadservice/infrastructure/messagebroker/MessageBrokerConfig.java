@@ -1,15 +1,14 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.JOB_AD_INT_EVENT_CHANNEL;
-
+import ch.admin.seco.jobs.services.jobadservice.application.ProfileRegistry;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.NullChannel;
 import org.springframework.messaging.MessageChannel;
-
-import ch.admin.seco.jobs.services.jobadservice.application.ProfileRegistry;
+import org.springframework.messaging.SubscribableChannel;
 
 @Configuration
 public class MessageBrokerConfig {
@@ -17,17 +16,30 @@ public class MessageBrokerConfig {
     @Configuration
     @Profile('!' + ProfileRegistry.AVAM_MOCK)
     @EnableBinding(MessageBrokerChannels.class)
-    static class DefaultMessageBroker {}
+    static class DefaultMessageBroker {
+    }
 
     @Configuration
     @Profile(ProfileRegistry.AVAM_MOCK)
     static class MockedMessageBroker {
+        @Bean
+        MessageBrokerChannels messageBrokerChannels() {
+            return new MessageBrokerChannels() {
+                @Override
+                public SubscribableChannel jobAdIntActionChannel() {
+                    return new DirectChannel();
+                }
 
-        @Bean(JOB_AD_INT_EVENT_CHANNEL)
-        MessageChannel jobAdEventIntChannel() {
-            return new NullChannel();
-            // use QueueChannel to catch messages
-            // or trigger a mocked response, which will be received by the StreamListener
+                @Override
+                public MessageChannel jobAdIntEventChannel() {
+                    return new NullChannel();
+                }
+
+                @Override
+                public MessageChannel jobAdEventChannel() {
+                    return new NullChannel();
+                }
+            };
         }
     }
 }

@@ -16,6 +16,7 @@ public interface MessageBrokerChannels {
     String JOB_AD_EVENT_CHANNEL = "job-ad-event";
 
     String JOB_AD_INT_ACTION_CHANNEL = "job-ad-int-action";
+
     String JOB_AD_INT_EVENT_CHANNEL = "job-ad-int-event";
 
     @Input(JOB_AD_INT_ACTION_CHANNEL)
