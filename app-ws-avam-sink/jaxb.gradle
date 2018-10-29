@@ -13,6 +13,8 @@ task genJaxb {
 
     outputs.dir classesDir
 
+    System.setProperty('javax.xml.accessExternalSchema', 'all')
+
     doLast() {
         project.ant {
             taskdef name: 'xjc', classname: 'com.sun.tools.xjc.XJCTask', classpath: configurations.jaxb.asPath
@@ -21,6 +23,9 @@ task genJaxb {
 
             xjc(destdir: sourcesDir, 'package': 'ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam') {
                 schema(dir: schemaDir, includes: '*.wsdl')
+                binding(dir: schemaDir) {
+                    include(name: 'bindings.xjb')
+                }
                 arg(value: '-wsdl')
                 produces(dir: sourcesDir, includes: '**/*.java')
             }

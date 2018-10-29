@@ -6,6 +6,8 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.WSArbeits
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.WSArbeitsformArray;
 import org.springframework.util.Assert;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -290,5 +292,4 @@ public class AvamJobAdvertisementAssembler {
             avamJobAdvertisement.setSk5SchriftlichCode(AvamCodeResolver.LANGUAGE_LEVEL.getLeft(languageSkill.getWrittenLevel()));
         }
     }
-
 }
