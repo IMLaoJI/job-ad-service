@@ -1,13 +1,11 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
-import ch.admin.seco.jobs.services.jobadservice.application.ProfileRegistry;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.source.InsertOste;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.source.InsertOsteResponse;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.source.WSOsteEgov;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Profile;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
@@ -19,6 +17,7 @@ import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
 
 import static org.springframework.util.StringUtils.hasText;
+import static org.springframework.util.StringUtils.trimWhitespace;
 
 @Endpoint
 public class AvamEndpoint {
@@ -84,7 +83,7 @@ public class AvamEndpoint {
     }
 
     private boolean isRejected(WSOsteEgov avamJobAdvertisement) {
-        return isFromJobroom(avamJobAdvertisement) && (avamJobAdvertisement.getAblehnungGrundCode() != null);
+        return isFromJobroom(avamJobAdvertisement) && hasText(avamJobAdvertisement.getAblehnungGrundCode());
     }
 
     private boolean isCancelled(WSOsteEgov avamJobAdvertisement) {
@@ -100,8 +99,9 @@ public class AvamEndpoint {
     }
 
     private boolean isFromJobroom(WSOsteEgov avamJobAdvertisement) {
-        return (AvamCodeResolver.SOURCE_SYSTEM.getLeft(SourceSystem.JOBROOM).equals(avamJobAdvertisement.getQuelleCode())
-                || AvamCodeResolver.SOURCE_SYSTEM.getLeft(SourceSystem.API).equals(avamJobAdvertisement.getQuelleCode()));
+        String quelleCode = trimWhitespace(avamJobAdvertisement.getQuelleCode());
+        return (AvamCodeResolver.SOURCE_SYSTEM.getLeft(SourceSystem.JOBROOM).equals(quelleCode)
+                || AvamCodeResolver.SOURCE_SYSTEM.getLeft(SourceSystem.API).equals(quelleCode));
     }
 
     private InsertOsteResponse response(String returnCode) {
@@ -109,4 +109,5 @@ public class AvamEndpoint {
         insertOsteResponse.setReturn(returnCode);
         return insertOsteResponse;
     }
+
 }
