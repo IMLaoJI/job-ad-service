@@ -1,30 +1,25 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.APPROVE;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.CANCEL;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.CREATE_FROM_AVAM;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.REJECT;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.ACTION;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.PARTITION_KEY;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.PAYLOAD_TYPE;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.RELEVANT_ID;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.SOURCE_SYSTEM;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.TARGET_SYSTEM;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageSystem.AVAM;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageSystem.JOB_AD_SERVICE;
-
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.*;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.*;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageSystem.AVAM;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageSystem.JOB_AD_SERVICE;
 
 @EnableBinding(Source.class)
 public class AvamSource {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AvamSource.class);
 
     private MessageChannel output;
 
@@ -33,6 +28,7 @@ public class AvamSource {
     }
 
     public void approve(ApprovalDto approvalDto) {
+        LOG.debug("Approve JobAdvertisement stellennummerAvam={}, stellennummerEgov={}", approvalDto.getStellennummerAvam(), approvalDto.getStellennummerEgov());
         output.send(MessageBuilder
                 .withPayload(approvalDto)
                 .setHeader(PARTITION_KEY, approvalDto.getStellennummerEgov())
@@ -45,6 +41,7 @@ public class AvamSource {
     }
 
     public void reject(RejectionDto rejectionDto) {
+        LOG.debug("Reject JobAdvertisement stellennummerAvam={}, stellennummerEgov={}", rejectionDto.getStellennummerAvam(), rejectionDto.getStellennummerEgov());
         output.send(MessageBuilder
                 .withPayload(rejectionDto)
                 .setHeader(PARTITION_KEY, rejectionDto.getStellennummerEgov())
@@ -57,6 +54,7 @@ public class AvamSource {
     }
 
     public void create(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
+        LOG.debug("Create JobAdvertisement stellennummerAvam={}", createJobAdvertisementFromAvamDto.getStellennummerAvam());
         output.send(MessageBuilder
                 .withPayload(createJobAdvertisementFromAvamDto)
                 .setHeader(PARTITION_KEY, createJobAdvertisementFromAvamDto.getStellennummerAvam())
@@ -69,6 +67,7 @@ public class AvamSource {
     }
 
     public void cancel(CancellationDto cancellationDto) {
+        LOG.debug("Cancel JobAdvertisement stellennummerAvam={}, stellennummerEgov={}", cancellationDto.getStellennummerAvam(), cancellationDto.getStellennummerEgov());
         output.send(MessageBuilder
                 .withPayload(cancellationDto)
                 .setHeader(PARTITION_KEY, cancellationDto.getStellennummerAvam())
