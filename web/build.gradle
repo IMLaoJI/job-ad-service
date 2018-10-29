@@ -4,6 +4,10 @@ apply from: "${rootProject.rootDir}/gradle/maven-publish.gradle"
 apply from: "${rootProject.rootDir}/gradle/liquibase.gradle"
 apply plugin: "org.asciidoctor.convert"
 apply from: "${rootProject.rootDir}/gradle/docker-compose.gradle"
+project.ext {
+    dockerImageName = "jobadservice"
+}
+apply from: "${rootProject.rootDir}/gradle/docker.gradle"
 
 dependencies {
     compile project(":infrastructure-database")
