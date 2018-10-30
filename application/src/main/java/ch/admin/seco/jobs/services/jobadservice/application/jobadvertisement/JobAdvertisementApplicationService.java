@@ -123,11 +123,7 @@ public class JobAdvertisementApplicationService {
             JobAdvertisement jobAdvertisement = existingJobAdvertisement.get();
             LOG.debug("Update StellennummerAvam '{}' from AVAM", createJobAdvertisementFromAvamDto.getStellennummerAvam());
             jobAdvertisement.update(prepareUpdaterFromAvam(createJobAdvertisementFromAvamDto));
-            if (jobAdvertisement.getStatus().equals(JobAdvertisementStatus.ARCHIVED)
-                    && (jobAdvertisement.getPublication().getEndDate() != null)
-                    && TimeMachine.now().toLocalDate().isBefore(jobAdvertisement.getPublication().getEndDate())) {
-                jobAdvertisement.refining();
-            }
+            checkAndRepublishIfNeeded(jobAdvertisement);
             return jobAdvertisement.getId();
         }
 
@@ -338,6 +334,7 @@ public class JobAdvertisementApplicationService {
         }
         UpdateJobAdvertisementFromAvamDto updateJobAdvertisement = approvalDto.getUpdateJobAdvertisement();
         jobAdvertisement.update(prepareUpdaterFromAvam(updateJobAdvertisement));
+        checkAndRepublishIfNeeded(jobAdvertisement);
     }
 
     public void updateJobCenters() {
@@ -520,6 +517,14 @@ public class JobAdvertisementApplicationService {
                 .findAllWherePublicationNeedToExpire(TimeMachine.now().toLocalDate())
                 .forEach(JobAdvertisement::expirePublication);
 
+    }
+
+    private void checkAndRepublishIfNeeded(JobAdvertisement jobAdvertisement) {
+        if (jobAdvertisement.getStatus().equals(JobAdvertisementStatus.ARCHIVED)
+                && (jobAdvertisement.getPublication().getEndDate() != null)
+                && TimeMachine.now().toLocalDate().isBefore(jobAdvertisement.getPublication().getEndDate())) {
+            jobAdvertisement.refining();
+        }
     }
 
     private void checkIfJobAdvertisementAlreadyExists(X28CreateJobAdvertisementDto createJobAdvertisementFromX28Dto) {
