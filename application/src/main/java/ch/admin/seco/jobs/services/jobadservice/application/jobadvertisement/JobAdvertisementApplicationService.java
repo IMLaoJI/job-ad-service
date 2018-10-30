@@ -1,9 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
-import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
-import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
-import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
-import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
+import ch.admin.seco.jobs.services.jobadservice.application.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
@@ -76,6 +73,8 @@ public class JobAdvertisementApplicationService {
 
     private final TransactionTemplate transactionTemplate;
 
+    private final BusinessLogger businessLogger;
+
     @Autowired
     public JobAdvertisementApplicationService(CurrentUserContext currentUserContext,
                                               JobAdvertisementRepository jobAdvertisementRepository,
@@ -83,7 +82,8 @@ public class JobAdvertisementApplicationService {
                                               ReportingObligationService reportingObligationService,
                                               LocationService locationService,
                                               ProfessionService professionService,
-                                              JobCenterService jobCenterService, TransactionTemplate transactionTemplate) {
+                                              JobCenterService jobCenterService, TransactionTemplate transactionTemplate,
+                                              BusinessLogger businessLogger) {
         this.currentUserContext = currentUserContext;
         this.jobAdvertisementRepository = jobAdvertisementRepository;
         this.jobAdvertisementFactory = jobAdvertisementFactory;
@@ -92,6 +92,7 @@ public class JobAdvertisementApplicationService {
         this.professionService = professionService;
         this.jobCenterService = jobCenterService;
         this.transactionTemplate = transactionTemplate;
+        this.businessLogger = businessLogger;
     }
 
     public JobAdvertisementId createFromWebForm(CreateJobAdvertisementDto createJobAdvertisementDto) {
@@ -283,6 +284,10 @@ public class JobAdvertisementApplicationService {
 
     public JobAdvertisementDto getById(JobAdvertisementId jobAdvertisementId) throws AggregateNotFoundException {
         JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
+
+        this.businessLogger.log(new BusinessLogData("JOB_ADVERTISEMENT_ACCESS", "JobAdvertisement",
+                jobAdvertisementId.getValue(), Collections.singletonMap("objectTypeStatus", jobAdvertisement.getStatus())));
+
         return JobAdvertisementDto.toDto(jobAdvertisement);
     }
 
@@ -788,11 +793,11 @@ public class JobAdvertisementApplicationService {
     }
 
     private ApplyChannel determineApplyChannel(ApplyChannel applyChannel, boolean companyAnonymous, String jobCenterCode) {
-        if(!companyAnonymous) {
+        if (!companyAnonymous) {
             return applyChannel;
         }
 
-        if(!hasText(jobCenterCode)) {
+        if (!hasText(jobCenterCode)) {
             return null;
         }
 
