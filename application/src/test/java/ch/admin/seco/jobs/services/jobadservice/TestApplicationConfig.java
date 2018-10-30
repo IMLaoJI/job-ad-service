@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice;
 
+import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogger;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,9 @@ public class TestApplicationConfig {
 
     @MockBean
     private MailSenderService mailSenderService;
+
+    @MockBean
+    private BusinessLogger businessLogger;
 
     @Bean
     public TestingCurrentUserContext testingCurrentUserContext() {
