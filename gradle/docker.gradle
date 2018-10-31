@@ -43,7 +43,6 @@ task buildDockerImage(type: DockerBuildImage) {
 
 task pushVersionedDockerImage(type: DockerPushImage) {
     imageName = "alvch-dockerv2-local.jfrog.io/${project.dockerImageName}"
-    tag = project.version
 }
 
 task pushLatestDockerImage(type: DockerPushImage) {
