@@ -1,7 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.dlq;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.dlq.DLQChannels.JOB_AD_ACTION_DLQ_CHANNEL;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.dlq.DLQChannels.JOB_AD_EVENT_DLQ_CHANNEL;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.dlq.DLQChannels.JOB_AD_INT_ACTION_DLQ_CHANNEL;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.dlq.DLQChannels.JOB_AD_INT_EVENT_DLQ_CHANNEL;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -58,12 +58,12 @@ public class DLQItemService {
         this.dlqItemProperties = dlqItemProperties;
     }
 
-    @StreamListener(target = JOB_AD_EVENT_DLQ_CHANNEL)
+    @StreamListener(target = JOB_AD_INT_EVENT_DLQ_CHANNEL)
     public void handleEventDLQMessage(Message<?> message) {
         doHandle(message, this::extractRelevantId);
     }
 
-    @StreamListener(target = JOB_AD_ACTION_DLQ_CHANNEL)
+    @StreamListener(target = JOB_AD_INT_ACTION_DLQ_CHANNEL)
     public void handleActionDLQMessage(Message<?> message) {
         doHandle(message, this::extractRelevantId);
     }
