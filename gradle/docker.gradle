@@ -42,18 +42,17 @@ task buildDockerImage(type: DockerBuildImage) {
 }
 
 task pushVersionedDockerImage(type: DockerPushImage) {
-    dependsOn buildDockerImage
     imageName = "alvch-dockerv2-local.jfrog.io/${project.dockerImageName}"
     tag = project.version
 }
 
 task pushLatestDockerImage(type: DockerPushImage) {
-    dependsOn buildDockerImage
     imageName = "alvch-dockerv2-local.jfrog.io/${project.dockerImageName}"
     tag = "latest"
 }
 
 task pushDockerImages(type: GradleBuild) {
+    dependsOn buildDockerImage
     group = "docker"
     tasks = ["pushVersionedDockerImage", "pushLatestDockerImage"]
 }
