@@ -575,6 +575,7 @@ public class JobAdvertisementApplicationService {
                 .setOccupations(occupations)
                 .setEmployment(employment)
                 .setApplyChannel(toApplyChannel(createJobAdvertisementDto.getApplyChannel()))
+                .setDisplayApplyChannel(toApplyChannel(createJobAdvertisementDto.getApplyChannel()))
                 .setDisplayCompany(company)
                 .setCompany(company)
                 .setEmployer(toEmployer(createJobAdvertisementDto.getEmployer()))
