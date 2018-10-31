@@ -23,7 +23,7 @@ import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
 
 task copyDockerFiles(type: Copy) {
     from project.file("Dockerfile")
-    from ("${project.buildDir}/libs") {
+    from("${project.buildDir}/libs") {
         exclude '*-lib.jar'
         rename { fileName ->
             fileName.replace("-${project.version}", "")
@@ -41,7 +41,19 @@ task buildDockerImage(type: DockerBuildImage) {
     ]
 }
 
-task pushDockerImage(type: DockerPushImage) {
+task pushVersionedDockerImage(type: DockerPushImage) {
     dependsOn buildDockerImage
     imageName = "alvch-dockerv2-local.jfrog.io/${project.dockerImageName}"
+    tag = project.version
+}
+
+task pushLatestDockerImage(type: DockerPushImage) {
+    dependsOn buildDockerImage
+    imageName = "alvch-dockerv2-local.jfrog.io/${project.dockerImageName}"
+    tag = "latest"
+}
+
+task pushDockerImages(type: GradleBuild) {
+    group = "docker"
+    tasks = ["pushVersionedDockerImage", "pushLatestDockerImage"]
 }
