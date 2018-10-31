@@ -567,6 +567,7 @@ public class JobAdvertisementApplicationService {
         String jobCenterCode = determineJobCenterCode(reportingObligation, createJobAdvertisementDto.isReportToAvam(), location);
 
         Company company = toCompany(createJobAdvertisementDto.getCompany());
+        ApplyChannel applyChannel = toApplyChannel(createJobAdvertisementDto.getApplyChannel());
         JobContent jobContent = new JobContent.Builder()
                 .setNumberOfJobs(createJobAdvertisementDto.getNumberOfJobs())
                 .setExternalUrl(createJobAdvertisementDto.getExternalUrl())
@@ -574,8 +575,8 @@ public class JobAdvertisementApplicationService {
                 .setLocation(location)
                 .setOccupations(occupations)
                 .setEmployment(employment)
-                .setApplyChannel(toApplyChannel(createJobAdvertisementDto.getApplyChannel()))
-                .setDisplayApplyChannel(toApplyChannel(createJobAdvertisementDto.getApplyChannel()))
+                .setApplyChannel(applyChannel)
+                .setDisplayApplyChannel(applyChannel)
                 .setDisplayCompany(company)
                 .setCompany(company)
                 .setEmployer(toEmployer(createJobAdvertisementDto.getEmployer()))
