@@ -9,5 +9,6 @@ public class MessageHeaders {
     public static final String PARTITION_KEY = "partitionKey";
     public static final String RELEVANT_ID = "relevant-id";
     public static final String PAYLOAD_TYPE = "payload-type";
+    public static final String EURES = "Eures";
 
 }
