@@ -3,7 +3,7 @@
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-    <changeSet author="fago" id="20181002080000-2">
+    <changeSet author="fago" id="20181001080000-3">
         <sql>
             update JOB_ADVERTISEMENT
             set
@@ -17,4 +17,3 @@
     </changeSet>
 
 </databaseChangeLog>
-
