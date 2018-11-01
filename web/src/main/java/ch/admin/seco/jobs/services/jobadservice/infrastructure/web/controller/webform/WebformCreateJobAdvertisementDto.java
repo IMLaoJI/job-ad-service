@@ -64,6 +64,7 @@ public class WebformCreateJobAdvertisementDto {
     private List<LanguageSkillDto> languageSkills;
 
     @Valid
+    @NotNull
     private ApplyChannelDto applyChannel;
 
     @Valid
