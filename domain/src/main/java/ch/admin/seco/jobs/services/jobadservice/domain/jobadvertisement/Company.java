@@ -1,16 +1,17 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement;
 
-import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
-import ch.admin.seco.jobs.services.jobadservice.core.domain.ValueObject;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenterAddress;
+import java.util.Objects;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 import javax.validation.Valid;
-import java.util.Objects;
+
+import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
+import ch.admin.seco.jobs.services.jobadservice.core.domain.ValueObject;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenterAddress;
 
 @Embeddable
 @Access(AccessType.FIELD)
@@ -57,117 +58,52 @@ public class Company implements ValueObject<Company> {
         return address.getName();
     }
 
-    Company setName(String name) {
-        this.address.setName(name);
-        return this;
-    }
-
     public String getStreet() {
         return address.getStreet();
-    }
-
-    Company setStreet(String street) {
-        this.address.setStreet(street);
-        return this;
     }
 
     public String getHouseNumber() {
         return address.getHouseNumber();
     }
 
-    Company setHouseNumber(String houseNumber) {
-        this.address.setHouseNumber(houseNumber);
-        return this;
-    }
-
     public String getPostalCode() {
         return address.getPostalCode();
-    }
-
-    Company setPostalCode(String postalCode) {
-        this.address.setPostalCode(postalCode);
-        return this;
     }
 
     public String getCity() {
         return address.getCity();
     }
 
-    Company setCity(String city) {
-        this.address.setCity(city);
-        return this;
-    }
-
     public String getPostOfficeBoxNumber() {
         return address.getPostOfficeBoxNumber();
-    }
-
-    Company setPostOfficeBoxNumber(String postOfficeBoxNumber) {
-        this.address.setPostOfficeBoxNumber(postOfficeBoxNumber);
-        return this;
     }
 
     public String getPostOfficeBoxPostalCode() {
         return address.getPostOfficeBoxPostalCode();
     }
 
-    Company setPostOfficeBoxPostalCode(String postOfficeBoxPostalCode) {
-        this.address.setPostOfficeBoxPostalCode(postOfficeBoxPostalCode);
-        return this;
-    }
-
     public String getPostOfficeBoxCity() {
         return address.getPostOfficeBoxCity();
-    }
-
-    Company setPostOfficeBoxCity(String postOfficeBoxCity) {
-        this.address.setPostOfficeBoxCity(postOfficeBoxCity);
-        return this;
     }
 
     public String getCountryIsoCode() {
         return address.getCountryIsoCode();
     }
 
-    Company setCountryIsoCode(String countryIsoCode) {
-        this.address.setCountryIsoCode(countryIsoCode);
-        return this;
-    }
-
     public String getPhone() {
         return phone;
-    }
-
-    Company setPhone(String phone) {
-        this.phone = phone;
-        return this;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public Company setEmail(String email) {
-        this.email = email;
-        return this;
-    }
-
     public String getWebsite() {
         return website;
     }
 
-    public Company setWebsite(String website) {
-        this.website = website;
-        return this;
-    }
-
     public boolean isSurrogate() {
         return surrogate;
-    }
-
-    public Company setSurrogate(boolean surrogate) {
-        this.surrogate = surrogate;
-        return this;
     }
 
     @Override
