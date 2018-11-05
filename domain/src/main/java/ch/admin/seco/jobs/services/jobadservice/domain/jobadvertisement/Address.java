@@ -60,36 +60,81 @@ public class Address {
         return name;
     }
 
+    Address setName(String name) {
+        this.name = name;
+        return this;
+    }
+
     public String getStreet() {
         return street;
+    }
+
+    Address setStreet(String street) {
+        this.street = street;
+        return this;
     }
 
     public String getHouseNumber() {
         return houseNumber;
     }
 
+    Address setHouseNumber(String houseNumber) {
+        this.houseNumber = houseNumber;
+        return this;
+    }
+
     public String getPostalCode() {
         return postalCode;
+    }
+
+    Address setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+        return this;
     }
 
     public String getCity() {
         return city;
     }
 
+    Address setCity(String city) {
+        this.city = city;
+        return this;
+    }
+
     public String getPostOfficeBoxNumber() {
         return postOfficeBoxNumber;
+    }
+
+    Address setPostOfficeBoxNumber(String postOfficeBoxNumber) {
+        this.postOfficeBoxNumber = postOfficeBoxNumber;
+        return this;
     }
 
     public String getPostOfficeBoxPostalCode() {
         return postOfficeBoxPostalCode;
     }
 
+    Address setPostOfficeBoxPostalCode(String postOfficeBoxPostalCode) {
+        this.postOfficeBoxPostalCode = postOfficeBoxPostalCode;
+        return this;
+    }
+
     public String getPostOfficeBoxCity() {
         return postOfficeBoxCity;
     }
 
+    Address setPostOfficeBoxCity(String postOfficeBoxCity) {
+        this.postOfficeBoxCity = postOfficeBoxCity;
+        return this;
+    }
+
     public String getCountryIsoCode() {
         return countryIsoCode;
+    }
+
+    Address setCountryIsoCode(String countryIsoCode) {
+        this.countryIsoCode = countryIsoCode;
+        return this;
     }
 
     @Override
