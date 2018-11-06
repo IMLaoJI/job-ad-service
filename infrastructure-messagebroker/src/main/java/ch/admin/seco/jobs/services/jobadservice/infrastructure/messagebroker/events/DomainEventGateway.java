@@ -4,9 +4,9 @@ import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventTy
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.event.EventListener;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -29,7 +29,7 @@ class DomainEventGateway {
         }
     }
 
-    @EventListener
+    @TransactionalEventListener
     public void handleJobAdvertisementEvent(JobAdvertisementEvent event) {
         if (!relevantEvents.contains(event.getDomainEventType())) {
             return;
