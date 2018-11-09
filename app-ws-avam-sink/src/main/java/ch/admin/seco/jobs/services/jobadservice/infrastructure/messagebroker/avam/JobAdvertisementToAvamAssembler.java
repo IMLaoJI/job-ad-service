@@ -133,7 +133,6 @@ public class JobAdvertisementToAvamAssembler {
             return;
         }
 
-        avamJobAdvertisement.setBewerSchriftlich(false);
         Address postAddress = applyChannel.getPostAddress();
         if (postAddress != null) {
             avamJobAdvertisement.setBewerSchriftlich(true);
