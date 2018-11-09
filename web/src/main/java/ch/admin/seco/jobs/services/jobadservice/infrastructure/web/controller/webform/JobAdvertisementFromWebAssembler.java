@@ -68,7 +68,7 @@ public class JobAdvertisementFromWebAssembler {
                 .setPostalCode(trimOrNull(createPostAddressDto.getPostalCode()))
                 .setCity(trimOrNull(createPostAddressDto.getCity()))
                 .setPostOfficeBoxNumber(trimOrNull(createPostAddressDto.getPostOfficeBoxNumber()))
-                .setPostOfficeBoxPostalCode(trimOrNull(createPostAddressDto.getPostalCode()))
+                .setPostOfficeBoxPostalCode(trimOrNull(createPostAddressDto.getPostOfficeBoxPostalCode()))
                 .setPostOfficeBoxCity(trimOrNull(createPostAddressDto.getPostOfficeBoxCity()))
                 .setCountryIsoCode(trimOrNull(createPostAddressDto.getCountryIsoCode()));
     }
