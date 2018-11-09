@@ -6,8 +6,6 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.WSArbeits
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.WSArbeitsformArray;
 import org.springframework.util.Assert;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,7 +15,7 @@ import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebro
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamDateTimeFormatter.formatLocalDate;
 import static org.springframework.util.StringUtils.hasText;
 
-public class AvamJobAdvertisementAssembler {
+public class JobAdvertisementToAvamAssembler {
 
     private static String DEFAULT_JOB_CENTER_CODE = "CHA20";
 
@@ -135,6 +133,7 @@ public class AvamJobAdvertisementAssembler {
             return;
         }
 
+        avamJobAdvertisement.setBewerSchriftlich(false);
         Address postAddress = applyChannel.getPostAddress();
         if (postAddress != null) {
             avamJobAdvertisement.setBewerSchriftlich(true);
