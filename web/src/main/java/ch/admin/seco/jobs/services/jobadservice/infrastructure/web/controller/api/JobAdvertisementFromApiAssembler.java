@@ -21,11 +21,11 @@ public class JobAdvertisementFromApiAssembler {
     CreateJobAdvertisementDto convert(ApiCreateJobAdvertisementDto apiCreateDto) {
         return new CreateJobAdvertisementDto()
                 .setReportToAvam(apiCreateDto.isReportToAvam())
-                .setExternalUrl(apiCreateDto.getExternalUrl())
-                .setExternalReference(apiCreateDto.getExternalReference())
+                .setExternalUrl(apiCreateDto.getExternalUrl().trim())
+                .setExternalReference(apiCreateDto.getExternalReference().trim())
                 .setContact(convertContact(apiCreateDto.getContact()))
                 .setPublication(convertPublication(apiCreateDto.getPublication()))
-                .setNumberOfJobs(apiCreateDto.getNumberOfJobs())
+                .setNumberOfJobs(apiCreateDto.getNumberOfJobs().trim())
                 .setJobDescriptions(convertJobDescriptions(apiCreateDto.getJobDescriptions()))
                 .setCompany(convertCompany(apiCreateDto.getCompany()))
                 .setEmployer(convertEmployer(apiCreateDto.getEmployer()))
@@ -33,7 +33,7 @@ public class JobAdvertisementFromApiAssembler {
                 .setLocation(convertCreateLocation(apiCreateDto.getLocation()))
                 .setOccupation(convertOccupation(apiCreateDto.getOccupation()))
                 .setLanguageSkills(convertLanguageSkills(apiCreateDto.getLanguageSkills()))
-                .setApplyChannel(convertApplyChannel(apiCreateDto.getApplyChannel()))
+                .setApplyChannel(convertApplyChannel(apiCreateDto))
                 .setPublicContact(convertPublicContact(apiCreateDto.getPublicContact()));
     }
 
@@ -43,11 +43,11 @@ public class JobAdvertisementFromApiAssembler {
         }
         return new ContactDto()
                 .setSalutation(apiContact.getSalutation())
-                .setFirstName(apiContact.getFirstName())
-                .setLastName(apiContact.getLastName())
-                .setPhone(apiContact.getPhone())
-                .setEmail(apiContact.getEmail())
-                .setLanguageIsoCode(apiContact.getLanguageIsoCode());
+                .setFirstName(apiContact.getFirstName().trim())
+                .setLastName(apiContact.getLastName().trim())
+                .setPhone(apiContact.getPhone().trim())
+                .setEmail(apiContact.getEmail().trim())
+                .setLanguageIsoCode(apiContact.getLanguageIsoCode().trim());
     }
 
     private PublicationDto convertPublication(ApiPublicationDto apiPublication) {
@@ -70,9 +70,9 @@ public class JobAdvertisementFromApiAssembler {
         }
         return apiJobDescriptions.stream()
                 .map(apiJobDescription -> new JobDescriptionDto()
-                        .setLanguageIsoCode(apiJobDescription.getLanguageIsoCode())
-                        .setTitle(apiJobDescription.getTitle())
-                        .setDescription(htmlToMarkdownConverter.convert(apiJobDescription.getDescription())
+                        .setLanguageIsoCode(apiJobDescription.getLanguageIsoCode().trim())
+                        .setTitle(apiJobDescription.getTitle().trim())
+                        .setDescription(htmlToMarkdownConverter.convert(apiJobDescription.getDescription().trim())
                         ))
                 .collect(Collectors.toList());
     }
@@ -83,18 +83,18 @@ public class JobAdvertisementFromApiAssembler {
             return null;
         }
         return new CompanyDto()
-                .setName(apiCompany.getName())
-                .setStreet(apiCompany.getStreet())
-                .setHouseNumber(apiCompany.getHouseNumber())
-                .setPostalCode(apiCompany.getPostalCode())
-                .setCity(apiCompany.getCity())
-                .setCountryIsoCode(apiCompany.getCountryIsoCode())
-                .setPostOfficeBoxNumber(apiCompany.getPostOfficeBoxNumber())
-                .setPostOfficeBoxPostalCode(apiCompany.getPostOfficeBoxPostalCode())
-                .setPostOfficeBoxCity(apiCompany.getPostOfficeBoxCity())
-                .setPhone(apiCompany.getPhone())
-                .setEmail(apiCompany.getEmail())
-                .setWebsite(apiCompany.getWebsite())
+                .setName(apiCompany.getName().trim())
+                .setStreet(apiCompany.getStreet().trim())
+                .setHouseNumber(apiCompany.getHouseNumber().trim())
+                .setPostalCode(apiCompany.getPostalCode().trim())
+                .setCity(apiCompany.getCity().trim())
+                .setCountryIsoCode(apiCompany.getCountryIsoCode().trim())
+                .setPostOfficeBoxNumber(apiCompany.getPostOfficeBoxNumber().trim())
+                .setPostOfficeBoxPostalCode(apiCompany.getPostOfficeBoxPostalCode().trim())
+                .setPostOfficeBoxCity(apiCompany.getPostOfficeBoxCity().trim())
+                .setPhone(apiCompany.getPhone().trim())
+                .setEmail(apiCompany.getEmail().trim())
+                .setWebsite(apiCompany.getWebsite().trim())
                 .setSurrogate(apiCompany.isSurrogate());
     }
 
@@ -103,10 +103,10 @@ public class JobAdvertisementFromApiAssembler {
             return null;
         }
         return new EmployerDto()
-                .setName(apiEmployer.getName())
-                .setPostalCode(apiEmployer.getPostalCode())
-                .setCity(apiEmployer.getCity())
-                .setCountryIsoCode(apiEmployer.getCountryIsoCode());
+                .setName(apiEmployer.getName().trim())
+                .setPostalCode(apiEmployer.getPostalCode().trim())
+                .setCity(apiEmployer.getCity().trim())
+                .setCountryIsoCode(apiEmployer.getCountryIsoCode().trim());
     }
 
     private EmploymentDto convertEmployment(ApiEmploymentDto apiEmployment) {
@@ -129,10 +129,10 @@ public class JobAdvertisementFromApiAssembler {
             return null;
         }
         return new CreateLocationDto()
-                .setRemarks(apiLocation.getRemarks())
-                .setCity(apiLocation.getCity())
-                .setPostalCode(apiLocation.getPostalCode())
-                .setCountryIsoCode(apiLocation.getCountryIsoCode());
+                .setRemarks(apiLocation.getRemarks().trim())
+                .setCity(apiLocation.getCity().trim())
+                .setPostalCode(apiLocation.getPostalCode().trim())
+                .setCountryIsoCode(apiLocation.getCountryIsoCode().trim());
     }
 
     private OccupationDto convertOccupation(ApiOccupationDto apiOccupation) {
@@ -140,9 +140,9 @@ public class JobAdvertisementFromApiAssembler {
             return null;
         }
         return new OccupationDto()
-                .setAvamOccupationCode(apiOccupation.getAvamOccupationCode())
+                .setAvamOccupationCode(apiOccupation.getAvamOccupationCode().trim())
                 .setWorkExperience(apiOccupation.getWorkExperience())
-                .setEducationCode(apiOccupation.getEducationCode());
+                .setEducationCode(apiOccupation.getEducationCode().trim());
     }
 
     private List<LanguageSkillDto> convertLanguageSkills(List<ApiLanguageSkillDto> apiLanguageSkills) {
@@ -151,24 +151,25 @@ public class JobAdvertisementFromApiAssembler {
         }
         return apiLanguageSkills.stream()
                 .map(apiLanguageSkill -> new LanguageSkillDto()
-                        .setLanguageIsoCode(apiLanguageSkill.getLanguageIsoCode())
+                        .setLanguageIsoCode(apiLanguageSkill.getLanguageIsoCode().trim())
                         .setSpokenLevel(apiLanguageSkill.getSpokenLevel())
                         .setWrittenLevel(apiLanguageSkill.getWrittenLevel())
                 )
                 .collect(Collectors.toList());
     }
 
-    private ApplyChannelDto convertApplyChannel(ApiApplyChannelDto apiApplyChannel) {
+    private ApplyChannelDto convertApplyChannel(ApiCreateJobAdvertisementDto apiCreateDto) {
+        ApiApplyChannelDto apiApplyChannel = apiCreateDto.getApplyChannel();
         if (apiApplyChannel == null) {
             return null;
         }
         return new ApplyChannelDto()
                 .setRawPostAddress(apiApplyChannel.getMailAddress())
-                .setPostAddress(AddressParser.parse(apiApplyChannel.getMailAddress()))
-                .setEmailAddress(apiApplyChannel.getEmailAddress())
-                .setPhoneNumber(apiApplyChannel.getPhoneNumber())
-                .setFormUrl(apiApplyChannel.getFormUrl())
-                .setAdditionalInfo(apiApplyChannel.getAdditionalInfo());
+                .setPostAddress(AddressParser.parse(apiApplyChannel.getMailAddress(), apiCreateDto.getCompany().getName().trim()))
+                .setEmailAddress(apiApplyChannel.getEmailAddress().trim())
+                .setPhoneNumber(apiApplyChannel.getPhoneNumber().trim())
+                .setFormUrl(apiApplyChannel.getFormUrl().trim())
+                .setAdditionalInfo(apiApplyChannel.getAdditionalInfo().trim());
     }
 
     private PublicContactDto convertPublicContact(ApiPublicContactDto apiPublicContact) {
@@ -177,10 +178,14 @@ public class JobAdvertisementFromApiAssembler {
         }
         return new PublicContactDto()
                 .setSalutation(apiPublicContact.getSalutation())
-                .setFirstName(apiPublicContact.getFirstName())
-                .setLastName(apiPublicContact.getLastName())
-                .setPhone(apiPublicContact.getPhone())
-                .setEmail(apiPublicContact.getEmail());
+                .setFirstName(apiPublicContact.getFirstName().trim())
+                .setLastName(apiPublicContact.getLastName().trim())
+                .setPhone(apiPublicContact.getPhone().trim())
+                .setEmail(apiPublicContact.getEmail().trim());
     }
 
+    // TODO replace trim with this
+    private static String safeTrimOrNull(String value) {
+        return (hasText(value)) ? value.trim() : null;
+    }
 }

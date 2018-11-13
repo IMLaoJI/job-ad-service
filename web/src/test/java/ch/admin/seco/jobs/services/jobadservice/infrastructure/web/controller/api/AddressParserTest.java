@@ -103,7 +103,7 @@ public class AddressParserTest {
     //@Test
     public void shouldParseAddress() {
         for (AddressTest address : addresses) {
-            AddressDto result = AddressParser.parse(address.getInput());
+            AddressDto result = AddressParser.parse(address.getInput(), null);
 
             if (address.getExpected() == null) {
                 assertThat(result).isNull();
