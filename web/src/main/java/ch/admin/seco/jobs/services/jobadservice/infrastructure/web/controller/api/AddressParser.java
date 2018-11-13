@@ -36,7 +36,8 @@ public class AddressParser {
                 // The address lacks either the company name or street address
                 address.setName(m.group(1).trim()).setStreet(m.group(1).trim()).setPostalCode(m.group(2)).setCity(m.group(3).trim());
                 if (address.getName().equalsIgnoreCase(companyName)) {
-                    // setStreet?
+                    // FIXME
+                    address.setStreet(null);
                 } else {
                     address.setName(companyName);
                 }
