@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.springframework.util.StringUtils.hasText;
+
 public class AddressParser {
 
 	private static final Pattern ADDRESS_PATTERN = Pattern.compile("(.*)[,][ ]*(\\d{4})[ ]+(.*)");
@@ -67,7 +69,7 @@ public class AddressParser {
 				address.setStreet(m.group(1));
 				address.setHouseNumber(m.group(2));
 			} else {
-				address.setStreet(streetOrPoBox);
+				address.setStreet(hasText(streetOrPoBox) ? streetOrPoBox : null);
 			}
 		}
 

@@ -46,7 +46,7 @@ public class AddressParserTest {
             new AddressTest(
                     // Address with no spaces after comma
                     "Beeworx GmbH,Steinengraben 40,4051 Basel",
-                    createAddressDto("Beeworx GmbH", "Steinengraben 40", null, "4051", "Basel", null, null, null, "CH")
+                    createAddressDto("Beeworx GmbH", "Steinengraben", "40", "4051", "Basel", null, null, null, "CH")
             ),
             new AddressTest(
                     // Address with space before comma
@@ -76,14 +76,15 @@ public class AddressParserTest {
             new AddressTest(
                     // Characters in house number
                     "Muster AG, Musterstrasse 10B, 3000 Bern",
-                    createAddressDto("Muster AG\nz.H Muster Hans", "Musterstrasse", "10B", "3000", "Bern", null, null, null, "CH")
+                    createAddressDto("Muster AG", "Musterstrasse", "10B", "3000", "Bern", null, null, null, "CH")
             ),
             new AddressTest(
                     // Line break separated and second name
                     "Muster AG \n  z.H Muster Hans  \n  Musterstrasse  1 \n3000 Bern",
-                    createAddressDto("Muster AG\nz.H Muster Hans", "Musterstrasse", "1", "3000", "Bern", null, null, null, "CH")
+                    createAddressDto("Muster AG ,  z.H Muster Hans", "Musterstrasse", "1", "3000", "Bern", null, null, null, "CH")
             ),
-            /*new AddressTest(
+            /*
+            new AddressTest(
                     // Country code Switzerland
                     "Muster AG, Musterstrasse 1, CH-3000 Bern",
                     createAddressDto("Muster AG", "Musterstrasse", "1", "3000", "Bern", null, null, null, "CH")
@@ -92,7 +93,8 @@ public class AddressParserTest {
                     // Country code Germany
                     "Muster AG, Musterstrasse 1, DE-12345 Freiburg",
                     createAddressDto("Muster AG", "Musterstrasse 1", null, "12345", "Freiburg", null, null, null, "DE")
-            ),*/
+            ),
+            */
             new AddressTest(
                     // Post office box address
                     "Muster AG, Postfach 123, 3000 Bern",
@@ -110,7 +112,7 @@ public class AddressParserTest {
     public void shouldParseAddress() {
         for (AddressTest address : addresses) {
             System.out.println("Check address: " + address.getInput());
-            AddressDto result = AddressParser.parse(address.getInput(), address.getExpected().getName());
+            AddressDto result = AddressParser.parse(address.getInput(), (address.getExpected() != null) ? address.getExpected().getName() : null);
 
             if (address.getExpected() == null) {
                 assertThat(result).as("Check result is null").isNull();
