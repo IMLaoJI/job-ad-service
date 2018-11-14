@@ -83,7 +83,6 @@ public class AddressParserTest {
                     "Muster AG \n  z.H Muster Hans  \n  Musterstrasse  1 \n3000 Bern",
                     createAddressDto("Muster AG ,  z.H Muster Hans", "Musterstrasse", "1", "3000", "Bern", null, null, null, "CH")
             ),
-            /*
             new AddressTest(
                     // Country code Switzerland
                     "Muster AG, Musterstrasse 1, CH-3000 Bern",
@@ -92,9 +91,8 @@ public class AddressParserTest {
             new AddressTest(
                     // Country code Germany
                     "Muster AG, Musterstrasse 1, DE-12345 Freiburg",
-                    createAddressDto("Muster AG", "Musterstrasse 1", null, "12345", "Freiburg", null, null, null, "DE")
+                    createAddressDto("Muster AG", "Musterstrasse", "1", "12345", "Freiburg", null, null, null, "DE")
             ),
-            */
             new AddressTest(
                     // Post office box address
                     "Muster AG, Postfach 123, 3000 Bern",
