@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class AddressParser {
 
-	private static final Pattern ADDRESS_PATTERN = Pattern.compile("(.*)[,][ ]*(\\d{4})[ ]+(.*)");
+	private static final Pattern ADDRESS_PATTERN = Pattern.compile("(.*)[,][ ]*([A-Z]{2}-)?(\\d{4,5})[ ]+(.*)");
 	private static final Pattern ADDRESSLINE_PATTERN = Pattern.compile("(.*)[,][ ]*(.*)");
 	private static final Pattern POBOX_PATTERN = Pattern.compile("(Postfach|Case postale|PO Box|Casella postale)[ ]+(\\d+)");
 	private static final Pattern STREET_PATTERN = Pattern.compile("(.*?)[ ]+(\\d.*+)");
@@ -18,7 +18,7 @@ public class AddressParser {
 	private static final Logger LOG = LoggerFactory.getLogger(AddressParser.class);
 
 	/*
-	 * This simplified parser assumes only Swiss addresses.
+	 * This simplified parser treats addresses as Swiss addresses unless a country code is given (E.g. DE-80120).
 	 * If the address is incomplete, the business name can be supplemented as address name.
 	 */
 	public static AddressDto parse(String rawAddress, String companyName) {
@@ -26,7 +26,7 @@ public class AddressParser {
 			return null;
 		}
 
-		// First we check whether this is a Swiss address
+		// First we check whether this is a valid address
 		Matcher m = ADDRESS_PATTERN.matcher(rawAddress.trim().replace('\n', ','));
 		if (!m.find()) {
 			LOG.info("Unable to parse address: '" + rawAddress + "'");
@@ -34,11 +34,10 @@ public class AddressParser {
 		}
 
 		AddressDto address = new AddressDto();
-		address.setCountryIsoCode("CH");
-
 		String addr = m.group(1).trim();
-		String postalCode = m.group(2);
-		String city = m.group(3);
+		address.setCountryIsoCode(m.group(2) == null ? "CH" : m.group(2).substring(0, 2));
+		String postalCode = m.group(3);
+		String city = m.group(4);
 
 		// Now we check whether the address is complete
 		String streetOrPoBox = "";
