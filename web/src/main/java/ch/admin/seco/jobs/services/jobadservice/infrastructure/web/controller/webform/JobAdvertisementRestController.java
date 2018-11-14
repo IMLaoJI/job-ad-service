@@ -3,6 +3,7 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.w
 import javax.validation.Valid;
 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,7 +57,8 @@ public class JobAdvertisementRestController {
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "25") int size
     ) {
-        return PageResource.of(jobAdvertisementApplicationService.findAllPaginated(PageRequest.of(page, size)));
+        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdTime")));
+        return PageResource.of(jobAdvertisementApplicationService.findAllPaginated(pageRequest));
     }
 
     @GetMapping("/{id}")
