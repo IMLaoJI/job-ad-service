@@ -104,22 +104,23 @@ public class AddressParserTest {
     @Test
     public void shouldParseAddress() {
         for (AddressTest address : addresses) {
+            System.out.println("Check address: " + address.getInput());
             AddressDto result = AddressParser.parse(address.getInput(), address.getExpected().getName());
 
             if (address.getExpected() == null) {
-                assertThat(result).isNull();
+                assertThat(result).as("Check result is null").isNull();
             } else {
-                assertThat(result).isNotNull();
+                assertThat(result).as("Check result is not null").isNotNull();
                 AddressDto expected = address.getExpected();
-                assertThat(result.getName()).isEqualTo(expected.getName());
-                assertThat(result.getStreet()).isEqualTo(expected.getStreet());
-                assertThat(result.getHouseNumber()).isEqualTo(expected.getHouseNumber());
-                assertThat(result.getPostalCode()).isEqualTo(expected.getPostalCode());
-                assertThat(result.getCity()).isEqualTo(expected.getCity());
-                assertThat(result.getPostOfficeBoxNumber()).isEqualTo(expected.getPostOfficeBoxNumber());
-                assertThat(result.getPostOfficeBoxPostalCode()).isEqualTo(expected.getPostOfficeBoxPostalCode());
-                assertThat(result.getPostOfficeBoxCity()).isEqualTo(expected.getPostOfficeBoxCity());
-                assertThat(result.getCountryIsoCode()).isEqualTo(expected.getCountryIsoCode());
+                assertThat(result.getName()).as("Check name").isEqualTo(expected.getName());
+                assertThat(result.getStreet()).as("Check street").isEqualTo(expected.getStreet());
+                assertThat(result.getHouseNumber()).as("Check house nr.").isEqualTo(expected.getHouseNumber());
+                assertThat(result.getPostalCode()).as("Check postal code").isEqualTo(expected.getPostalCode());
+                assertThat(result.getCity()).as("Check city").isEqualTo(expected.getCity());
+                assertThat(result.getPostOfficeBoxNumber()).as("Check POBox nr").isEqualTo(expected.getPostOfficeBoxNumber());
+                assertThat(result.getPostOfficeBoxPostalCode()).as("Check POBox postal code").isEqualTo(expected.getPostOfficeBoxPostalCode());
+                assertThat(result.getPostOfficeBoxCity()).as("Check POBox city").isEqualTo(expected.getPostOfficeBoxCity());
+                assertThat(result.getCountryIsoCode()).as("Check country ISO code").isEqualTo(expected.getCountryIsoCode());
             }
         }
     }
