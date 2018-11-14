@@ -2,8 +2,6 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.a
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.AddressDto;
 
-import static org.springframework.util.StringUtils.hasText;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,41 +10,67 @@ import java.util.regex.Pattern;
 
 public class AddressParser {
 
-    private static final Pattern ADDRESS_PATTERN = Pattern.compile("(.*)[,][ ]*(.*?)[,][ ]*(\\d{4})[ ]+(\\p{Alpha}.*)");
-    private static final Pattern ADDRESS_PATTERN_SHORT = Pattern.compile("(.*)[,][ ]*(\\d{4})[ ]+(\\p{Alpha}.*)");
+	private static final Pattern ADDRESS_PATTERN = Pattern.compile("(.*)[,][ ]*(\\d{4})[ ]+(.*)");
+	private static final Pattern ADDRESSLINE_PATTERN = Pattern.compile("(.*)[,][ ]*(.*)");
+	private static final Pattern POBOX_PATTERN = Pattern.compile("(Postfach|Case postale|PO Box|Casella postale)[ ]+(\\d+)");
+	private static final Pattern STREET_PATTERN = Pattern.compile("(.*?)[ ]+(\\d.*+)");
 
-    private static final Logger LOG = LoggerFactory.getLogger(AddressParser.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AddressParser.class);
 
-    /*
-     * This simplified parser assumes only Swiss street addresses. PO Box addresses are treated like street addresses.
-     * If the address is incomplete, the business name can be supplemented as address name.
-     */
-    public static AddressDto parse(String rawAddress, String companyName) {
-        if (!hasText(rawAddress)) {
-            return null;
-        }
-        Matcher m = ADDRESS_PATTERN.matcher(rawAddress);
-        AddressDto address = new AddressDto();
-        address.setCountryIsoCode("CH");
-        if (m.find()) {
-            address.setName(m.group(1).trim()).setStreet(m.group(2).trim()).setPostalCode(m.group(3)).setCity(m.group(4).trim());
-        } else {
-            m = ADDRESS_PATTERN_SHORT.matcher(rawAddress);
-            if (m.find()) {
-                // The address lacks either the company name or street address
-                address.setName(m.group(1).trim()).setStreet(m.group(1).trim()).setPostalCode(m.group(2)).setCity(m.group(3).trim());
-                if (address.getName().equalsIgnoreCase(companyName)) {
-                    // FIXME
-                    address.setStreet(null);
-                } else {
-                    address.setName(companyName);
-                }
-            } else {
-                LOG.warn("Unable to parse apply channel address: " + rawAddress);
-                return null;
-            }
-        }
-        return address;
-    }
+	/*
+	 * This simplified parser assumes only Swiss addresses.
+	 * If the address is incomplete, the business name can be supplemented as address name.
+	 */
+	public static AddressDto parse(String rawAddress, String companyName) {
+		if (rawAddress == null || rawAddress.isEmpty()) {
+			return null;
+		}
 
+		// First we check whether this is a Swiss address
+		Matcher m = ADDRESS_PATTERN.matcher(rawAddress.trim().replace('\n', ','));
+		if (!m.find()) {
+			LOG.info("Unable to parse address: '" + rawAddress + "'");
+			return null;
+		}
+
+		AddressDto address = new AddressDto();
+		address.setCountryIsoCode("CH");
+
+		String addr = m.group(1).trim();
+		String postalCode = m.group(2);
+		String city = m.group(3);
+
+		// Now we check whether the address is complete
+		String streetOrPoBox = "";
+		m = ADDRESSLINE_PATTERN.matcher(addr);
+		if (m.find()) {
+			address.setName(m.group(1).trim());
+			streetOrPoBox = m.group(2);
+		} else {
+			address.setName(companyName);
+			if (!addr.equalsIgnoreCase(companyName)) {
+				streetOrPoBox = addr;
+			}
+		}
+
+		// Now check for PO Box and Street number
+		m = POBOX_PATTERN.matcher(streetOrPoBox);
+		if (m.find()) {
+			address.setPostOfficeBoxNumber(m.group(2));
+			address.setPostOfficeBoxPostalCode(postalCode);
+			address.setPostOfficeBoxCity(city);
+		} else {
+			address.setPostalCode(postalCode);
+			address.setCity(city);
+			m = STREET_PATTERN.matcher(streetOrPoBox);
+			if (m.find()) {
+				address.setStreet(m.group(1));
+				address.setHouseNumber(m.group(2));
+			} else {
+				address.setStreet(streetOrPoBox);
+			}
+		}
+
+		return address;
+	}
 }
