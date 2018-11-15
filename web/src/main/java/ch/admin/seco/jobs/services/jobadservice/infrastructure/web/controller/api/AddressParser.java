@@ -24,29 +24,29 @@ public class AddressParser {
 	 * If the address is incomplete, the business name can be supplemented as address name.
 	 */
 	public static AddressDto parse(String rawAddress, String companyName) {
-		if (rawAddress == null || rawAddress.isEmpty()) {
+		if (!hasText(rawAddress)) {
 			return null;
 		}
 
 		// First we check whether this is a valid address
-		Matcher m = ADDRESS_PATTERN.matcher(rawAddress.trim().replace('\n', ','));
-		if (!m.find()) {
+		Matcher addressMatcher = ADDRESS_PATTERN.matcher(rawAddress.trim().replace('\n', ','));
+		if (!addressMatcher.find()) {
 			LOG.info("Unable to parse address: '" + rawAddress + "'");
 			return null;
 		}
 
 		AddressDto address = new AddressDto();
-		String addr = m.group(1).trim();
-		address.setCountryIsoCode(m.group(2) == null ? "CH" : m.group(2).substring(0, 2));
-		String postalCode = m.group(3);
-		String city = m.group(4);
+		String addr = addressMatcher.group(1).trim();
+		address.setCountryIsoCode(addressMatcher.group(2) == null ? "CH" : addressMatcher.group(2).substring(0, 2));
+		String postalCode = addressMatcher.group(3);
+		String city = addressMatcher.group(4);
 
 		// Now we check whether the address is complete
 		String streetOrPoBox = "";
-		m = ADDRESSLINE_PATTERN.matcher(addr);
-		if (m.find()) {
-			address.setName(m.group(1).trim());
-			streetOrPoBox = m.group(2);
+		Matcher addressLineMatcher = ADDRESSLINE_PATTERN.matcher(addr);
+		if (addressLineMatcher.find()) {
+			address.setName(addressLineMatcher.group(1).trim());
+			streetOrPoBox = addressLineMatcher.group(2);
 		} else {
 			address.setName(companyName);
 			if (!addr.equalsIgnoreCase(companyName)) {
@@ -55,18 +55,18 @@ public class AddressParser {
 		}
 
 		// Now check for PO Box and Street number
-		m = POBOX_PATTERN.matcher(streetOrPoBox);
-		if (m.find()) {
-			address.setPostOfficeBoxNumber(m.group(2));
+		Matcher poBoxMatcher = POBOX_PATTERN.matcher(streetOrPoBox);
+		if (poBoxMatcher.find()) {
+			address.setPostOfficeBoxNumber(poBoxMatcher.group(2));
 			address.setPostOfficeBoxPostalCode(postalCode);
 			address.setPostOfficeBoxCity(city);
 		} else {
 			address.setPostalCode(postalCode);
 			address.setCity(city);
-			m = STREET_PATTERN.matcher(streetOrPoBox);
-			if (m.find()) {
-				address.setStreet(m.group(1));
-				address.setHouseNumber(m.group(2));
+			Matcher streetMatcher = STREET_PATTERN.matcher(streetOrPoBox);
+			if (streetMatcher.find()) {
+				address.setStreet(streetMatcher.group(1));
+				address.setHouseNumber(streetMatcher.group(2));
 			} else {
 				address.setStreet(hasText(streetOrPoBox) ? streetOrPoBox : null);
 			}

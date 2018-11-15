@@ -9,6 +9,11 @@ public class AddressParserTest {
 
     private AddressTest[] addresses = {
             new AddressTest(
+                    // null
+                    null,
+                    null
+            ),
+            new AddressTest(
                     // 2 words city
                     "A à Z emplois SA, 2301 La Chaux-de-Fonds",
                     createAddressDto("A à Z emplois SA", null, null, "2301", "La Chaux-de-Fonds", null, null, null, "CH")
@@ -80,6 +85,11 @@ public class AddressParserTest {
             ),
             new AddressTest(
                     // Line break separated and second name
+                    "Muster AG\nz.H Muster Hans\nMusterstrasse 1\n3000 Bern",
+                    createAddressDto("Muster AG,z.H Muster Hans", "Musterstrasse", "1", "3000", "Bern", null, null, null, "CH")
+            ),
+            new AddressTest(
+                    // Line break separated and second name and spaces
                     "Muster AG \n  z.H Muster Hans  \n  Musterstrasse  1 \n3000 Bern",
                     createAddressDto("Muster AG ,  z.H Muster Hans", "Musterstrasse", "1", "3000", "Bern", null, null, null, "CH")
             ),
