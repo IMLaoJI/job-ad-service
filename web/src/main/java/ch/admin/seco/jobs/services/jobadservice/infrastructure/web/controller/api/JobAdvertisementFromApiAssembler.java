@@ -24,11 +24,11 @@ public class JobAdvertisementFromApiAssembler {
 	CreateJobAdvertisementDto convert(ApiCreateJobAdvertisementDto apiCreateDto) {
 		return new CreateJobAdvertisementDto()
 				.setReportToAvam(apiCreateDto.isReportToAvam())
-				.setExternalUrl(safeTrimOrNull(apiCreateDto.getExternalUrl()))
-				.setExternalReference(safeTrimOrNull(apiCreateDto.getExternalReference()))
+				.setExternalUrl(trimOrNull(apiCreateDto.getExternalUrl()))
+				.setExternalReference(trimOrNull(apiCreateDto.getExternalReference()))
 				.setContact(convertContact(apiCreateDto.getContact()))
 				.setPublication(convertPublication(apiCreateDto.getPublication()))
-				.setNumberOfJobs(safeTrimOrNull(apiCreateDto.getNumberOfJobs()))
+				.setNumberOfJobs(trimOrNull(apiCreateDto.getNumberOfJobs()))
 				.setJobDescriptions(convertJobDescriptions(apiCreateDto.getJobDescriptions()))
 				.setCompany(convertCompany(apiCreateDto.getCompany()))
 				.setEmployer(convertEmployer(apiCreateDto.getEmployer()))
@@ -46,11 +46,11 @@ public class JobAdvertisementFromApiAssembler {
 		}
 		return new ContactDto()
 				.setSalutation(apiContact.getSalutation())
-				.setFirstName(safeTrimOrNull(apiContact.getFirstName()))
-				.setLastName(safeTrimOrNull(apiContact.getLastName()))
-				.setPhone(safeTrimOrNull(apiContact.getPhone()))
-				.setEmail(safeTrimOrNull(apiContact.getEmail()))
-				.setLanguageIsoCode(safeTrimOrNull(apiContact.getLanguageIsoCode()));
+				.setFirstName(trimOrNull(apiContact.getFirstName()))
+				.setLastName(trimOrNull(apiContact.getLastName()))
+				.setPhone(trimOrNull(apiContact.getPhone()))
+				.setEmail(trimOrNull(apiContact.getEmail()))
+				.setLanguageIsoCode(trimOrNull(apiContact.getLanguageIsoCode()));
 	}
 
 	private PublicationDto convertPublication(ApiPublicationDto apiPublication) {
@@ -73,9 +73,9 @@ public class JobAdvertisementFromApiAssembler {
 		}
 		return apiJobDescriptions.stream()
 				.map(apiJobDescription -> new JobDescriptionDto()
-						.setLanguageIsoCode(safeTrimOrNull(apiJobDescription.getLanguageIsoCode()))
-						.setTitle(safeTrimOrNull(apiJobDescription.getTitle()))
-						.setDescription(htmlToMarkdownConverter.convert(safeTrimOrNull(apiJobDescription.getDescription()))
+						.setLanguageIsoCode(trimOrNull(apiJobDescription.getLanguageIsoCode()))
+						.setTitle(trimOrNull(apiJobDescription.getTitle()))
+						.setDescription(htmlToMarkdownConverter.convert(trimOrNull(apiJobDescription.getDescription()))
 						))
 				.collect(Collectors.toList());
 	}
@@ -86,18 +86,18 @@ public class JobAdvertisementFromApiAssembler {
 			return null;
 		}
 		return new CompanyDto()
-				.setName(safeTrimOrNull(apiCompany.getName()))
-				.setStreet(safeTrimOrNull(apiCompany.getStreet()))
-				.setHouseNumber(safeTrimOrNull(apiCompany.getHouseNumber()))
-				.setPostalCode(safeTrimOrNull(apiCompany.getPostalCode()))
-				.setCity(safeTrimOrNull(apiCompany.getCity()))
-				.setCountryIsoCode(safeTrimOrNull(apiCompany.getCountryIsoCode()))
-				.setPostOfficeBoxNumber(safeTrimOrNull(apiCompany.getPostOfficeBoxNumber()))
-				.setPostOfficeBoxPostalCode(safeTrimOrNull(apiCompany.getPostOfficeBoxPostalCode()))
-				.setPostOfficeBoxCity(safeTrimOrNull(apiCompany.getPostOfficeBoxCity()))
-				.setPhone(safeTrimOrNull(apiCompany.getPhone()))
-				.setEmail(safeTrimOrNull(apiCompany.getEmail()))
-				.setWebsite(safeTrimOrNull(apiCompany.getWebsite()))
+				.setName(trimOrNull(apiCompany.getName()))
+				.setStreet(trimOrNull(apiCompany.getStreet()))
+				.setHouseNumber(trimOrNull(apiCompany.getHouseNumber()))
+				.setPostalCode(trimOrNull(apiCompany.getPostalCode()))
+				.setCity(trimOrNull(apiCompany.getCity()))
+				.setCountryIsoCode(trimOrNull(apiCompany.getCountryIsoCode()))
+				.setPostOfficeBoxNumber(trimOrNull(apiCompany.getPostOfficeBoxNumber()))
+				.setPostOfficeBoxPostalCode(trimOrNull(apiCompany.getPostOfficeBoxPostalCode()))
+				.setPostOfficeBoxCity(trimOrNull(apiCompany.getPostOfficeBoxCity()))
+				.setPhone(trimOrNull(apiCompany.getPhone()))
+				.setEmail(trimOrNull(apiCompany.getEmail()))
+				.setWebsite(trimOrNull(apiCompany.getWebsite()))
 				.setSurrogate(apiCompany.isSurrogate());
 	}
 
@@ -106,10 +106,10 @@ public class JobAdvertisementFromApiAssembler {
 			return null;
 		}
 		return new EmployerDto()
-				.setName(safeTrimOrNull(apiEmployer.getName()))
-				.setPostalCode(safeTrimOrNull(apiEmployer.getPostalCode()))
-				.setCity(safeTrimOrNull(apiEmployer.getCity()))
-				.setCountryIsoCode(safeTrimOrNull(apiEmployer.getCountryIsoCode()));
+				.setName(trimOrNull(apiEmployer.getName()))
+				.setPostalCode(trimOrNull(apiEmployer.getPostalCode()))
+				.setCity(trimOrNull(apiEmployer.getCity()))
+				.setCountryIsoCode(trimOrNull(apiEmployer.getCountryIsoCode()));
 	}
 
 	private EmploymentDto convertEmployment(ApiEmploymentDto apiEmployment) {
@@ -132,10 +132,10 @@ public class JobAdvertisementFromApiAssembler {
 			return null;
 		}
 		return new CreateLocationDto()
-				.setRemarks(safeTrimOrNull(apiLocation.getRemarks()))
-				.setCity(safeTrimOrNull(apiLocation.getCity()))
-				.setPostalCode(safeTrimOrNull(apiLocation.getPostalCode()))
-				.setCountryIsoCode(safeTrimOrNull(apiLocation.getCountryIsoCode()));
+				.setRemarks(trimOrNull(apiLocation.getRemarks()))
+				.setCity(trimOrNull(apiLocation.getCity()))
+				.setPostalCode(trimOrNull(apiLocation.getPostalCode()))
+				.setCountryIsoCode(trimOrNull(apiLocation.getCountryIsoCode()));
 	}
 
 	private OccupationDto convertOccupation(ApiOccupationDto apiOccupation) {
@@ -143,9 +143,9 @@ public class JobAdvertisementFromApiAssembler {
 			return null;
 		}
 		return new OccupationDto()
-				.setAvamOccupationCode(safeTrimOrNull(apiOccupation.getAvamOccupationCode()))
+				.setAvamOccupationCode(trimOrNull(apiOccupation.getAvamOccupationCode()))
 				.setWorkExperience(apiOccupation.getWorkExperience())
-				.setEducationCode(safeTrimOrNull(apiOccupation.getEducationCode()));
+				.setEducationCode(trimOrNull(apiOccupation.getEducationCode()));
 	}
 
 	private List<LanguageSkillDto> convertLanguageSkills(List<ApiLanguageSkillDto> apiLanguageSkills) {
@@ -154,7 +154,7 @@ public class JobAdvertisementFromApiAssembler {
 		}
 		return apiLanguageSkills.stream()
 				.map(apiLanguageSkill -> new LanguageSkillDto()
-						.setLanguageIsoCode(safeTrimOrNull(apiLanguageSkill.getLanguageIsoCode()))
+						.setLanguageIsoCode(trimOrNull(apiLanguageSkill.getLanguageIsoCode()))
 						.setSpokenLevel(apiLanguageSkill.getSpokenLevel())
 						.setWrittenLevel(apiLanguageSkill.getWrittenLevel())
 				)
@@ -167,12 +167,12 @@ public class JobAdvertisementFromApiAssembler {
 			return null;
 		}
 		return new ApplyChannelDto()
-				.setRawPostAddress(safeTrimOrNull(apiApplyChannel.getMailAddress()))
-				.setPostAddress(AddressParser.parse(safeTrimOrNull(apiApplyChannel.getMailAddress()), safeTrimOrNull(apiCreateDto.getCompany().getName())))
-				.setEmailAddress(safeTrimOrNull(apiApplyChannel.getEmailAddress()))
-				.setPhoneNumber(safeTrimOrNull(apiApplyChannel.getPhoneNumber()))
-				.setFormUrl(safeTrimOrNull(apiApplyChannel.getFormUrl()))
-				.setAdditionalInfo(safeTrimOrNull(apiApplyChannel.getAdditionalInfo()));
+				.setRawPostAddress(trimOrNull(apiApplyChannel.getMailAddress()))
+				.setPostAddress(AddressParser.parse(trimOrNull(apiApplyChannel.getMailAddress()), trimOrNull(apiCreateDto.getCompany().getName())))
+				.setEmailAddress(trimOrNull(apiApplyChannel.getEmailAddress()))
+				.setPhoneNumber(trimOrNull(apiApplyChannel.getPhoneNumber()))
+				.setFormUrl(trimOrNull(apiApplyChannel.getFormUrl()))
+				.setAdditionalInfo(trimOrNull(apiApplyChannel.getAdditionalInfo()));
 	}
 
 	private PublicContactDto convertPublicContact(ApiPublicContactDto apiPublicContact) {
@@ -181,13 +181,13 @@ public class JobAdvertisementFromApiAssembler {
 		}
 		return new PublicContactDto()
 				.setSalutation(apiPublicContact.getSalutation())
-				.setFirstName(safeTrimOrNull(apiPublicContact.getFirstName()))
-				.setLastName(safeTrimOrNull(apiPublicContact.getLastName()))
-				.setPhone(safeTrimOrNull(apiPublicContact.getPhone()))
-				.setEmail(safeTrimOrNull(apiPublicContact.getEmail()));
+				.setFirstName(trimOrNull(apiPublicContact.getFirstName()))
+				.setLastName(trimOrNull(apiPublicContact.getLastName()))
+				.setPhone(trimOrNull(apiPublicContact.getPhone()))
+				.setEmail(trimOrNull(apiPublicContact.getEmail()));
 	}
 
-	private static String safeTrimOrNull(String value) {
+	private static String trimOrNull(String value) {
 		return (hasText(value)) ? value.trim() : null;
 	}
 }
