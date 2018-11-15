@@ -39,7 +39,6 @@ public class ApiUserApplicationService {
                 .setTechnicalContactName(createApiUserDto.getTechnicalContactName())
                 .setTechnicalContactEmail(createApiUserDto.getTechnicalContactEmail())
                 .setActive(createApiUserDto.isActive())
-                .setCreateDate(TimeMachine.now().toLocalDate())
                 .build();
 
         ApiUser newApiUser = apiUserRepository.save(apiUser);
