@@ -5,7 +5,7 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.e
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.APPROVE_CONDITION;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.CANCEL_CONDITION;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.CREATE_FROM_AVAM_CONDITION;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.JOB_AD_ACTION_CHANNEL;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.JOB_AD_INT_ACTION_CHANNEL;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.REJECT_CONDITION;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.EVENT;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.PARTITION_KEY;
@@ -75,17 +75,17 @@ public class AvamService {
                 .build());
     }
 
-    @StreamListener(target = JOB_AD_ACTION_CHANNEL, condition = APPROVE_CONDITION)
+    @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = APPROVE_CONDITION)
     public void handleApprovedAction(ApprovalDto approvalDto) {
         jobAdvertisementApplicationService.approve(approvalDto);
     }
 
-    @StreamListener(target = JOB_AD_ACTION_CHANNEL, condition = REJECT_CONDITION)
+    @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = REJECT_CONDITION)
     public void handleRejectAction(RejectionDto rejectionDto) {
         jobAdvertisementApplicationService.reject(rejectionDto);
     }
 
-    @StreamListener(target = JOB_AD_ACTION_CHANNEL, condition = CREATE_FROM_AVAM_CONDITION)
+    @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CREATE_FROM_AVAM_CONDITION)
     public void handleCreateAction(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
         try {
             jobAdvertisementApplicationService.createFromAvam(createJobAdvertisementFromAvamDto);
@@ -94,7 +94,7 @@ public class AvamService {
         }
     }
 
-    @StreamListener(target = JOB_AD_ACTION_CHANNEL, condition = CANCEL_CONDITION)
+    @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CANCEL_CONDITION)
     public void handleCancelAction(CancellationDto cancellationDto) {
         JobAdvertisementDto jobAdvertisementDto;
         if(StringUtils.isNotBlank(cancellationDto.getStellennummerEgov())) {

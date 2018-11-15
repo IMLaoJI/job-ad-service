@@ -46,7 +46,7 @@ public class DLQItemConfig {
     }
 
     @Configuration
-    @Profile('!' + ProfileRegistry.AVAM_MOCK)
+    @Profile('!' + ProfileRegistry.MESSAGE_BROKER_MOCK)
     @EnableBinding(DLQChannels.class)
     static class DefaultMessageBroker {
 

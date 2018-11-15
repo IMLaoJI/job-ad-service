@@ -1,21 +1,21 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
+
+import javax.validation.Valid;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.validation.Valid;
-
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkForm;
-
 public class JobAdvertisementDto {
 
     private String id;
+
+    private LocalDateTime createdTime;
+
+    private LocalDateTime updatedTime;
 
     private JobAdvertisementStatus status;
 
@@ -55,205 +55,222 @@ public class JobAdvertisementDto {
     @Valid
     private PublicationDto publication;
 
-    protected JobAdvertisementDto() {
+    public JobAdvertisementDto() {
         // For reflection libs
-    }
-
-    public JobAdvertisementDto(String id, JobAdvertisementStatus status, SourceSystem sourceSystem, String externalReference, String stellennummerEgov, String stellennummerAvam, String fingerprint, boolean reportingObligation, LocalDate reportingObligationEndDate, boolean reportToAvam, String jobCenterCode, LocalDate approvalDate, LocalDate rejectionDate, String rejectionCode, String rejectionReason, LocalDate cancellationDate, CancellationCode cancellationCode, JobContentDto jobContent, OwnerDto owner, ContactDto contact, PublicationDto publication) {
-        this.id = id;
-        this.status = status;
-        this.sourceSystem = sourceSystem;
-        this.externalReference = externalReference;
-        this.stellennummerEgov = stellennummerEgov;
-        this.stellennummerAvam = stellennummerAvam;
-        this.fingerprint = fingerprint;
-        this.reportingObligation = reportingObligation;
-        this.reportingObligationEndDate = reportingObligationEndDate;
-        this.reportToAvam = reportToAvam;
-        this.jobCenterCode = jobCenterCode;
-        this.approvalDate = approvalDate;
-        this.rejectionDate = rejectionDate;
-        this.rejectionCode = rejectionCode;
-        this.rejectionReason = rejectionReason;
-        this.cancellationDate = cancellationDate;
-        this.cancellationCode = cancellationCode;
-        this.jobContent = jobContent;
-        this.publication = publication;
     }
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public JobAdvertisementDto setId(String id) {
         this.id = id;
+        return this;
+    }
+
+    public LocalDateTime getCreatedTime() {
+        return createdTime;
+    }
+
+    public JobAdvertisementDto setCreatedTime(LocalDateTime createdTime) {
+        this.createdTime = createdTime;
+        return this;
+    }
+
+    public LocalDateTime getUpdatedTime() {
+        return updatedTime;
+    }
+
+    public JobAdvertisementDto setUpdatedTime(LocalDateTime updatedTime) {
+        this.updatedTime = updatedTime;
+        return this;
     }
 
     public JobAdvertisementStatus getStatus() {
         return status;
     }
 
-    public void setStatus(JobAdvertisementStatus status) {
+    public JobAdvertisementDto setStatus(JobAdvertisementStatus status) {
         this.status = status;
+        return this;
     }
 
     public SourceSystem getSourceSystem() {
         return sourceSystem;
     }
 
-    public void setSourceSystem(SourceSystem sourceSystem) {
+    public JobAdvertisementDto setSourceSystem(SourceSystem sourceSystem) {
         this.sourceSystem = sourceSystem;
+        return this;
     }
 
     public String getExternalReference() {
         return externalReference;
     }
 
-    public void setExternalReference(String externalReference) {
+    public JobAdvertisementDto setExternalReference(String externalReference) {
         this.externalReference = externalReference;
+        return this;
     }
 
     public String getStellennummerEgov() {
         return stellennummerEgov;
     }
 
-    public void setStellennummerEgov(String stellennummerEgov) {
+    public JobAdvertisementDto setStellennummerEgov(String stellennummerEgov) {
         this.stellennummerEgov = stellennummerEgov;
+        return this;
     }
 
     public String getStellennummerAvam() {
         return stellennummerAvam;
     }
 
-    public void setStellennummerAvam(String stellennummerAvam) {
+    public JobAdvertisementDto setStellennummerAvam(String stellennummerAvam) {
         this.stellennummerAvam = stellennummerAvam;
+        return this;
     }
 
     public String getFingerprint() {
         return fingerprint;
     }
 
-    public void setFingerprint(String fingerprint) {
+    public JobAdvertisementDto setFingerprint(String fingerprint) {
         this.fingerprint = fingerprint;
+        return this;
     }
 
     public boolean isReportingObligation() {
         return reportingObligation;
     }
 
-    public void setReportingObligation(boolean reportingObligation) {
+    public JobAdvertisementDto setReportingObligation(boolean reportingObligation) {
         this.reportingObligation = reportingObligation;
+        return this;
     }
 
     public LocalDate getReportingObligationEndDate() {
         return reportingObligationEndDate;
     }
 
-    public void setReportingObligationEndDate(LocalDate reportingObligationEndDate) {
+    public JobAdvertisementDto setReportingObligationEndDate(LocalDate reportingObligationEndDate) {
         this.reportingObligationEndDate = reportingObligationEndDate;
+        return this;
     }
 
     public boolean isReportToAvam() {
         return reportToAvam;
     }
 
-    public void setReportToAvam(boolean reportToAvam) {
+    public JobAdvertisementDto setReportToAvam(boolean reportToAvam) {
         this.reportToAvam = reportToAvam;
+        return this;
     }
 
     public String getJobCenterCode() {
         return jobCenterCode;
     }
 
-    public void setJobCenterCode(String jobCenterCode) {
+    public JobAdvertisementDto setJobCenterCode(String jobCenterCode) {
         this.jobCenterCode = jobCenterCode;
+        return this;
     }
 
     public LocalDate getApprovalDate() {
         return approvalDate;
     }
 
-    public void setApprovalDate(LocalDate approvalDate) {
+    public JobAdvertisementDto setApprovalDate(LocalDate approvalDate) {
         this.approvalDate = approvalDate;
+        return this;
     }
 
     public LocalDate getRejectionDate() {
         return rejectionDate;
     }
 
-    public void setRejectionDate(LocalDate rejectionDate) {
+    public JobAdvertisementDto setRejectionDate(LocalDate rejectionDate) {
         this.rejectionDate = rejectionDate;
+        return this;
     }
 
     public String getRejectionCode() {
         return rejectionCode;
     }
 
-    public void setRejectionCode(String rejectionCode) {
+    public JobAdvertisementDto setRejectionCode(String rejectionCode) {
         this.rejectionCode = rejectionCode;
+        return this;
     }
 
     public String getRejectionReason() {
         return rejectionReason;
     }
 
-    public void setRejectionReason(String rejectionReason) {
+    public JobAdvertisementDto setRejectionReason(String rejectionReason) {
         this.rejectionReason = rejectionReason;
+        return this;
     }
 
     public LocalDate getCancellationDate() {
         return cancellationDate;
     }
 
-    public void setCancellationDate(LocalDate cancellationDate) {
+    public JobAdvertisementDto setCancellationDate(LocalDate cancellationDate) {
         this.cancellationDate = cancellationDate;
+        return this;
     }
 
     public CancellationCode getCancellationCode() {
         return cancellationCode;
     }
 
-    public void setCancellationCode(CancellationCode cancellationCode) {
+    public JobAdvertisementDto setCancellationCode(CancellationCode cancellationCode) {
         this.cancellationCode = cancellationCode;
+        return this;
     }
 
     public JobContentDto getJobContent() {
         return jobContent;
     }
 
-    public void setJobContent(JobContentDto jobContent) {
+    public JobAdvertisementDto setJobContent(JobContentDto jobContent) {
         this.jobContent = jobContent;
+        return this;
     }
 
     public PublicationDto getPublication() {
         return publication;
     }
 
-    public void setPublication(PublicationDto publication) {
+    public JobAdvertisementDto setPublication(PublicationDto publication) {
         this.publication = publication;
+        return this;
     }
 
     public static JobAdvertisementDto toDto(JobAdvertisement jobAdvertisement) {
-        JobAdvertisementDto jobAdvertisementDto = new JobAdvertisementDto();
-        jobAdvertisementDto.setId(jobAdvertisement.getId().getValue());
-        jobAdvertisementDto.setStatus(jobAdvertisement.getStatus());
-        jobAdvertisementDto.setSourceSystem(jobAdvertisement.getSourceSystem());
-        jobAdvertisementDto.setExternalReference(jobAdvertisement.getExternalReference());
-        jobAdvertisementDto.setStellennummerEgov(jobAdvertisement.getStellennummerEgov());
-        jobAdvertisementDto.setStellennummerAvam(jobAdvertisement.getStellennummerAvam());
-        jobAdvertisementDto.setFingerprint(jobAdvertisement.getFingerprint());
-        jobAdvertisementDto.setReportingObligation(jobAdvertisement.isReportingObligation());
-        jobAdvertisementDto.setReportingObligationEndDate(jobAdvertisement.getReportingObligationEndDate());
-        jobAdvertisementDto.setReportToAvam(jobAdvertisement.isReportToAvam());
-        jobAdvertisementDto.setJobCenterCode(jobAdvertisement.getJobCenterCode());
-        jobAdvertisementDto.setApprovalDate(jobAdvertisement.getApprovalDate());
-        jobAdvertisementDto.setRejectionDate(jobAdvertisement.getRejectionDate());
-        jobAdvertisementDto.setRejectionCode(jobAdvertisement.getRejectionCode());
-        jobAdvertisementDto.setRejectionReason(jobAdvertisement.getRejectionReason());
-        jobAdvertisementDto.setCancellationDate(jobAdvertisement.getCancellationDate());
-        jobAdvertisementDto.setCancellationCode(jobAdvertisement.getCancellationCode());
-        jobAdvertisementDto.setJobContent(JobContentDto.toDto(jobAdvertisement.getJobContent()));
-        jobAdvertisementDto.setPublication(PublicationDto.toDto(jobAdvertisement.getPublication()));
+        JobAdvertisementDto jobAdvertisementDto = new JobAdvertisementDto()
+                .setId(jobAdvertisement.getId().getValue())
+                .setCreatedTime(jobAdvertisement.getCreatedTime())
+                .setUpdatedTime(jobAdvertisement.getUpdatedTime())
+                .setStatus(jobAdvertisement.getStatus())
+                .setSourceSystem(jobAdvertisement.getSourceSystem())
+                .setExternalReference(jobAdvertisement.getExternalReference())
+                .setStellennummerEgov(jobAdvertisement.getStellennummerEgov())
+                .setStellennummerAvam(jobAdvertisement.getStellennummerAvam())
+                .setFingerprint(jobAdvertisement.getFingerprint())
+                .setReportingObligation(jobAdvertisement.isReportingObligation())
+                .setReportingObligationEndDate(jobAdvertisement.getReportingObligationEndDate())
+                .setReportToAvam(jobAdvertisement.isReportToAvam())
+                .setJobCenterCode(jobAdvertisement.getJobCenterCode())
+                .setApprovalDate(jobAdvertisement.getApprovalDate())
+                .setRejectionDate(jobAdvertisement.getRejectionDate())
+                .setRejectionCode(jobAdvertisement.getRejectionCode())
+                .setRejectionReason(jobAdvertisement.getRejectionReason())
+                .setCancellationDate(jobAdvertisement.getCancellationDate())
+                .setCancellationCode(jobAdvertisement.getCancellationCode())
+                .setJobContent(JobContentDto.toDto(jobAdvertisement.getJobContent()))
+                .setPublication(PublicationDto.toDto(jobAdvertisement.getPublication()));
 
         // Eager load data from ElementCollection
         Set<WorkForm> workForms = jobAdvertisement.getJobContent().getEmployment().getWorkForms() != null

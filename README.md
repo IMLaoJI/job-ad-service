@@ -30,3 +30,4 @@ The payload scripts can be found under ```/src/test-data```. Be aware of already
 [Setting up Continuous Integration]: http://www.jhipster.tech/documentation-archive/v4.14.0/setting-up-ci/
 
 [Gatling]: http://gatling.io/
+

@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.CREATE_FROM_X28_CONDITION;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.JOB_AD_ACTION_CHANNEL;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.JOB_AD_INT_ACTION_CHANNEL;
 
 @Service
 public class X28Adapter {
@@ -58,7 +58,7 @@ public class X28Adapter {
         }
     }
 
-    @StreamListener(target = JOB_AD_ACTION_CHANNEL, condition = CREATE_FROM_X28_CONDITION)
+    @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CREATE_FROM_X28_CONDITION)
     public void handleCreateFromX28Action(X28CreateJobAdvertisementDto createFromX28) {
         try {
             logLastX28MessageDate(createFromX28.getFingerprint());
