@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import static org.springframework.util.StringUtils.hasText;
 
-public class AddressParser {
+class AddressParser {
 
 	private static final Pattern ADDRESS_PATTERN = Pattern.compile("(.*)[,][ ]*([A-Z]{2}-)?(\\d{4,5})[ ]+(.*)");
 	private static final Pattern ADDRESSLINE_PATTERN = Pattern.compile("(.*)[,][ ]*(.*)");
@@ -23,7 +23,7 @@ public class AddressParser {
 	 * This simplified parser treats addresses as Swiss addresses unless a country code is given (E.g. DE-80120).
 	 * If the address is incomplete, the business name can be supplemented as address name.
 	 */
-	public static AddressDto parse(String rawAddress, String companyName) {
+	static AddressDto parse(String rawAddress, String companyName) {
 		if (!hasText(rawAddress)) {
 			return null;
 		}
