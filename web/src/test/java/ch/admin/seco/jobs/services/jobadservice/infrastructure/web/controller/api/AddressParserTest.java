@@ -1,12 +1,18 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.api;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.AddressDto;
+import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AddressParserTest {
 
     private AddressTest[] addresses = {
+            new AddressTest(
+                    // null
+                    null,
+                    null
+            ),
             new AddressTest(
                     // 2 words city
                     "A à Z emplois SA, 2301 La Chaux-de-Fonds",
@@ -75,12 +81,17 @@ public class AddressParserTest {
             new AddressTest(
                     // Characters in house number
                     "Muster AG, Musterstrasse 10B, 3000 Bern",
-                    createAddressDto("Muster AG\nz.H Muster Hans", "Musterstrasse", "1", "3000", "Bern", null, null, null, "CH")
+                    createAddressDto("Muster AG", "Musterstrasse", "10B", "3000", "Bern", null, null, null, "CH")
             ),
             new AddressTest(
                     // Line break separated and second name
                     "Muster AG\nz.H Muster Hans\nMusterstrasse 1\n3000 Bern",
-                    createAddressDto("Muster AG\nz.H Muster Hans", "Musterstrasse", "1", "3000", "Bern", null, null, null, "CH")
+                    createAddressDto("Muster AG,z.H Muster Hans", "Musterstrasse", "1", "3000", "Bern", null, null, null, "CH")
+            ),
+            new AddressTest(
+                    // Line break separated and second name and spaces
+                    "Muster AG \n  z.H Muster Hans  \n  Musterstrasse  1 \n3000 Bern",
+                    createAddressDto("Muster AG ,  z.H Muster Hans", "Musterstrasse", "1", "3000", "Bern", null, null, null, "CH")
             ),
             new AddressTest(
                     // Country code Switzerland
@@ -96,15 +107,20 @@ public class AddressParserTest {
                     // Post office box address
                     "Muster AG, Postfach 123, 3000 Bern",
                     createAddressDto("Muster AG", null, null, null, null, "123", "3000", "Bern", "CH")
-            )
+            ),
+		    new AddressTest(
+				    // Post office box address
+				    "Muster AG , PO Box 1023  , 3000 Bern",
+				    createAddressDto("Muster AG", null, null, null, null, "1023", "3000", "Bern", "CH")
+		    )
     };
 
     // FIXME Test should run correctly
-    //@Test
+    @Test
     public void shouldParseAddress() {
         for (AddressTest address : addresses) {
             System.out.println("Check address: " + address.getInput());
-            AddressDto result = AddressParser.parse(address.getInput());
+            AddressDto result = AddressParser.parse(address.getInput(), (address.getExpected() != null) ? address.getExpected().getName() : null);
 
             if (address.getExpected() == null) {
                 assertThat(result).as("Check result is null").isNull();
