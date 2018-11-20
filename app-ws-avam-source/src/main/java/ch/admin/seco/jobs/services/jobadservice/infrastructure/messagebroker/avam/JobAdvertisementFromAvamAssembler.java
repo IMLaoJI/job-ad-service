@@ -333,7 +333,7 @@ public class JobAdvertisementFromAvamAssembler {
         return new AddressDto()
                 .setName(safeTrimOrNull(avamJobAdvertisement.getBewerUntName()))
                 .setStreet(safeTrimOrNull(avamJobAdvertisement.getBewerUntStrasse()))
-                .setHouseNumber(safeTrimOrNull(avamJobAdvertisement.getUntHausNr()))
+                .setHouseNumber(safeTrimOrNull(avamJobAdvertisement.getBewerUntHausNr()))
                 .setPostalCode(safeTrimOrNull(avamJobAdvertisement.getBewerUntPlz()))
                 .setCity(safeTrimOrNull(avamJobAdvertisement.getBewerUntOrt()))
                 .setPostOfficeBoxNumber(safeTrimOrNull(avamJobAdvertisement.getBewerUntPostfach()))
