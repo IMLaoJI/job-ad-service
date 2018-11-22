@@ -4,6 +4,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -54,7 +55,8 @@ public class JobAdvertisementApiRestController {
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "25") int size
     ) {
-        return PageResource.of(jobAdvertisementToApiAssembler.convertPage(jobAdvertisementApplicationService.findOwnJobAdvertisements(PageRequest.of(page, size))));
+        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdTime")));
+        return PageResource.of(jobAdvertisementToApiAssembler.convertPage(jobAdvertisementApplicationService.findOwnJobAdvertisements(pageRequest)));
     }
 
     @GetMapping("/{id}")
