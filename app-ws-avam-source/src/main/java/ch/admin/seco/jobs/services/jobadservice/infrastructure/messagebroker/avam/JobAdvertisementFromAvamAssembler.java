@@ -65,7 +65,8 @@ public class JobAdvertisementFromAvamAssembler {
                 createCreateLocationDto(avamJobAdvertisement),
                 createOccupationDtos(avamJobAdvertisement),
                 createLanguageSkillDtos(avamJobAdvertisement),
-                createPublicationDto(avamJobAdvertisement)
+                createPublicationDto(avamJobAdvertisement),
+                createPublicContactDto(avamJobAdvertisement)
         );
     }
 
@@ -93,7 +94,8 @@ public class JobAdvertisementFromAvamAssembler {
                         createCreateLocationDto(avamJobAdvertisement),
                         createOccupationDtos(avamJobAdvertisement),
                         createLanguageSkillDtos(avamJobAdvertisement),
-                        createPublicationDto(avamJobAdvertisement)
+                        createPublicationDto(avamJobAdvertisement),
+                        createPublicContactDto(avamJobAdvertisement)
                 )
         );
     }
@@ -129,9 +131,27 @@ public class JobAdvertisementFromAvamAssembler {
                     .setSalutation(hasText(avamJobAdvertisement.getKpAnredeCode()) ? SALUTATIONS.getRight(avamJobAdvertisement.getKpAnredeCode()) : Salutation.MR)
                     .setFirstName(safeTrimOrNull(avamJobAdvertisement.getKpVorname()))
                     .setLastName(safeTrimOrNull(avamJobAdvertisement.getKpName()))
-                    .setPhone(sanitizePhoneNumber(avamJobAdvertisement.getKpTelefonNr(), avamJobAdvertisement))
-                    .setEmail(sanitizeEmail(avamJobAdvertisement.getKpEmail(), avamJobAdvertisement))
+                    .setPhone(sanitizePhoneNumber(safeTrimOrNull(avamJobAdvertisement.getKpTelefonNr()), avamJobAdvertisement))
+                    .setEmail(sanitizeEmail(safeTrimOrNull(avamJobAdvertisement.getKpEmail()), avamJobAdvertisement))
                     .setLanguageIsoCode(""); // Not defined in this AVAM version
+        }
+
+        return null;
+    }
+
+    private PublicContactDto createPublicContactDto(WSOsteEgov avamJobAdvertisement) {
+        if (hasText(avamJobAdvertisement.getKpFragenAnredeCode()) ||
+                hasText(avamJobAdvertisement.getKpFragenVorname()) ||
+                hasText(avamJobAdvertisement.getKpFragenName()) ||
+                hasText(avamJobAdvertisement.getKpFragenTelefonNr()) ||
+                hasText(avamJobAdvertisement.getKpFragenEmail())) {
+
+            return new PublicContactDto()
+                    .setSalutation(hasText(avamJobAdvertisement.getKpAnredeCode()) ? SALUTATIONS.getRight(avamJobAdvertisement.getKpFragenAnredeCode()) : Salutation.MR)
+                    .setFirstName(safeTrimOrNull(avamJobAdvertisement.getKpFragenVorname()))
+                    .setLastName(safeTrimOrNull(avamJobAdvertisement.getKpFragenName()))
+                    .setPhone(sanitizePhoneNumber(safeTrimOrNull(avamJobAdvertisement.getKpFragenTelefonNr()), avamJobAdvertisement))
+                    .setEmail(sanitizeEmail(safeTrimOrNull(avamJobAdvertisement.getKpFragenEmail()), avamJobAdvertisement));
         }
 
         return null;
@@ -178,10 +198,10 @@ public class JobAdvertisementFromAvamAssembler {
 
     private ApplyChannelDto createApplyChannelDto(WSOsteEgov avamJobAdvertisement) {
         return new ApplyChannelDto()
-                .setMailAddress(avamJobAdvertisement.isBewerSchriftlich() ? createApplyMailAddress(avamJobAdvertisement) : null)
-                .setEmailAddress(avamJobAdvertisement.isBewerElektronisch() ? sanitizeEmail(avamJobAdvertisement.getUntEmail(), avamJobAdvertisement) : null)
-                .setPhoneNumber(avamJobAdvertisement.isBewerTelefonisch() ? sanitizePhoneNumber(avamJobAdvertisement.getUntTelefon(), avamJobAdvertisement) : null)
-                .setFormUrl(avamJobAdvertisement.isBewerElektronisch() ? sanitizeUrl(avamJobAdvertisement.getUntUrl(), avamJobAdvertisement) : null)
+                .setPostAddress(avamJobAdvertisement.isBewerSchriftlich() ? createApplyChannelPostAddress(avamJobAdvertisement) : null)
+                .setEmailAddress(avamJobAdvertisement.isBewerElektronisch() ? sanitizeEmail(safeTrimOrNull(avamJobAdvertisement.getBewerUntEmail()), avamJobAdvertisement) : null)
+                .setPhoneNumber(avamJobAdvertisement.isBewerTelefonisch() ? sanitizePhoneNumber(safeTrimOrNull(avamJobAdvertisement.getBewerUntTelefon()), avamJobAdvertisement) : null)
+                .setFormUrl(avamJobAdvertisement.isBewerElektronisch() ? sanitizeUrl(safeTrimOrNull(avamJobAdvertisement.getBewerUntUrl()), avamJobAdvertisement) : null)
                 .setAdditionalInfo(safeTrimOrNull(avamJobAdvertisement.getBewerAngaben()));
     }
 
@@ -309,29 +329,17 @@ public class JobAdvertisementFromAvamAssembler {
         return null;
     }
 
-    private String createApplyMailAddress(WSOsteEgov avamJobAdvertisement) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(avamJobAdvertisement.getUntName());
-        if (hasText(avamJobAdvertisement.getUntStrasse())) {
-            sb.append(", ");
-            sb.append(avamJobAdvertisement.getUntStrasse());
-            sb.append(' ');
-            sb.append(avamJobAdvertisement.getUntHausNr());
-        }
-        if (hasText(avamJobAdvertisement.getUntPostfach())) {
-            sb.append(", ");
-            sb.append(avamJobAdvertisement.getUntPostfach());
-            sb.append(", ");
-            sb.append(avamJobAdvertisement.getUntPostfachPlz());
-            sb.append(' ');
-            sb.append(avamJobAdvertisement.getUntPostfachOrt());
-        } else if (hasText(avamJobAdvertisement.getUntPlz())) {
-            sb.append(", ");
-            sb.append(avamJobAdvertisement.getUntPlz());
-            sb.append(' ');
-            sb.append(avamJobAdvertisement.getUntOrt());
-        }
-        return sb.toString();
+    private AddressDto createApplyChannelPostAddress(WSOsteEgov avamJobAdvertisement) {
+        return new AddressDto()
+                .setName(safeTrimOrNull(avamJobAdvertisement.getBewerUntName()))
+                .setStreet(safeTrimOrNull(avamJobAdvertisement.getBewerUntStrasse()))
+                .setHouseNumber(safeTrimOrNull(avamJobAdvertisement.getBewerUntHausNr()))
+                .setPostalCode(safeTrimOrNull(avamJobAdvertisement.getBewerUntPlz()))
+                .setCity(safeTrimOrNull(avamJobAdvertisement.getBewerUntOrt()))
+                .setPostOfficeBoxNumber(safeTrimOrNull(avamJobAdvertisement.getBewerUntPostfach()))
+                .setPostOfficeBoxPostalCode(safeTrimOrNull(avamJobAdvertisement.getBewerUntPostfachPlz()))
+                .setPostOfficeBoxCity(safeTrimOrNull(avamJobAdvertisement.getBewerUntPostfachOrt()))
+                .setCountryIsoCode(safeTrimOrNull(avamJobAdvertisement.getBewerUntLand()));
     }
 
 

@@ -22,6 +22,7 @@ public class JobAdvertisementUpdater {
     static final String SECTION_DISPLAY_COMPANY = "SECTION_DISPLAY_COMPANY";
     static final String SECTION_COMPANY = "SECTION_COMPANY";
     static final String SECTION_CONTACT = "SECTION_CONTACT";
+    static final String SECTION_PUBLIC_CONTACT = "SECTION_PUBLIC_CONTACT";
     static final String SECTION_LOCATION = "SECTION_LOCATION";
     static final String SECTION_OCCUPATIONS = "SECTION_OCCUPATIONS";
     static final String SECTION_LANGUAGE_SKILLS = "SECTION_LANGUAGE_SKILLS";
@@ -58,6 +59,8 @@ public class JobAdvertisementUpdater {
 
     private Contact contact;
 
+    private PublicContact publicContact;
+
     private Location location;
 
     private List<Occupation> occupations;
@@ -83,6 +86,7 @@ public class JobAdvertisementUpdater {
         this.displayCompany = builder.displayCompany;
         this.company = builder.company;
         this.contact = builder.contact;
+        this.publicContact = builder.publicContact;
         this.location = builder.location;
         this.occupations = builder.occupations;
         this.languageSkills = builder.languageSkills;
@@ -153,6 +157,10 @@ public class JobAdvertisementUpdater {
         return contact;
     }
 
+    public PublicContact getPublicContact() {
+        return publicContact;
+    }
+
     public Location getLocation() {
         return location;
     }
@@ -187,6 +195,7 @@ public class JobAdvertisementUpdater {
         private Company displayCompany;
         private Company company;
         private Contact contact;
+        private PublicContact publicContact;
         private Location location;
         private List<Occupation> occupations;
         private List<LanguageSkill> languageSkills;
@@ -271,6 +280,12 @@ public class JobAdvertisementUpdater {
         public Builder setContact(Contact contact) {
             this.changedSections.add(SECTION_CONTACT);
             this.contact = contact;
+            return this;
+        }
+
+        public Builder setPublicContact(PublicContact publicContact) {
+            this.changedSections.add(SECTION_PUBLIC_CONTACT);
+            this.publicContact = publicContact;
             return this;
         }
 

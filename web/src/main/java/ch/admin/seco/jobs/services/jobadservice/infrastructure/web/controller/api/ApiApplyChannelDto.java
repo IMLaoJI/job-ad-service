@@ -22,68 +22,48 @@ public class ApiApplyChannelDto {
     @Size(max=255)
     private String additionalInfo;
 
-    protected ApiApplyChannelDto() {
-        // For reflection libs
-    }
-
-    public ApiApplyChannelDto(String mailAddress, String emailAddress, String phoneNumber, String formUrl, String additionalInfo) {
-        this.mailAddress = mailAddress;
-        this.emailAddress = emailAddress;
-        this.phoneNumber = phoneNumber;
-        this.formUrl = formUrl;
-        this.additionalInfo = additionalInfo;
-    }
-
     public String getMailAddress() {
         return mailAddress;
     }
 
-    public void setMailAddress(String mailAddress) {
+    public ApiApplyChannelDto setMailAddress(String mailAddress) {
         this.mailAddress = mailAddress;
+        return this;
     }
 
     public String getEmailAddress() {
         return emailAddress;
     }
 
-    public void setEmailAddress(String emailAddress) {
+    public ApiApplyChannelDto setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
+        return this;
     }
 
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
+    public ApiApplyChannelDto setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+        return this;
     }
 
     public String getFormUrl() {
         return formUrl;
     }
 
-    public void setFormUrl(String formUrl) {
+    public ApiApplyChannelDto setFormUrl(String formUrl) {
         this.formUrl = formUrl;
+        return this;
     }
 
     public String getAdditionalInfo() {
         return additionalInfo;
     }
 
-    public void setAdditionalInfo(String additionalInfo) {
+    public ApiApplyChannelDto setAdditionalInfo(String additionalInfo) {
         this.additionalInfo = additionalInfo;
-    }
-
-    public static ApiApplyChannelDto toDto(ApplyChannel applyChannel) {
-        if (applyChannel == null) {
-            return null;
-        }
-        ApiApplyChannelDto applyChannelDto = new ApiApplyChannelDto();
-        applyChannelDto.setMailAddress(applyChannel.getMailAddress());
-        applyChannelDto.setEmailAddress(applyChannel.getEmailAddress());
-        applyChannelDto.setPhoneNumber(applyChannel.getPhoneNumber());
-        applyChannelDto.setFormUrl(applyChannel.getFormUrl());
-        applyChannelDto.setAdditionalInfo(applyChannel.getAdditionalInfo());
-        return applyChannelDto;
+        return this;
     }
 }

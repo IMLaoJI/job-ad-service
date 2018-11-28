@@ -17,13 +17,13 @@ public class AvamWebServiceClient {
 
     private static final String AVAM_RESPONSE_OK = "NK_AVAM: OK";
 
-    private final AvamJobAdvertisementAssembler assembler;
+    private final JobAdvertisementToAvamAssembler assembler;
     private final WebServiceTemplate webserviceTemplate;
     private final String username;
     private final String password;
 
     public AvamWebServiceClient(WebServiceTemplate webserviceTemplate, String username, String password) {
-        this.assembler = new AvamJobAdvertisementAssembler();
+        this.assembler = new JobAdvertisementToAvamAssembler();
         this.webserviceTemplate = webserviceTemplate;
         this.username = username;
         this.password = password;

@@ -15,7 +15,7 @@ import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebro
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamDateTimeFormatter.formatLocalDate;
 import static org.springframework.util.StringUtils.hasText;
 
-public class AvamJobAdvertisementAssembler {
+public class JobAdvertisementToAvamAssembler {
 
     private static String DEFAULT_JOB_CENTER_CODE = "CHA20";
 
@@ -83,6 +83,7 @@ public class AvamJobAdvertisementAssembler {
         fillLocation(avamJobAdvertisement, jobContent.getLocation());
         fillOccupation(avamJobAdvertisement, jobContent.getOccupations());
         fillLangaugeSkills(avamJobAdvertisement, jobContent.getLanguageSkills());
+        fillPublicContact(avamJobAdvertisement, jobContent.getPublicContact());
 
         avamJobAdvertisement.setMeldepflicht(jobAdvertisement.isReportingObligation());
         avamJobAdvertisement.setSperrfrist(formatLocalDate(jobAdvertisement.getReportingObligationEndDate()));
@@ -131,12 +132,28 @@ public class AvamJobAdvertisementAssembler {
         if (applyChannel == null) {
             return;
         }
-        avamJobAdvertisement.setBewerSchriftlich(hasText(applyChannel.getMailAddress()));
+
+        Address postAddress = applyChannel.getPostAddress();
+        if (postAddress != null) {
+            avamJobAdvertisement.setBewerSchriftlich(true);
+            avamJobAdvertisement.setBewerUntName(postAddress.getName());
+            avamJobAdvertisement.setBewerUntStrasse(postAddress.getStreet());
+            avamJobAdvertisement.setBewerUntHausNr(postAddress.getHouseNumber());
+            avamJobAdvertisement.setBewerUntPlz(postAddress.getPostalCode());
+            avamJobAdvertisement.setBewerUntOrt(postAddress.getCity());
+            avamJobAdvertisement.setBewerUntPostfach(postAddress.getPostOfficeBoxNumber());
+            avamJobAdvertisement.setBewerUntPostfachPlz(postAddress.getPostOfficeBoxPostalCode());
+            avamJobAdvertisement.setBewerUntPostfachOrt(postAddress.getPostOfficeBoxCity());
+            avamJobAdvertisement.setBewerUntLand(postAddress.getCountryIsoCode());
+        }
+
         avamJobAdvertisement.setBewerElektronisch(hasText(applyChannel.getEmailAddress()) || hasText(applyChannel.getFormUrl()));
-        avamJobAdvertisement.setUntEmail(applyChannel.getEmailAddress());
-        avamJobAdvertisement.setUntUrl(applyChannel.getFormUrl()); // actually used for 'Online Bewerbung' instead 'home page'
+        avamJobAdvertisement.setBewerUntEmail(applyChannel.getEmailAddress());
+        avamJobAdvertisement.setBewerUntUrl(applyChannel.getFormUrl());
+
         avamJobAdvertisement.setBewerTelefonisch(hasText(applyChannel.getPhoneNumber()));
-        avamJobAdvertisement.setUntTelefon(applyChannel.getPhoneNumber());
+        avamJobAdvertisement.setBewerUntTelefon(applyChannel.getPhoneNumber());
+
         avamJobAdvertisement.setBewerAngaben(applyChannel.getAdditionalInfo());
     }
 
@@ -177,6 +194,17 @@ public class AvamJobAdvertisementAssembler {
         // FIXME: Temparory fix for mulitple email-addresses. to be remove after 01.09.2018 or handled otherwise
         avamJobAdvertisement.setKpEmail(fetchFirstEmail(contact.getEmail()));
         //avamJobAdvertisement.setKpEmail(contact.getEmail());
+    }
+
+    private void fillPublicContact(TOsteEgov avamJobAdvertisement, PublicContact contact) {
+        if (contact == null) {
+            return;
+        }
+        avamJobAdvertisement.setKpFragenAnredeCode(AvamCodeResolver.SALUTATIONS.getLeft(contact.getSalutation()));
+        avamJobAdvertisement.setKpFragenVorname(contact.getFirstName());
+        avamJobAdvertisement.setKpFragenName(contact.getLastName());
+        avamJobAdvertisement.setKpFragenTelefonNr(contact.getPhone());
+        avamJobAdvertisement.setKpFragenEmail(fetchFirstEmail(contact.getEmail()));
     }
 
     static String fetchFirstEmail(String email) {
@@ -262,5 +290,4 @@ public class AvamJobAdvertisementAssembler {
             avamJobAdvertisement.setSk5SchriftlichCode(AvamCodeResolver.LANGUAGE_LEVEL.getLeft(languageSkill.getWrittenLevel()));
         }
     }
-
- }
+}

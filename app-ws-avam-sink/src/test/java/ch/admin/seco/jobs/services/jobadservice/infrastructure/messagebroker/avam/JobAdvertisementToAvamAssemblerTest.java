@@ -1,6 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamJobAdvertisementAssembler.fetchFirstEmail;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.JobAdvertisementToAvamAssembler.fetchFirstEmail;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
@@ -23,7 +23,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Publicat
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.TOsteEgov;
 
-public class AvamJobAdvertisementAssemblerTest {
+public class JobAdvertisementToAvamAssemblerTest {
 
     @Test
     public void testFetchFirstEmail() {
@@ -58,7 +58,7 @@ public class AvamJobAdvertisementAssemblerTest {
                 .build();
         JobAdvertisement jobAdvertisement = createJobAdvertisementForCompanyAndEmployer(company, employer);
 
-        AvamJobAdvertisementAssembler assembler = new AvamJobAdvertisementAssembler();
+        JobAdvertisementToAvamAssembler assembler = new JobAdvertisementToAvamAssembler();
 
         TOsteEgov oste = assembler.toOsteEgov(jobAdvertisement, AvamAction.ANMELDUNG);
 
@@ -91,7 +91,7 @@ public class AvamJobAdvertisementAssemblerTest {
 
         JobAdvertisement jobAdvertisement = createJobAdvertisementForCompanyAndEmployer(company, null);
 
-        AvamJobAdvertisementAssembler assembler = new AvamJobAdvertisementAssembler();
+        JobAdvertisementToAvamAssembler assembler = new JobAdvertisementToAvamAssembler();
 
         TOsteEgov oste = assembler.toOsteEgov(jobAdvertisement, AvamAction.ANMELDUNG);
 

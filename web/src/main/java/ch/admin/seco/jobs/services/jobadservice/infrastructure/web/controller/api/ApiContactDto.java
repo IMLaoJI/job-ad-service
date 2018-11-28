@@ -36,78 +36,57 @@ public class ApiContactDto {
     @LanguageIsoCode
     private String languageIsoCode;
 
-    protected ApiContactDto() {
-        // For reflection libs
-    }
-
-    public ApiContactDto(Salutation salutation, String firstName, String lastName, String phone, String email, String languageIsoCode) {
-        this.salutation = salutation;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phone = phone;
-        this.email = email;
-        this.languageIsoCode = languageIsoCode;
-    }
-
     public Salutation getSalutation() {
         return salutation;
     }
 
-    public void setSalutation(Salutation salutation) {
+    public ApiContactDto setSalutation(Salutation salutation) {
         this.salutation = salutation;
+        return this;
     }
 
     public String getFirstName() {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
+    public ApiContactDto setFirstName(String firstName) {
         this.firstName = firstName;
+        return this;
     }
 
     public String getLastName() {
         return lastName;
     }
 
-    public void setLastName(String lastName) {
+    public ApiContactDto setLastName(String lastName) {
         this.lastName = lastName;
+        return this;
     }
 
     public String getPhone() {
         return phone;
     }
 
-    public void setPhone(String phone) {
+    public ApiContactDto setPhone(String phone) {
         this.phone = phone;
+        return this;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
+    public ApiContactDto setEmail(String email) {
         this.email = email;
+        return this;
     }
 
     public String getLanguageIsoCode() {
         return languageIsoCode;
     }
 
-    public void setLanguageIsoCode(String languageIsoCode) {
+    public ApiContactDto setLanguageIsoCode(String languageIsoCode) {
         this.languageIsoCode = languageIsoCode;
-    }
-
-    public static ApiContactDto toDto(Contact contact) {
-        if (contact == null) {
-            return null;
-        }
-        ApiContactDto contactDto = new ApiContactDto();
-        contactDto.setSalutation(contact.getSalutation());
-        contactDto.setFirstName(contact.getFirstName());
-        contactDto.setLastName(contact.getLastName());
-        contactDto.setPhone(contact.getPhone());
-        contactDto.setEmail(contact.getEmail());
-        contactDto.setLanguageIsoCode(contact.getLanguage().getLanguage());
-        return contactDto;
+        return this;
     }
 }
