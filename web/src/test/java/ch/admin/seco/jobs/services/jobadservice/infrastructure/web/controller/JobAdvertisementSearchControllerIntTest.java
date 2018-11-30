@@ -482,13 +482,14 @@ public class JobAdvertisementSearchControllerIntTest {
     @Test
     public void shouldFilterByCompanyName() throws Exception {
         // GIVEN
-        index(createJob(job01.id()));
+        index(createJobWithCompanyName(job01.id(), "Siemens AG"));
         index(createJobWithCompanyName(job02.id(), "Gösser"));
-        index(createJob(job03.id()));
+        index(createJobWithCompanyName(job03.id(), "Goessip"));
+        index(createJobWithCompanyName(job04.id(), "AG Gösser Zurich"));
 
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setCompanyName("Goesser");
+        searchRequest.setCompanyName("goes");
 
         ResultActions resultActions = mockMvc.perform(
                 post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -500,9 +501,10 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(header().string("X-Total-Count", "1"))
-                .andExpect(jsonPath("$.*.id").value(job02.name()))
-        ;
+                .andExpect(header().string("X-Total-Count", "3"))
+                .andExpect(jsonPath("$.[*].id").value(hasItem(job02.name())))
+                .andExpect(jsonPath("$.[*].id").value(hasItem(job03.name())))
+                .andExpect(jsonPath("$.[*].id").value(hasItem(job04.name())));
     }
 
     @Test

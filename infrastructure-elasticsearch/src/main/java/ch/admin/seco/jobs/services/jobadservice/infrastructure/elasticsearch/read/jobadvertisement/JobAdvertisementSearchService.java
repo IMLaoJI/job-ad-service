@@ -346,7 +346,7 @@ public class JobAdvertisementSearchService {
         BoolQueryBuilder companyFilter = boolQuery();
 
         if (isNotBlank(companyName)) {
-            companyFilter.must(matchPhraseQuery(PATH_COMPANY_NAME, companyName));
+            companyFilter.must(matchPhrasePrefixQuery(PATH_COMPANY_NAME, companyName));
         }
 
         return companyFilter;
