@@ -20,7 +20,7 @@ public class DefaultProfessionService implements ProfessionService {
 
     @Override
     public Profession findByAvamCode(String avamCode) {
-        OccupationLabelMappingResource resource = occupationLabelApiClient.getOccupationMapping(ProfessionCodeType.AVAM.toString(), avamCode);
+        OccupationLabelMappingResource resource = occupationLabelApiClient.getOccupationMapping(ProfessionCodeType.AVAM.name(), avamCode);
         if (resource != null) {
             return new Profession(
                     new ProfessionId(resource.getAvamCode()),
