@@ -23,8 +23,8 @@ public enum JobAdvertisementStatus {
         APPROVED.allowedDestinationStates = new JobAdvertisementStatus[]{CANCELLED, REFINING};
         REJECTED.allowedDestinationStates = new JobAdvertisementStatus[]{};
         REFINING.allowedDestinationStates = new JobAdvertisementStatus[]{CANCELLED, PUBLISHED_RESTRICTED, PUBLISHED_PUBLIC};
-        PUBLISHED_RESTRICTED.allowedDestinationStates = new JobAdvertisementStatus[]{CANCELLED, PUBLISHED_PUBLIC};
-        PUBLISHED_PUBLIC.allowedDestinationStates = new JobAdvertisementStatus[]{CANCELLED, ARCHIVED};
+        PUBLISHED_RESTRICTED.allowedDestinationStates = new JobAdvertisementStatus[]{CANCELLED, PUBLISHED_PUBLIC, REFINING};
+        PUBLISHED_PUBLIC.allowedDestinationStates = new JobAdvertisementStatus[]{CANCELLED, ARCHIVED, REFINING};
         CANCELLED.allowedDestinationStates = new JobAdvertisementStatus[]{CANCELLED};
         ARCHIVED.allowedDestinationStates = new JobAdvertisementStatus[]{PUBLISHED_PUBLIC, CANCELLED, REFINING};
     }
@@ -36,6 +36,10 @@ public enum JobAdvertisementStatus {
             throw new IllegalJobAdvertisementStatusTransitionException(this, destination);
         }
         return destination;
+    }
+
+    public boolean canTransitTo(JobAdvertisementStatus destination) {
+        return Arrays.asList(allowedDestinationStates).contains(destination);
     }
 
     public boolean isInAnyStates(JobAdvertisementStatus... status) {

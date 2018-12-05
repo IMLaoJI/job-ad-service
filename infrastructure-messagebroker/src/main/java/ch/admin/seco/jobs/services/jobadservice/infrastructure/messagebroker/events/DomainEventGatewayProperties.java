@@ -21,7 +21,8 @@ public class DomainEventGatewayProperties {
                     JobAdvertisementEvents.JOB_ADVERTISEMENT_PUBLISH_PUBLIC.getDomainEventType(),
                     JobAdvertisementEvents.JOB_ADVERTISEMENT_UPDATED.getDomainEventType(),
                     JobAdvertisementEvents.JOB_ADVERTISEMENT_CANCELLED.getDomainEventType(),
-                    JobAdvertisementEvents.JOB_ADVERTISEMENT_ARCHIVED.getDomainEventType()
+                    JobAdvertisementEvents.JOB_ADVERTISEMENT_ARCHIVED.getDomainEventType(),
+                    JobAdvertisementEvents.JOB_ADVERTISEMENT_ADJOURNED_PUBLICATION.getDomainEventType()
             )
     );
 

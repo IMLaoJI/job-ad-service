@@ -42,6 +42,7 @@ import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPu
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.core.validations.Violations;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.changes.ChangeLog;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementAdjournedPublicationEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementApprovedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementArchivedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementBlackoutExpiredEvent;
@@ -274,7 +275,19 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
 		if (!changeLog.isEmpty()) {
 			this.updatedTime = TimeMachine.now();
 			DomainEventPublisher.publish(new JobAdvertisementUpdatedEvent(this, changeLog));
+
+			if (this.status.canTransitTo(JobAdvertisementStatus.REFINING)
+					&& this.publication.getStartDate() != null
+					&& TimeMachine.now().toLocalDate().isBefore(this.publication.getStartDate())) {
+				this.adjournPublication();
+			}
 		}
+	}
+
+	private void adjournPublication() {
+		this.status = status.validateTransitionTo(JobAdvertisementStatus.REFINING);
+		this.updatedTime = TimeMachine.now();
+		DomainEventPublisher.publish(new JobAdvertisementAdjournedPublicationEvent(this));
 	}
 
 	public void inspect() {

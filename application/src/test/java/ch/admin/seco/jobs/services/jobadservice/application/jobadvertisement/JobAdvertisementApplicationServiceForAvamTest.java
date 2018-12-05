@@ -197,8 +197,8 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         AvamCreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(
                 inspectingJobAd.getJobContent().getCompany(),
                 new PublicationDto()
-                        .setStartDate(now().minusDays(10))
-                        .setEndDate(now().plusDays(2))
+                        .setStartDate(now().plusDays(10))
+                        .setEndDate(now().plusDays(22))
         );
 
         // when
