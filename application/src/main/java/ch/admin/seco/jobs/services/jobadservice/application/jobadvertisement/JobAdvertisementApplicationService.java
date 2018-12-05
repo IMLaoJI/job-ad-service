@@ -26,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionSystemException;
@@ -281,6 +282,7 @@ public class JobAdvertisementApplicationService {
         );
     }
 
+    @PreAuthorize("@jobAdvertisementAuthorizationService.canViewJob(#jobAdvertisementId)")
     public JobAdvertisementDto getById(JobAdvertisementId jobAdvertisementId) throws AggregateNotFoundException {
         JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
 
@@ -300,6 +302,7 @@ public class JobAdvertisementApplicationService {
         return jobAdvertisement.map(JobAdvertisementDto::toDto).orElse(null);
     }
 
+    @PreAuthorize("@jobAdvertisementAuthorizationService.canViewJob(#stellennummerAvam)")
     public JobAdvertisementDto getByStellennummerAvam(String stellennummerAvam) {
         JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerAvam(stellennummerAvam);
         return JobAdvertisementDto.toDto(jobAdvertisement);
@@ -310,6 +313,7 @@ public class JobAdvertisementApplicationService {
         return jobAdvertisement.map(JobAdvertisementDto::toDto).orElse(null);
     }
 
+    @PreAuthorize("@jobAdvertisementAuthorizationService.canViewJob(#stellennummerEgov)")
     public JobAdvertisementDto getByStellennummerEgov(String stellennummerEgov) {
         JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerEgov(stellennummerEgov);
         return JobAdvertisementDto.toDto(jobAdvertisement);

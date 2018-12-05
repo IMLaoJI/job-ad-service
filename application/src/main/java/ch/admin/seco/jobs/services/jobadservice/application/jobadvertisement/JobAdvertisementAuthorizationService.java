@@ -1,16 +1,19 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
+import static org.springframework.util.StringUtils.hasText;
+
+import java.util.Optional;
+
+import javax.transaction.Transactional;
+
+import org.springframework.stereotype.Component;
+
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUser;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
-import org.springframework.stereotype.Component;
-
-import javax.transaction.Transactional;
-import java.util.Optional;
-
-import static org.springframework.util.StringUtils.hasText;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
 
 @Component
 @Transactional
@@ -54,5 +57,22 @@ public class JobAdvertisementAuthorizationService {
 
         String companyId = currentUser.getCompanyId();
         return (companyId != null) && companyId.equals(jobAdvertisement.getOwner().getCompanyId());
+    }
+
+    public boolean canViewJob(JobAdvertisementId jobAdvertisementId) {
+        return this.jobAdvertisementRepository.findById(jobAdvertisementId)
+                .map(this::canViewJob)
+                .orElse(false);
+    }
+
+    public boolean canViewJob(String stellennummer) {
+        return this.jobAdvertisementRepository.findByStellennummerAvamOrStellennummerEgov(stellennummer)
+                .map(this::canViewJob)
+                .orElse(false);
+    }
+
+    private boolean canViewJob(JobAdvertisement jobAdvertisement) {
+        return jobAdvertisement.getStatus() != JobAdvertisementStatus.PUBLISHED_RESTRICTED
+                || this.currentUserContext.getCurrentUser() != null;
     }
 }

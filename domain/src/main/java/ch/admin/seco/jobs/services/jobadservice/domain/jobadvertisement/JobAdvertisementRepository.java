@@ -44,6 +44,9 @@ public interface JobAdvertisementRepository extends JpaRepository<JobAdvertiseme
 
     Optional<JobAdvertisement> findByFingerprint(String fingerprint);
 
+    @Query("select j from JobAdvertisement j where j.stellennummerAvam = :code or j.stellennummerEgov = :stellennummer")
+    Optional<JobAdvertisement> findByStellennummerAvamOrStellennummerEgov(String stellennummer);
+
     @Query("select j from JobAdvertisement j where j.owner.accessToken = :accessToken")
     Optional<JobAdvertisement> findOneByAccessToken(@Param("accessToken") String accessToken);
 
