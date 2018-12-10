@@ -16,7 +16,7 @@ interface JobCenterApiClient {
     );
 
     @GetMapping(value = "/api/job-centers")
-    JobCenterResource searchJobCenterByCode(@RequestParam("code") String code);
+    JobCenterResource searchJobCenterByCode(@RequestParam("code") String code, @RequestParam(name = "language") String language);
 
     @GetMapping(value = "/api/job-centers")
     List<JobCenterResource> findAllJobCenters();

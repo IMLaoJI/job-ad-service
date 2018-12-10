@@ -9,7 +9,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-
 
 import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.application.MailSenderData;
@@ -39,10 +37,10 @@ public class JobAdvertisementMailEventListener {
 
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
-	private static final String LANGUAGE_DE = new Locale("de").getLanguage();
-	private static final String LANGUAGE_FR = new Locale("fr").getLanguage();
-	private static final String LANGUAGE_IT = new Locale("it").getLanguage();
-	private static final String LANGUAGE_EN = new Locale("en").getLanguage();
+	private static final String LANGUAGE_DE = Locale.GERMAN.getLanguage();
+	private static final String LANGUAGE_FR = Locale.FRENCH.getLanguage();
+	private static final String LANGUAGE_IT = Locale.ITALIAN.getLanguage();
+	private static final String LANGUAGE_EN = Locale.ENGLISH.getLanguage();
 
 	private static Logger LOG = LoggerFactory.getLogger(JobAdvertisementMailEventListener.class);
 
@@ -85,11 +83,8 @@ public class JobAdvertisementMailEventListener {
 			return;
 		}
 		LOG.debug("EVENT catched for mail: JOB_ADVERTISEMENT_CREATED for JobAdvertisementId: '{}'", event.getAggregateId().getValue());
-		Locale contactLocale = new Locale(DEFAULT_LANGUAGE);
-		if (jobAdvertisement.getContact() != null) {
-			contactLocale = jobAdvertisement.getContact().getLanguage();
-		}
-		final JobCenter jobCenter = jobCenterService.findJobCenterByCode(jobAdvertisement.getJobCenterCode());
+		final Locale contactLocale = resolveLocale(jobAdvertisement);
+		final JobCenter jobCenter = jobCenterService.findJobCenterByCode(jobAdvertisement.getJobCenterCode(), contactLocale);
 		final String stellennummer = extractStellennummer(jobAdvertisement);
 		Map<String, Object> variables = new HashMap<>();
 		variables.put("stellennummer", stellennummer);
@@ -120,7 +115,8 @@ public class JobAdvertisementMailEventListener {
 		}
 		LOG.debug("EVENT catched for mail: JOB_ADVERTISEMENT_REFINED for JobAdvertisementId: '{}'", event.getAggregateId().getValue());
 
-		final JobCenter jobCenter = jobCenterService.findJobCenterByCode(jobAdvertisement.getJobCenterCode());
+		final Locale contactLocale = resolveLocale(jobAdvertisement);
+		final JobCenter jobCenter = jobCenterService.findJobCenterByCode(jobAdvertisement.getJobCenterCode(), contactLocale);
 		final String stellennummer = extractStellennummer(jobAdvertisement);
 		Map<String, Object> variables = new HashMap<>();
 		variables.put("stellennummer", stellennummer);
@@ -133,11 +129,9 @@ public class JobAdvertisementMailEventListener {
 				jobAdvertisement.getJobContent()
 						.getNumberOfJobs())
 		);
-		Locale contactLocale = new Locale(DEFAULT_LANGUAGE);
 		String subject = JOB_ADVERTISEMENT_REFINED_MULTILINGUAL_SUBJECT;
 		String template = JOB_ADVERTISEMENT_REFINED_MULTILINGUAL_TEMPLATE;
 		if (hasContactLanguage(jobAdvertisement)) {
-			contactLocale = jobAdvertisement.getContact().getLanguage();
 			subject = JOB_ADVERTISEMENT_REFINED_SUBJECT;
 			template = JOB_ADVERTISEMENT_REFINED_TEMPLATE;
 		}
@@ -160,11 +154,8 @@ public class JobAdvertisementMailEventListener {
 			return;
 		}
 		LOG.debug("EVENT catched for mail: JOB_ADVERTISEMENT_REJECTED for JobAdvertisementId: '{}'", event.getAggregateId().getValue());
-		Locale contactLocale = new Locale(DEFAULT_LANGUAGE);
-		if (jobAdvertisement.getContact() != null) {
-			contactLocale = jobAdvertisement.getContact().getLanguage();
-		}
-		final JobCenter jobCenter = jobCenterService.findJobCenterByCode(jobAdvertisement.getJobCenterCode());
+		final Locale contactLocale = resolveLocale(jobAdvertisement);
+		final JobCenter jobCenter = jobCenterService.findJobCenterByCode(jobAdvertisement.getJobCenterCode(), contactLocale);
 		final String stellennummer = extractStellennummer(jobAdvertisement);
 		Map<String, Object> variables = new HashMap<>();
 		variables.put("stellennummer", stellennummer);
@@ -192,16 +183,15 @@ public class JobAdvertisementMailEventListener {
 			return;
 		}
 		LOG.debug("EVENT catched for mail: JOB_ADVERTISEMENT_CANCELLED for JobAdvertisementId: '{}'", event.getAggregateId().getValue());
-		final JobCenter jobCenter = jobCenterService.findJobCenterByCode(jobAdvertisement.getJobCenterCode());
+		final Locale contactLocale = resolveLocale(jobAdvertisement);
+		final JobCenter jobCenter = jobCenterService.findJobCenterByCode(jobAdvertisement.getJobCenterCode(), contactLocale);
 		final String stellennummer = extractStellennummer(jobAdvertisement);
 		Map<String, Object> variables = new HashMap<>();
 		variables.put("stellennummer", stellennummer);
 		variables.put("jobCenter", jobCenter);
-		Locale contactLocale = new Locale(DEFAULT_LANGUAGE);
 		String subject = JOB_ADVERTISEMENT_CANCELLED_MULTILINGUAL_SUBJECT;
 		String template = JOB_ADVERTISEMENT_CANCELLED_MULTILINGUAL_TEMPLATE;
 		if (hasContactLanguage(jobAdvertisement)) {
-			contactLocale = jobAdvertisement.getContact().getLanguage();
 			subject = JOB_ADVERTISEMENT_CANCELLED_SUBJECT;
 			template = JOB_ADVERTISEMENT_CANCELLED_TEMPLATE;
 		}
@@ -262,6 +252,10 @@ public class JobAdvertisementMailEventListener {
 
 	private String nullSafeFormatLocalDate(LocalDate date) {
 		return (date != null) ? date.format(DATE_FORMATTER) : null;
+	}
+
+	private Locale resolveLocale(JobAdvertisement jobAdvertisement) {
+		return hasContactLanguage(jobAdvertisement) ? jobAdvertisement.getContact().getLanguage() : new Locale(DEFAULT_LANGUAGE);
 	}
 
 }

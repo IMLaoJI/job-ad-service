@@ -1,6 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.service.reference.jobcenter;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -26,7 +27,13 @@ class DefaultJobCenterService implements JobCenterService {
 
     @Override
     public JobCenter findJobCenterByCode(String code) {
-        JobCenterResource jobCenterResource = jobCenterApiClient.searchJobCenterByCode(code);
+        return findJobCenterByCode(code, null);
+    }
+
+    @Override
+    public JobCenter findJobCenterByCode(String code, Locale language) {
+        String languageKey = language == null ? Locale.GERMAN.getLanguage() : language.getLanguage();
+        JobCenterResource jobCenterResource = jobCenterApiClient.searchJobCenterByCode(code, languageKey);
         if (jobCenterResource == null) {
             return null;
         }
