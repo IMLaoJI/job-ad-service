@@ -270,13 +270,13 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
 		return publication;
 	}
 
-	public void update(JobAdvertisementUpdater updater) {
-		ChangeLog changeLog = applyUpdates(updater);
-		if (!changeLog.isEmpty()) {
-			this.updatedTime = TimeMachine.now();
-			DomainEventPublisher.publish(new JobAdvertisementUpdatedEvent(this, changeLog));
+    public void update(JobAdvertisementUpdater updater) {
+        ChangeLog changeLog = applyUpdates(updater);
+        if (!changeLog.isEmpty()) {
+            this.updatedTime = TimeMachine.now();
+            DomainEventPublisher.publish(new JobAdvertisementUpdatedEvent(this, changeLog));
 
-			if (this.status.canTransitTo(JobAdvertisementStatus.REFINING)
+    if (this.status.canTransitTo(JobAdvertisementStatus.REFINING)
 					&& this.publication.getStartDate() != null
 					&& TimeMachine.now().toLocalDate().isBefore(this.publication.getStartDate())) {
 				this.adjournPublication();
@@ -287,8 +287,7 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
 	private void adjournPublication() {
 		this.status = status.validateTransitionTo(JobAdvertisementStatus.REFINING);
 		this.updatedTime = TimeMachine.now();
-		DomainEventPublisher.publish(new JobAdvertisementAdjournedPublicationEvent(this));
-	}
+		DomainEventPublisher.publish(new JobAdvertisementAdjournedPublicationEvent(this));}
 
 	public void inspect() {
 		Condition.notBlank(this.stellennummerEgov, "StellennummerEgov can't be null");
