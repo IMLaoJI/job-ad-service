@@ -8,6 +8,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
+import ch.admin.seco.jobs.services.jobadservice.core.conditions.ConditionException;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.IllegalJobAdvertisementStatusTransitionException;
 import org.zalando.problem.DefaultProblem;
 import org.zalando.problem.Problem;
 import org.zalando.problem.ProblemBuilder;
@@ -105,9 +107,24 @@ public class ExceptionTranslator implements ProblemHandling {
         return create(ex, problem, request);
     }
 
-    @ExceptionHandler(BadRequestAlertException.class)
-    public ResponseEntity<Problem> handleBadRequestAlertException(BadRequestAlertException ex, NativeWebRequest request) {
-        return create(ex, request);
+    @ExceptionHandler(ConditionException.class)
+    public ResponseEntity<Problem> handleConditionException(ConditionException ex, NativeWebRequest request) {
+        Problem problem = Problem.builder()
+                .withStatus(Status.BAD_REQUEST)
+                .with("message", ErrorConstants.CONDITION_VIOLATION_TYPE)
+                .with("fieldError", ex.getMessage())
+                .build();
+        return create(ex, problem, request);
+    }
+
+    @ExceptionHandler(IllegalJobAdvertisementStatusTransitionException.class)
+    public ResponseEntity<Problem> handleIllegalJobAdvertisementStatusTransitionException(IllegalJobAdvertisementStatusTransitionException ex, NativeWebRequest request) {
+        Problem problem = Problem.builder()
+                .withStatus(Status.BAD_REQUEST)
+                .with("message", ErrorConstants.STATUS_VIOLATION_TYPE)
+                .with("transitionError", ex.getMessage())
+                .build();
+        return create(ex, problem, request);
     }
 
     @ExceptionHandler(ConcurrencyFailureException.class)
