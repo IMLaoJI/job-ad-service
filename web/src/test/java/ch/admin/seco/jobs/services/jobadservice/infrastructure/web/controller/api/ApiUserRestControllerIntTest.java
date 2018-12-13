@@ -148,7 +148,7 @@ public class ApiUserRestControllerIntTest {
 
         // THEN
         resultActions
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath(JSON_PATH_USERNAME).value(expectedApiUser.getUsername()))
                 .andExpect(jsonPath(JSON_PATH_COMPANY_NAME).value(expectedApiUser.getCompanyName()))
