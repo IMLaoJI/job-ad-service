@@ -90,10 +90,6 @@ public class JobAdvertisementFactory {
 
         JobAdvertisement newJobAdvertisement = jobAdvertisementRepository.save(jobAdvertisement);
 
-//      if( CONDITION THAT IS UNIQUE TO 'REACTIVATED' JOBADS NOT PREVIOUSLY IN THE DB ){
-//          DomainEventPublisher.publish(new JobAdvertisementAdjournedPublicationEvent(newJobAdvertisement));
-//      }
-
         DomainEventPublisher.publish(new JobAdvertisementApprovedEvent(newJobAdvertisement));
         return newJobAdvertisement;
     }
