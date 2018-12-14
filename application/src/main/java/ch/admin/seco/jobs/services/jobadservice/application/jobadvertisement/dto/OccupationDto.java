@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import javax.validation.constraints.NotEmpty;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Qualification;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience;
 
 public class OccupationDto {
@@ -16,6 +17,8 @@ public class OccupationDto {
     private WorkExperience workExperience;
 
     private String educationCode;
+
+    private Qualification qualificationCode;
 
     public String getAvamOccupationCode() {
         return avamOccupationCode;
@@ -41,6 +44,15 @@ public class OccupationDto {
 
     public OccupationDto setEducationCode(String educationCode) {
         this.educationCode = educationCode;
+        return this;
+    }
+
+    public Qualification getQualificationCode() {
+        return qualificationCode;
+    }
+
+    public OccupationDto setQualificationCode(Qualification qualificationCode) {
+        this.qualificationCode = qualificationCode;
         return this;
     }
 
