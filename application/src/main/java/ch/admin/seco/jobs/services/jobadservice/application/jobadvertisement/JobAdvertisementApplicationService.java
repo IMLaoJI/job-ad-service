@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.util.StringUtils.hasText;
 
 import java.time.LocalDate;
+import java.time.chrono.ChronoLocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -361,6 +362,11 @@ public class JobAdvertisementApplicationService {
         return jobAdvertisement.map(JobAdvertisementDto::toDto).orElse(null);
     }
 
+    public JobAdvertisementDto getByStellennummerEgovOrAvam(String stellennummerEgov, String stellennummerAvam) {
+        Optional<JobAdvertisement> jobAdvertisement = jobAdvertisementRepository.findByStellennummerEgov(stellennummerEgov);
+        return jobAdvertisement.map(JobAdvertisementDto::toDto).orElseGet(() -> this.getByStellennummerAvam(stellennummerAvam));
+    }
+
     @PreAuthorize("@jobAdvertisementAuthorizationService.canViewJob(#stellennummerEgov)")
     public JobAdvertisementDto getByStellennummerEgov(String stellennummerEgov) {
         JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerEgov(stellennummerEgov);
@@ -543,7 +549,7 @@ public class JobAdvertisementApplicationService {
         if ((startDate != null) && startDate.isAfter(TimeMachine.now().toLocalDate())) {
             return;
         }
-        if (jobAdvertisement.isReportingObligation() && REFINING.equals(jobAdvertisement.getStatus())) {
+        if (determineIfValidForRestrictedPublication(jobAdvertisement)) {
             LOG.debug("Publish in restricted area for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
             jobAdvertisement.publishRestricted();
         } else {
@@ -993,5 +999,9 @@ public class JobAdvertisementApplicationService {
                         .build()
                 )
                 .collect(toList());
+    }
+
+    private boolean determineIfValidForRestrictedPublication(JobAdvertisement jobAdvertisement) {
+        return jobAdvertisement.isReportingObligation() && REFINING.equals(jobAdvertisement.getStatus()) && jobAdvertisement.getReportingObligationEndDate().isBefore(ChronoLocalDate.from(TimeMachine.now()));
     }
 }

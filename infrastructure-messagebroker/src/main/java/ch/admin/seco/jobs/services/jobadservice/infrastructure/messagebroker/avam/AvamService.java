@@ -16,8 +16,6 @@ import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebro
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageSystem.AVAM;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageSystem.JOB_AD_SERVICE;
 
-import java.util.Optional;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +31,6 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromAvamDto;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
@@ -81,28 +78,16 @@ public class AvamService {
 
     @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = APPROVE_CONDITION)
     public void handleApprovedAction(ApprovalDto approvalDto) {
-
-        //As I see it we have 3 Cases:
-        // REGULAR: APPROVAL: Regular Path
-        // ARCHIVED: (JOBAD IS IN DB AND ARCHIVED)
-        // INACTIVE: (JOBAD IS NOT IN DB ANYMORE)
-
-        Optional<JobAdvertisement> jobAdvertisement = jobAdvertisementApplicationService.findJobAdvertisementByStellennummerAvamOrEgov(approvalDto.getStellennummerAvam(), approvalDto.getStellennummerAvam());
-        if (jobAdvertisement.isPresent()) {
-            if (jobAdvertisement.get().getStatus() == JobAdvertisementStatus.INSPECTING) {
-                //CASE REGULAR
-                jobAdvertisementApplicationService.approve(approvalDto);
-
-            } else {
-                //CASE ARCHIVED
-                jobAdvertisementApplicationService.adjourn(approvalDto);
-            }
-
+        JobAdvertisementDto jobAdvertisementDto;
+        if (StringUtils.isNotBlank(approvalDto.getStellennummerEgov())) {
+            return;
+        }
+        jobAdvertisementDto = jobAdvertisementApplicationService.getByStellennummerEgovOrAvam(approvalDto.getStellennummerEgov(), approvalDto.getStellennummerAvam());
+        Condition.notNull(jobAdvertisementDto, "Couldn't find the jobAdvertisement for stellennummerEgov %s nor stellennummerAvam %s", approvalDto.getStellennummerEgov(), approvalDto.getStellennummerAvam());
+        if (jobAdvertisementDto.getStatus() == JobAdvertisementStatus.INSPECTING) {
+            jobAdvertisementApplicationService.approve(approvalDto);
         } else {
-            //CASE INACTIVE
-            UpdateJobAdvertisementFromAvamDto updateJobAdvertisement = approvalDto.getUpdateJobAdvertisement();
-            AvamCreateJobAdvertisementDto avamCreateJobAdvertisementDto = getAvamCreateJobAdvertisementDto(approvalDto, updateJobAdvertisement);
-            jobAdvertisementApplicationService.createFromAvam(avamCreateJobAdvertisementDto);
+            jobAdvertisementApplicationService.adjourn(approvalDto);
         }
     }
 
@@ -136,26 +121,5 @@ public class AvamService {
                 SourceSystem.RAV,
                 null
         );
-    }
-
-    private AvamCreateJobAdvertisementDto getAvamCreateJobAdvertisementDto(ApprovalDto approvalDto, UpdateJobAdvertisementFromAvamDto updateJobAdvertisement) {
-        return new AvamCreateJobAdvertisementDto(approvalDto.getStellennummerAvam(),
-                updateJobAdvertisement.getTitle(),
-                updateJobAdvertisement.getDescription(),
-                updateJobAdvertisement.getLanguageIsoCode(),
-                updateJobAdvertisement.getNumberOfJobs(),
-                updateJobAdvertisement.isReportingObligation(),
-                updateJobAdvertisement.getReportingObligationEndDate(),
-                updateJobAdvertisement.getJobCenterCode(),
-                updateJobAdvertisement.getApprovalDate(),
-                updateJobAdvertisement.getEmployment(),
-                updateJobAdvertisement.getApplyChannel(),
-                updateJobAdvertisement.getCompany(),
-                updateJobAdvertisement.getContact(),
-                updateJobAdvertisement.getLocation(),
-                updateJobAdvertisement.getOccupations() ,
-                updateJobAdvertisement.getLanguageSkills(),
-                updateJobAdvertisement.getPublication(),
-                updateJobAdvertisement.getPublicContact());
     }
 }
