@@ -39,7 +39,7 @@ public class Occupation implements ValueObject<Occupation> {
     private String educationCode;
 
     @Enumerated(EnumType.STRING)
-    private Qualification qualification;
+    private Qualification qualificationCode;
 
     protected Occupation() {
         // For reflection libs
@@ -53,7 +53,7 @@ public class Occupation implements ValueObject<Occupation> {
         this.label = builder.label;
         this.workExperience = builder.workExperience;
         this.educationCode = builder.educationCode;
-        this.qualification = builder.qualificationCode;
+        this.qualificationCode = builder.qualificationCode;
     }
 
     public String getAvamOccupationCode() {
@@ -80,8 +80,8 @@ public class Occupation implements ValueObject<Occupation> {
         return workExperience;
     }
 
-    public Qualification getQualification() {
-        return qualification;
+    public Qualification getQualificationCode() {
+        return qualificationCode;
     }
 
     public String getEducationCode() {
@@ -100,12 +100,12 @@ public class Occupation implements ValueObject<Occupation> {
                 Objects.equals(label, that.label) &&
                 workExperience == that.workExperience &&
                 Objects.equals(educationCode, that.educationCode) &&
-                qualification == that.qualification;
+                qualificationCode == that.qualificationCode;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(avamOccupationCode, sbn3Code, sbn5Code, bfsCode, label, workExperience, educationCode, qualification);
+        return Objects.hash(avamOccupationCode, sbn3Code, sbn5Code, bfsCode, label, workExperience, educationCode, qualificationCode);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class Occupation implements ValueObject<Occupation> {
                 ", label='" + label + '\'' +
                 ", workExperience=" + workExperience +
                 ", educationCode='" + educationCode + '\'' +
-                ", qualification=" + qualification +
+                ", qualificationCode=" + qualificationCode +
                 '}';
     }
 

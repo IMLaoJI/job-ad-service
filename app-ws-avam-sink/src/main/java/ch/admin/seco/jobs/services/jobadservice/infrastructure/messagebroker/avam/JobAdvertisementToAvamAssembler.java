@@ -252,7 +252,7 @@ public class JobAdvertisementToAvamAssembler {
             avamJobAdvertisement.setBq1AvamBeruf(occupation.getLabel());
             avamJobAdvertisement.setBq1AvamBerufNr(occupation.getAvamOccupationCode());
             avamJobAdvertisement.setBq1ErfahrungCode(AvamCodeResolver.EXPERIENCES.getLeft(occupation.getWorkExperience()));
-            avamJobAdvertisement.setBq1QualifikationCode(AvamCodeResolver.QUALIFICATION_CODE.getLeft(occupation.getQualification()));
+            avamJobAdvertisement.setBq1QualifikationCode(AvamCodeResolver.QUALIFICATION_CODE.getLeft(occupation.getQualificationCode()));
             avamJobAdvertisement.setBq1AusbildungCode(occupation.getEducationCode());
         }
         /*

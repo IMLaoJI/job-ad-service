@@ -4,6 +4,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Qualification;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience;
 
 public class X28OccupationDto {
@@ -17,21 +18,25 @@ public class X28OccupationDto {
     @Size(max = 8)
     private String educationCode;
 
+    private Qualification qualificationCode;
+
     protected X28OccupationDto() {
         // For reflection libs
     }
 
-    public X28OccupationDto(String avamOccupationCode, WorkExperience workExperience, String educationCode) {
+    public X28OccupationDto(String avamOccupationCode, WorkExperience workExperience, String educationCode, Qualification qualificationCode) {
         this.avamOccupationCode = avamOccupationCode;
         this.workExperience = workExperience;
         this.educationCode = educationCode;
+        this.qualificationCode = qualificationCode;
     }
 
     OccupationDto toOccupationDto() {
         return new OccupationDto()
                 .setAvamOccupationCode(avamOccupationCode)
                 .setWorkExperience(workExperience)
-                .setEducationCode(educationCode);
+                .setEducationCode(educationCode)
+                .setQualificationCode(qualificationCode);
     }
 
     public String getAvamOccupationCode() {
@@ -56,5 +61,13 @@ public class X28OccupationDto {
 
     public void setEducationCode(String educationCode) {
         this.educationCode = educationCode;
+    }
+
+    public Qualification getQualificationCode() {
+        return qualificationCode;
+    }
+
+    public void setQualificationCode(Qualification qualificationCode) {
+        this.qualificationCode = qualificationCode;
     }
 }

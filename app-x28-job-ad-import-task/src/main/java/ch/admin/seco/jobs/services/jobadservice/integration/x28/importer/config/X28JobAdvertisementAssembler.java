@@ -31,13 +31,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28CompanyDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28ContactDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28LanguageSkillDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28LocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28OccupationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Qualification;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.WorkingTimePercentage;
@@ -168,26 +169,29 @@ class X28JobAdvertisementAssembler {
             occupations.add(new X28OccupationDto(
                     fallbackAwareAvamOccuptionCode(x28JobAdvertisement.getBq1AvamBerufNr()),
                     resolveExperience(x28JobAdvertisement.getBq1ErfahrungCode()),
-                    x28JobAdvertisement.getBq1AusbildungCode()
+                    x28JobAdvertisement.getBq1AusbildungCode(),
+                    resolveQualification(x28JobAdvertisement.getBq1QualifikationCode())
             ));
         }
         if (hasText(x28JobAdvertisement.getBq2AvamBerufNr())) {
             occupations.add(new X28OccupationDto(
                     fallbackAwareAvamOccuptionCode(x28JobAdvertisement.getBq2AvamBerufNr()),
                     resolveExperience(x28JobAdvertisement.getBq2ErfahrungCode()),
-                    x28JobAdvertisement.getBq2AusbildungCode()
+                    x28JobAdvertisement.getBq2AusbildungCode(),
+                    resolveQualification(x28JobAdvertisement.getBq2QualifikationCode())
             ));
         }
         if (hasText(x28JobAdvertisement.getBq3AvamBerufNr())) {
             occupations.add(new X28OccupationDto(
                     fallbackAwareAvamOccuptionCode(x28JobAdvertisement.getBq3AvamBerufNr()),
                     resolveExperience(x28JobAdvertisement.getBq3ErfahrungCode()),
-                    x28JobAdvertisement.getBq3AusbildungCode()
+                    x28JobAdvertisement.getBq3AusbildungCode(),
+                    resolveQualification(x28JobAdvertisement.getBq2QualifikationCode())
             ));
         }
 
         if (occupations.isEmpty()) {
-            occupations.add(new X28OccupationDto(DEFAULT_AVAM_OCCUPATION_CODE, null, null));
+            occupations.add(new X28OccupationDto(DEFAULT_AVAM_OCCUPATION_CODE, null, null, null));
         }
 
         return occupations;
@@ -294,6 +298,17 @@ class X28JobAdvertisementAssembler {
         }
 
         return resolvedWorkExperience;
+    }
+
+    private Qualification resolveQualification(String qualificationCode) {
+        final Qualification resolvedQualification;
+
+        if (AvamCodeResolver.QUALIFICATION_CODE.getRight(qualificationCode) != null) {
+            resolvedQualification = AvamCodeResolver.QUALIFICATION_CODE.getRight(qualificationCode);
+        } else {
+            resolvedQualification = EnumUtils.getEnum(Qualification.class, qualificationCode);
+        }
+        return resolvedQualification;
     }
 
     private String sanitize(String text) {
