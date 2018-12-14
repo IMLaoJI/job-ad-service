@@ -1,15 +1,15 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement;
 
-import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.stereotype.Component;
 
+import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.AuditUser;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPublisher;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementApprovedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementCreatedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementPublishPublicEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementApprovedEvent;
 
 @Component
 public class JobAdvertisementFactory {
@@ -89,6 +89,11 @@ public class JobAdvertisementFactory {
                 .build();
 
         JobAdvertisement newJobAdvertisement = jobAdvertisementRepository.save(jobAdvertisement);
+
+//      if( CONDITION THAT IS UNIQUE TO 'REACTIVATED' JOBADS NOT PREVIOUSLY IN THE DB ){
+//          DomainEventPublisher.publish(new JobAdvertisementAdjournedPublicationEvent(newJobAdvertisement));
+//      }
+
         DomainEventPublisher.publish(new JobAdvertisementApprovedEvent(newJobAdvertisement));
         return newJobAdvertisement;
     }

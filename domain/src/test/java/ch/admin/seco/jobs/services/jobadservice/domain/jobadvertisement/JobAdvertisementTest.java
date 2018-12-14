@@ -86,6 +86,20 @@ public class JobAdvertisementTest {
     }
 
     @Test
+    public void testAdjourn() {
+        //given
+        JobAdvertisement jobAdvertisement = testJobAdvertisement().build();
+
+        //when
+        jobAdvertisement.adjournPublication();
+
+        //then
+
+        JobAdvertisementEvent jobAdvertisementEvent = domainEventMockUtils.assertSingleDomainEventPublished(JobAdvertisementEvents.JOB_ADVERTISEMENT_ADJOURNED_PUBLICATION.getDomainEventType());
+        assertThat(jobAdvertisementEvent.getAggregateId()).isEqualTo(job01.id());
+    }
+
+    @Test
     public void testShortTermValidation() {
         //given
         JobAdvertisement.Builder jobAdBuilder = testJobAdvertisement()
