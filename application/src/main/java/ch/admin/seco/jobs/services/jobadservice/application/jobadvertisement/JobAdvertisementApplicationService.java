@@ -349,14 +349,6 @@ public class JobAdvertisementApplicationService {
         return JobAdvertisementDto.toDto(jobAdvertisement);
     }
 
-    public Optional<JobAdvertisement> findJobAdvertisementByStellennummerAvamOrEgov(String stellennummerAvam, String stellennummerEgov) throws AggregateNotFoundException {
-        Optional<JobAdvertisement> jobAdvertisement = jobAdvertisementRepository.findByStellennummerAvam(stellennummerAvam);
-        if (jobAdvertisement.isPresent()) {
-            return jobAdvertisement;
-        }
-        return jobAdvertisementRepository.findByStellennummerEgov(stellennummerEgov);
-    }
-
     public JobAdvertisementDto findByStellennummerEgov(String stellennummerEgov) {
         Optional<JobAdvertisement> jobAdvertisement = jobAdvertisementRepository.findByStellennummerEgov(stellennummerEgov);
         return jobAdvertisement.map(JobAdvertisementDto::toDto).orElse(null);
