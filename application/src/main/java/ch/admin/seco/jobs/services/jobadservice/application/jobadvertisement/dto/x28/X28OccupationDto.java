@@ -20,17 +20,6 @@ public class X28OccupationDto {
 
     private Qualification qualificationCode;
 
-    protected X28OccupationDto() {
-        // For reflection libs
-    }
-
-    public X28OccupationDto(String avamOccupationCode, WorkExperience workExperience, String educationCode, Qualification qualificationCode) {
-        this.avamOccupationCode = avamOccupationCode;
-        this.workExperience = workExperience;
-        this.educationCode = educationCode;
-        this.qualificationCode = qualificationCode;
-    }
-
     OccupationDto toOccupationDto() {
         return new OccupationDto()
                 .setAvamOccupationCode(avamOccupationCode)
@@ -43,31 +32,35 @@ public class X28OccupationDto {
         return avamOccupationCode;
     }
 
+    public X28OccupationDto setAvamOccupationCode(String avamOccupationCode) {
+        this.avamOccupationCode = avamOccupationCode;
+        return this;
+    }
+
     public WorkExperience getWorkExperience() {
         return workExperience;
     }
 
-    public void setWorkExperience(WorkExperience workExperience) {
+    public X28OccupationDto setWorkExperience(WorkExperience workExperience) {
         this.workExperience = workExperience;
-    }
-
-    public void setAvamOccupationCode(String avamOccupationCode) {
-        this.avamOccupationCode = avamOccupationCode;
+        return this;
     }
 
     public String getEducationCode() {
         return educationCode;
     }
 
-    public void setEducationCode(String educationCode) {
+    public X28OccupationDto setEducationCode(String educationCode) {
         this.educationCode = educationCode;
+        return this;
     }
 
     public Qualification getQualificationCode() {
         return qualificationCode;
     }
 
-    public void setQualificationCode(Qualification qualificationCode) {
+    public X28OccupationDto setQualificationCode(Qualification qualificationCode) {
         this.qualificationCode = qualificationCode;
+        return this;
     }
 }

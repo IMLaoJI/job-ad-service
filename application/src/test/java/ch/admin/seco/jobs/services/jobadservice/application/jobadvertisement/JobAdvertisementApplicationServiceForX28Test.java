@@ -29,13 +29,15 @@ import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromX28Dto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28CompanyDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28CreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28OccupationDto;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents;
 
@@ -106,6 +108,13 @@ public class JobAdvertisementApplicationServiceForX28Test {
         assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getName()).isEqualTo(x28CompanyDto.getName());
         assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getCity()).isEqualTo(x28CompanyDto.getCity());
         assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getStreet()).isEqualTo(x28CompanyDto.getStreet());
+
+        Occupation occupation = jobAdvertisement.getJobContent().getOccupations().get(0);
+        X28OccupationDto x28OccupationDto = createJobAdvertisementDto.getOccupations().get(0);
+        assertThat(occupation.getWorkExperience()).isEqualByComparingTo(x28OccupationDto.getWorkExperience());
+        assertThat(occupation.getAvamOccupationCode()).isEqualToIgnoringCase(x28OccupationDto.getAvamOccupationCode());
+        assertThat(occupation.getEducationCode()).isEqualToIgnoringCase(x28OccupationDto.getEducationCode());
+        assertThat(occupation.getQualificationCode()).isEqualByComparingTo(x28OccupationDto.getQualificationCode());
 
         domainEventMockUtils.assertSingleDomainEventPublished(JobAdvertisementEvents.JOB_ADVERTISEMENT_PUBLISH_PUBLIC.getDomainEventType());
     }

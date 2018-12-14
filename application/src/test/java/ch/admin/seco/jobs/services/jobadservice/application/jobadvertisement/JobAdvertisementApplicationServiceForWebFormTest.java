@@ -25,6 +25,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Company;
@@ -32,6 +33,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents;
 
@@ -99,6 +101,15 @@ public class JobAdvertisementApplicationServiceForWebFormTest {
 
         assertThat(jobAdvertisement.isReportingObligation()).isFalse();
         assertThat(jobAdvertisement.getJobContent().getDisplayCompany()).isEqualTo(company);
+
+
+        Occupation occupation = jobAdvertisement.getJobContent().getOccupations().get(0);
+        OccupationDto occupationDto = createJobAdvertisementDto.getOccupation();
+        assertThat(occupation.getWorkExperience()).isEqualByComparingTo(occupationDto.getWorkExperience());
+        assertThat(occupation.getAvamOccupationCode()).isEqualToIgnoringCase(occupationDto.getAvamOccupationCode());
+        assertThat(occupation.getEducationCode()).isEqualToIgnoringCase(occupationDto.getEducationCode());
+        assertThat(occupation.getQualificationCode()).isEqualByComparingTo(occupationDto.getQualificationCode());
+
 
         domainEventMockUtils.assertSingleDomainEventPublished(JobAdvertisementEvents.JOB_ADVERTISEMENT_CREATED.getDomainEventType());
         verify(locationService, times(1)).isLocationValid(any());

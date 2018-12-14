@@ -60,7 +60,8 @@ public class OccupationDto {
         return new OccupationDto()
                 .setAvamOccupationCode(occupation.getAvamOccupationCode())
                 .setWorkExperience(occupation.getWorkExperience())
-                .setEducationCode(occupation.getEducationCode());
+                .setEducationCode(occupation.getEducationCode())
+                .setQualificationCode(occupation.getQualificationCode());
     }
 
     public static List<OccupationDto> toDto(List<Occupation> occupations) {

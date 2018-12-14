@@ -166,34 +166,36 @@ class X28JobAdvertisementAssembler {
     private List<X28OccupationDto> createOccupations(Oste x28JobAdvertisement) {
         List<X28OccupationDto> occupations = new ArrayList<>();
         if (hasText(x28JobAdvertisement.getBq1AvamBerufNr())) {
-            occupations.add(new X28OccupationDto(
-                    fallbackAwareAvamOccuptionCode(x28JobAdvertisement.getBq1AvamBerufNr()),
-                    resolveExperience(x28JobAdvertisement.getBq1ErfahrungCode()),
-                    x28JobAdvertisement.getBq1AusbildungCode(),
-                    resolveQualification(x28JobAdvertisement.getBq1QualifikationCode())
-            ));
+            occupations.add(new X28OccupationDto()
+                    .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(x28JobAdvertisement.getBq1AvamBerufNr()))
+                    .setWorkExperience(resolveExperience(x28JobAdvertisement.getBq1ErfahrungCode()))
+                    .setEducationCode(x28JobAdvertisement.getBq1AusbildungCode())
+                    .setQualificationCode(resolveQualification(x28JobAdvertisement.getBq1QualifikationCode()))
+            );
         }
         if (hasText(x28JobAdvertisement.getBq2AvamBerufNr())) {
-            occupations.add(new X28OccupationDto(
-                    fallbackAwareAvamOccuptionCode(x28JobAdvertisement.getBq2AvamBerufNr()),
-                    resolveExperience(x28JobAdvertisement.getBq2ErfahrungCode()),
-                    x28JobAdvertisement.getBq2AusbildungCode(),
-                    resolveQualification(x28JobAdvertisement.getBq2QualifikationCode())
-            ));
+            occupations.add(new X28OccupationDto()
+                    .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(x28JobAdvertisement.getBq2AvamBerufNr()))
+                    .setWorkExperience(resolveExperience(x28JobAdvertisement.getBq2ErfahrungCode()))
+                    .setEducationCode(x28JobAdvertisement.getBq2AusbildungCode())
+                    .setQualificationCode(resolveQualification(x28JobAdvertisement.getBq2QualifikationCode()))
+            );
         }
         if (hasText(x28JobAdvertisement.getBq3AvamBerufNr())) {
-            occupations.add(new X28OccupationDto(
-                    fallbackAwareAvamOccuptionCode(x28JobAdvertisement.getBq3AvamBerufNr()),
-                    resolveExperience(x28JobAdvertisement.getBq3ErfahrungCode()),
-                    x28JobAdvertisement.getBq3AusbildungCode(),
-                    resolveQualification(x28JobAdvertisement.getBq2QualifikationCode())
-            ));
+            occupations.add(new X28OccupationDto()
+                    .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(x28JobAdvertisement.getBq3AvamBerufNr()))
+                    .setWorkExperience(resolveExperience(x28JobAdvertisement.getBq3ErfahrungCode()))
+                    .setEducationCode(x28JobAdvertisement.getBq3AusbildungCode())
+                    .setQualificationCode(resolveQualification(x28JobAdvertisement.getBq3QualifikationCode()))
+            );
         }
-
         if (occupations.isEmpty()) {
-            occupations.add(new X28OccupationDto(DEFAULT_AVAM_OCCUPATION_CODE, null, null, null));
+            occupations.add(new X28OccupationDto()
+                    .setAvamOccupationCode(DEFAULT_AVAM_OCCUPATION_CODE)
+                    .setWorkExperience(null)
+                    .setEducationCode(null)
+                    .setQualificationCode(null));
         }
-
         return occupations;
     }
 
