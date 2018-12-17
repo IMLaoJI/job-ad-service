@@ -26,6 +26,7 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -124,6 +125,7 @@ public class ApiUserRestControllerIntTest {
     }
 
     @Test
+    @WithMockUser(roles = "SYSADMIN")
     public void shouldCreateApiUser() throws Exception {
         // GIVEN
         ApiUser expectedApiUser = createApiUser01();
@@ -173,6 +175,7 @@ public class ApiUserRestControllerIntTest {
     }
 
     @Test
+    @WithMockUser(roles = "SYSADMIN")
 	public void shouldNotSaveApiUserWithSameUsername() throws Exception {
 		// GIVEN
 		ApiUser originalApiUser = createApiUser01();
@@ -207,6 +210,7 @@ public class ApiUserRestControllerIntTest {
 	}
 
 	@Test
+    @WithMockUser(roles = "SYSADMIN")
     public void shouldFindById() throws Exception {
         // GIVEN
         ApiUser originalApiUser = createApiUser01();
@@ -230,6 +234,7 @@ public class ApiUserRestControllerIntTest {
     }
 
     @Test
+    @WithMockUser(roles = "SYSADMIN")
     public void shouldUpdateApiUserDetails() throws Exception {
         // GIVEN
         ApiUser originalApiUser = createApiUser01();
@@ -275,6 +280,7 @@ public class ApiUserRestControllerIntTest {
     }
 
     @Test
+    @WithMockUser(roles = "SYSADMIN")
     public void shouldUpdateApiUserPassword() throws Exception {
         // GIVEN
         ApiUser originalApiUser = createApiUser01();
@@ -297,6 +303,7 @@ public class ApiUserRestControllerIntTest {
     }
 
     @Test
+    @WithMockUser(roles = "SYSADMIN")
     public void shouldUpdateApiUserStatus() throws Exception {
         // GIVEN
         ApiUser originalApiUser = createApiUser01();
@@ -317,6 +324,7 @@ public class ApiUserRestControllerIntTest {
     }
 
     @Test
+    @WithMockUser(roles = "SYSADMIN")
     public void shouldFindApiUser() throws Exception {
         // GIVEN
         ApiUser originalApiUser1 = createApiUser01();
@@ -349,6 +357,7 @@ public class ApiUserRestControllerIntTest {
     }
 
     @Test
+    @WithMockUser(roles = "SYSADMIN")
     public void shouldFindAllApiUsers() throws Exception {
         // GIVEN
         storeElastic(createApiUser01());
