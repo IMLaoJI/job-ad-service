@@ -14,10 +14,8 @@ public class CompanyDto {
 
     private String houseNumber;
 
-    @NotBlank
     private String postalCode;
 
-    @NotBlank
     private String city;
 
     @NotBlank
