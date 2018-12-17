@@ -5,7 +5,7 @@
     <changeSet author="fago" id="20181214080000-1">
         <addColumn tableName="JOB_ADVERTISEMENT_OCCUPATION">
             <column name="QUALIFICATION_CODE"
-                    type="VARCHAR(20)">
+                    type="VARCHAR(10)">
             </column>
         </addColumn>
     </changeSet>

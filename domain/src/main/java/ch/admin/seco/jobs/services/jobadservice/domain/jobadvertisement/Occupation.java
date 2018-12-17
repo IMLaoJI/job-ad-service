@@ -80,12 +80,12 @@ public class Occupation implements ValueObject<Occupation> {
         return workExperience;
     }
 
-    public Qualification getQualificationCode() {
-        return qualificationCode;
-    }
-
     public String getEducationCode() {
         return educationCode;
+    }
+
+    public Qualification getQualificationCode() {
+        return qualificationCode;
     }
 
     @Override
