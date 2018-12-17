@@ -39,7 +39,6 @@ public class JobAdvertisementEventListener {
     void onCreated(JobAdvertisementCreatedEvent event) {
         LOG.debug("EVENT caught for internal: JOB_ADVERTISEMENT_CREATED for JobAdvertisementId: '{}'", event.getAggregateId().getValue());
         final JobAdvertisement jobAdvertisement = getJobAdvertisement(event.getAggregateId());
-        // isReporting or isReportToAvam will still be true when we receive a Reactivation ??
         if (jobAdvertisement.isReportingObligation() || jobAdvertisement.isReportToAvam() || jobAdvertisement.getSourceSystem().equals(SourceSystem.JOBROOM)) {
             jobAdvertisementApplicationService.inspect(jobAdvertisement.getId());
         } else {
