@@ -1,6 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.api;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCode;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
@@ -15,8 +16,7 @@ public class ApiOccupationDto {
 
     private WorkExperience workExperience;
 
-    @Size(max = 8)
-    @Pattern(regexp = "[0-9]*")
+    @SupportedEducationCode
     private String educationCode;
 
     public String getAvamOccupationCode() {
