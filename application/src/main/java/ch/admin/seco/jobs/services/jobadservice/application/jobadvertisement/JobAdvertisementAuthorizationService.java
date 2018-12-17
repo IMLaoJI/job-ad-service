@@ -50,6 +50,9 @@ public class JobAdvertisementAuthorizationService {
     }
 
     public boolean isOwner(JobAdvertisement jobAdvertisement, CurrentUser currentUser) {
+        if(currentUser == null) {
+            return false;
+        }
         String userId = currentUser.getUserId();
         if ((userId != null) && userId.equals(jobAdvertisement.getOwner().getUserId())) {
             return true;
