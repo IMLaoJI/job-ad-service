@@ -7,6 +7,7 @@ import javax.validation.constraints.NotEmpty;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCode;
 
 public class OccupationDto {
 
@@ -15,6 +16,7 @@ public class OccupationDto {
 
     private WorkExperience workExperience;
 
+    @SupportedEducationCode
     private String educationCode;
 
     public String getAvamOccupationCode() {
