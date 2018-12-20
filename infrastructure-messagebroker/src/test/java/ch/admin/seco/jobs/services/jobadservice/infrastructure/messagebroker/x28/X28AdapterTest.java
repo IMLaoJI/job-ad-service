@@ -24,9 +24,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28CompanyDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28ContactDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28LanguageSkillDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28LocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28OccupationDto;
@@ -36,6 +36,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Publication;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Qualification;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience;
@@ -140,7 +141,10 @@ public class X28AdapterTest {
                                 .setWorkForms(null))
                 .setCompany(new X28CompanyDto("companyName", "companyStreet", "companyHouseNumber", "companyPostalCode", "companyCity", "CH", null, null, null, "companyPhone", "companyEmail", "companyWebside", false))
                 .setLocation(new X28LocationDto(null, "locationCity", "locationPostalCode", "CH"))
-                .setOccupations(Collections.singletonList(new X28OccupationDto("avamOccupationCode", WorkExperience.MORE_THAN_1_YEAR, "educationCode")))
+                .setOccupations(Collections.singletonList(new X28OccupationDto().setAvamOccupationCode("avamOccupationCode")
+                        .setWorkExperience(WorkExperience.MORE_THAN_1_YEAR)
+                        .setEducationCode("educationCode")
+                        .setQualificationCode(Qualification.SKILLED)))
                 .setProfessionCodes("professionCodes")
                 .setLanguageSkills(Collections.singletonList(new X28LanguageSkillDto("de", LanguageLevel.PROFICIENT, LanguageLevel.INTERMEDIATE)))
                 .setPublicationStartDate(LocalDate.of(2018, 1, 1))

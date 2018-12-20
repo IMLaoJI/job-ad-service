@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import javax.validation.constraints.NotEmpty;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Qualification;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCode;
 
@@ -18,6 +19,8 @@ public class OccupationDto {
 
     @SupportedEducationCode
     private String educationCode;
+
+    private Qualification qualificationCode;
 
     public String getAvamOccupationCode() {
         return avamOccupationCode;
@@ -46,11 +49,21 @@ public class OccupationDto {
         return this;
     }
 
+    public Qualification getQualificationCode() {
+        return qualificationCode;
+    }
+
+    public OccupationDto setQualificationCode(Qualification qualificationCode) {
+        this.qualificationCode = qualificationCode;
+        return this;
+    }
+
     public static OccupationDto toDto(Occupation occupation) {
         return new OccupationDto()
                 .setAvamOccupationCode(occupation.getAvamOccupationCode())
                 .setWorkExperience(occupation.getWorkExperience())
-                .setEducationCode(occupation.getEducationCode());
+                .setEducationCode(occupation.getEducationCode())
+                .setQualificationCode(occupation.getQualificationCode());
     }
 
     public static List<OccupationDto> toDto(List<Occupation> occupations) {

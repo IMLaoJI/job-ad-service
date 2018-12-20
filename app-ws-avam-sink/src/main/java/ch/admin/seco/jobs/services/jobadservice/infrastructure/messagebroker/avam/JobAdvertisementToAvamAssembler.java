@@ -1,19 +1,36 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.TOsteEgov;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.WSArbeitsform;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.WSArbeitsformArray;
-import org.springframework.util.Assert;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode.CHANGE_OR_REPOSE;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode.NOT_OCCUPIED;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode.OCCUPIED_OTHER;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.SOURCE_SYSTEM;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.WORK_FORMS;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamDateTimeFormatter.formatLocalDate;
 import static org.springframework.util.StringUtils.hasText;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.util.Assert;
+
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Address;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.ApplyChannel;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Company;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Contact;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Employer;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Employment;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobContent;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobDescription;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageSkill;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Location;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.PublicContact;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Publication;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.TOsteEgov;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.WSArbeitsform;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.WSArbeitsformArray;
 
 public class JobAdvertisementToAvamAssembler {
 
@@ -235,6 +252,7 @@ public class JobAdvertisementToAvamAssembler {
             avamJobAdvertisement.setBq1AvamBeruf(occupation.getLabel());
             avamJobAdvertisement.setBq1AvamBerufNr(occupation.getAvamOccupationCode());
             avamJobAdvertisement.setBq1ErfahrungCode(AvamCodeResolver.EXPERIENCES.getLeft(occupation.getWorkExperience()));
+            avamJobAdvertisement.setBq1QualifikationCode(AvamCodeResolver.QUALIFICATION_CODE.getLeft(occupation.getQualificationCode()));
             avamJobAdvertisement.setBq1AusbildungCode(occupation.getEducationCode());
         }
         /*

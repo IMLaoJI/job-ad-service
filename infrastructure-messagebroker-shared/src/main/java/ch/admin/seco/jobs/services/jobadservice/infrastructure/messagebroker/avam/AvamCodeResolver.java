@@ -1,7 +1,13 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
 import ch.admin.seco.jobs.services.jobadservice.core.utils.MappingBuilder;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Qualification;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkForm;
 
 /**
  * Mapping AVAM codes with the value of the application
@@ -103,5 +109,11 @@ public class AvamCodeResolver {
             .put("6", CancellationCode.OCCUPIED_OTHER)
             .put("7", CancellationCode.AVAM_OTHER)
             .put("8", CancellationCode.AVAM_SYSTEM_CANCEL)
+            .toImmutable();
+
+    public static final MappingBuilder<String, Qualification> QUALIFICATION_CODE = new MappingBuilder<String, Qualification>()
+            .put("1", Qualification.SKILLED)
+            .put("2", Qualification.SEMISKILLED)
+            .put("3", Qualification.UNSKILLED)
             .toImmutable();
 }

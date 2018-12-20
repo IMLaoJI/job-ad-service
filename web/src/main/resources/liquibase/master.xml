@@ -30,4 +30,5 @@
     <include file="classpath:/liquibase/changelog/20181005080000_update_ApiUser_add_countLoginFailure.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20181018080000_update_ApplyChannel_postAddress.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20181119080000_update_Company_street_length.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/liquibase/changelog/20181212080000_add_qualification_property.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
