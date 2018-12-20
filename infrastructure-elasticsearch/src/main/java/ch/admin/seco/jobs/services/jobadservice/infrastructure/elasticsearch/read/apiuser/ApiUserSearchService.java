@@ -10,6 +10,7 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import ch.admin.seco.jobs.services.jobadservice.application.apiuser.dto.ApiUserDto;
@@ -32,6 +33,7 @@ public class ApiUserSearchService {
         this.apiUserElasticsearchRepository = apiUserElasticsearchRepository;
     }
 
+    @PreAuthorize("hasRole(T(ch.admin.seco.jobs.services.jobadservice.application.security.Role).SYSADMIN.value)")
     public Page<ApiUserDto> search(ApiUserSearchRequest searchRequest, Pageable pageable) {
         QueryBuilder query = StringUtils.isBlank(searchRequest.getQuery())
                 ? matchAllQuery()

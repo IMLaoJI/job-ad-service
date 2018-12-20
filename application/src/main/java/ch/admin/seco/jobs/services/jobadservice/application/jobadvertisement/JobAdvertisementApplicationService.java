@@ -255,11 +255,6 @@ public class JobAdvertisementApplicationService {
         return jobAdvertisement.getId();
     }
 
-    public List<JobAdvertisementDto> findAll() {
-        List<JobAdvertisement> jobAdvertisements = jobAdvertisementRepository.findAll();
-        return jobAdvertisements.stream().map(JobAdvertisementDto::toDto).collect(toList());
-    }
-
     public Page<JobAdvertisementDto> findOwnJobAdvertisements(Pageable pageable) {
         CurrentUser currentUser = currentUserContext.getCurrentUser();
         if (currentUser == null) {
@@ -273,6 +268,7 @@ public class JobAdvertisementApplicationService {
         );
     }
 
+    @PreAuthorize("hasRole(T(ch.admin.seco.jobs.services.jobadservice.application.security.Role).SYSADMIN.value)")
     public Page<JobAdvertisementDto> findAllPaginated(Pageable pageable) {
         Page<JobAdvertisement> jobAdvertisements = jobAdvertisementRepository.findAll(pageable);
         return new PageImpl<>(

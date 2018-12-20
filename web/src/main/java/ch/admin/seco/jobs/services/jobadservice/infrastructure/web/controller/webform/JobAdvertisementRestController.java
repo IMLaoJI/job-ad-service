@@ -1,21 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.webform;
 
-import javax.validation.Valid;
-
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
@@ -28,6 +12,13 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.CancellationResource;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.PageResource;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/jobAdvertisements")
@@ -45,13 +36,23 @@ public class JobAdvertisementRestController {
         this.jobAdvertisementFromWebAssembler = jobAdvertisementFromWebAssembler;
     }
 
+    /**
+     * Response status:
+     * - 201 Created: The job ad has been successfully created
+     * - 400 Bad Request: The request was malformed or invalid
+     */
     @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
     public JobAdvertisementDto createFromWebform(@RequestBody @Valid WebformCreateJobAdvertisementDto createJobAdvertisementFromWebDto) throws AggregateNotFoundException {
         CreateJobAdvertisementDto createJobAdvertisementDto = jobAdvertisementFromWebAssembler.convert(createJobAdvertisementFromWebDto);
         JobAdvertisementId jobAdvertisementId = jobAdvertisementApplicationService.createFromWebForm(createJobAdvertisementDto);
         return jobAdvertisementApplicationService.getById(jobAdvertisementId);
     }
 
+    /**
+     * Response status:
+     * - 200 Ok: The page with job ads has been returned
+     */
     @GetMapping
     public PageResource<JobAdvertisementDto> getAll(
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -61,31 +62,70 @@ public class JobAdvertisementRestController {
         return PageResource.of(jobAdvertisementApplicationService.findAllPaginated(pageRequest));
     }
 
+    /**
+     * Response status:
+     * - 200 Ok: The job ad has been returned
+     * - 401 Unauthorized: User is not logged in
+     * - 403 Forbidden: User has not the required permission to perform this action
+     * - 404 Not Found: No job ad has be found for the given id
+     */
     @GetMapping("/{id}")
     public JobAdvertisementDto getOne(@PathVariable String id) throws AggregateNotFoundException {
         return jobAdvertisementApplicationService.getById(new JobAdvertisementId(id));
     }
 
+    /**
+     * Response status:
+     * - 200 Ok: The job ad has been returned
+     * - 404 Not Found: No job ad has be found for the given accessToken
+     */
     @GetMapping("/token/{accessToken}")
     public JobAdvertisementDto getOneByAccessToken(@PathVariable String accessToken) throws AggregateNotFoundException {
         return jobAdvertisementApplicationService.getByAccessToken(accessToken);
     }
 
+    /**
+     * Response status:
+     * - 200 Ok: The job ad has been returned
+     * - 401 Unauthorized: User is not logged in
+     * - 403 Forbidden: User has not the required permission to perform this action
+     * - 404 Not Found: No job ad has be found for the given stellennummerEgov
+     */
     @GetMapping("/byStellennummerEgov/{stellennummerEgov}")
     public JobAdvertisementDto getOneByStellennummerEgov(@PathVariable String stellennummerEgov) throws AggregateNotFoundException {
         return jobAdvertisementApplicationService.getByStellennummerEgov(stellennummerEgov);
     }
 
+    /**
+     * Response status:
+     * - 200 Ok: The job ad has been returned
+     * - 401 Unauthorized: User is not logged in
+     * - 403 Forbidden: User has not the required permission to perform this action
+     * - 404 Not Found: No job ad has be found for the given stellennummerAvam
+     */
     @GetMapping("/byStellennummerAvam/{stellennummerAvam}")
     public JobAdvertisementDto getOneByStellennummerAvam(@PathVariable String stellennummerAvam) throws AggregateNotFoundException {
         return jobAdvertisementApplicationService.getByStellennummerAvam(stellennummerAvam);
     }
 
+    /**
+     * Response status:
+     * - 200 Ok: The job ad has been returned
+     * - 404 Not Found: No job ad has be found for the given fingerprint
+     */
     @GetMapping("/byFingerprint/{fingerprint}")
     public JobAdvertisementDto getOneByFingerprint(@PathVariable String fingerprint) {
         return jobAdvertisementApplicationService.getByFingerprint(fingerprint);
     }
 
+    /**
+     * Response status:
+     * - 204 No Content: The job ad has been successfully updated
+     * - 400 Bad Request: The request was malformed or invalid
+     * - 401 Unauthorized: User is not logged in
+     * - 403 Forbidden: User has not the required permission to perform this action
+     * - 404 Not Found: No job ad has be found for the given fingerprint
+     */
     @PatchMapping("/{id}/cancel")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@jobAdvertisementAuthorizationService.canCancel(#id, #token)")
@@ -93,25 +133,52 @@ public class JobAdvertisementRestController {
         jobAdvertisementApplicationService.cancel(new JobAdvertisementId(id), TimeMachine.now().toLocalDate(), cancellation.getCode(), SourceSystem.JOBROOM, token);
     }
 
+    /**
+     * Response status:
+     * - 200 Ok: The page with events has been returned for this job ad
+     * - 404 Not Found: No job ad has be found for the given id
+     */
     @GetMapping("/{id}/events")
     public PageResource<EventData> getEventsOfJobAdvertisement(@PathVariable String id) throws AggregateNotFoundException {
         return PageResource.of(eventStore.findByAggregateId(id, JobAdvertisement.class.getSimpleName(), 0, 100));
     }
 
+    /**
+     * Response status:
+     * - 204 No Content: The job ad has been successfully updated
+     * - 401 Unauthorized: User is not logged in
+     * - 403 Forbidden: User has not the required permission to perform this action
+     * - 404 Not Found: No job ad has be found for the given id
+     */
     @PostMapping("/{id}/retry/inspect")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole(T(ch.admin.seco.jobs.services.jobadservice.application.security.Role).SYSADMIN.value)")
     public void retryInspect(@PathVariable String id) {
         jobAdvertisementApplicationService.inspect(new JobAdvertisementId(id));
     }
 
-
+    /**
+     * Response status:
+     * - 204 No Content: The job ad has been successfully updated
+     * - 401 Unauthorized: User is not logged in
+     * - 403 Forbidden: User has not the required permission to perform this action
+     */
     @GetMapping("/_actions/update-job-centers")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole(T(ch.admin.seco.jobs.services.jobadservice.application.security.Role).SYSADMIN.value)")
     public void updateJobCenters() {
         this.jobAdvertisementApplicationService.updateJobCenters();
     }
 
+    /**
+     * Response status:
+     * - 204 No Content: The job ad has been successfully updated
+     * - 401 Unauthorized: User is not logged in
+     * - 403 Forbidden: User has not the required permission to perform this action
+     * - 404 Not Found: No job center has be found for the given jobCenterCode
+     */
     @GetMapping("/_actions/update-job-centers/{jobCenterCode}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole(T(ch.admin.seco.jobs.services.jobadservice.application.security.Role).SYSADMIN.value)")
     public void updateJobCenter(@PathVariable String jobCenterCode) {
         this.jobAdvertisementApplicationService.updateJobCenter(jobCenterCode);
