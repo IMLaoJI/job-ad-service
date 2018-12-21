@@ -50,7 +50,7 @@ public class LogstashBusinessLogger implements BusinessLogger {
         log.info(this.businessLogMarker, "BusinessLogEntry: {}", entries(businessLogEntry));
     }
 
-    private Object[] extractAuthorities(CurrentUser currentUser) {
-        return currentUser != null ? currentUser.getAuthorities().toArray() : new Object[0];
+    private String extractAuthorities(CurrentUser currentUser) {
+        return currentUser != null ? currentUser.getAuthorities().toString() : null;
     }
 }
