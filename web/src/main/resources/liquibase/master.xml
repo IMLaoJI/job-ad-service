@@ -32,4 +32,5 @@
     <include file="classpath:/liquibase/changelog/20181119080000_update_Company_street_length.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20181212080000_add_qualification_property.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20181221080000_update_qualification_property.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/liquibase/changelog/20190108080000_update_owner_user_display_name.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

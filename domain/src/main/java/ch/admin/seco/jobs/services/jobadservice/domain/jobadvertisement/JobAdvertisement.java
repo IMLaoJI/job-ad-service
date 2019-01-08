@@ -114,6 +114,7 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
 	@Embedded
 	@AttributeOverrides({
 			@AttributeOverride(name = "userId", column = @Column(name = "OWNER_USER_ID")),
+			@AttributeOverride(name = "userDisplayName", column = @Column(name = "OWNER_USER_DISPLAY_NAME")),
 			@AttributeOverride(name = "companyId", column = @Column(name = "OWNER_COMPANY_ID")),
 			@AttributeOverride(name = "accessToken", column = @Column(name = "OWNER_ACCESS_TOKEN"))
 	})

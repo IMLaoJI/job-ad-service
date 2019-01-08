@@ -8,6 +8,8 @@ public class Owner {
 
     private String userId;
 
+    private String userDisplayName;
+
     private String companyId;
 
     private String accessToken;
@@ -18,12 +20,17 @@ public class Owner {
 
     public Owner(Builder builder) {
         this.userId = builder.userId;
+        this.userDisplayName = builder.userDisplayName;
         this.companyId = builder.companyId;
         this.accessToken = Condition.notNull(builder.accessToken, "Access token can't be null");
     }
 
     public String getUserId() {
         return userId;
+    }
+
+    public String getUserDisplayName() {
+        return userDisplayName;
     }
 
     public String getCompanyId() {
@@ -40,6 +47,7 @@ public class Owner {
         if (o == null || getClass() != o.getClass()) return false;
         Owner owner = (Owner) o;
         return Objects.equals(userId, owner.userId) &&
+                Objects.equals(userDisplayName, owner.userDisplayName) &&
                 Objects.equals(companyId, owner.companyId) &&
                 Objects.equals(accessToken, owner.accessToken);
     }
@@ -53,6 +61,7 @@ public class Owner {
     public String toString() {
         return "Owner{" +
                 "userId='" + userId + '\'' +
+                ", userDisplayName='" + userDisplayName + '\'' +
                 ", companyId='" + companyId + '\'' +
                 ", accessToken='" + accessToken + '\'' +
                 '}';
@@ -60,6 +69,7 @@ public class Owner {
 
     public static final class Builder {
         private String userId;
+        private String userDisplayName;
         private String companyId;
         private String accessToken;
 
@@ -72,6 +82,11 @@ public class Owner {
 
         public Builder setUserId(String userId) {
             this.userId = userId;
+            return this;
+        }
+
+        public Builder setUserDisplayName(String userDisplayName) {
+            this.userDisplayName = userDisplayName;
             return this;
         }
 
