@@ -180,13 +180,12 @@ public class JobAdvertisementSearchService {
     }
 
     private BoolQueryBuilder createdSinceDaysManagedFilter(ManagedJobAdSearchRequest searchRequest) {
-        BoolQueryBuilder query = boolQuery();
-        if (searchRequest.getCreatedSinceDays() == null) {
-            return query;
-        }
-
-        String createdSinceDaysDate = String.format("now-%sd/d", searchRequest.getCreatedSinceDays());
-        return query.must(rangeQuery(PATH_CREATED_TIME).gte(createdSinceDaysDate));
+        return searchRequest.getCreatedSinceDays() == null
+                ? boolQuery()
+                : boolQuery()
+                .must(
+                        rangeQuery(PATH_CREATED_TIME).gte(String.format("now-%sd/d", searchRequest.getCreatedSinceDays()))
+                );
     }
 
     private BoolQueryBuilder publicationStartDatePeaFilter(PeaJobAdvertisementSearchRequest searchRequest) {
