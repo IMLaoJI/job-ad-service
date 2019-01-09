@@ -54,6 +54,7 @@ public class JobAdvertisementSearchService {
     private static Logger LOG = LoggerFactory.getLogger(JobAdvertisementSearchService.class);
 
     private static final String PATH_CTX = "jobAdvertisement.";
+    private static final String PATH_CREATED_TIME = PATH_CTX + "createdTime";
     private static final String PATH_AVAM_JOB_ID = PATH_CTX + "stellennummerAvam";
     private static final String PATH_EGOV_JOB_ID = PATH_CTX + "stellennummerEgov";
     private static final String PATH_COMPANY_NAME = PATH_CTX + "jobContent.displayCompany.name";
@@ -134,9 +135,11 @@ public class JobAdvertisementSearchService {
             PeaJobAdvertisementSearchRequest searchRequest,
             Pageable pageable) {
 
-        SearchQuery query = createPeaSearchQueryBuilder(searchRequest)
-                .withPageable(pageable)
-                .build();
+        SearchQuery query = buildPageableQueryWithFilters(
+                pageable,
+                titleFilter(searchRequest),
+                publicationStartDatePeaFilter(searchRequest),
+                ownerFilter(searchRequest.getCompanyId()));
 
         return jobAdvertisementElasticsearchRepository.search(query)
                 .map(JobAdvertisementDocument::getJobAdvertisement)
@@ -148,28 +151,22 @@ public class JobAdvertisementSearchService {
             ManagedJobAdSearchRequest searchRequest,
             Pageable pageable) {
 
-        return null;
-        /*
-        FIXME adapt createPeaSearchQueryBuilder
-        SearchQuery query = createPeaSearchQueryBuilder(searchRequest)
-                .withPageable(pageable)
-                .build();
+        SearchQuery query = buildPageableQueryWithFilters(
+                pageable,
+                createdSinceDaysManagedFilter(searchRequest),
+                ownerFilter(searchRequest.getCompanyId())
+        );
 
         return jobAdvertisementElasticsearchRepository.search(query)
                 .map(JobAdvertisementDocument::getJobAdvertisement)
                 .map(JobAdvertisementDto::toDtoWithOwner);
-        */
     }
 
-    private NativeSearchQueryBuilder createPeaSearchQueryBuilder(PeaJobAdvertisementSearchRequest searchRequest) {
-        QueryBuilder filter = mustAll(
-                titleFilter(searchRequest),
-                publicationStartDatePeaFilter(searchRequest),
-                ownerFilter(searchRequest.getCompanyId())
-        );
-
+    private SearchQuery buildPageableQueryWithFilters(Pageable pageable, BoolQueryBuilder... queryBuilders) {
         return new NativeSearchQueryBuilder()
-                .withFilter(filter);
+                .withFilter(mustAll(queryBuilders))
+                .withPageable(pageable)
+                .build();
     }
 
     private BoolQueryBuilder titleFilter(PeaJobAdvertisementSearchRequest searchRequest) {
@@ -180,6 +177,16 @@ public class JobAdvertisementSearchService {
         }
 
         return query;
+    }
+
+    private BoolQueryBuilder createdSinceDaysManagedFilter(ManagedJobAdSearchRequest searchRequest) {
+        BoolQueryBuilder query = boolQuery();
+        if (searchRequest.getCreatedSinceDays() == null) {
+            return query;
+        }
+
+        String createdSinceDaysDate = String.format("now-%sd/d", searchRequest.getCreatedSinceDays());
+        return query.must(rangeQuery(PATH_CREATED_TIME).gte(createdSinceDaysDate));
     }
 
     private BoolQueryBuilder publicationStartDatePeaFilter(PeaJobAdvertisementSearchRequest searchRequest) {
