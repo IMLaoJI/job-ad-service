@@ -42,6 +42,7 @@ import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsea
 import static org.apache.commons.lang3.ArrayUtils.*;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.springframework.data.domain.Sort.Order.desc;
 
 @Service
 public class JobAdvertisementSearchService {
@@ -152,7 +153,10 @@ public class JobAdvertisementSearchService {
             Pageable pageable) {
 
         SearchQuery query = buildPageableQueryWithFilters(
-                pageable,
+                PageRequest.of(
+                        pageable.getPageNumber(),
+                        pageable.getPageSize(),
+                        Sort.by(desc(PATH_PUBLICATION_START_DATE))),
                 createdSinceDaysManagedFilter(searchRequest),
                 ownerFilter(searchRequest.getCompanyId())
         );
@@ -208,11 +212,11 @@ public class JobAdvertisementSearchService {
             case date_asc:
                 return Sort.by(Sort.Order.asc(PATH_PUBLICATION_START_DATE));
             case date_desc:
-                return Sort.by(Sort.Order.desc(PATH_PUBLICATION_START_DATE));
+                return Sort.by(desc(PATH_PUBLICATION_START_DATE));
             default:
                 return Sort.by(
-                        Sort.Order.desc(RELEVANCE),
-                        Sort.Order.desc(PATH_PUBLICATION_START_DATE)
+                        desc(RELEVANCE),
+                        desc(PATH_PUBLICATION_START_DATE)
                 );
         }
     }
