@@ -78,11 +78,7 @@ public class AvamService {
 
     @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = APPROVE_CONDITION)
     public void handleApprovedAction(ApprovalDto approvalDto) {
-        JobAdvertisementDto jobAdvertisementDto;
-        if (isNotBlank(approvalDto.getStellennummerEgov())) {
-            return;
-        }
-        jobAdvertisementDto = jobAdvertisementApplicationService.getByStellennummerEgovOrAvam(approvalDto.getStellennummerEgov(), approvalDto.getStellennummerAvam());
+        JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.getByStellennummerEgovOrAvam(approvalDto.getStellennummerEgov(), approvalDto.getStellennummerAvam());
         notNull(jobAdvertisementDto, "Couldn't find the jobAdvertisement for stellennummerEgov %s nor stellennummerAvam %s", approvalDto.getStellennummerEgov(), approvalDto.getStellennummerAvam());
         if (jobAdvertisementDto.getStatus() == JobAdvertisementStatus.INSPECTING) {
             jobAdvertisementApplicationService.approve(approvalDto);
