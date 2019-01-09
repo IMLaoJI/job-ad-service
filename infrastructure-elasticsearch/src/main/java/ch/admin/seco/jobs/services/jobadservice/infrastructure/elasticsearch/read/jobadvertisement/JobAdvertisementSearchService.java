@@ -8,7 +8,6 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
-
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.Operator;
@@ -127,6 +126,10 @@ public class JobAdvertisementSearchService {
         });
     }
 
+    /**
+     * @deprecated Implementation for the JobRoom. It will be removed after go live of the eServiceUi.
+     */
+    @Deprecated
     public Page<JobAdvertisementDto> searchPeaJobAdvertisements(
             PeaJobAdvertisementSearchRequest searchRequest,
             Pageable pageable) {
@@ -138,6 +141,24 @@ public class JobAdvertisementSearchService {
         return jobAdvertisementElasticsearchRepository.search(query)
                 .map(JobAdvertisementDocument::getJobAdvertisement)
                 .map(JobAdvertisementDto::toDto);
+    }
+
+    // FIXME The current user should be validated to be member of the given companyId.
+    public Page<JobAdvertisementDto> searchManagedJobAds(
+            ManagedJobAdSearchRequest searchRequest,
+            Pageable pageable) {
+
+        return null;
+        /*
+        FIXME adapt createPeaSearchQueryBuilder
+        SearchQuery query = createPeaSearchQueryBuilder(searchRequest)
+                .withPageable(pageable)
+                .build();
+
+        return jobAdvertisementElasticsearchRepository.search(query)
+                .map(JobAdvertisementDocument::getJobAdvertisement)
+                .map(JobAdvertisementDto::toDtoWithOwner);
+        */
     }
 
     private NativeSearchQueryBuilder createPeaSearchQueryBuilder(PeaJobAdvertisementSearchRequest searchRequest) {
@@ -329,7 +350,7 @@ public class JobAdvertisementSearchService {
             return boolQuery()
                     .should(publishedPublicFilter)
                     .should(publishedRestrictedFilter)
-            ;
+                    ;
         }
         return boolQuery().must(termQuery(PATH_PUBLICATION_PUBLIC_DISPLAY, true));
     }

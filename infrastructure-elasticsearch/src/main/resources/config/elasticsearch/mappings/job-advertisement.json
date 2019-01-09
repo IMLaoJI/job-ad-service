@@ -245,6 +245,9 @@
               },
               "userId": {
                 "type": "keyword"
+              },
+              "userDisplayName": {
+                "type": "keyword"
               }
             }
           },

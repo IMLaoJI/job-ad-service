@@ -4,6 +4,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.JobAdvertisementSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.JobAdvertisementSearchService;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.ManagedJobAdSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.PeaJobAdvertisementSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PaginationUtil;
 
@@ -50,6 +51,10 @@ public class JobAdvertisementSearchController {
         return new ResponseEntity<>(resultPage.getContent(), headers, HttpStatus.OK);
     }
 
+    /**
+     * @deprecated Implementation for the JobRoom. It will be removed after go live of the eServiceUi.
+     */
+    @Deprecated
     @PostMapping("/_search/pea")
     @Timed
     public ResponseEntity<List<JobAdvertisementDto>> searchPeaJobs(
@@ -57,6 +62,16 @@ public class JobAdvertisementSearchController {
 
         Page<JobAdvertisementDto> resultPage = jobAdvertisementSearchService.searchPeaJobAdvertisements(searchRequest, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(resultPage, "/api/_search/pea");
+        return new ResponseEntity<>(resultPage.getContent(), headers, HttpStatus.OK);
+    }
+
+    @PostMapping("/_search/managed")
+    @Timed
+    public ResponseEntity<List<JobAdvertisementDto>> searchManagedJobAds(
+            @RequestBody @Valid ManagedJobAdSearchRequest searchRequest, Pageable pageable) {
+
+        Page<JobAdvertisementDto> resultPage = jobAdvertisementSearchService.searchManagedJobAds(searchRequest, pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(resultPage, "/api/jobAdvertisements/_search/managed");
         return new ResponseEntity<>(resultPage.getContent(), headers, HttpStatus.OK);
     }
 
