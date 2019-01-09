@@ -10,7 +10,7 @@ public class ManagedJobAdSearchRequest {
 
 	@Min(7)
 	@Max(365)
-	private Integer createdSinceDays;
+	private Integer onlineSinceDays;
 
 	private String ownerUserId;
 
@@ -26,12 +26,12 @@ public class ManagedJobAdSearchRequest {
 		return this;
 	}
 
-	public Integer getCreatedSinceDays() {
-		return createdSinceDays;
+	public Integer getOnlineSinceDays() {
+		return onlineSinceDays;
 	}
 
-	public ManagedJobAdSearchRequest setCreatedSinceDays(Integer createdSinceDays) {
-		this.createdSinceDays = createdSinceDays;
+	public ManagedJobAdSearchRequest setOnlineSinceDays(Integer onlineSinceDays) {
+		this.onlineSinceDays = onlineSinceDays;
 		return this;
 	}
 

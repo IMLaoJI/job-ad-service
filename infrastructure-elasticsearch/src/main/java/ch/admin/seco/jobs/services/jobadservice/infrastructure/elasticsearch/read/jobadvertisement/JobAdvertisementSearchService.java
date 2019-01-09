@@ -29,6 +29,7 @@ import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -139,7 +140,7 @@ public class JobAdvertisementSearchService {
         SearchQuery query = buildPageableQueryWithFilters(
                 pageable,
                 titleFilter(searchRequest),
-                publicationStartDatePeaFilter(searchRequest),
+                publicationStartDateFilter(searchRequest.getOnlineSinceDays()),
                 ownerFilter(searchRequest.getCompanyId()));
 
         return jobAdvertisementElasticsearchRepository.search(query)
@@ -147,7 +148,7 @@ public class JobAdvertisementSearchService {
                 .map(JobAdvertisementDto::toDto);
     }
 
-    // FIXME The current user should be validated to be member of the given companyId.
+    @PreAuthorize("@jobAdvertisementAuthorizationService.isCurrentUserMemberOfCompany(#searchRequest.companyId)")
     public Page<JobAdvertisementDto> searchManagedJobAds(
             ManagedJobAdSearchRequest searchRequest,
             Pageable pageable) {
@@ -157,7 +158,7 @@ public class JobAdvertisementSearchService {
                         pageable.getPageNumber(),
                         pageable.getPageSize(),
                         Sort.by(desc(PATH_PUBLICATION_START_DATE))),
-                createdSinceDaysManagedFilter(searchRequest),
+                publicationStartDateFilter(searchRequest.getOnlineSinceDays()),
                 ownerFilter(searchRequest.getCompanyId())
         );
 
@@ -183,23 +184,11 @@ public class JobAdvertisementSearchService {
         return query;
     }
 
-    private BoolQueryBuilder createdSinceDaysManagedFilter(ManagedJobAdSearchRequest searchRequest) {
-        return searchRequest.getCreatedSinceDays() == null
+    private BoolQueryBuilder publicationStartDateFilter(Integer onlineSinceDays) {
+        return onlineSinceDays == null
                 ? boolQuery()
                 : boolQuery()
-                .must(
-                        rangeQuery(PATH_CREATED_TIME).gte(String.format("now-%sd/d", searchRequest.getCreatedSinceDays()))
-                );
-    }
-
-    private BoolQueryBuilder publicationStartDatePeaFilter(PeaJobAdvertisementSearchRequest searchRequest) {
-        BoolQueryBuilder query = boolQuery();
-        if (searchRequest.getOnlineSinceDays() == null) {
-            return query;
-        }
-
-        String publicationStartDate = String.format("now-%sd/d", searchRequest.getOnlineSinceDays());
-        return query.must(rangeQuery(PATH_PUBLICATION_START_DATE).gte(publicationStartDate));
+                .must(rangeQuery(PATH_PUBLICATION_START_DATE).gte(String.format("now-%sd/d", onlineSinceDays)));
     }
 
     public long count(JobAdvertisementSearchRequest jobSearchRequest) {
