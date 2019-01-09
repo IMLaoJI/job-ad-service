@@ -11,9 +11,9 @@ import static java.time.LocalDate.now;
 import java.time.LocalDate;
 import java.util.Collections;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import org.assertj.core.util.Sets;
 
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.AddressDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
@@ -25,6 +25,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Company;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Qualification;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
 
 public class CreateJobAdvertisementFromAvamDtoTestFixture {
@@ -90,7 +91,8 @@ public class CreateJobAdvertisementFromAvamDtoTestFixture {
                 Collections.singletonList(new OccupationDto()
                         .setAvamOccupationCode("avamCode")
                         .setWorkExperience(MORE_THAN_1_YEAR)
-                        .setEducationCode("educationCode")),
+                        .setEducationCode("educationCode")
+                        .setQualificationCode(Qualification.SKILLED)),
                 Collections.singletonList(new LanguageSkillDto()
                         .setLanguageIsoCode("de")
                         .setSpokenLevel(PROFICIENT)

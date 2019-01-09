@@ -44,6 +44,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
@@ -54,6 +55,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
 
@@ -123,6 +125,13 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         assertThat(jobAdvertisement.isReportingObligation()).isTrue();
         assertThat(jobAdvertisement.getJobContent().getDisplayCompany()).isEqualTo(testCompany().build());
         assertThat(jobAdvertisement.getJobContent().getDisplayApplyChannel()).isEqualTo(testApplyChannel().build());
+
+        Occupation occupation = jobAdvertisement.getJobContent().getOccupations().get(0);
+        OccupationDto occupationDto = createJobAdvertisementDto.getOccupations().get(0);
+        assertThat(occupation.getWorkExperience()).isEqualByComparingTo(occupationDto.getWorkExperience());
+        assertThat(occupation.getAvamOccupationCode()).isEqualToIgnoringCase(occupationDto.getAvamOccupationCode());
+        assertThat(occupation.getEducationCode()).isEqualToIgnoringCase(occupationDto.getEducationCode());
+        assertThat(occupation.getQualificationCode()).isEqualByComparingTo(occupationDto.getQualificationCode());
 
 
         domainEventMockUtils.assertSingleDomainEventPublished(JOB_ADVERTISEMENT_APPROVED.getDomainEventType());

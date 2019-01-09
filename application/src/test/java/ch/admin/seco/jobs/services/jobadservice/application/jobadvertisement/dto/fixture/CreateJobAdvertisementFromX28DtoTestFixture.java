@@ -6,13 +6,14 @@ import java.time.LocalDate;
 import java.util.Collections;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28CompanyDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28LanguageSkillDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28LocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28OccupationDto;
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Qualification;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience;
 
 public class CreateJobAdvertisementFromX28DtoTestFixture {
@@ -40,7 +41,11 @@ public class CreateJobAdvertisementFromX28DtoTestFixture {
                         .setWorkForms(null))
                 .setCompany(new X28CompanyDto("name", "street", "houseNumber", "postalCode", "city", "CH", null, null, null, "phone", "email", "website", false))
                 .setLocation(new X28LocationDto(null, "city", "postalCode", null))
-                .setOccupations(Collections.singletonList(new X28OccupationDto("avamCode", WorkExperience.MORE_THAN_1_YEAR, "educationCode")))
+                .setOccupations(Collections.singletonList(new X28OccupationDto()
+                        .setAvamOccupationCode("avamCode")
+                        .setWorkExperience(WorkExperience.MORE_THAN_1_YEAR)
+                        .setEducationCode( "educationCode")
+                        .setQualificationCode(Qualification.SKILLED)))
                 .setProfessionCodes("1,2")
                 .setLanguageSkills(Collections.singletonList(new X28LanguageSkillDto("de", LanguageLevel.PROFICIENT, LanguageLevel.PROFICIENT)))
                 .setPublicationStartDate(TimeMachine.now().toLocalDate())

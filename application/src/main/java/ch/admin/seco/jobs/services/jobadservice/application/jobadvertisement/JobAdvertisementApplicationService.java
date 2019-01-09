@@ -6,7 +6,6 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.util.StringUtils.hasText;
 
 import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -296,11 +295,6 @@ public class JobAdvertisementApplicationService {
         return jobAdvertisement.getId();
     }
 
-    public List<JobAdvertisementDto> findAll() {
-        List<JobAdvertisement> jobAdvertisements = jobAdvertisementRepository.findAll();
-        return jobAdvertisements.stream().map(JobAdvertisementDto::toDto).collect(toList());
-    }
-
     public Page<JobAdvertisementDto> findOwnJobAdvertisements(Pageable pageable) {
         CurrentUser currentUser = currentUserContext.getCurrentUser();
         if (currentUser == null) {
@@ -314,6 +308,7 @@ public class JobAdvertisementApplicationService {
         );
     }
 
+    @PreAuthorize("hasRole(T(ch.admin.seco.jobs.services.jobadservice.application.security.Role).SYSADMIN.value)")
     public Page<JobAdvertisementDto> findAllPaginated(Pageable pageable) {
         Page<JobAdvertisement> jobAdvertisements = jobAdvertisementRepository.findAll(pageable);
         return new PageImpl<>(
@@ -699,6 +694,7 @@ public class JobAdvertisementApplicationService {
                 .setLabel(profession.getLabel())
                 .setWorkExperience(occupation.getWorkExperience())
                 .setEducationCode(occupation.getEducationCode())
+                .setQualification(occupation.getQualificationCode())
                 .build();
     }
 
@@ -977,6 +973,7 @@ public class JobAdvertisementApplicationService {
                 .setAvamOccupationCode(occupationDto.getAvamOccupationCode())
                 .setWorkExperience(occupationDto.getWorkExperience())
                 .setEducationCode(occupationDto.getEducationCode())
+                .setQualification(occupationDto.getQualificationCode())
                 .build();
     }
 

@@ -38,6 +38,9 @@ public class Occupation implements ValueObject<Occupation> {
     // TODO @Size(max = 16)
     private String educationCode;
 
+    @Enumerated(EnumType.STRING)
+    private Qualification qualificationCode;
+
     protected Occupation() {
         // For reflection libs
     }
@@ -50,6 +53,7 @@ public class Occupation implements ValueObject<Occupation> {
         this.label = builder.label;
         this.workExperience = builder.workExperience;
         this.educationCode = builder.educationCode;
+        this.qualificationCode = builder.qualificationCode;
     }
 
     public String getAvamOccupationCode() {
@@ -80,15 +84,14 @@ public class Occupation implements ValueObject<Occupation> {
         return educationCode;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(avamOccupationCode, sbn3Code, sbn5Code, bfsCode, label, workExperience, educationCode);
+    public Qualification getQualificationCode() {
+        return qualificationCode;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         Occupation that = (Occupation) o;
         return Objects.equals(avamOccupationCode, that.avamOccupationCode) &&
                 Objects.equals(sbn3Code, that.sbn3Code) &&
@@ -96,7 +99,13 @@ public class Occupation implements ValueObject<Occupation> {
                 Objects.equals(bfsCode, that.bfsCode) &&
                 Objects.equals(label, that.label) &&
                 workExperience == that.workExperience &&
-                Objects.equals(educationCode, that.educationCode);
+                Objects.equals(educationCode, that.educationCode) &&
+                qualificationCode == that.qualificationCode;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(avamOccupationCode, sbn3Code, sbn5Code, bfsCode, label, workExperience, educationCode, qualificationCode);
     }
 
     @Override
@@ -109,6 +118,7 @@ public class Occupation implements ValueObject<Occupation> {
                 ", label='" + label + '\'' +
                 ", workExperience=" + workExperience +
                 ", educationCode='" + educationCode + '\'' +
+                ", qualificationCode=" + qualificationCode +
                 '}';
     }
 
@@ -120,6 +130,7 @@ public class Occupation implements ValueObject<Occupation> {
         private String label;
         private WorkExperience workExperience;
         private String educationCode;
+        private Qualification qualificationCode;
 
         public Builder() {
         }
@@ -160,6 +171,11 @@ public class Occupation implements ValueObject<Occupation> {
 
         public Builder setEducationCode(String educationCode) {
             this.educationCode = educationCode;
+            return this;
+        }
+
+        public Builder setQualification(Qualification qualification) {
+            this.qualificationCode = qualification;
             return this;
         }
     }
