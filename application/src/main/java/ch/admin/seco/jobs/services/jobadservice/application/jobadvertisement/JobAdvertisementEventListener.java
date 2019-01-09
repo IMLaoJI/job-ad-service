@@ -1,23 +1,25 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
-import ch.admin.seco.jobs.services.jobadservice.core.domain.AggregateNotFoundException;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import ch.admin.seco.jobs.services.jobadservice.core.domain.AggregateNotFoundException;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementAdjournedPublicationEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementApprovedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementBlackoutExpiredEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementCreatedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementPublishExpiredEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementRefinedEvent;
-
-import java.util.Optional;
 
 @Component
 public class JobAdvertisementEventListener {
@@ -66,6 +68,12 @@ public class JobAdvertisementEventListener {
     void onPublishExpired(JobAdvertisementPublishExpiredEvent event) {
         LOG.debug("EVENT caught for internal: JOB_ADVERTISEMENT_PUBLISH_EXPIRED for JobAdvertisementId: '{}'", event.getAggregateId().getValue());
         jobAdvertisementApplicationService.archive(event.getAggregateId());
+    }
+
+    @EventListener
+    void onAdjourned(JobAdvertisementAdjournedPublicationEvent event) {
+        LOG.debug("EVENT caught for internal: JOB_ADVERTISEMENT_ADJOURNED for JobAdvertisementId: '{}'", event.getAggregateId().getValue());
+        jobAdvertisementApplicationService.publish(event.getAggregateId());
     }
 
     private JobAdvertisement getJobAdvertisement(JobAdvertisementId jobAdvertisementId) throws AggregateNotFoundException {

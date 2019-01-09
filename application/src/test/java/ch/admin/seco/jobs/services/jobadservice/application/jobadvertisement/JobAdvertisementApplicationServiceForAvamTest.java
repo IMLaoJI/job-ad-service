@@ -10,6 +10,7 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.J
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.INSPECTING;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REJECTED;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_ADJOURNED_PUBLICATION;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_APPROVED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_REJECTED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_UPDATED;
@@ -276,6 +277,26 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         assertThat(jobAdvertisement.getJobContent().getJobDescriptions().get(0).getDescription()).isEqualTo("OTHER VALUE");
         domainEventMockUtils.assertMultipleDomainEventPublished(2, JOB_ADVERTISEMENT_UPDATED.getDomainEventType());
     }
+
+    @Test
+    public void shouldAdjourn() {
+        // given
+        JobAdvertisement archivedJobAd = jobAdvertisementRepository.save(
+                testJobAdvertisement()
+                        .setStatus(ARCHIVED)
+                        .setJobContent(JobContentFixture.of(job01.id()).build())
+                        .build());
+        UpdateJobAdvertisementFromAvamDto updateJobAdvertisementFromAvamDto = testUpdateJobAdvertisementFromAvamDto(archivedJobAd);
+        ApprovalDto approvalDto = testApprovalDto(updateJobAdvertisementFromAvamDto);
+
+        // when
+        sut.adjourn(approvalDto);
+
+        // then
+        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(archivedJobAd.getId());
+        domainEventMockUtils.assertSingleDomainEventPublished(JOB_ADVERTISEMENT_ADJOURNED_PUBLICATION.getDomainEventType());
+    }
+
 
     @Test
     public void shouldReject() {

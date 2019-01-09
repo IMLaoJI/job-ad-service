@@ -349,6 +349,12 @@ public class JobAdvertisementApplicationService {
         return jobAdvertisement.map(JobAdvertisementDto::toDto).orElse(null);
     }
 
+    public JobAdvertisementDto getByStellennummerEgovOrAvam(String stellennummerEgov, String stellennummerAvam) {
+        final String externalId = hasText(stellennummerEgov) ? stellennummerEgov : (hasText(stellennummerAvam) ? stellennummerAvam : null);
+        Optional<JobAdvertisement> jobAdvertisement = jobAdvertisementRepository.findByStellennummerAvamOrStellennummerEgov(externalId);
+        return jobAdvertisement.map(JobAdvertisementDto::toDto).orElseThrow(() -> new AggregateNotFoundException(JobAdvertisement.class, AggregateNotFoundException.IndentifierType.EXTERNAL_ID, externalId));
+    }
+
     @PreAuthorize("@jobAdvertisementAuthorizationService.canViewJob(#stellennummerEgov)")
     public JobAdvertisementDto getByStellennummerEgov(String stellennummerEgov) {
         JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerEgov(stellennummerEgov);
@@ -491,6 +497,13 @@ public class JobAdvertisementApplicationService {
         jobAdvertisement.refining();
     }
 
+    public void adjourn(ApprovalDto approvalDto) {
+        Condition.notNull(approvalDto.getStellennummerEgov(), "StellennummerEgov can't be null");
+        JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerEgov(approvalDto.getStellennummerEgov());
+        LOG.debug("Starting adjourn for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
+        jobAdvertisement.adjournPublication();
+    }
+
     public void publish(JobAdvertisementId jobAdvertisementId) {
         Condition.notNull(jobAdvertisementId, "JobAdvertisementId can't be null");
         LOG.debug("Starting publish for JobAdvertisementId: '{}'", jobAdvertisementId.getValue());
@@ -524,7 +537,7 @@ public class JobAdvertisementApplicationService {
         if ((startDate != null) && startDate.isAfter(TimeMachine.now().toLocalDate())) {
             return;
         }
-        if (jobAdvertisement.isReportingObligation() && REFINING.equals(jobAdvertisement.getStatus())) {
+        if (determineIfValidForRestrictedPublication(jobAdvertisement)) {
             LOG.debug("Publish in restricted area for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
             jobAdvertisement.publishRestricted();
         } else {
@@ -976,5 +989,11 @@ public class JobAdvertisementApplicationService {
                         .build()
                 )
                 .collect(toList());
+    }
+
+    private boolean determineIfValidForRestrictedPublication(JobAdvertisement jobAdvertisement) {
+        return REFINING.equals(jobAdvertisement.getStatus())
+                && jobAdvertisement.isReportingObligation()
+                && ((jobAdvertisement.getReportingObligationEndDate() == null) || jobAdvertisement.getReportingObligationEndDate().isAfter(TimeMachine.now().toLocalDate()));
     }
 }
