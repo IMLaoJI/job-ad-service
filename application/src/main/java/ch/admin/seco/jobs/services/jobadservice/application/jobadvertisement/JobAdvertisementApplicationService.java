@@ -994,6 +994,6 @@ public class JobAdvertisementApplicationService {
     private boolean determineIfValidForRestrictedPublication(JobAdvertisement jobAdvertisement) {
         return REFINING.equals(jobAdvertisement.getStatus())
                 && jobAdvertisement.isReportingObligation()
-                && jobAdvertisement.getReportingObligationEndDate().isAfter(TimeMachine.now().toLocalDate());
+                && ((jobAdvertisement.getReportingObligationEndDate() == null) || jobAdvertisement.getReportingObligationEndDate().isAfter(TimeMachine.now().toLocalDate()));
     }
 }

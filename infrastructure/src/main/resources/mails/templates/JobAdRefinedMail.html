@@ -10,7 +10,7 @@
         <p th:if="${numberOfJobs > 1}">
             <strong th:text="#{mail.jobAd.refined.body.para.numberofjobs(${numberOfJobs})}"></strong>
         </p>
-        <p th:if="${reportingObligation}">
+        <p th:if="${showReportingObligation}">
             <em th:text="#{mail.jobAd.refined.body.reporting.obligation}"></em><br>
             <br>
             <strong th:text="#{mail.jobAd.refined.body.reporting.obligation.date(${reportingObligationEndDate})}"></strong>
