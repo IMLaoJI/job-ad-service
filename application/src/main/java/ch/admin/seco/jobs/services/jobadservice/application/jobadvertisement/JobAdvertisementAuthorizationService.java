@@ -46,7 +46,7 @@ public class JobAdvertisementAuthorizationService {
     }
 
     public boolean isOwner(JobAdvertisement jobAdvertisement, CurrentUser currentUser) {
-        if(currentUser == null) {
+        if (currentUser == null) {
             return false;
         }
         String userId = currentUser.getUserId();
@@ -71,8 +71,14 @@ public class JobAdvertisementAuthorizationService {
     }
 
     public boolean isCurrentUserMemberOfCompany(String companyId) {
+        if (companyId == null) {
+            return false;
+        }
         CurrentUser currentUser = this.currentUserContext.getCurrentUser();
-        return (companyId != null) && companyId.equals(currentUser.getCompanyId());
+        if (currentUser == null) {
+            return false;
+        }
+        return companyId.equals(currentUser.getCompanyId());
     }
 
     private boolean hasToken(JobAdvertisement jobAdvertisement, String token) {
