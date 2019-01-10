@@ -13,7 +13,19 @@ public class ManagedJobAdSearchRequest {
     @NotBlank
     private String ownerUserId;
 
+    @NotBlank
+    private String companyId;
+
     private String[] keywords;
+
+    public String getCompanyId() {
+        return companyId;
+    }
+
+    public ManagedJobAdSearchRequest setCompanyId(String companyId) {
+        this.companyId = companyId;
+        return this;
+    }
 
     public String getOwnerUserId() {
         return ownerUserId;
