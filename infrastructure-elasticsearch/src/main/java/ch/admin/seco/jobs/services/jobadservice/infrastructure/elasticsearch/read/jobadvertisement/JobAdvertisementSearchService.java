@@ -163,7 +163,8 @@ public class JobAdvertisementSearchService {
                 .withQuery(createManagedJobAdsKeywordsQuery(searchRequest.getKeywords()))
                 .withFilter(mustAll(
                         publicationStartDateFilter(searchRequest.getOnlineSinceDays()),
-                        ownerUserIdFilter(searchRequest.getOwnerUserId())))
+                        ownerUserIdFilter(searchRequest.getOwnerUserId()),
+                        ownerCompanyIdFilter(searchRequest.getCompanyId())))
                 .withPageable(
                         PageRequest.of(
                                 pageable.getPageNumber(),
