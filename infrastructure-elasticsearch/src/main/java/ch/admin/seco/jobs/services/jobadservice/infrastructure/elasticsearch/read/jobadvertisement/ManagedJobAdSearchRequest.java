@@ -6,50 +6,39 @@ import javax.validation.constraints.NotBlank;
 
 public class ManagedJobAdSearchRequest {
 
-	private String searchString;
+    @Min(7)
+    @Max(365)
+    private Integer onlineSinceDays;
 
-	@Min(7)
-	@Max(365)
-	private Integer onlineSinceDays;
+    @NotBlank
+    private String ownerUserId;
 
-	private String ownerUserId;
+    private String[] keywords;
 
-	@NotBlank
-	private String companyId;
+    public String getOwnerUserId() {
+        return ownerUserId;
+    }
 
-	public String getSearchString() {
-		return searchString;
-	}
+    public Integer getOnlineSinceDays() {
+        return onlineSinceDays;
+    }
 
-	public ManagedJobAdSearchRequest setSearchString(String searchString) {
-		this.searchString = searchString;
-		return this;
-	}
+    public ManagedJobAdSearchRequest setOnlineSinceDays(Integer onlineSinceDays) {
+        this.onlineSinceDays = onlineSinceDays;
+        return this;
+    }
 
-	public Integer getOnlineSinceDays() {
-		return onlineSinceDays;
-	}
+    public ManagedJobAdSearchRequest setOwnerUserId(String ownerUserId) {
+        this.ownerUserId = ownerUserId;
+        return this;
+    }
 
-	public ManagedJobAdSearchRequest setOnlineSinceDays(Integer onlineSinceDays) {
-		this.onlineSinceDays = onlineSinceDays;
-		return this;
-	}
+    public String[] getKeywords() {
+        return keywords;
+    }
 
-	public String getOwnerUserId() {
-		return ownerUserId;
-	}
-
-	public ManagedJobAdSearchRequest setOwnerUserId(String ownerUserId) {
-		this.ownerUserId = ownerUserId;
-		return this;
-	}
-
-	public String getCompanyId() {
-		return companyId;
-	}
-
-	public ManagedJobAdSearchRequest setCompanyId(String companyId) {
-		this.companyId = companyId;
-		return this;
-	}
+    public ManagedJobAdSearchRequest setKeywords(String[] keywords) {
+        this.keywords = keywords;
+        return this;
+    }
 }
