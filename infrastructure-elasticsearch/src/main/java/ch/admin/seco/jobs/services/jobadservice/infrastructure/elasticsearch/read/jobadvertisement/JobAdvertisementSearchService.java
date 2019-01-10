@@ -180,14 +180,11 @@ public class JobAdvertisementSearchService {
     }
 
     private QueryBuilder createManagedJobAdsKeywordsQuery(String keywordsText) {
-        if(keywordsText == null){
+        if(isBlank(keywordsText)){
             return matchAllQuery();
         }
 
         String[] keywords = keywordsText.split(MANAGED_JOB_AD_KEYWORD_DELIMITER);
-        if (isEmpty(keywords)) {
-            return matchAllQuery();
-        }
 
         BoolQueryBuilder keywordQuery = boolQuery();
         Stream.of(keywords)
