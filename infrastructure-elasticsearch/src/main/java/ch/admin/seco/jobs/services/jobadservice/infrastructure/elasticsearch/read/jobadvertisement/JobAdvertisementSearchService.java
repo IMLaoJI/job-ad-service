@@ -49,10 +49,11 @@ import static org.springframework.data.domain.Sort.Order.desc;
 
 @Service
 public class JobAdvertisementSearchService {
+
     public enum SearchSort {
         score,
         date_asc,
-        date_desc
+        date_desc;
     }
 
     private static Logger LOG = LoggerFactory.getLogger(JobAdvertisementSearchService.class);
@@ -88,6 +89,7 @@ public class JobAdvertisementSearchService {
     private static final String PATH_LANGUAGE_SKILL_CODE = PATH_CTX + "jobContent.languageSkills.languageIsoCode";
     private static final String RELEVANCE = "_score";
     private static final int ONLINE_SINCE_DAYS = 60;
+    private static final String MANAGED_JOB_AD_KEYWORD_DELIMITER = "\\s+";
 
     private final CurrentUserContext currentUserContext;
     private final ElasticsearchTemplate elasticsearchTemplate;
@@ -182,7 +184,7 @@ public class JobAdvertisementSearchService {
             return matchAllQuery();
         }
 
-        String[] keywords = keywordsText.split("\\s+");
+        String[] keywords = keywordsText.split(MANAGED_JOB_AD_KEYWORD_DELIMITER);
         if (isEmpty(keywords)) {
             return matchAllQuery();
         }
