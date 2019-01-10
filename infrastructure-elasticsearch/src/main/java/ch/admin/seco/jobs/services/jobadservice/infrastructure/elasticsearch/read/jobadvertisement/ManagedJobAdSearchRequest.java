@@ -15,7 +15,7 @@ public class ManagedJobAdSearchRequest {
     @NotBlank
     private String companyId;
 
-    private String[] keywords;
+    private String keywordsText;
 
     public String getOwnerUserId() {
         return ownerUserId;
@@ -44,12 +44,12 @@ public class ManagedJobAdSearchRequest {
         return this;
     }
 
-    public String[] getKeywords() {
-        return keywords;
+    public String getKeywordsText() {
+        return keywordsText;
     }
 
-    public ManagedJobAdSearchRequest setKeywords(String[] keywords) {
-        this.keywords = keywords;
+    public ManagedJobAdSearchRequest setKeywordsText(String keywordsText) {
+        this.keywordsText = keywordsText;
         return this;
     }
 }

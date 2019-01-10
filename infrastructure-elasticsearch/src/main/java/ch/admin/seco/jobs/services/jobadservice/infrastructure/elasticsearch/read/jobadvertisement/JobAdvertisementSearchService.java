@@ -160,7 +160,7 @@ public class JobAdvertisementSearchService {
             Pageable pageable) {
 
         SearchQuery query = new NativeSearchQueryBuilder()
-                .withQuery(createManagedJobAdsKeywordsQuery(searchRequest.getKeywords()))
+                .withQuery(createManagedJobAdsKeywordsQuery(searchRequest.getKeywordsText()))
                 .withFilter(mustAll(
                         publicationStartDateFilter(searchRequest.getOnlineSinceDays()),
                         ownerUserIdFilter(searchRequest.getOwnerUserId()),
@@ -177,7 +177,12 @@ public class JobAdvertisementSearchService {
                 .map(JobAdvertisementDto::toDtoWithOwner);
     }
 
-    private QueryBuilder createManagedJobAdsKeywordsQuery(String[] keywords) {
+    private QueryBuilder createManagedJobAdsKeywordsQuery(String keywordsText) {
+        if(keywordsText == null){
+            return matchAllQuery();
+        }
+
+        String[] keywords = keywordsText.split("\\s+");
         if (isEmpty(keywords)) {
             return matchAllQuery();
         }
