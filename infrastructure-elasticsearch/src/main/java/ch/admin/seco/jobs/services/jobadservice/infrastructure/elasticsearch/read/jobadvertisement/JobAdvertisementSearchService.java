@@ -185,9 +185,10 @@ public class JobAdvertisementSearchService {
     }
 
     private BoolQueryBuilder publicationStartDateFilter(Integer onlineSinceDays) {
-        return onlineSinceDays == null
-                ? boolQuery()
-                : boolQuery()
+        if (onlineSinceDays == null) {
+            return boolQuery();
+        }
+        return boolQuery()
                 .must(rangeQuery(PATH_PUBLICATION_START_DATE).gte(String.format("now-%sd/d", onlineSinceDays)));
     }
 
