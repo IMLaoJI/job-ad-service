@@ -10,7 +10,6 @@ public class ManagedJobAdSearchRequest {
     @Max(365)
     private Integer onlineSinceDays;
 
-    @NotBlank
     private String ownerUserId;
 
     @NotBlank
