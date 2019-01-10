@@ -212,14 +212,6 @@ public class JobAdvertisementSearchService {
         return query;
     }
 
-    private BoolQueryBuilder publicationStartDateFilter(Integer onlineSinceDays) {
-        if (onlineSinceDays == null) {
-            return boolQuery();
-        }
-        return boolQuery().must(
-                rangeQuery(PATH_PUBLICATION_START_DATE).gte(String.format("now-%sd/d", onlineSinceDays)));
-    }
-
     public long count(JobAdvertisementSearchRequest jobSearchRequest) {
         SearchQuery countQuery = createSearchQueryBuilder(jobSearchRequest).build();
         return elasticsearchTemplate.count(countQuery, JobAdvertisementDocument.class);
@@ -326,10 +318,11 @@ public class JobAdvertisementSearchService {
     }
 
     private QueryBuilder createFilter(JobAdvertisementSearchRequest jobSearchRequest) {
+        Integer onlineSinceDays = Optional.ofNullable(jobSearchRequest.getOnlineSince()).orElse(ONLINE_SINCE_DAYS);
         return mustAll(
                 statusFilter(jobSearchRequest),
                 displayFilter(jobSearchRequest),
-                startDateFilter(jobSearchRequest),
+                publicationStartDateFilter(onlineSinceDays),
                 localityFilter(jobSearchRequest),
                 workingTimeFilter(jobSearchRequest),
                 contractTypeFilter(jobSearchRequest),
@@ -383,11 +376,12 @@ public class JobAdvertisementSearchService {
         return boolQuery().must(termQuery(PATH_PUBLICATION_PUBLIC_DISPLAY, true));
     }
 
-    private BoolQueryBuilder startDateFilter(JobAdvertisementSearchRequest jobSearchRequest) {
-        int onlineSince = Optional.ofNullable(jobSearchRequest.getOnlineSince()).orElse(ONLINE_SINCE_DAYS);
-        String publicationStartDate = String.format("now-%sd/d", onlineSince);
-
-        return boolQuery().must(rangeQuery(PATH_PUBLICATION_START_DATE).gte(publicationStartDate));
+    private BoolQueryBuilder publicationStartDateFilter(Integer onlineSinceDays) {
+        if (onlineSinceDays == null) {
+            return boolQuery();
+        }
+        return boolQuery().must(
+                rangeQuery(PATH_PUBLICATION_START_DATE).gte(String.format("now-%sd/d", onlineSinceDays)));
     }
 
     private BoolQueryBuilder companyFilter(String companyName) {

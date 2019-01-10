@@ -17,6 +17,15 @@ public class ManagedJobAdSearchRequest {
 
     private String[] keywords;
 
+    public String getOwnerUserId() {
+        return ownerUserId;
+    }
+
+    public ManagedJobAdSearchRequest setOwnerUserId(String ownerUserId) {
+        this.ownerUserId = ownerUserId;
+        return this;
+    }
+
     public String getCompanyId() {
         return companyId;
     }
@@ -26,21 +35,12 @@ public class ManagedJobAdSearchRequest {
         return this;
     }
 
-    public String getOwnerUserId() {
-        return ownerUserId;
-    }
-
     public Integer getOnlineSinceDays() {
         return onlineSinceDays;
     }
 
     public ManagedJobAdSearchRequest setOnlineSinceDays(Integer onlineSinceDays) {
         this.onlineSinceDays = onlineSinceDays;
-        return this;
-    }
-
-    public ManagedJobAdSearchRequest setOwnerUserId(String ownerUserId) {
-        this.ownerUserId = ownerUserId;
         return this;
     }
 
