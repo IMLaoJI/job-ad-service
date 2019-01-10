@@ -53,7 +53,7 @@ public class JobAdvertisementSearchService {
     public enum SearchSort {
         score,
         date_asc,
-        date_desc;
+        date_desc
     }
 
     private static Logger LOG = LoggerFactory.getLogger(JobAdvertisementSearchService.class);
