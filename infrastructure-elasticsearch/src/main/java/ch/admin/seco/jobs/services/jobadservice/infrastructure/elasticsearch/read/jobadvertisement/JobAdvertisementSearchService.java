@@ -180,7 +180,7 @@ public class JobAdvertisementSearchService {
     }
 
     private QueryBuilder createManagedJobAdsKeywordsQuery(String keywordsText) {
-        if(isBlank(keywordsText)){
+        if (isBlank(keywordsText)){
             return matchAllQuery();
         }
 
