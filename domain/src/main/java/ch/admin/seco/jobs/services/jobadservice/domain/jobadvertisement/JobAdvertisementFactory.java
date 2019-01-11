@@ -118,6 +118,7 @@ public class JobAdvertisementFactory {
         if(auditUser != null) {
             return new Owner.Builder()
                     .setUserId(auditUser.getUserId())
+                    .setUserDisplayName(auditUser.getDisplayName())
                     .setCompanyId(auditUser.getCompanyId())
                     .setAccessToken(accessTokenGenerator.generateToken())
                     .build();

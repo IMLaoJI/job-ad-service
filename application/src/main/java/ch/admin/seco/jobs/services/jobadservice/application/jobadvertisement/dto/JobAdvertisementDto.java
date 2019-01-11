@@ -55,6 +55,8 @@ public class JobAdvertisementDto {
     @Valid
     private PublicationDto publication;
 
+    private OwnerDto owner;
+
     public JobAdvertisementDto() {
         // For reflection libs
     }
@@ -248,6 +250,15 @@ public class JobAdvertisementDto {
         return this;
     }
 
+    public OwnerDto getOwner() {
+        return owner;
+    }
+
+    public JobAdvertisementDto setOwner(OwnerDto owner) {
+        this.owner = owner;
+        return this;
+    }
+
     public static JobAdvertisementDto toDto(JobAdvertisement jobAdvertisement) {
         JobAdvertisementDto jobAdvertisementDto = new JobAdvertisementDto()
                 .setId(jobAdvertisement.getId().getValue())
@@ -279,5 +290,10 @@ public class JobAdvertisementDto {
 
         jobAdvertisementDto.getJobContent().getEmployment().setWorkForms(new HashSet<>(workForms));
         return jobAdvertisementDto;
+    }
+
+    public static JobAdvertisementDto toDtoWithOwner(JobAdvertisement jobAdvertisement) {
+        return toDto(jobAdvertisement)
+                .setOwner(OwnerDto.toDto(jobAdvertisement.getOwner()));
     }
 }

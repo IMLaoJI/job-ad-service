@@ -30,6 +30,7 @@ import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -40,12 +41,15 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.J
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.ElasticsearchIndexService.TYPE_JOB_ADVERTISEMENT;
+import static net.logstash.logback.encoder.org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.ArrayUtils.*;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.springframework.data.domain.Sort.Order.desc;
 
 @Service
 public class JobAdvertisementSearchService {
+
     public enum SearchSort {
         score,
         date_asc,
@@ -59,10 +63,13 @@ public class JobAdvertisementSearchService {
     private static final String PATH_EGOV_JOB_ID = PATH_CTX + "stellennummerEgov";
     private static final String PATH_COMPANY_NAME = PATH_CTX + "jobContent.displayCompany.name";
     private static final String PATH_OWNER_COMPANY_ID = PATH_CTX + "owner.companyId";
+    private static final String PATH_OWNER_USER_ID = PATH_CTX + "owner.userId";
+    private static final String PATH_OWNER_USER_DISPLAY_NAME = PATH_CTX + "owner.userDisplayName";
     private static final String PATH_DESCRIPTION = PATH_CTX + "jobContent.jobDescriptions.description";
     private static final String PATH_LOCATION_CANTON_CODE = PATH_CTX + "jobContent.location.cantonCode";
     private static final String PATH_LOCATION_COMMUNAL_CODE = PATH_CTX + "jobContent.location.communalCode";
     private static final String PATH_LOCATION_REGION_CODE = PATH_CTX + "jobContent.location.regionCode";
+    private static final String PATH_LOCATION_CITY = PATH_CTX + "jobContent.location.city";
     private static final String PATH_OCCUPATIONS = PATH_CTX + "jobContent.occupations";
     private static final String PATH_OCCUPATIONS_AVAM_OCCUPATION_CODE = PATH_OCCUPATIONS + ".avamOccupationCode";
     private static final String PATH_OCCUPATIONS_BFS_CODE = PATH_OCCUPATIONS + ".bfsCode";
@@ -82,6 +89,7 @@ public class JobAdvertisementSearchService {
     private static final String PATH_LANGUAGE_SKILL_CODE = PATH_CTX + "jobContent.languageSkills.languageIsoCode";
     private static final String RELEVANCE = "_score";
     private static final int ONLINE_SINCE_DAYS = 60;
+    private static final String MANAGED_JOB_AD_KEYWORD_DELIMITER = "\\s+";
 
     private final CurrentUserContext currentUserContext;
     private final ElasticsearchTemplate elasticsearchTemplate;
@@ -127,11 +135,19 @@ public class JobAdvertisementSearchService {
         });
     }
 
+    /**
+     * @deprecated Implementation for the JobRoom. It will be removed after go live of the eServiceUi.
+     */
+    @Deprecated
     public Page<JobAdvertisementDto> searchPeaJobAdvertisements(
             PeaJobAdvertisementSearchRequest searchRequest,
             Pageable pageable) {
 
-        SearchQuery query = createPeaSearchQueryBuilder(searchRequest)
+        SearchQuery query = new NativeSearchQueryBuilder()
+                .withFilter(mustAll(
+                        titleFilter(searchRequest),
+                        publicationStartDateFilter(searchRequest.getOnlineSinceDays()),
+                        ownerCompanyIdFilter(searchRequest.getCompanyId())))
                 .withPageable(pageable)
                 .build();
 
@@ -140,15 +156,55 @@ public class JobAdvertisementSearchService {
                 .map(JobAdvertisementDto::toDto);
     }
 
-    private NativeSearchQueryBuilder createPeaSearchQueryBuilder(PeaJobAdvertisementSearchRequest searchRequest) {
-        QueryBuilder filter = mustAll(
-                titleFilter(searchRequest),
-                publicationStartDatePeaFilter(searchRequest),
-                ownerFilter(searchRequest.getCompanyId())
-        );
+    @PreAuthorize("@jobAdvertisementAuthorizationService.isCurrentUserMemberOfCompany(#searchRequest.companyId)")
+    public Page<JobAdvertisementDto> searchManagedJobAds(
+            ManagedJobAdSearchRequest searchRequest,
+            Pageable pageable) {
 
-        return new NativeSearchQueryBuilder()
-                .withFilter(filter);
+        SearchQuery query = new NativeSearchQueryBuilder()
+                .withQuery(createManagedJobAdsKeywordsQuery(searchRequest.getKeywordsText()))
+                .withFilter(mustAll(
+                        publicationStartDateFilter(searchRequest.getOnlineSinceDays()),
+                        ownerUserIdFilter(searchRequest.getOwnerUserId()),
+                        ownerCompanyIdFilter(searchRequest.getCompanyId())))
+                .withPageable(
+                        PageRequest.of(
+                                pageable.getPageNumber(),
+                                pageable.getPageSize(),
+                                Sort.by(desc(PATH_PUBLICATION_START_DATE))))
+                .withHighlightFields(new HighlightBuilder.Field("*"))
+                .build();
+
+        return jobAdvertisementElasticsearchRepository.search(query)
+                .map(JobAdvertisementDocument::getJobAdvertisement)
+                .map(JobAdvertisementDto::toDtoWithOwner);
+    }
+
+    private QueryBuilder createManagedJobAdsKeywordsQuery(String keywordsText) {
+        if (isBlank(keywordsText)) {
+            return matchAllQuery();
+        }
+
+        String[] keywords = keywordsText.split(MANAGED_JOB_AD_KEYWORD_DELIMITER);
+
+        BoolQueryBuilder keywordQuery = boolQuery();
+        Stream.of(keywords)
+                .flatMap(keyword -> Stream.of(
+                        multiMatchQuery(keyword, PATH_OWNER_USER_DISPLAY_NAME, PATH_LOCATION_CITY)
+                                .field(PATH_TITLE, 1.5f).type(MultiMatchQueryBuilder.Type.PHRASE_PREFIX),
+                        termQuery(PATH_AVAM_JOB_ID, keyword).boost(10f),
+                        termQuery(PATH_EGOV_JOB_ID, keyword).boost(10f)
+                ))
+                .forEach(keywordQuery::should);
+
+        String allKeywords = Stream.of(keywords).collect(Collectors.joining(" "));
+        if (isNotBlank(allKeywords)) {
+            keywordQuery.should(multiMatchQuery(allKeywords, PATH_OWNER_USER_DISPLAY_NAME, PATH_LOCATION_CITY, PATH_TITLE)
+                    .boost(2f)
+                    .operator(Operator.AND));
+        }
+
+        return mustAll(keywordQuery);
     }
 
     private BoolQueryBuilder titleFilter(PeaJobAdvertisementSearchRequest searchRequest) {
@@ -161,16 +217,6 @@ public class JobAdvertisementSearchService {
         return query;
     }
 
-    private BoolQueryBuilder publicationStartDatePeaFilter(PeaJobAdvertisementSearchRequest searchRequest) {
-        BoolQueryBuilder query = boolQuery();
-        if (searchRequest.getOnlineSinceDays() == null) {
-            return query;
-        }
-
-        String publicationStartDate = String.format("now-%sd/d", searchRequest.getOnlineSinceDays());
-        return query.must(rangeQuery(PATH_PUBLICATION_START_DATE).gte(publicationStartDate));
-    }
-
     public long count(JobAdvertisementSearchRequest jobSearchRequest) {
         SearchQuery countQuery = createSearchQueryBuilder(jobSearchRequest).build();
         return elasticsearchTemplate.count(countQuery, JobAdvertisementDocument.class);
@@ -181,11 +227,11 @@ public class JobAdvertisementSearchService {
             case date_asc:
                 return Sort.by(Sort.Order.asc(PATH_PUBLICATION_START_DATE));
             case date_desc:
-                return Sort.by(Sort.Order.desc(PATH_PUBLICATION_START_DATE));
+                return Sort.by(desc(PATH_PUBLICATION_START_DATE));
             default:
                 return Sort.by(
-                        Sort.Order.desc(RELEVANCE),
-                        Sort.Order.desc(PATH_PUBLICATION_START_DATE)
+                        desc(RELEVANCE),
+                        desc(PATH_PUBLICATION_START_DATE)
                 );
         }
     }
@@ -277,10 +323,11 @@ public class JobAdvertisementSearchService {
     }
 
     private QueryBuilder createFilter(JobAdvertisementSearchRequest jobSearchRequest) {
+        Integer onlineSinceDays = Optional.ofNullable(jobSearchRequest.getOnlineSince()).orElse(ONLINE_SINCE_DAYS);
         return mustAll(
                 statusFilter(jobSearchRequest),
                 displayFilter(jobSearchRequest),
-                startDateFilter(jobSearchRequest),
+                publicationStartDateFilter(onlineSinceDays),
                 localityFilter(jobSearchRequest),
                 workingTimeFilter(jobSearchRequest),
                 contractTypeFilter(jobSearchRequest),
@@ -334,11 +381,12 @@ public class JobAdvertisementSearchService {
         return boolQuery().must(termQuery(PATH_PUBLICATION_PUBLIC_DISPLAY, true));
     }
 
-    private BoolQueryBuilder startDateFilter(JobAdvertisementSearchRequest jobSearchRequest) {
-        int onlineSince = Optional.ofNullable(jobSearchRequest.getOnlineSince()).orElse(ONLINE_SINCE_DAYS);
-        String publicationStartDate = String.format("now-%sd/d", onlineSince);
-
-        return boolQuery().must(rangeQuery(PATH_PUBLICATION_START_DATE).gte(publicationStartDate));
+    private BoolQueryBuilder publicationStartDateFilter(Integer onlineSinceDays) {
+        if (onlineSinceDays == null) {
+            return boolQuery();
+        }
+        return boolQuery().must(
+                rangeQuery(PATH_PUBLICATION_START_DATE).gte(String.format("now-%sd/d", onlineSinceDays)));
     }
 
     private BoolQueryBuilder companyFilter(String companyName) {
@@ -351,14 +399,18 @@ public class JobAdvertisementSearchService {
         return companyFilter;
     }
 
-    private BoolQueryBuilder ownerFilter(String companyId) {
-        BoolQueryBuilder companyFilter = boolQuery();
-
-        if (isNotBlank(companyId)) {
-            companyFilter.must(termQuery(PATH_OWNER_COMPANY_ID, companyId));
+    private BoolQueryBuilder ownerCompanyIdFilter(String companyId) {
+        if (isBlank(companyId)) {
+            return boolQuery();
         }
+        return boolQuery().must(termQuery(PATH_OWNER_COMPANY_ID, companyId));
+    }
 
-        return companyFilter;
+    private BoolQueryBuilder ownerUserIdFilter(String userId) {
+        if (isBlank(userId)) {
+            return boolQuery();
+        }
+        return boolQuery().must(termQuery(PATH_OWNER_USER_ID, userId));
     }
 
     private BoolQueryBuilder contractTypeFilter(JobAdvertisementSearchRequest jobSearchRequest) {

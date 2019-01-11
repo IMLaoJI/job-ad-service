@@ -45,12 +45,8 @@ public class JobAdvertisementAuthorizationService {
 
     }
 
-    private boolean hasToken(JobAdvertisement jobAdvertisement, String token) {
-        return jobAdvertisement.getOwner().getAccessToken().equals(token);
-    }
-
     public boolean isOwner(JobAdvertisement jobAdvertisement, CurrentUser currentUser) {
-        if(currentUser == null) {
+        if (currentUser == null) {
             return false;
         }
         String userId = currentUser.getUserId();
@@ -72,6 +68,21 @@ public class JobAdvertisementAuthorizationService {
         return this.jobAdvertisementRepository.findByStellennummerAvamOrStellennummerEgov(stellennummer)
                 .map(this::canViewJob)
                 .orElse(false);
+    }
+
+    public boolean isCurrentUserMemberOfCompany(String companyId) {
+        if (companyId == null) {
+            return false;
+        }
+        CurrentUser currentUser = this.currentUserContext.getCurrentUser();
+        if (currentUser == null) {
+            return false;
+        }
+        return companyId.equals(currentUser.getCompanyId());
+    }
+
+    private boolean hasToken(JobAdvertisement jobAdvertisement, String token) {
+        return jobAdvertisement.getOwner().getAccessToken().equals(token);
     }
 
     private boolean canViewJob(JobAdvertisement jobAdvertisement) {
