@@ -172,6 +172,7 @@ public class JobAdvertisementSearchService {
                                 pageable.getPageNumber(),
                                 pageable.getPageSize(),
                                 Sort.by(desc(PATH_PUBLICATION_START_DATE))))
+                .withHighlightFields(new HighlightBuilder.Field("*"))
                 .build();
 
         return jobAdvertisementElasticsearchRepository.search(query)
