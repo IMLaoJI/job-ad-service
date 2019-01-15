@@ -38,7 +38,6 @@ public class X28JobAdWriter implements ItemWriter<X28CreateJobAdvertisementDto> 
     }
 
     private void send(X28CreateJobAdvertisementDto createFromX28, String key) {
-        LOG.debug("Sending item with fingerprint: {} to JobAd service", createFromX28.getFingerprint());
         output.send(MessageBuilder
                 .withPayload(createFromX28)
                 .setHeader(PARTITION_KEY, key)
@@ -48,6 +47,5 @@ public class X28JobAdWriter implements ItemWriter<X28CreateJobAdvertisementDto> 
                 .setHeader(TARGET_SYSTEM, JOB_AD_SERVICE.name())
                 .setHeader(PAYLOAD_TYPE, createFromX28.getClass().getSimpleName())
                 .build());
-        LOG.debug("Successfully sent item with fingerprint: {} to JobAd service", createFromX28.getFingerprint());
     }
 }
