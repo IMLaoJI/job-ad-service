@@ -2,15 +2,19 @@ package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture
 
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode.OCCUPIED_JOBCENTER;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.CREATED;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.JOBROOM;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.ContactFixture.testContact;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture.testJobContent;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture.testOwner;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublicationEmpty;
 import static java.time.LocalDate.now;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement.Builder;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 
 public class JobAdvertisementFixture {
 
@@ -39,5 +43,14 @@ public class JobAdvertisementFixture {
                 .setOwner(testOwner().build())
                 .setContact(testContact().build())
                 .setPublication(testPublicationEmpty().build());
+    }
+
+    public static JobAdvertisement.Builder of(JobAdvertisementId jobAdvertisementId) {
+        return testJobAdvertisement()
+                .setId(jobAdvertisementId)
+                .setOwner(OwnerFixture.of(jobAdvertisementId).build())
+                .setJobContent(JobContentFixture.of(jobAdvertisementId).build())
+                .setStellennummerEgov(jobAdvertisementId.getValue())
+                .setContact(ContactFixture.of(jobAdvertisementId).build());
     }
 }

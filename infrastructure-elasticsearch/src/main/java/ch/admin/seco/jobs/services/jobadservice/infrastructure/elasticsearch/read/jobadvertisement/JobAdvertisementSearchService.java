@@ -8,7 +8,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
-
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.Operator;
@@ -45,6 +45,7 @@ import static net.logstash.logback.encoder.org.apache.commons.lang.StringUtils.i
 import static org.apache.commons.lang3.ArrayUtils.*;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.springframework.data.domain.Sort.Order.asc;
 import static org.springframework.data.domain.Sort.Order.desc;
 
 @Service
@@ -166,18 +167,32 @@ public class JobAdvertisementSearchService {
                 .withFilter(mustAll(
                         publicationStartDateFilter(searchRequest.getOnlineSinceDays()),
                         ownerUserIdFilter(searchRequest.getOwnerUserId()),
-                        ownerCompanyIdFilter(searchRequest.getCompanyId())))
-                .withPageable(
-                        PageRequest.of(
-                                pageable.getPageNumber(),
-                                pageable.getPageSize(),
-                                Sort.by(desc(PATH_PUBLICATION_START_DATE))))
-                .withHighlightFields(new HighlightBuilder.Field("*"))
+                        ownerCompanyIdFilter(searchRequest.getCompanyId()),
+                        stateFilter(searchRequest.getState())))
+                .withPageable(pageable)
+                .withHighlightFields(new HighlightBuilder.Field("*").fragmentSize(300).numOfFragments(1))
                 .build();
 
-        return jobAdvertisementElasticsearchRepository.search(query)
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("query: {}", query.getQuery());
+            LOG.trace("filter: {}", query.getFilter());
+        }
+
+        return elasticsearchTemplate.query(query, response -> extractHighlightedResults(pageable, response));
+    }
+
+    private AggregatedPageImpl<JobAdvertisementDto> extractHighlightedResults(Pageable pageable, SearchResponse response) {
+        AggregatedPage<JobAdvertisementDocument> searchResults = resultsMapper.mapResults(response, JobAdvertisementDocument.class, pageable);
+        SearchHits searchHits = response.getHits();
+        Iterator<SearchHit> searchHitIterator = searchHits.iterator();
+
+        List<JobAdvertisementDto> highlightedResults = searchResults.getContent().stream()
                 .map(JobAdvertisementDocument::getJobAdvertisement)
-                .map(JobAdvertisementDto::toDtoWithOwner);
+                .map(JobAdvertisementDto::toDtoWithOwner)
+                .map(jobAdvertisementDto -> highlightManagedFields(jobAdvertisementDto, searchHitIterator.next().getHighlightFields()))
+                .collect(Collectors.toList());
+
+        return new AggregatedPageImpl<>(highlightedResults, pageable, searchHits.totalHits, searchResults.getAggregations(), searchResults.getScrollId());
     }
 
     private QueryBuilder createManagedJobAdsKeywordsQuery(String keywordsText) {
@@ -225,7 +240,7 @@ public class JobAdvertisementSearchService {
     private Sort createSort(SearchSort sort) {
         switch (sort) {
             case date_asc:
-                return Sort.by(Sort.Order.asc(PATH_PUBLICATION_START_DATE));
+                return Sort.by(asc(PATH_PUBLICATION_START_DATE));
             case date_desc:
                 return Sort.by(desc(PATH_PUBLICATION_START_DATE));
             default:
@@ -413,6 +428,13 @@ public class JobAdvertisementSearchService {
         return boolQuery().must(termQuery(PATH_OWNER_USER_ID, userId));
     }
 
+    private BoolQueryBuilder stateFilter(JobAdvertisementStatus state) {
+        if (state == null) {
+            return boolQuery();
+        }
+        return boolQuery().must(termQuery(PATH_STATUS, state.name()));
+    }
+
     private BoolQueryBuilder contractTypeFilter(JobAdvertisementSearchRequest jobSearchRequest) {
         BoolQueryBuilder contractTypeFilter = boolQuery();
 
@@ -472,6 +494,30 @@ public class JobAdvertisementSearchService {
 
         }
 
+        return jobAdvertisementDto;
+    }
+
+    private static JobAdvertisementDto highlightManagedFields(JobAdvertisementDto jobAdvertisementDto, Map<String, HighlightField> highlightFieldMap) {
+        highlightFieldMap.keySet().forEach(key -> {
+            String keyFragment = highlightFieldMap.get(key).getFragments()[0].toString();
+            switch (key) {
+                case PATH_OWNER_USER_DISPLAY_NAME:
+                    jobAdvertisementDto.getOwner().setUserDisplayName(keyFragment);
+                    break;
+                case PATH_LOCATION_CITY:
+                    jobAdvertisementDto.getJobContent().getLocation().setCity(keyFragment);
+                    break;
+                case PATH_TITLE:
+                    jobAdvertisementDto.getJobContent().getJobDescriptions().forEach(dto -> dto.setTitle(keyFragment));
+                    break;
+                case PATH_AVAM_JOB_ID:
+                    jobAdvertisementDto.setStellennummerAvam(keyFragment);
+                    break;
+                case PATH_EGOV_JOB_ID:
+                    jobAdvertisementDto.setStellennummerEgov(keyFragment);
+                    break;
+            }
+        });
         return jobAdvertisementDto;
     }
 }

@@ -1,5 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -16,6 +18,8 @@ public class ManagedJobAdSearchRequest {
     private String companyId;
 
     private String keywordsText;
+
+    private JobAdvertisementStatus state;
 
     public String getOwnerUserId() {
         return ownerUserId;
@@ -50,6 +54,15 @@ public class ManagedJobAdSearchRequest {
 
     public ManagedJobAdSearchRequest setKeywordsText(String keywordsText) {
         this.keywordsText = keywordsText;
+        return this;
+    }
+
+    public JobAdvertisementStatus getState() {
+        return state;
+    }
+
+    public ManagedJobAdSearchRequest setState(JobAdvertisementStatus state) {
+        this.state = state;
         return this;
     }
 }

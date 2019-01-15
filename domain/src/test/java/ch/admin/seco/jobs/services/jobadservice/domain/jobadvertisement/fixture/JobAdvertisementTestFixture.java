@@ -352,7 +352,7 @@ public class JobAdvertisementTestFixture {
         );
     }
 
-    public static JobAdvertisement testJobAdvertisementWithContent(JobAdvertisementId jobAdvertisementId, JobContent jobContent) {
+    private static JobAdvertisement testJobAdvertisementWithContent(JobAdvertisementId jobAdvertisementId, JobContent jobContent) {
         return new JobAdvertisement.Builder()
                 .setId(jobAdvertisementId)
                 .setSourceSystem(JOBROOM)
