@@ -1,6 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.core.time;
 
 import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -32,5 +33,33 @@ public class TimeMachine {
 
     public static void reset() {
         clock = Clock.systemDefaultZone();
+    }
+
+    public static boolean isAfterToday(LocalDate date) {
+        if (date == null) {
+            return false;
+        }
+        return date.isAfter(now().toLocalDate());
+    }
+
+    public static boolean isAfterToday(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return false;
+        }
+        return dateTime.isAfter(now());
+    }
+
+    public static boolean isBeforeToday(LocalDate date) {
+        if (date == null) {
+            return false;
+        }
+        return date.isBefore(now().toLocalDate());
+    }
+
+    public static boolean isBeforeToday(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return false;
+        }
+        return dateTime.isBefore(now());
     }
 }
