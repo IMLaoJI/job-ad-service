@@ -151,7 +151,8 @@
                   },
                   "title": {
                     "type": "text",
-                    "analyzer": "ascii_folding"
+                    "analyzer": "ascii_folding",
+                    "fielddata": "true"
                   }
                 }
               },
@@ -175,7 +176,8 @@
                     "type": "keyword"
                   },
                   "city": {
-                    "type": "text"
+                    "type": "text",
+                    "fielddata": "true"
                   },
                   "communalCode": {
                     "type": "keyword"

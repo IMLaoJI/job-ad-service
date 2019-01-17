@@ -944,6 +944,149 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(jsonPath("$.[*].stellennummerEgov").value(hasItem("<em>StellennummerEgov</em>")));
     }
 
+    @Test
+    public void shouldSearchManagedJobAdBeSearchedByKeywordsBeSortedDesByTitle() throws Exception {
+        // GIVEN
+        saveJobAdvertisementDocuments(
+                JobAdvertisementFixture.of(job01.id()),
+                JobAdvertisementFixture.of(job02.id())
+                        .setJobContent(
+                                JobContentFixture.of(job02.id())
+                                        .setJobDescriptions(asList(
+                                                testJobDescription().setTitle("desc1").build()
+//                                                ,testJobDescription().setTitle("descA").build()
+//                                                ,testJobDescription().setTitle("test").build()
+                                        ))
+                                        .build()),
+                JobAdvertisementFixture.of(job03.id())
+                        .setJobContent(
+                                JobContentFixture.of(job03.id())
+                                        .setJobDescriptions(asList(testJobDescription().setTitle("desc3").build()))
+                                        .build()),
+                JobAdvertisementFixture.of(job04.id())
+                        .setJobContent(
+                                JobContentFixture.of(job04.id())
+                                        .setJobDescriptions(asList(testJobDescription().setTitle("desc2").build()))
+                                        .build())
+        );
+
+        ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
+                .setCompanyId("companyId")
+                .setKeywordsText("desc");
+
+        // WHEN
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search/managed")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(request))
+                        .param("sort", "jobAdvertisement.jobContent.jobDescriptions.title,DESC")
+        )
+                .andExpect(status().isOk());
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "3"))
+                .andExpect(jsonPath("$.[0].jobContent.jobDescriptions[0].title").value(equalTo("<em>desc3</em>")))
+                .andExpect(jsonPath("$.[1].jobContent.jobDescriptions[0].title").value(equalTo("<em>desc2</em>")))
+                .andExpect(jsonPath("$.[2].jobContent.jobDescriptions[0].title").value(equalTo("<em>desc1</em>")))
+                ;
+    }
+
+    @Test
+    public void shouldSearchManagedJobAdBeSortedDescByCity() throws Exception {
+        // GIVEN
+        saveJobAdvertisementDocuments(
+                JobAdvertisementFixture.of(job01.id()),
+                JobAdvertisementFixture.of(job02.id())
+                        .setJobContent(
+                                JobContentFixture.of(job02.id())
+                                        .setLocation(testLocation().setCity("Zurich").build())
+                                        .build()),
+                JobAdvertisementFixture.of(job03.id())
+                        .setJobContent(
+                                JobContentFixture.of(job03.id())
+                                        .setLocation(testLocation().setCity("Munich").build())
+                                        .build()),
+                JobAdvertisementFixture.of(job04.id())
+                        .setJobContent(
+                                JobContentFixture.of(job04.id())
+                                        .setLocation(testLocation().setCity("Adliswil").build())
+                                        .build()),
+                JobAdvertisementFixture.of(job05.id())
+                        .setJobContent(
+                                JobContentFixture.of(job05.id())
+                                        .setLocation(testLocation().setCity("denver").build())
+                                        .build())
+        );
+
+        ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
+                .setCompanyId("companyId");
+
+        // WHEN
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search/managed")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(request))
+                        .param("sort", "jobAdvertisement.jobContent.location.city,DESC")
+        )
+                .andExpect(status().isOk());
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "5"))
+                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Zurich")))
+                .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("Munich")))
+                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("denver")))
+                .andExpect(jsonPath("$.[3].jobContent.location.city").value(equalTo("city")))
+                .andExpect(jsonPath("$.[4].jobContent.location.city").value(equalTo("Adliswil")))
+
+        ;
+    }
+
+    @Test
+    public void shouldSearchManagedJobAdBeSearchedAndSortedDescByCity() throws Exception {
+        // GIVEN
+        saveJobAdvertisementDocuments(
+                JobAdvertisementFixture.of(job01.id()),
+                JobAdvertisementFixture.of(job02.id())
+                        .setJobContent(
+                                JobContentFixture.of(job02.id())
+                                        .setLocation(testLocation().setCity("ZurichA").build())
+                                        .build()),
+                JobAdvertisementFixture.of(job03.id())
+                        .setJobContent(
+                                JobContentFixture.of(job03.id())
+                                        .setLocation(testLocation().setCity("ZurichZ").build())
+                                        .build()),
+                JobAdvertisementFixture.of(job04.id())
+                        .setJobContent(
+                                JobContentFixture.of(job04.id())
+                                        .setLocation(testLocation().setCity("ZurichB").build())
+                                        .build())
+        );
+
+        ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
+                .setCompanyId("companyId")
+                .setKeywordsText("Zur");
+
+        // WHEN
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search/managed")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(request))
+                        .param("sort", "jobAdvertisement.jobContent.location.city,DESC")
+        )
+                .andExpect(status().isOk());
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "3"))
+                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("<em>ZurichZ</em>")))
+                .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("<em>ZurichB</em>")))
+                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("<em>ZurichA</em>")))
+        ;
+    }
+
     private ResultActions post(Object request, String urlTemplate) throws Exception {
         return mockMvc.perform(
                 MockMvcRequestBuilders.post(urlTemplate)
