@@ -1,49 +1,10 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.CANCELLATION_CODE;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.EXPERIENCES;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.LANGUAGES;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.LANGUAGE_LEVEL;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.QUALIFICATION_CODE;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.SALUTATIONS;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.WORK_FORMS;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamDateTimeFormatter.parseToLocalDate;
-import static java.util.stream.Collectors.toList;
-import static org.springframework.util.StringUtils.hasText;
-import static org.springframework.util.StringUtils.trimAllWhitespace;
-
-import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import com.google.i18n.phonenumbers.NumberParseException;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.Phonenumber;
-import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.AddressDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.AvamCancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromAvamDto;
 import ch.admin.seco.jobs.services.jobadservice.core.utils.MappingBuilder;
@@ -52,6 +13,25 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkForm
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.WorkingTimePercentage;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.source.WSArbeitsformArray;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.source.WSOsteEgov;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
+import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.*;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamDateTimeFormatter.parseToLocalDate;
+import static java.util.stream.Collectors.toList;
+import static org.springframework.util.StringUtils.hasText;
+import static org.springframework.util.StringUtils.trimAllWhitespace;
 
 public class JobAdvertisementFromAvamAssembler {
 
@@ -131,13 +111,16 @@ public class JobAdvertisementFromAvamAssembler {
         );
     }
 
-    CancellationDto createCancellationDto(WSOsteEgov avamJobAdvertisement) {
-        return new CancellationDto(
-                safeTrimOrNull(avamJobAdvertisement.getStellennummerEgov()),
-                safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()),
-                parseToLocalDate(avamJobAdvertisement.getAbmeldeDatum()),
-                resolveMapping(CANCELLATION_CODE, avamJobAdvertisement.getAbmeldeGrundCode(), "CANCELLATION_CODE")
-        );
+    AvamCancellationDto createCancellationDto(WSOsteEgov avamJobAdvertisement) {
+        return new AvamCancellationDto()
+                .setStellennummerEgov(safeTrimOrNull(avamJobAdvertisement.getStellennummerEgov()))
+                .setStellennummerAvam(safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()))
+                .setJobDescriptionTitle(safeTrimOrNull(avamJobAdvertisement.getBezeichnung()))
+                .setCancellationDate(parseToLocalDate(avamJobAdvertisement.getAbmeldeDatum()))
+                .setCancellationCode(resolveMapping(CANCELLATION_CODE, avamJobAdvertisement.getAbmeldeGrundCode(), "CANCELLATION_CODE"))
+                .setContactEmail(safeTrimOrNull(avamJobAdvertisement.getKpEmail()))
+                .setJobCenterCode(safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich())
+                );
     }
 
     private ContactDto createContactDto(WSOsteEgov avamJobAdvertisement) {
@@ -244,7 +227,7 @@ public class JobAdvertisementFromAvamAssembler {
                 .setAvamOccupationCode(safeTrimOrNull(avamBerufNr.toString()))
                 .setWorkExperience(resolveMapping(EXPERIENCES, erfahrungCode, "EXPERIENCES"))
                 .setEducationCode(safeTrimOrNull(ausbildungCode))
-                .setQualificationCode(resolveMapping(QUALIFICATION_CODE, qualifikationCode,"QUALIFICATION_CODE"));
+                .setQualificationCode(resolveMapping(QUALIFICATION_CODE, qualifikationCode, "QUALIFICATION_CODE"));
     }
 
     private List<LanguageSkillDto> createLanguageSkillDtos(WSOsteEgov avamJobAdvertisement) {

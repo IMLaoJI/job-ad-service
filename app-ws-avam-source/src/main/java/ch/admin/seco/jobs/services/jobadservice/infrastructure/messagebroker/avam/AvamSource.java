@@ -2,7 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.av
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.AvamCancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +66,7 @@ public class AvamSource {
                 .build());
     }
 
-    public void cancel(CancellationDto cancellationDto) {
+    public void cancel(AvamCancellationDto cancellationDto) {
         LOG.debug("Cancel JobAdvertisement stellennummerAvam={}, stellennummerEgov={}", cancellationDto.getStellennummerAvam(), cancellationDto.getStellennummerEgov());
         output.send(MessageBuilder
                 .withPayload(cancellationDto)

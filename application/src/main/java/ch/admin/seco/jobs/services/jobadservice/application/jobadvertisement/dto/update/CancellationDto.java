@@ -4,13 +4,10 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Cancella
 
 import java.time.LocalDate;
 
-import javax.validation.constraints.NotNull;
-
 public class CancellationDto {
 
     private String stellennummerEgov;
 
-    @NotNull
     private String stellennummerAvam;
 
     private LocalDate date;
