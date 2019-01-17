@@ -1,6 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 
 import java.time.LocalDate;
 
@@ -13,6 +14,8 @@ public class CancellationDto {
     private LocalDate date;
 
     private CancellationCode code;
+
+    private SourceSystem sourceSystem;
 
     protected CancellationDto() {
         // For reflection libs
