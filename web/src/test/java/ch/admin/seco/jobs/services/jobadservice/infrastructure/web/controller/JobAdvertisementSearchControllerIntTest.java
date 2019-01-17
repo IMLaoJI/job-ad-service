@@ -907,8 +907,7 @@ public class JobAdvertisementSearchControllerIntTest {
                         .setOwner(
                                 OwnerFixture.of(job02.id())
                                         .setUserDisplayName("OwnerUserDisplayName")
-                                        .build()
-                        ),
+                                        .build()),
                 JobAdvertisementFixture.of(job03.id())
                         .setJobContent(
                                 JobContentFixture.of(job03.id())
@@ -945,18 +944,14 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
-    public void shouldSearchManagedJobAdBeSearchedByKeywordsBeSortedDesByTitle() throws Exception {
+    public void shouldSearchManagedJobAdBeSearchedAndSortedByTitle() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
                 JobAdvertisementFixture.of(job01.id()),
                 JobAdvertisementFixture.of(job02.id())
                         .setJobContent(
                                 JobContentFixture.of(job02.id())
-                                        .setJobDescriptions(asList(
-                                                testJobDescription().setTitle("desc1").build()
-//                                                ,testJobDescription().setTitle("descA").build()
-//                                                ,testJobDescription().setTitle("test").build()
-                                        ))
+                                        .setJobDescriptions(asList(testJobDescription().setTitle("desc1").build()))
                                         .build()),
                 JobAdvertisementFixture.of(job03.id())
                         .setJobContent(
@@ -988,8 +983,54 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(header().string("X-Total-Count", "3"))
                 .andExpect(jsonPath("$.[0].jobContent.jobDescriptions[0].title").value(equalTo("<em>desc3</em>")))
                 .andExpect(jsonPath("$.[1].jobContent.jobDescriptions[0].title").value(equalTo("<em>desc2</em>")))
-                .andExpect(jsonPath("$.[2].jobContent.jobDescriptions[0].title").value(equalTo("<em>desc1</em>")))
-                ;
+                .andExpect(jsonPath("$.[2].jobContent.jobDescriptions[0].title").value(equalTo("<em>desc1</em>")));
+    }
+
+    @Test
+    public void shouldSearchManagedJobAdBeSearchedNotSortedDesByTitleIfMultipleDescriptions() throws Exception {
+        // GIVEN
+        saveJobAdvertisementDocuments(
+                JobAdvertisementFixture.of(job01.id()),
+                JobAdvertisementFixture.of(job02.id())
+                        .setJobContent(
+                                JobContentFixture.of(job02.id())
+                                        .setJobDescriptions(asList( // be aware of multiple descriptions which break sorting
+                                                testJobDescription().setTitle("desc1").build(),
+                                                testJobDescription().setTitle("descA").build(),
+                                                testJobDescription().setTitle("test").build()
+                                        ))
+                                        .build()),
+                JobAdvertisementFixture.of(job03.id())
+                        .setJobContent(
+                                JobContentFixture.of(job03.id())
+                                        .setJobDescriptions(asList(testJobDescription().setTitle("desc3").build()))
+                                        .build()),
+                JobAdvertisementFixture.of(job04.id())
+                        .setJobContent(
+                                JobContentFixture.of(job04.id())
+                                        .setJobDescriptions(asList(testJobDescription().setTitle("desc2").build()))
+                                        .build())
+        );
+
+        ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
+                .setCompanyId("companyId")
+                .setKeywordsText("desc");
+
+        // WHEN
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search/managed")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(request))
+                        .param("sort", "jobAdvertisement.jobContent.jobDescriptions.title,DESC")
+        )
+                .andExpect(status().isOk());
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "3"))
+                .andExpect(jsonPath("$.[0].jobContent.jobDescriptions[0].title").value(equalTo("<em>desc1</em>"))) // this title is 1st due to multiple descriptions
+                .andExpect(jsonPath("$.[1].jobContent.jobDescriptions[0].title").value(equalTo("<em>desc3</em>")))
+                .andExpect(jsonPath("$.[2].jobContent.jobDescriptions[0].title").value(equalTo("<em>desc2</em>")));
     }
 
     @Test
@@ -1038,9 +1079,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("Munich")))
                 .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("denver")))
                 .andExpect(jsonPath("$.[3].jobContent.location.city").value(equalTo("city")))
-                .andExpect(jsonPath("$.[4].jobContent.location.city").value(equalTo("Adliswil")))
-
-        ;
+                .andExpect(jsonPath("$.[4].jobContent.location.city").value(equalTo("Adliswil")));
     }
 
     @Test
@@ -1083,8 +1122,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(header().string("X-Total-Count", "3"))
                 .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("<em>ZurichZ</em>")))
                 .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("<em>ZurichB</em>")))
-                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("<em>ZurichA</em>")))
-        ;
+                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("<em>ZurichA</em>")));
     }
 
     private ResultActions post(Object request, String urlTemplate) throws Exception {
@@ -1094,7 +1132,6 @@ public class JobAdvertisementSearchControllerIntTest {
                         .content(TestUtil.convertObjectToJsonBytes(request))
         );
     }
-
 
     private void index(JobAdvertisement jobAdvertisement) {
         this.jobAdvertisementElasticsearchRepository.save(new JobAdvertisementDocument(jobAdvertisement));
