@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
 @SpringBootApplication
-public class TestApplicationConfig {
+public class TestConfig {
 
     @MockBean
     MailSenderService mailSenderService;
