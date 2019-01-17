@@ -17,15 +17,16 @@ public class AvamConfig {
 
     private final JobCenterService jobCenterService;
 
-
     private final MailSenderService mailSenderService;
 
+    private final MessageSource messageSource;
 
-    public AvamConfig(MessageBrokerChannels messageBrokerChannels, JobAdvertisementApplicationService jobAdvertisementApplicationService, JobCenterService jobCenterService, MailSenderService mailSenderService, MessageSource messageSource) {
+    public AvamConfig(MessageBrokerChannels messageBrokerChannels, JobAdvertisementApplicationService jobAdvertisementApplicationService, JobCenterService jobCenterService, MailSenderService mailSenderService, MessageSource messageSource, MessageSource messageSource1) {
         this.messageBrokerChannels = messageBrokerChannels;
         this.jobAdvertisementApplicationService = jobAdvertisementApplicationService;
         this.jobCenterService = jobCenterService;
         this.mailSenderService = mailSenderService;
+        this.messageSource = messageSource1;
     }
 
     @Bean
@@ -34,8 +35,8 @@ public class AvamConfig {
                 jobAdvertisementApplicationService,
                 messageBrokerChannels.jobAdIntEventChannel(),
                 jobCenterService,
-                mailSenderService
-        );
+                mailSenderService,
+                messageSource);
     }
 
 }

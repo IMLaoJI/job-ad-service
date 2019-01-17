@@ -18,6 +18,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.context.MessageSource;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
 
@@ -46,6 +47,8 @@ public class AvamService {
 
     private final MailSenderService mailSenderService;
 
+    private final MessageSource messageSource;
+
 
     private static final String JOB_ADVERTISEMENT_CANCELLED_MULTILINGUAL_SUBJECT = "mail.jobAd.cancelled.subject_multilingual";
     private static final String JOB_ADVERTISEMENT_CANCELLED_MULTILINGUAL_TEMPLATE = "JobAdCancelledMail_multilingual.html";
@@ -56,11 +59,13 @@ public class AvamService {
     public AvamService(JobAdvertisementApplicationService jobAdvertisementApplicationService,
                        MessageChannel jobAdEventChannel,
                        JobCenterService jobCenterService,
-                       MailSenderService mailSenderService) {
+                       MailSenderService mailSenderService,
+                       MessageSource messageSource) {
         this.jobAdvertisementApplicationService = jobAdvertisementApplicationService;
         this.jobAdEventChannel = jobAdEventChannel;
         this.jobCenterService = jobCenterService;
         this.mailSenderService = mailSenderService;
+        this.messageSource = messageSource;
     }
 
     void register(JobAdvertisement jobAdvertisement) {
@@ -151,7 +156,8 @@ public class AvamService {
     private MailSenderData prepareMailSenderData(AvamCancellationDto cancellationDto, Map<String, Object> variables) {
         return new MailSenderData.Builder()
                 .setTo(parseMultipleAddresses(cancellationDto.getContactEmail()))
-                .setSubject(JOB_ADVERTISEMENT_CANCELLED_MULTILINGUAL_SUBJECT)
+                .setSubject(messageSource.getMessage(JOB_ADVERTISEMENT_CANCELLED_MULTILINGUAL_SUBJECT,
+                        new Object[]{cancellationDto.getJobDescriptionTitle(), cancellationDto.getStellennummerAvam()}, new Locale(DEFAULT_LANGUAGE)))
                 .setTemplateName(JOB_ADVERTISEMENT_CANCELLED_MULTILINGUAL_TEMPLATE)
                 .setTemplateVariables(variables)
                 .setLocale(new Locale(DEFAULT_LANGUAGE))

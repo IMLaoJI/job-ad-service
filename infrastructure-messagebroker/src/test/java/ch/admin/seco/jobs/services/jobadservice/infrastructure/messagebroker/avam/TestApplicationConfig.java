@@ -7,6 +7,8 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.support.ResourceBundleMessageSource;
 
 @SpringBootApplication
 public class TestApplicationConfig {
@@ -25,4 +27,12 @@ public class TestApplicationConfig {
 
     @MockBean
     JobAdvertisementRepository jobAdvertisementRepository;
+
+    @Bean
+    public ResourceBundleMessageSource messageSource() {
+        ResourceBundleMessageSource source = new ResourceBundleMessageSource();
+        source.setBasenames("mails/i18n/mail-messages");
+        return source;
+    }
+
 }
