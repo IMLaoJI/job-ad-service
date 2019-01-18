@@ -974,7 +974,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search/managed")
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
                         .content(TestUtil.convertObjectToJsonBytes(request))
-                        .param("sort", "jobAdvertisement.jobContent.jobDescriptions.title,DESC")
+                        .param("sort", "jobAdvertisement.jobContent.jobDescriptions.title.raw,DESC")
         )
                 .andExpect(status().isOk());
 
@@ -1021,7 +1021,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search/managed")
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
                         .content(TestUtil.convertObjectToJsonBytes(request))
-                        .param("sort", "jobAdvertisement.jobContent.jobDescriptions.title,DESC")
+                        .param("sort", "jobAdvertisement.jobContent.jobDescriptions.title.raw,DESC")
         )
                 .andExpect(status().isOk());
 

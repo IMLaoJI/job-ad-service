@@ -152,7 +152,11 @@
                   "title": {
                     "type": "text",
                     "analyzer": "ascii_folding",
-                    "fielddata": "true"
+                    "fields": {
+                      "raw": {
+                        "type": "keyword",
+                        "ignore_above": 32
+                      }
                   }
                 }
               },
