@@ -51,7 +51,7 @@ public class AvamServiceTest {
     @Test
     public void sendEmailIfCancellationDtoNotFound() {
         // given
-        AvamCancellationDto cancellationDto = testAvamCancellationDto();
+        AvamCancellationDto cancellationDto = testAvamCancellationDto().setStellennummerEgov(null).setStellennummerAvam(null);
 
         // when
         avamService.handleCancelAction(cancellationDto);
