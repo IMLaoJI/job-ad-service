@@ -36,6 +36,9 @@ public class AvamServiceTest {
     private MailSenderService mailSenderService;
 
     @Autowired
+    private AvamMailSenderService avamMailSenderService;
+
+    @Autowired
     private MessageSource messageSource;
 
     @Autowired

@@ -2,7 +2,6 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.av
 
 import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.application.MailSenderData;
-import ch.admin.seco.jobs.services.jobadservice.application.MailSenderService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementAlreadyExistsException;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
@@ -17,12 +16,9 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.annotation.StreamListener;
-import org.springframework.context.MessageSource;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
 
-import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import static ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition.notNull;
@@ -44,27 +40,16 @@ public class AvamService {
 
     private final JobAdvertisementApplicationService jobAdvertisementApplicationService;
 
-    private final MailSenderService mailSenderService;
-
-    private final MessageSource messageSource;
-
-
-    private static final String JOB_ADVERTISEMENT_CANCELLED_MULTILINGUAL_SUBJECT = "mail.jobAd.cancelled.subject_multilingual";
-    private static final String JOB_ADVERTISEMENT_CANCELLED_MULTILINGUAL_TEMPLATE = "JobAdCancelledMail_multilingual.html";
-    private static final String DEFAULT_LANGUAGE = "";
-    private static final String EMAIL_DELIMITER = "\\s*;\\s*";
-
+    private final AvamMailSenderService avamMailSenderService;
 
     public AvamService(JobAdvertisementApplicationService jobAdvertisementApplicationService,
                        MessageChannel jobAdEventChannel,
                        JobCenterService jobCenterService,
-                       MailSenderService mailSenderService,
-                       MessageSource messageSource) {
+                       AvamMailSenderService avamMailSenderService) {
         this.jobAdvertisementApplicationService = jobAdvertisementApplicationService;
         this.jobAdEventChannel = jobAdEventChannel;
         this.jobCenterService = jobCenterService;
-        this.mailSenderService = mailSenderService;
-        this.messageSource = messageSource;
+        this.avamMailSenderService = avamMailSenderService;
     }
 
     void register(JobAdvertisement jobAdvertisement) {
@@ -132,8 +117,9 @@ public class AvamService {
                 return;
             }
             final JobCenter jobCenter = jobCenterService.findJobCenterByCode(avamCancellationDto.getJobCenterCode());
-            Map<String, Object> variables = prepareTemplateVariables(avamCancellationDto, jobCenter);
-            mailSenderService.send(prepareMailSenderData(avamCancellationDto, variables));
+            Map<String, Object> variables = avamMailSenderService.prepareTemplateVariables(avamCancellationDto, jobCenter);
+            MailSenderData mailSenderData = avamMailSenderService.prepareMailSenderData(avamCancellationDto, variables);
+            avamMailSenderService.send(mailSenderData);
         } else {
             CancellationDto cancellationDto = AvamCancellationDto.toDto(avamCancellationDto);
             jobAdvertisementApplicationService.cancel(
@@ -144,25 +130,4 @@ public class AvamService {
         }
     }
 
-    private Map<String, Object> prepareTemplateVariables(AvamCancellationDto cancellationDto, JobCenter jobCenter) {
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("stellennummer", cancellationDto.getStellennummerAvam());
-        variables.put("jobCenter", jobCenter);
-        return variables;
-    }
-
-    private MailSenderData prepareMailSenderData(AvamCancellationDto cancellationDto, Map<String, Object> variables) {
-        return new MailSenderData.Builder()
-                .setTo(parseMultipleAddresses(cancellationDto.getContactEmail()))
-                .setSubject(messageSource.getMessage(JOB_ADVERTISEMENT_CANCELLED_MULTILINGUAL_SUBJECT,
-                        new Object[]{cancellationDto.getJobDescriptionTitle(), cancellationDto.getStellennummerAvam()}, new Locale(DEFAULT_LANGUAGE)))
-                .setTemplateName(JOB_ADVERTISEMENT_CANCELLED_MULTILINGUAL_TEMPLATE)
-                .setTemplateVariables(variables)
-                .setLocale(new Locale(DEFAULT_LANGUAGE))
-                .build();
-    }
-
-    private static String[] parseMultipleAddresses(String emailAddress) {
-        return (emailAddress == null) ? null : emailAddress.split(EMAIL_DELIMITER);
-    }
 }
