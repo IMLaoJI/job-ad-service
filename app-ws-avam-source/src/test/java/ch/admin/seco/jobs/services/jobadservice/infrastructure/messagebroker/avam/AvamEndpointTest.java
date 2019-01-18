@@ -4,6 +4,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -144,6 +145,7 @@ public class AvamEndpointTest {
         assertThat(cancellationDto.getContactEmail()).isEqualTo("kpemail");
         assertThat(cancellationDto.getJobDescriptionTitle()).isEqualTo("Dies ist ein Test (Florist)");
         assertThat(cancellationDto.getCancellationCode()).isEqualTo(CancellationCode.OCCUPIED_JOBCENTER);
+        assertThat(cancellationDto.getSourceSystem()).isEqualTo(SourceSystem.JOBROOM);
     }
 
     private ClassPathResource getAsResource(String payloadFile) {
