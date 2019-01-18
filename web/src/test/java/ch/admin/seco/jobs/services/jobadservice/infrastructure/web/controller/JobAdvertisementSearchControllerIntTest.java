@@ -974,7 +974,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search/managed")
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
                         .content(TestUtil.convertObjectToJsonBytes(request))
-                        .param("sort", "jobAdvertisement.jobContent.jobDescriptions.title.raw,DESC")
+                        .param("sort", "jobAdvertisement.jobContent.jobDescriptions.title.keyword,DESC")
         )
                 .andExpect(status().isOk());
 
@@ -1021,7 +1021,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search/managed")
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
                         .content(TestUtil.convertObjectToJsonBytes(request))
-                        .param("sort", "jobAdvertisement.jobContent.jobDescriptions.title.raw,DESC")
+                        .param("sort", "jobAdvertisement.jobContent.jobDescriptions.title.keyword,DESC")
         )
                 .andExpect(status().isOk());
 
@@ -1068,7 +1068,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search/managed")
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
                         .content(TestUtil.convertObjectToJsonBytes(request))
-                        .param("sort", "jobAdvertisement.jobContent.location.city,DESC")
+                        .param("sort", "jobAdvertisement.jobContent.location.city.keyword,DESC")
         )
                 .andExpect(status().isOk());
 
@@ -1113,7 +1113,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search/managed")
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
                         .content(TestUtil.convertObjectToJsonBytes(request))
-                        .param("sort", "jobAdvertisement.jobContent.location.city,DESC")
+                        .param("sort", "jobAdvertisement.jobContent.location.city.keyword,DESC")
         )
                 .andExpect(status().isOk());
 

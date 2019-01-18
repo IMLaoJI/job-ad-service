@@ -153,10 +153,11 @@
                     "type": "text",
                     "analyzer": "ascii_folding",
                     "fields": {
-                      "raw": {
+                      "keyword": {
                         "type": "keyword",
-                        "ignore_above": 32
+                        "ignore_above": 256
                       }
+                    }
                   }
                 }
               },
@@ -181,7 +182,12 @@
                   },
                   "city": {
                     "type": "text",
-                    "fielddata": "true"
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                      }
+                    }
                   },
                   "communalCode": {
                     "type": "keyword"
