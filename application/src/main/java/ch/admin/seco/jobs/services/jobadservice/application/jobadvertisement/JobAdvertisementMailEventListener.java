@@ -87,16 +87,7 @@ public class JobAdvertisementMailEventListener {
         variables.put("jobAdvertisementId", jobAdvertisement.getId().getValue());
         variables.put("accessToken", jobAdvertisement.getOwner().getAccessToken());
         variables.put("jobCenter", jobCenter);
-        mailSenderService.send(
-                new MailSenderData.Builder()
-                        .setTo(parseMultipleAddresses(jobAdvertisement.getContact().getEmail()))
-                        .setSubject(messageSource.getMessage(JOB_ADVERTISEMENT_CREATED_SUBJECT,
-                                new Object[]{jobAdvertisement.getJobContent().getJobDescriptions().get(0).getTitle(), stellennummer}, contactLocale))
-                        .setTemplateName(JOB_ADVERTISEMENT_CREATED_TEMPLATE)
-                        .setTemplateVariables(variables)
-                        .setLocale(contactLocale)
-                        .build()
-        );
+        sendMail(jobAdvertisement, contactLocale, stellennummer, variables, JOB_ADVERTISEMENT_CREATED_SUBJECT, JOB_ADVERTISEMENT_CREATED_TEMPLATE);
     }
 
     @EventListener
@@ -130,16 +121,7 @@ public class JobAdvertisementMailEventListener {
             subject = JOB_ADVERTISEMENT_REFINED_SUBJECT;
             template = JOB_ADVERTISEMENT_REFINED_TEMPLATE;
         }
-        mailSenderService.send(
-                new MailSenderData.Builder()
-                        .setTo(parseMultipleAddresses(jobAdvertisement.getContact().getEmail()))
-                        .setSubject(messageSource.getMessage(subject,
-                                new Object[]{jobAdvertisement.getJobContent().getJobDescriptions().get(0).getTitle(), stellennummer}, contactLocale))
-                        .setTemplateName(template)
-                        .setTemplateVariables(variables)
-                        .setLocale(contactLocale)
-                        .build()
-        );
+        sendMail(jobAdvertisement, contactLocale, stellennummer, variables, subject, template);
     }
 
     private boolean showReportingObligation(JobAdvertisement jobAdvertisement) {
@@ -161,16 +143,7 @@ public class JobAdvertisementMailEventListener {
         variables.put("stellennummer", stellennummer);
         variables.put("rejectionReason", jobAdvertisement.getRejectionReason());
         variables.put("jobCenter", jobCenter);
-        mailSenderService.send(
-                new MailSenderData.Builder()
-                        .setTo(parseMultipleAddresses(jobAdvertisement.getContact().getEmail()))
-                        .setSubject(messageSource.getMessage(JOB_ADVERTISEMENT_REJECTED_SUBJECT,
-                                new Object[]{jobAdvertisement.getJobContent().getJobDescriptions().get(0).getTitle(), stellennummer}, contactLocale))
-                        .setTemplateName(JOB_ADVERTISEMENT_REJECTED_TEMPLATE)
-                        .setTemplateVariables(variables)
-                        .setLocale(contactLocale)
-                        .build()
-        );
+        sendMail(jobAdvertisement, contactLocale, stellennummer, variables, JOB_ADVERTISEMENT_REJECTED_SUBJECT, JOB_ADVERTISEMENT_REJECTED_TEMPLATE);
     }
 
     @EventListener
@@ -195,6 +168,10 @@ public class JobAdvertisementMailEventListener {
             subject = JOB_ADVERTISEMENT_CANCELLED_SUBJECT;
             template = JOB_ADVERTISEMENT_CANCELLED_TEMPLATE;
         }
+        sendMail(jobAdvertisement, contactLocale, stellennummer, variables, subject, template);
+    }
+
+    private void sendMail(JobAdvertisement jobAdvertisement, Locale contactLocale, String stellennummer, Map<String, Object> variables, String subject, String template) {
         mailSenderService.send(
                 new MailSenderData.Builder()
                         .setTo(parseMultipleAddresses(jobAdvertisement.getContact().getEmail()))
@@ -231,10 +208,7 @@ public class JobAdvertisementMailEventListener {
         if (locale.getLanguage().equals(LANGUAGE_FR)) {
             return true;
         }
-        if (locale.getLanguage().equals(LANGUAGE_IT)) {
-            return true;
-        }
-        return false;
+        return locale.getLanguage().equals(LANGUAGE_IT);
     }
 
     private boolean hasNoContactEmail(Contact contact) {
