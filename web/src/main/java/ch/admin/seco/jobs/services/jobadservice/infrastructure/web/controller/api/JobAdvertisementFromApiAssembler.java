@@ -4,13 +4,13 @@ import ch.admin.seco.jobs.services.jobadservice.application.HtmlToMarkdownConver
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.util.StringUtils.hasText;
-
-import org.springframework.stereotype.Component;
 
 @Component
 public class JobAdvertisementFromApiAssembler {
@@ -38,6 +38,13 @@ public class JobAdvertisementFromApiAssembler {
 				.setLanguageSkills(convertLanguageSkills(apiCreateDto.getLanguageSkills()))
 				.setApplyChannel(convertApplyChannel(apiCreateDto))
 				.setPublicContact(convertPublicContact(apiCreateDto.getPublicContact()));
+	}
+
+	CancellationDto convert(ApiCancellationDto apiCancellationDto) {
+		return new CancellationDto()
+				.setCode(apiCancellationDto.getCode())
+				.setSourceSystem(apiCancellationDto.getSourceSystem())
+				.setDate(apiCancellationDto.getCancellationDate());
 	}
 
 	private ContactDto convertContact(ApiContactDto apiContact) {

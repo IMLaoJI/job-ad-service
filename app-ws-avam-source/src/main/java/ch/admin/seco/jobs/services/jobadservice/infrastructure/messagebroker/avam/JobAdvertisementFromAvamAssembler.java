@@ -118,8 +118,8 @@ public class JobAdvertisementFromAvamAssembler {
                 .setCancellationDate(parseToLocalDate(avamJobAdvertisement.getAbmeldeDatum()))
                 .setCancellationCode(resolveMapping(CANCELLATION_CODE, avamJobAdvertisement.getAbmeldeGrundCode(), "CANCELLATION_CODE"))
                 .setContactEmail(safeTrimOrNull(avamJobAdvertisement.getKpEmail()))
-                .setJobCenterCode(safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich())
-                );
+                .setJobCenterCode(safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()))
+                .setSourceSystem(resolveMapping(SOURCE_SYSTEM, avamJobAdvertisement.getQuelleCode(), "SOURCE_SYSTEM"));
     }
 
     private ContactDto createContactDto(WSOsteEgov avamJobAdvertisement) {

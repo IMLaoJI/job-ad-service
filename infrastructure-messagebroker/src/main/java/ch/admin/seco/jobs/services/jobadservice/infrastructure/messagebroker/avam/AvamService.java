@@ -8,11 +8,11 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.Job
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,27 +119,26 @@ public class AvamService {
     }
 
     @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CANCEL_CONDITION)
-    public void handleCancelAction(AvamCancellationDto cancellationDto) {
+    public void handleCancelAction(AvamCancellationDto avamCancellationDto) {
         JobAdvertisementDto jobAdvertisementDto;
-        if (isNotBlank(cancellationDto.getStellennummerEgov())) {
-            jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerEgov(cancellationDto.getStellennummerEgov());
+        if (isNotBlank(avamCancellationDto.getStellennummerEgov())) {
+            jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerEgov(avamCancellationDto.getStellennummerEgov());
         } else {
-            jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerAvam(cancellationDto.getStellennummerAvam());
+            jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerAvam(avamCancellationDto.getStellennummerAvam());
         }
         if (jobAdvertisementDto == null) {
-            LOG.info("Couldn't find the jobAdvertisement for AvamCancellationDto with stellennummerAvam {} ", cancellationDto.getStellennummerAvam());
-            if (cancellationDto.getContactEmail() == null) {
+            LOG.info("Couldn't find the jobAdvertisement for AvamCancellationDto with stellennummerAvam {} ", avamCancellationDto.getStellennummerAvam());
+            if (avamCancellationDto.getContactEmail() == null) {
                 return;
             }
-            final JobCenter jobCenter = jobCenterService.findJobCenterByCode(cancellationDto.getJobCenterCode());
-            Map<String, Object> variables = prepareTemplateVariables(cancellationDto, jobCenter);
-            mailSenderService.send(prepareMailSenderData(cancellationDto, variables));
+            final JobCenter jobCenter = jobCenterService.findJobCenterByCode(avamCancellationDto.getJobCenterCode());
+            Map<String, Object> variables = prepareTemplateVariables(avamCancellationDto, jobCenter);
+            mailSenderService.send(prepareMailSenderData(avamCancellationDto, variables));
         } else {
+            CancellationDto cancellationDto = AvamCancellationDto.toDto(avamCancellationDto);
             jobAdvertisementApplicationService.cancel(
                     new JobAdvertisementId(jobAdvertisementDto.getId()),
-                    cancellationDto.getCancellationDate(),
-                    cancellationDto.getCancellationCode(),
-                    SourceSystem.RAV,
+                    cancellationDto,
                     null
             );
         }

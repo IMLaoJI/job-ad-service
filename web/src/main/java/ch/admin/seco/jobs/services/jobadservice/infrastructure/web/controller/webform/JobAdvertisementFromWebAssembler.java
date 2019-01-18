@@ -1,14 +1,14 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.webform;
 
-import static org.springframework.util.StringUtils.hasText;
-import static org.springframework.util.StringUtils.trimWhitespace;
-
-import org.springframework.stereotype.Component;
-
 import ch.admin.seco.jobs.services.jobadservice.application.HtmlToMarkdownConverter;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.AddressDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
+import org.springframework.stereotype.Component;
+
+import static org.springframework.util.StringUtils.hasText;
+import static org.springframework.util.StringUtils.trimWhitespace;
 
 @Component
 public class JobAdvertisementFromWebAssembler {
@@ -39,6 +39,13 @@ public class JobAdvertisementFromWebAssembler {
                 .setPublicContact(createJobAdvertisementFromWebDto.getPublicContact())
                 .setLocation(createJobAdvertisementFromWebDto.getLocation())
                 .setOccupation(createJobAdvertisementFromWebDto.getOccupation());
+    }
+
+    CancellationDto convert(WebformCancellationDto webformCancellationDto) {
+        return new CancellationDto()
+                .setCode(webformCancellationDto.getCode())
+                .setSourceSystem(webformCancellationDto.getSourceSystem())
+                .setDate(webformCancellationDto.getCancellationDate());
     }
 
     private ApplyChannelDto convertApplyChannel(ApplyChannelDto createApplyChannelDto) {

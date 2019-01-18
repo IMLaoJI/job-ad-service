@@ -1,6 +1,8 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -17,6 +19,8 @@ public class AvamCancellationDto {
     private LocalDate cancellationDate;
 
     private CancellationCode cancellationCode;
+
+    private SourceSystem sourceSystem;
 
     private String contactEmail;
 
@@ -48,6 +52,9 @@ public class AvamCancellationDto {
         return jobCenterCode;
     }
 
+    public SourceSystem getSourceSystem() {
+        return sourceSystem;
+    }
 
     public AvamCancellationDto setStellennummerEgov(String stellennummerEgov) {
         this.stellennummerEgov = stellennummerEgov;
@@ -82,6 +89,20 @@ public class AvamCancellationDto {
     public AvamCancellationDto setJobCenterCode(String jobCenterCode) {
         this.jobCenterCode = jobCenterCode;
         return this;
+    }
+
+    public AvamCancellationDto setSourceSystem(SourceSystem sourceSystem) {
+        this.sourceSystem = sourceSystem;
+        return this;
+    }
+
+    protected static CancellationDto toDto(AvamCancellationDto avamCancellationDto){
+        return new CancellationDto()
+                .setStellennummerEgov(avamCancellationDto.getStellennummerEgov())
+                .setStellennummerAvam(avamCancellationDto.getStellennummerAvam())
+                .setCode(avamCancellationDto.getCancellationCode())
+                .setDate(avamCancellationDto.getCancellationDate())
+                .setSourceSystem(avamCancellationDto.getSourceSystem());
     }
 
 }
