@@ -35,41 +35,6 @@ public class JobAdvertisementTest {
         domainEventMockUtils.clearEvents();
     }
 
-    //@Test
-    public void testUpdate() {
-        //given
-        JobAdvertisement jobAdvertisement = testJobAdvertisement().build();
-
-        //when
-        jobAdvertisement.update(new JobAdvertisementUpdater.Builder(null)
-                        .setCompany(testCompany()
-                                .build()
-                        )
-                        .build()
-        );
-
-        //then
-        assertThat(jobAdvertisement.getStatus()).isEqualTo(JobAdvertisementStatus.CREATED);
-
-        Company company = jobAdvertisement.getJobContent().getCompany();
-        assertThat(company).isNotNull();
-        assertThat(company.getName()).isEqualTo("name");
-        assertThat(company.getStreet()).isEqualTo("street");
-        assertThat(company.getHouseNumber()).isEqualTo("houseNumber");
-        assertThat(company.getPostalCode()).isEqualTo("postalCode");
-        assertThat(company.getCity()).isEqualTo("city");
-        assertThat(company.getCountryIsoCode()).isEqualTo("countryIsoCode");
-        assertThat(company.getPostOfficeBoxNumber()).isEqualTo("postOfficeBoxNumber");
-        assertThat(company.getPostOfficeBoxPostalCode()).isEqualTo("postOfficeBoxPostalCode");
-        assertThat(company.getPostOfficeBoxCity()).isEqualTo("postOfficeBoxCity");
-        assertThat(company.getPhone()).isEqualTo("phone");
-        assertThat(company.getEmail()).isEqualTo("email");
-        assertThat(company.getWebsite()).isEqualTo("website");
-
-        JobAdvertisementEvent jobAdvertisementEvent = domainEventMockUtils.assertSingleDomainEventPublished(JobAdvertisementEvents.JOB_ADVERTISEMENT_UPDATED.getDomainEventType());
-        assertThat(jobAdvertisementEvent.getAggregateId()).isEqualTo(job01.id());
-    }
-
     @Test
     public void testInspect() {
         //given

@@ -534,7 +534,7 @@ public class JobAdvertisementApplicationService {
     private void publish(JobAdvertisement jobAdvertisement) {
         Condition.notNull(jobAdvertisement, "JobAdvertisement can't be null");
         LocalDate startDate = jobAdvertisement.getPublication().getStartDate();
-        if ((startDate != null) && startDate.isAfter(TimeMachine.now().toLocalDate())) {
+        if (TimeMachine.isAfterToday(startDate)) {
             return;
         }
         if (determineIfValidForRestrictedPublication(jobAdvertisement)) {
@@ -994,6 +994,6 @@ public class JobAdvertisementApplicationService {
     private boolean determineIfValidForRestrictedPublication(JobAdvertisement jobAdvertisement) {
         return REFINING.equals(jobAdvertisement.getStatus())
                 && jobAdvertisement.isReportingObligation()
-                && ((jobAdvertisement.getReportingObligationEndDate() == null) || jobAdvertisement.getReportingObligationEndDate().isAfter(TimeMachine.now().toLocalDate()));
+                && ((jobAdvertisement.getReportingObligationEndDate() == null) || TimeMachine.isAfterToday(jobAdvertisement.getReportingObligationEndDate()));
     }
 }
