@@ -177,7 +177,6 @@ public class JobAdvertisementSearchService {
             LOG.trace("query: {}", query.getQuery());
             LOG.trace("filter: {}", query.getFilter());
             LOG.trace("sort: {}", query.getSort());
-
         }
 
         return elasticsearchTemplate.query(query, response -> extractHighlightedResults(pageable, response));
