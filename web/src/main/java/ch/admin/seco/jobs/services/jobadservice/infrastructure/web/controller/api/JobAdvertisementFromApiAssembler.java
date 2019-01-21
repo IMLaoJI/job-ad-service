@@ -14,6 +14,9 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
+import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.CancellationResource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -49,11 +52,11 @@ public class JobAdvertisementFromApiAssembler {
 				.setPublicContact(convertPublicContact(apiCreateDto.getPublicContact()));
 	}
 
-	CancellationDto convert(ApiCancellationDto apiCancellationDto) {
+	CancellationDto convert(CancellationResource apiCancellationDto) {
 		return new CancellationDto()
 				.setCode(apiCancellationDto.getCode())
-				.setSourceSystem(apiCancellationDto.getSourceSystem())
-				.setDate(apiCancellationDto.getCancellationDate());
+				.setSourceSystem(SourceSystem.API)
+				.setDate(TimeMachine.now().toLocalDate());
 	}
 
 	private ContactDto convertContact(ApiContactDto apiContact) {

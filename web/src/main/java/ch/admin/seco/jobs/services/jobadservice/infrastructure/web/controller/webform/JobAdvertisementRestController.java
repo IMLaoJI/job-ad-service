@@ -9,6 +9,7 @@ import ch.admin.seco.jobs.services.jobadservice.core.domain.events.EventData;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.EventStore;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.CancellationResource;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.PageResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -127,8 +128,8 @@ public class JobAdvertisementRestController {
     @PatchMapping("/{id}/cancel")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@jobAdvertisementAuthorizationService.canCancel(#id, #token)")
-    public void cancel(@PathVariable String id, @RequestParam(required = false) String token, @RequestBody WebformCancellationDto webformCancellationDto) {
-        CancellationDto cancellationDto = jobAdvertisementFromWebAssembler.convert(webformCancellationDto);
+    public void cancel(@PathVariable String id, @RequestParam(required = false) String token, @RequestBody CancellationResource cancellation) {
+        CancellationDto cancellationDto = jobAdvertisementFromWebAssembler.convert(cancellation);
         jobAdvertisementApplicationService.cancel(new JobAdvertisementId(id), cancellationDto, token);
     }
 

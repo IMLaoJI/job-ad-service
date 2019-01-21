@@ -5,6 +5,9 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
+import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.CancellationResource;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.util.StringUtils.hasText;
@@ -41,11 +44,11 @@ public class JobAdvertisementFromWebAssembler {
                 .setOccupation(createJobAdvertisementFromWebDto.getOccupation());
     }
 
-    CancellationDto convert(WebformCancellationDto webformCancellationDto) {
+    CancellationDto convert(CancellationResource cancellation) {
         return new CancellationDto()
-                .setCode(webformCancellationDto.getCode())
-                .setSourceSystem(webformCancellationDto.getSourceSystem())
-                .setDate(webformCancellationDto.getCancellationDate());
+                .setCode(cancellation.getCode())
+                .setSourceSystem(SourceSystem.JOBROOM)
+                .setDate(TimeMachine.now().toLocalDate());
     }
 
     private ApplyChannelDto convertApplyChannel(ApplyChannelDto createApplyChannelDto) {

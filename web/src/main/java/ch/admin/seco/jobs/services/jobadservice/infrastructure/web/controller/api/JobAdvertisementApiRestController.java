@@ -5,6 +5,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.AggregateNotFoundException;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.CancellationResource;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.PageResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -80,8 +81,8 @@ public class JobAdvertisementApiRestController {
      */
     @PatchMapping("/{id}/cancel")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void cancel(@PathVariable String id, @RequestBody ApiCancellationDto apiCancellationDto) {
-        CancellationDto cancellationDto = jobAdvertisementFromApiAssembler.convert(apiCancellationDto);
+    public void cancel(@PathVariable String id, @RequestBody CancellationResource cancellation) {
+        CancellationDto cancellationDto = jobAdvertisementFromApiAssembler.convert(cancellation);
         jobAdvertisementApplicationService.cancel(new JobAdvertisementId(id), cancellationDto, null);
     }
 
