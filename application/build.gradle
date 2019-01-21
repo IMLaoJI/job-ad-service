@@ -2,6 +2,7 @@ dependencies {
     compile project(':domain')
     compile 'org.springframework:spring-tx'
     compile 'org.springframework.boot:spring-boot-starter-security'
+    compile 'com.google.guava:guava'
 
     testCompile files(this.project(':domain').sourceSets.test.output)
     testCompile files(this.project(':core').sourceSets.test.output)
