@@ -1075,10 +1075,10 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "5"))
-                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Zurich")))
-                .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("Munich")))
-                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("denver")))
-                .andExpect(jsonPath("$.[3].jobContent.location.city").value(equalTo("city")))
+                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("denver")))
+                .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("city")))
+                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("Zurich")))
+                .andExpect(jsonPath("$.[3].jobContent.location.city").value(equalTo("Munich")))
                 .andExpect(jsonPath("$.[4].jobContent.location.city").value(equalTo("Adliswil")));
     }
 
