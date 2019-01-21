@@ -109,8 +109,8 @@ public class AvamCancellationDto {
         return new CancellationDto()
                 .setStellennummerEgov(avamCancellationDto.getStellennummerEgov())
                 .setStellennummerAvam(avamCancellationDto.getStellennummerAvam())
-                .setCode(avamCancellationDto.getCancellationCode())
-                .setDate(avamCancellationDto.getCancellationDate())
+                .setCancellationCode(avamCancellationDto.getCancellationCode())
+                .setCancellationDate(avamCancellationDto.getCancellationDate())
                 .setSourceSystem(avamCancellationDto.getSourceSystem());
     }
 

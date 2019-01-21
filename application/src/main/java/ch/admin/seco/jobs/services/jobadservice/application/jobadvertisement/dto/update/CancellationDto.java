@@ -11,11 +11,9 @@ public class CancellationDto {
 
     private String stellennummerAvam;
 
-    //FIXME refactor to cancellationdate
-    private LocalDate date;
+    private LocalDate cancellationDate;
 
-    //FIXME refactor to cancellationcode
-    private CancellationCode code;
+    private CancellationCode cancellationCode;
 
     private SourceSystem sourceSystem;
 
@@ -28,12 +26,12 @@ public class CancellationDto {
         return stellennummerAvam;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public LocalDate getCancellationDate() {
+        return cancellationDate;
     }
 
-    public CancellationCode getCode() {
-        return code;
+    public CancellationCode getCancellationCode() {
+        return cancellationCode;
     }
 
     public SourceSystem getSourceSystem() {
@@ -50,13 +48,13 @@ public class CancellationDto {
         return this;
     }
 
-    public CancellationDto setDate(LocalDate date) {
-        this.date = date;
+    public CancellationDto setCancellationDate(LocalDate date) {
+        this.cancellationDate = date;
         return this;
     }
 
-    public CancellationDto setCode(CancellationCode code) {
-        this.code = code;
+    public CancellationDto setCancellationCode(CancellationCode cancellationCode) {
+        this.cancellationCode = cancellationCode;
         return this;
     }
 

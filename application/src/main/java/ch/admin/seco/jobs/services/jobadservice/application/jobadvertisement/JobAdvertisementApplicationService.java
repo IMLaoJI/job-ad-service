@@ -489,7 +489,7 @@ public class JobAdvertisementApplicationService {
         Condition.notNull(jobAdvertisementId, "JobAdvertisementId can't be null");
         JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
         LOG.debug("Starting cancel for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
-        jobAdvertisement.cancel(cancellationDto.getDate(), cancellationDto.getCode(), cancellationDto.getSourceSystem());
+        jobAdvertisement.cancel(cancellationDto.getCancellationDate(), cancellationDto.getCancellationCode(), cancellationDto.getSourceSystem());
     }
 
     public void refining(JobAdvertisementId jobAdvertisementId) {

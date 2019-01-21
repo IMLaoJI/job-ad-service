@@ -52,11 +52,11 @@ public class JobAdvertisementFromApiAssembler {
 				.setPublicContact(convertPublicContact(apiCreateDto.getPublicContact()));
 	}
 
-	CancellationDto convert(CancellationResource apiCancellationDto) {
+	CancellationDto convert(CancellationResource cancellation) {
 		return new CancellationDto()
-				.setCode(apiCancellationDto.getCode())
+				.setCancellationCode(cancellation.getCode())
 				.setSourceSystem(SourceSystem.API)
-				.setDate(TimeMachine.now().toLocalDate());
+				.setCancellationDate(TimeMachine.now().toLocalDate());
 	}
 
 	private ContactDto convertContact(ApiContactDto apiContact) {
