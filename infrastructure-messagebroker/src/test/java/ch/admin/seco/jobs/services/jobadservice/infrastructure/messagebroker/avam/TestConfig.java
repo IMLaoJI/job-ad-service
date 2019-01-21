@@ -20,10 +20,10 @@ public class TestConfig {
     JobAdvertisementApplicationService jobAdvertisementApplicationService;
 
     @MockBean
-    MessageBrokerChannels messageBrokerChannels;
+    JobCenterService jobCenterService;
 
     @MockBean
-    JobCenterService jobCenterService;
+    MessageBrokerChannels messageBrokerChannels;
 
     @MockBean
     JobAdvertisementRepository jobAdvertisementRepository;

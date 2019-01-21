@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
+import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.application.MailSenderData;
 import ch.admin.seco.jobs.services.jobadservice.application.MailSenderService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
@@ -7,6 +8,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,17 +48,19 @@ public class AvamServiceTest {
     @Autowired
     private JobAdvertisementApplicationService jobAdvertisementApplicationService;
 
+    @Autowired
+    private JobCenterService jobCenterService;
+
     @Before
     public void setUp() {
-        JobAdvertisement jobAdvertisement = testJobAdvertisement().build();
-        JobAdvertisementDto jobAdvertisementDto = JobAdvertisementDto.toDto(jobAdvertisement);
-        when(jobAdvertisementApplicationService.findByStellennummerEgov(any())).thenReturn(jobAdvertisementDto);
+        when(jobCenterService.findJobCenterByCode((any()))).thenReturn(new JobCenter());
     }
 
     @Test
     public void sendEmailIfCancellationDtoNotFound() {
+        when(jobAdvertisementApplicationService.findByStellennummerEgovOrAvam(any(), any())).thenReturn(null);
         // given
-        AvamCancellationDto cancellationDto = testAvamCancellationDto().setStellennummerEgov(null).setStellennummerAvam(null);
+        AvamCancellationDto cancellationDto = testAvamCancellationDto().setStellennummerEgov(null).setStellennummerAvam("12345");
 
         // when
         avamService.handleCancelAction(cancellationDto);
@@ -74,6 +78,9 @@ public class AvamServiceTest {
 
     @Test
     public void dontSendCancellationEmailDirectlyIfFound() {
+        JobAdvertisement jobAdvertisement = testJobAdvertisement().build();
+        JobAdvertisementDto jobAdvertisementDto = JobAdvertisementDto.toDto(jobAdvertisement);
+        when(jobAdvertisementApplicationService.findByStellennummerEgovOrAvam(any(), any())).thenReturn(jobAdvertisementDto);
         // given
         AvamCancellationDto avamCancellationDto = testAvamCancellationDto();
 

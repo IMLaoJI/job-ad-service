@@ -196,7 +196,7 @@ public class JobAdvertisementApplicationServiceTest {
         // given
         jobAdvertisementRepository.save(testJobAdvertisementWithStatusAndPublicationEndDate(
                 job01.id(), CREATED, null));
-        CancellationDto cancellationDto = new CancellationDto().setDate(LocalDate.of(2018, 1, 1)).setCode(OCCUPIED_OTHER).setSourceSystem(RAV);
+        CancellationDto cancellationDto = new CancellationDto().setCancellationDate(LocalDate.of(2018, 1, 1)).setCancellationCode(OCCUPIED_OTHER).setSourceSystem(RAV);
         // when
         sut.cancel(job01.id(), cancellationDto, null);
 
