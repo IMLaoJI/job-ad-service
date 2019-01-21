@@ -20,6 +20,16 @@
         ]
       }
     },
+    "normalizer": {
+      "lowercase_sort_normalizer": {
+        "type": "custom",
+        "char_filter": [],
+        "filter": [
+          "lowercase",
+          "asciifolding"
+        ]
+      }
+    },
     "tokenizer": {
       "extended_whitespace": {
         "type": "pattern",
