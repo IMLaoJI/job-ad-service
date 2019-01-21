@@ -4,6 +4,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
@@ -11,19 +12,25 @@ public class AvamCancellationDto {
 
     private String stellennummerEgov;
 
-    @NotNull
+    @NotBlank
     private String stellennummerAvam;
 
+    @NotBlank
     private String jobDescriptionTitle;
 
+    @NotNull
     private LocalDate cancellationDate;
 
+    @NotNull
     private CancellationCode cancellationCode;
 
+    @NotNull
     private SourceSystem sourceSystem;
 
+    @NotBlank
     private String contactEmail;
 
+    @NotBlank
     private String jobCenterCode;
 
     public String getStellennummerEgov() {
@@ -34,7 +41,9 @@ public class AvamCancellationDto {
         return stellennummerAvam;
     }
 
-    public String getJobDescriptionTitle() { return jobDescriptionTitle; }
+    public String getJobDescriptionTitle() {
+        return jobDescriptionTitle;
+    }
 
     public LocalDate getCancellationDate() {
         return cancellationDate;
@@ -96,7 +105,7 @@ public class AvamCancellationDto {
         return this;
     }
 
-    protected static CancellationDto toDto(AvamCancellationDto avamCancellationDto){
+    protected static CancellationDto toDto(AvamCancellationDto avamCancellationDto) {
         return new CancellationDto()
                 .setStellennummerEgov(avamCancellationDto.getStellennummerEgov())
                 .setStellennummerAvam(avamCancellationDto.getStellennummerAvam())

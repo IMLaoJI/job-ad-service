@@ -11,8 +11,10 @@ public class CancellationDto {
 
     private String stellennummerAvam;
 
+    //FIXME refactor to cancellationdate
     private LocalDate date;
 
+    //FIXME refactor to cancellationcode
     private CancellationCode code;
 
     private SourceSystem sourceSystem;

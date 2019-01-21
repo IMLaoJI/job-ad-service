@@ -4,6 +4,10 @@ import java.util.Collection;
 
 public class Condition {
 
+    public static void throwConditionException(String message, Object... arguments) {
+        throw new ConditionException(message, arguments);
+    }
+
     public static <T> T notNull(T value) {
         return notNull(value, "Given value can't be null!");
     }

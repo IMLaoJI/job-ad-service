@@ -351,6 +351,12 @@ public class JobAdvertisementApplicationService {
         return jobAdvertisement.map(JobAdvertisementDto::toDto).orElseThrow(() -> new AggregateNotFoundException(JobAdvertisement.class, AggregateNotFoundException.IndentifierType.EXTERNAL_ID, externalId));
     }
 
+    public JobAdvertisementDto findByStellennummerEgovOrAvam(String stellennummerEgov, String stellennummerAvam) {
+        final String externalId = hasText(stellennummerEgov) ? stellennummerEgov : (hasText(stellennummerAvam) ? stellennummerAvam : null);
+        Optional<JobAdvertisement> jobAdvertisement = jobAdvertisementRepository.findByStellennummerAvamOrStellennummerEgov(externalId);
+        return jobAdvertisement.map(JobAdvertisementDto::toDto).orElse(null);
+    }
+
     @PreAuthorize("@jobAdvertisementAuthorizationService.canViewJob(#stellennummerEgov)")
     public JobAdvertisementDto getByStellennummerEgov(String stellennummerEgov) {
         JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerEgov(stellennummerEgov);

@@ -134,12 +134,12 @@ public class JobAdvertisementFromAvamAssembler {
         return new AvamCancellationDto()
                 .setStellennummerEgov(safeTrimOrNull(avamJobAdvertisement.getStellennummerEgov()))
                 .setStellennummerAvam(safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()))
-                .setJobDescriptionTitle(safeTrimOrNull(avamJobAdvertisement.getBezeichnung()))
                 .setCancellationDate(parseToLocalDate(avamJobAdvertisement.getAbmeldeDatum()))
                 .setCancellationCode(resolveMapping(CANCELLATION_CODE, avamJobAdvertisement.getAbmeldeGrundCode(), "CANCELLATION_CODE"))
+                .setSourceSystem(resolveMapping(SOURCE_SYSTEM, avamJobAdvertisement.getQuelleCode(), "SOURCE_SYSTEM"))
+                .setJobDescriptionTitle(safeTrimOrNull(avamJobAdvertisement.getBezeichnung()))
                 .setContactEmail(safeTrimOrNull(avamJobAdvertisement.getKpEmail()))
-                .setJobCenterCode(safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()))
-                .setSourceSystem(resolveMapping(SOURCE_SYSTEM, avamJobAdvertisement.getQuelleCode(), "SOURCE_SYSTEM"));
+                .setJobCenterCode(safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()));
     }
 
     private ContactDto createContactDto(WSOsteEgov avamJobAdvertisement) {
