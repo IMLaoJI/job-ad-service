@@ -10,7 +10,6 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
 import org.slf4j.Logger;
@@ -88,11 +87,7 @@ public class AvamService {
     public void handleApprovedAction(ApprovalDto approvalDto) {
         JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.getByStellennummerEgovOrAvam(approvalDto.getStellennummerEgov(), approvalDto.getStellennummerAvam());
         notNull(jobAdvertisementDto, "Couldn't find the jobAdvertisement to approve for stellennummerEgov %s nor stellennummerAvam %s", approvalDto.getStellennummerEgov(), approvalDto.getStellennummerAvam());
-        if (jobAdvertisementDto.getStatus() == JobAdvertisementStatus.INSPECTING) {
-            jobAdvertisementApplicationService.approve(approvalDto);
-        } else {
-            jobAdvertisementApplicationService.adjourn(approvalDto);
-        }
+        jobAdvertisementApplicationService.approve(approvalDto);
     }
 
     @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = REJECT_CONDITION)

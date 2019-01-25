@@ -379,11 +379,12 @@ public class JobAdvertisementApplicationService {
     public void approve(ApprovalDto approvalDto) {
         Condition.notNull(approvalDto.getStellennummerEgov(), "StellennummerEgov can't be null");
         JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerEgov(approvalDto.getStellennummerEgov());
-        LOG.debug("Starting approve for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
-        // FIXME This is a workaround when updating after approved, until AVAM add an actionType on there message.
         if (jobAdvertisement.getStatus().equals(INSPECTING)) {
+            LOG.debug("Starting approve for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
             jobAdvertisement.approve(approvalDto.getStellennummerAvam(), approvalDto.getDate(), approvalDto.isReportingObligation(), approvalDto.getReportingObligationEndDate());
         }
+        // FIXME This is a workaround when updating after approval, until AVAM add an actionType on there message.
+        LOG.debug("Starting UPDATE for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
         UpdateJobAdvertisementFromAvamDto updateJobAdvertisement = approvalDto.getUpdateJobAdvertisement();
         jobAdvertisement.update(prepareUpdaterFromAvam(updateJobAdvertisement));
     }
@@ -497,13 +498,6 @@ public class JobAdvertisementApplicationService {
         LOG.debug("Starting refining for JobAdvertisementId: '{}'", jobAdvertisementId.getValue());
         JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
         jobAdvertisement.refining();
-    }
-
-    public void adjourn(ApprovalDto approvalDto) {
-        Condition.notNull(approvalDto.getStellennummerEgov(), "StellennummerEgov can't be null");
-        JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerEgov(approvalDto.getStellennummerEgov());
-        LOG.debug("Starting adjourn for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
-        jobAdvertisement.adjournPublication();
     }
 
     public void publish(JobAdvertisementId jobAdvertisementId) {
