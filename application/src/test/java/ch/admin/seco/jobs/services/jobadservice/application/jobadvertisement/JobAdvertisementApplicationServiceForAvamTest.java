@@ -279,26 +279,6 @@ public class JobAdvertisementApplicationServiceForAvamTest {
     }
 
     @Test
-    public void shouldAdjourn() {
-        // given
-        JobAdvertisement archivedJobAd = jobAdvertisementRepository.save(
-                testJobAdvertisement()
-                        .setStatus(ARCHIVED)
-                        .setJobContent(JobContentFixture.of(job01.id()).build())
-                        .build());
-        UpdateJobAdvertisementFromAvamDto updateJobAdvertisementFromAvamDto = testUpdateJobAdvertisementFromAvamDto(archivedJobAd);
-        ApprovalDto approvalDto = testApprovalDto(updateJobAdvertisementFromAvamDto);
-
-        // when
-        sut.adjourn(approvalDto);
-
-        // then
-        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(archivedJobAd.getId());
-        domainEventMockUtils.assertSingleDomainEventPublished(JOB_ADVERTISEMENT_ADJOURNED_PUBLICATION.getDomainEventType());
-    }
-
-
-    @Test
     public void shouldReject() {
         // given
         jobAdvertisementRepository.save(
