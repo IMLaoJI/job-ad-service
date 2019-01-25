@@ -1,22 +1,15 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.APPROVE;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.CANCEL;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.CREATE_FROM_AVAM;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.REJECT;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.ACTION;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.ws.test.server.RequestCreators.withPayload;
-
-import java.io.IOException;
-
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.json.JacksonTester;
@@ -32,10 +25,15 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.ws.test.server.MockWebServiceClient;
 import org.springframework.ws.test.server.ResponseMatchers;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
+import java.io.IOException;
+
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.APPROVE;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.CANCEL;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.CREATE_FROM_AVAM;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.REJECT;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.ACTION;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.ws.test.server.RequestCreators.withPayload;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = AvamSourceApplication.class)
@@ -47,7 +45,7 @@ public class AvamEndpointTest {
     private JacksonTester<ApprovalDto> approvalDtoJacksonTester;
     private JacksonTester<RejectionDto> rejectionDtoJacksonTester;
     private JacksonTester<AvamCreateJobAdvertisementDto> createJobAdvertisementAvamDtoJacksonTester;
-    private JacksonTester<CancellationDto> cancellationDtoJacksonTester;
+    private JacksonTester<AvamCancellationDto> cancellationDtoJacksonTester;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -142,13 +140,16 @@ public class AvamEndpointTest {
         assertThat(received).isNotNull();
         assertThat(received.getHeaders().get(ACTION)).isEqualTo(CANCEL.name());
 
-        CancellationDto cancellationDto = cancellationDtoJacksonTester.parse(received.getPayload()).getObject();
+        AvamCancellationDto cancellationDto = cancellationDtoJacksonTester.parse(received.getPayload()).getObject();
         assertThat(cancellationDto.getStellennummerEgov()).isEqualTo("EGOV-0004");
         assertThat(cancellationDto.getStellennummerAvam()).isEqualTo("AVAM-0004");
-        assertThat(cancellationDto.getDate()).isEqualTo("2018-03-04");
-        assertThat(cancellationDto.getCode()).isEqualTo(CancellationCode.OCCUPIED_JOBCENTER);
+        assertThat(cancellationDto.getCancellationDate()).isEqualTo("2018-03-04");
+        assertThat(cancellationDto.getJobCenterCode()).isEqualTo("BEA12");
+        assertThat(cancellationDto.getContactEmail()).isEqualTo("kpemail");
+        assertThat(cancellationDto.getJobDescriptionTitle()).isEqualTo("Dies ist ein Test (Florist)");
+        assertThat(cancellationDto.getCancellationCode()).isEqualTo(CancellationCode.OCCUPIED_JOBCENTER);
+        assertThat(cancellationDto.getSourceSystem()).isEqualTo(SourceSystem.JOBROOM);
     }
-
 
     private ClassPathResource getAsResource(String payloadFile) {
         return new ClassPathResource(payloadFile);

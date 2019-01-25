@@ -1,34 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.INSPECTING;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REFINING;
-import static java.util.stream.Collectors.toList;
-import static org.springframework.util.StringUtils.hasText;
-
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-
-import javax.persistence.EntityNotFoundException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionSystemException;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionTemplate;
-
 import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogData;
 import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogger;
 import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
@@ -51,6 +22,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromAvamDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromX28Dto;
@@ -62,7 +34,6 @@ import ch.admin.seco.jobs.services.jobadservice.core.domain.AggregateNotFoundExc
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Address;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.ApplyChannel;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Company;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Contact;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Employer;
@@ -81,10 +52,35 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Location
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.PublicContact;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Publication;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
 import ch.admin.seco.jobs.services.jobadservice.domain.profession.Profession;
 import ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionSystemException;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import javax.persistence.EntityNotFoundException;
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.INSPECTING;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REFINING;
+import static java.util.stream.Collectors.toList;
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 @Transactional(rollbackFor = {Exception.class})
@@ -355,6 +351,12 @@ public class JobAdvertisementApplicationService {
         return jobAdvertisement.map(JobAdvertisementDto::toDto).orElseThrow(() -> new AggregateNotFoundException(JobAdvertisement.class, AggregateNotFoundException.IndentifierType.EXTERNAL_ID, externalId));
     }
 
+    public JobAdvertisementDto findByStellennummerEgovOrAvam(String stellennummerEgov, String stellennummerAvam) {
+        final String externalId = hasText(stellennummerEgov) ? stellennummerEgov : (hasText(stellennummerAvam) ? stellennummerAvam : null);
+        Optional<JobAdvertisement> jobAdvertisement = jobAdvertisementRepository.findByStellennummerAvamOrStellennummerEgov(externalId);
+        return jobAdvertisement.map(JobAdvertisementDto::toDto).orElse(null);
+    }
+
     @PreAuthorize("@jobAdvertisementAuthorizationService.canViewJob(#stellennummerEgov)")
     public JobAdvertisementDto getByStellennummerEgov(String stellennummerEgov) {
         JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerEgov(stellennummerEgov);
@@ -483,11 +485,11 @@ public class JobAdvertisementApplicationService {
     }
 
     // FIXME @PreAuthorize("@jobAdvertisementAuthorizationService.canCancel(jobAdvertisementId, token)")
-    public void cancel(JobAdvertisementId jobAdvertisementId, LocalDate date, CancellationCode cancellationCode, SourceSystem cancelledBy, String token) {
+    public void cancel(JobAdvertisementId jobAdvertisementId, CancellationDto cancellationDto, String token) {
         Condition.notNull(jobAdvertisementId, "JobAdvertisementId can't be null");
         JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
         LOG.debug("Starting cancel for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
-        jobAdvertisement.cancel(date, cancellationCode, cancelledBy);
+        jobAdvertisement.cancel(cancellationDto.getCancellationDate(), cancellationDto.getCancellationCode(), cancellationDto.getSourceSystem());
     }
 
     public void refining(JobAdvertisementId jobAdvertisementId) {

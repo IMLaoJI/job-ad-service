@@ -1,62 +1,65 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 
 import java.time.LocalDate;
-
-import javax.validation.constraints.NotNull;
 
 public class CancellationDto {
 
     private String stellennummerEgov;
 
-    @NotNull
     private String stellennummerAvam;
 
-    private LocalDate date;
+    private LocalDate cancellationDate;
 
-    private CancellationCode code;
+    private CancellationCode cancellationCode;
 
-    protected CancellationDto() {
-        // For reflection libs
-    }
+    private SourceSystem sourceSystem;
 
-    public CancellationDto(String stellennummerEgov, String stellennummerAvam, LocalDate date, CancellationCode code) {
-        this.stellennummerEgov = stellennummerEgov;
-        this.stellennummerAvam = stellennummerAvam;
-        this.date = date;
-        this.code = code;
-    }
 
     public String getStellennummerEgov() {
         return stellennummerEgov;
-    }
-
-    public void setStellennummerEgov(String stellennummerEgov) {
-        this.stellennummerEgov = stellennummerEgov;
     }
 
     public String getStellennummerAvam() {
         return stellennummerAvam;
     }
 
-    public void setStellennummerAvam(String stellennummerAvam) {
+    public LocalDate getCancellationDate() {
+        return cancellationDate;
+    }
+
+    public CancellationCode getCancellationCode() {
+        return cancellationCode;
+    }
+
+    public SourceSystem getSourceSystem() {
+        return sourceSystem;
+    }
+
+    public CancellationDto setStellennummerEgov(String stellennummerEgov) {
+        this.stellennummerEgov = stellennummerEgov;
+        return this;
+    }
+
+    public CancellationDto setStellennummerAvam(String stellennummerAvam) {
         this.stellennummerAvam = stellennummerAvam;
+        return this;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public CancellationDto setCancellationDate(LocalDate date) {
+        this.cancellationDate = date;
+        return this;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public CancellationDto setCancellationCode(CancellationCode cancellationCode) {
+        this.cancellationCode = cancellationCode;
+        return this;
     }
 
-    public CancellationCode getCode() {
-        return code;
-    }
-
-    public void setCode(CancellationCode code) {
-        this.code = code;
+    public CancellationDto setSourceSystem(SourceSystem sourceSystem) {
+        this.sourceSystem = sourceSystem;
+        return this;
     }
 }

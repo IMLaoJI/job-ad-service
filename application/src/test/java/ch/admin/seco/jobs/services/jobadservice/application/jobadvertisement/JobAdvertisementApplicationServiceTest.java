@@ -1,5 +1,39 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
+import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
+import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
+import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
+import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
+import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEvent;
+import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Company;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Location;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
+import org.assertj.core.api.iterable.Extractor;
+import org.assertj.core.data.Index;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService.EXTERN_JOB_AD_REACTIVATION_DAY_NUM;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementDtoTestFixture.testCreateJobAdvertisementDto;
 import static ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine.reset;
@@ -13,6 +47,7 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.J
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REFINING;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.JOBROOM;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.RAV;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_BLACKOUT_EXPIRED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_CANCELLED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_INSPECTING;
@@ -37,41 +72,6 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.assertj.core.api.iterable.Extractor;
-import org.assertj.core.data.Index;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
-import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
-import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
-import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
-import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEvent;
-import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Company;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Location;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -196,15 +196,16 @@ public class JobAdvertisementApplicationServiceTest {
         // given
         jobAdvertisementRepository.save(testJobAdvertisementWithStatusAndPublicationEndDate(
                 job01.id(), CREATED, null));
-
+        CancellationDto cancellationDto = new CancellationDto().setCancellationDate(LocalDate.of(2018, 1, 1)).setCancellationCode(OCCUPIED_OTHER).setSourceSystem(RAV);
         // when
-        sut.cancel(job01.id(), LocalDate.of(2018, 1, 1), OCCUPIED_OTHER, JOBROOM, null);
+        sut.cancel(job01.id(), cancellationDto, null);
 
         // then
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.findById(job01.id()).get();
         assertThat(jobAdvertisement.getCancellationCode()).isEqualTo(OCCUPIED_OTHER);
         assertThat(jobAdvertisement.getCancellationDate()).isEqualTo(LocalDate.of(2018, 1, 1));
         assertThat(jobAdvertisement.getStatus()).isEqualTo(CANCELLED);
+        assertThat(jobAdvertisement.getSourceSystem()).isEqualTo(JOBROOM);
         domainEventMockUtils.assertSingleDomainEventPublished(JOB_ADVERTISEMENT_CANCELLED.getDomainEventType());
     }
 

@@ -1,5 +1,24 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
+import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementAlreadyExistsException;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.MessageChannel;
+
 import static ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition.notNull;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_CANCELLED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_INSPECTING;
@@ -16,26 +35,6 @@ import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebro
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.TARGET_SYSTEM;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageSystem.AVAM;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageSystem.JOB_AD_SERVICE;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.cloud.stream.annotation.StreamListener;
-import org.springframework.integration.support.MessageBuilder;
-import org.springframework.messaging.MessageChannel;
-
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementAlreadyExistsException;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 
 public class AvamService {
 
@@ -43,11 +42,20 @@ public class AvamService {
 
     private final MessageChannel jobAdEventChannel;
 
+    private final JobCenterService jobCenterService;
+
     private final JobAdvertisementApplicationService jobAdvertisementApplicationService;
 
-    public AvamService(JobAdvertisementApplicationService jobAdvertisementApplicationService, MessageChannel jobAdEventChannel) {
+    private final AvamMailSender avamMailSender;
+
+    public AvamService(JobAdvertisementApplicationService jobAdvertisementApplicationService,
+                       MessageChannel jobAdEventChannel,
+                       JobCenterService jobCenterService,
+                       AvamMailSender avamMailSender) {
         this.jobAdvertisementApplicationService = jobAdvertisementApplicationService;
         this.jobAdEventChannel = jobAdEventChannel;
+        this.jobCenterService = jobCenterService;
+        this.avamMailSender = avamMailSender;
     }
 
     void register(JobAdvertisement jobAdvertisement) {
@@ -79,7 +87,7 @@ public class AvamService {
     @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = APPROVE_CONDITION)
     public void handleApprovedAction(ApprovalDto approvalDto) {
         JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.getByStellennummerEgovOrAvam(approvalDto.getStellennummerEgov(), approvalDto.getStellennummerAvam());
-        notNull(jobAdvertisementDto, "Couldn't find the jobAdvertisement for stellennummerEgov %s nor stellennummerAvam %s", approvalDto.getStellennummerEgov(), approvalDto.getStellennummerAvam());
+        notNull(jobAdvertisementDto, "Couldn't find the jobAdvertisement to approve for stellennummerEgov %s nor stellennummerAvam %s", approvalDto.getStellennummerEgov(), approvalDto.getStellennummerAvam());
         if (jobAdvertisementDto.getStatus() == JobAdvertisementStatus.INSPECTING) {
             jobAdvertisementApplicationService.approve(approvalDto);
         } else {
@@ -102,20 +110,24 @@ public class AvamService {
     }
 
     @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CANCEL_CONDITION)
-    public void handleCancelAction(CancellationDto cancellationDto) {
-        JobAdvertisementDto jobAdvertisementDto;
-        if(isNotBlank(cancellationDto.getStellennummerEgov())) {
-            jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerEgov(cancellationDto.getStellennummerEgov());
-        } else {
-            jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerAvam(cancellationDto.getStellennummerAvam());
+    public void handleCancelAction(AvamCancellationDto avamCancellationDto) {
+        JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerEgovOrAvam(avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerAvam());
+
+        if ((jobAdvertisementDto == null) && (avamCancellationDto.getSourceSystem() == SourceSystem.RAV)) {
+            LOG.info("Cancellation of an unknown jobAdvertisement from AVAM with stellennummerAvam {}", avamCancellationDto.getStellennummerAvam());
+            final JobCenter jobCenter = jobCenterService.findJobCenterByCode(avamCancellationDto.getJobCenterCode());
+            avamMailSender.sendCancellation(avamCancellationDto, jobCenter);
+            return;
         }
-        notNull(jobAdvertisementDto, "Couldn't find the jobAdvertisement for stellennummerEgov %s nor stellennummerAvam %s", cancellationDto.getStellennummerEgov(), cancellationDto.getStellennummerAvam());
+
+        notNull(jobAdvertisementDto, "Couldn't find the jobAdvertisement to cancel for stellennummerEgov %s nor stellennummerAvam %s", avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerAvam());
+
+        CancellationDto cancellationDto = AvamCancellationDto.toDto(avamCancellationDto);
         jobAdvertisementApplicationService.cancel(
                 new JobAdvertisementId(jobAdvertisementDto.getId()),
-                cancellationDto.getDate(),
-                cancellationDto.getCode(),
-                SourceSystem.RAV,
+                cancellationDto,
                 null
         );
     }
+
 }

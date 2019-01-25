@@ -74,7 +74,7 @@
         <jobSharing>0</jobSharing>
         <kategorieCode></kategorieCode>
         <kpAnredeCode>1</kpAnredeCode>
-        <kpEmail></kpEmail>
+        <kpEmail>kpemail</kpEmail>
         <kpName>Kessler</kpName>
         <kpTelefonNr></kpTelefonNr>
         <kpVorname>Marcel</kpVorname>
@@ -142,3 +142,5 @@
         <behindert>0</behindert>
     </oste>
 </val:insertOste>
+
+

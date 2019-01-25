@@ -1,16 +1,28 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.api;
 
 import ch.admin.seco.jobs.services.jobadservice.application.HtmlToMarkdownConverter;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmployerDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
+import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.CancellationResource;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.util.StringUtils.hasText;
-
-import org.springframework.stereotype.Component;
 
 @Component
 public class JobAdvertisementFromApiAssembler {
@@ -38,6 +50,13 @@ public class JobAdvertisementFromApiAssembler {
 				.setLanguageSkills(convertLanguageSkills(apiCreateDto.getLanguageSkills()))
 				.setApplyChannel(convertApplyChannel(apiCreateDto))
 				.setPublicContact(convertPublicContact(apiCreateDto.getPublicContact()));
+	}
+
+	CancellationDto convert(CancellationResource cancellation) {
+		return new CancellationDto()
+				.setCancellationCode(cancellation.getCode())
+				.setSourceSystem(SourceSystem.API)
+				.setCancellationDate(TimeMachine.now().toLocalDate());
 	}
 
 	private ContactDto convertContact(ApiContactDto apiContact) {

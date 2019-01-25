@@ -2,7 +2,6 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.av
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +9,8 @@ import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
+
+import javax.validation.Valid;
 
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.*;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.*;
@@ -66,7 +67,7 @@ public class AvamSource {
                 .build());
     }
 
-    public void cancel(CancellationDto cancellationDto) {
+    public void cancel(@Valid AvamCancellationDto cancellationDto) {
         LOG.debug("Cancel JobAdvertisement stellennummerAvam={}, stellennummerEgov={}", cancellationDto.getStellennummerAvam(), cancellationDto.getStellennummerEgov());
         output.send(MessageBuilder
                 .withPayload(cancellationDto)
