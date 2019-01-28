@@ -15,7 +15,6 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.J
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementRefinedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementRejectedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
-import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,9 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.apache.commons.lang3.math.NumberUtils.toInt;
@@ -84,16 +85,18 @@ public class JobAdvertisementMailEventListener {
         final Locale contactLocale = resolveLocale(jobAdvertisement);
         final JobCenter jobCenter = jobCenterService.findJobCenterByCode(jobAdvertisement.getJobCenterCode(), contactLocale);
         final String stellennummer = extractStellennummer(jobAdvertisement);
+        final Map<String, Object> variables = new HashMap<>();
+        variables.put("stellennummer", stellennummer);
+        variables.put("showReportingObligation", showReportingObligation(jobAdvertisement));
+        variables.put("jobAdvertisementId", jobAdvertisement.getId().getValue());
+        variables.put("accessToken", jobAdvertisement.getOwner().getAccessToken());
+        variables.put("jobCenter", jobCenter);
+
         mailSenderService.send(new MailSenderData.Builder()
                 .setTo(parseMultipleAddresses(jobAdvertisement.getContact().getEmail()))
                 .setSubject(messageSource.getMessage(JOB_ADVERTISEMENT_CREATED_SUBJECT, new Object[]{jobAdvertisement.getJobContent().getJobDescriptions().get(0).getTitle(), stellennummer}, contactLocale))
                 .setTemplateName(JOB_ADVERTISEMENT_CREATED_TEMPLATE)
-                .setTemplateVariables(ImmutableMap.of(
-                        "stellennummer", stellennummer,
-                        "showReportingObligation", showReportingObligation(jobAdvertisement),
-                        "jobAdvertisementId", jobAdvertisement.getId().getValue(),
-                        "accessToken", jobAdvertisement.getOwner().getAccessToken(),
-                        "jobCenter", jobCenter))
+                .setTemplateVariables(variables)
                 .setLocale(contactLocale)
                 .build());
     }
@@ -108,17 +111,18 @@ public class JobAdvertisementMailEventListener {
         final Locale contactLocale = resolveLocale(jobAdvertisement);
         final JobCenter jobCenter = jobCenterService.findJobCenterByCode(jobAdvertisement.getJobCenterCode(), contactLocale);
         final String stellennummer = extractStellennummer(jobAdvertisement);
+        final Map<String, Object> variables = new HashMap<>();
+        variables.put("stellennummer", stellennummer);
+        variables.put("rejectionReason", jobAdvertisement.getRejectionReason());
+        variables.put("jobCenter", jobCenter);
+
         mailSenderService.send(new MailSenderData.Builder()
                 .setTo(parseMultipleAddresses(jobAdvertisement.getContact().getEmail()))
                 .setSubject(messageSource.getMessage(JOB_ADVERTISEMENT_REJECTED_SUBJECT, new Object[]{jobAdvertisement.getJobContent().getJobDescriptions().get(0).getTitle(), stellennummer}, contactLocale))
                 .setTemplateName(JOB_ADVERTISEMENT_REJECTED_TEMPLATE)
-                .setTemplateVariables(ImmutableMap.of(
-                        "stellennummer", stellennummer,
-                        "rejectionReason", jobAdvertisement.getRejectionReason(),
-                        "jobCenter", jobCenter))
+                .setTemplateVariables(variables)
                 .setLocale(contactLocale)
                 .build());
-
     }
 
     @EventListener
@@ -136,20 +140,20 @@ public class JobAdvertisementMailEventListener {
         final String stellennummer = extractStellennummer(jobAdvertisement);
         final String subject = hasContactLanguage(jobAdvertisement) ? JOB_ADVERTISEMENT_REFINED_SUBJECT : JOB_ADVERTISEMENT_REFINED_MULTILINGUAL_SUBJECT;
         final String template = hasContactLanguage(jobAdvertisement) ? JOB_ADVERTISEMENT_REFINED_TEMPLATE : JOB_ADVERTISEMENT_REFINED_MULTILINGUAL_TEMPLATE;
+        final Map<String, Object> variables = new HashMap<>();
+        variables.put("stellennummer", stellennummer);
+        variables.put("showReportingObligation", showReportingObligation(jobAdvertisement));
+        variables.put("reportingObligationEndDate", nullSafeFormatLocalDate(jobAdvertisement.getReportingObligationEndDate()));
+        variables.put("jobAdvertisementId", jobAdvertisement.getId().getValue());
+        variables.put("accessToken", jobAdvertisement.getOwner().getAccessToken());
+        variables.put("jobCenter", jobCenter);
+        variables.put("numberOfJobs", toInt(jobAdvertisement.getJobContent().getNumberOfJobs()));
+
         mailSenderService.send(new MailSenderData.Builder()
                 .setTo(parseMultipleAddresses(jobAdvertisement.getContact().getEmail()))
                 .setSubject(messageSource.getMessage(subject, new Object[]{jobAdvertisement.getJobContent().getJobDescriptions().get(0).getTitle(), stellennummer}, contactLocale))
                 .setTemplateName(template)
-                .setTemplateVariables(
-                        new ImmutableMap.Builder<String, Object>()
-                                .put("stellennummer", stellennummer)
-                                .put("showReportingObligation", showReportingObligation(jobAdvertisement))
-                                .put("reportingObligationEndDate", nullSafeFormatLocalDate(jobAdvertisement.getReportingObligationEndDate()))
-                                .put("jobAdvertisementId", jobAdvertisement.getId().getValue())
-                                .put("accessToken", jobAdvertisement.getOwner().getAccessToken())
-                                .put("jobCenter", jobCenter)
-                                .put("numberOfJobs", toInt(jobAdvertisement.getJobContent().getNumberOfJobs()))
-                                .build())
+                .setTemplateVariables(variables)
                 .setLocale(contactLocale)
                 .build());
     }
@@ -169,13 +173,15 @@ public class JobAdvertisementMailEventListener {
         final JobCenter jobCenter = jobCenterService.findJobCenterByCode(jobAdvertisement.getJobCenterCode(), contactLocale);
         final String subject = hasContactLanguage(jobAdvertisement) ? JOB_ADVERTISEMENT_CANCELLED_SUBJECT : JOB_ADVERTISEMENT_CANCELLED_MULTILINGUAL_SUBJECT;
         final String template = hasContactLanguage(jobAdvertisement) ? JOB_ADVERTISEMENT_CANCELLED_TEMPLATE : JOB_ADVERTISEMENT_CANCELLED_MULTILINGUAL_TEMPLATE;
+        final Map<String, Object> variables = new HashMap<>();
+        variables.put("stellennummer", stellennummer);
+        variables.put("jobCenter", jobCenter);
+
         mailSenderService.send(new MailSenderData.Builder()
                 .setTo(parseMultipleAddresses(jobAdvertisement.getContact().getEmail()))
                 .setSubject(messageSource.getMessage(subject, new Object[]{jobAdvertisement.getJobContent().getJobDescriptions().get(0).getTitle(), stellennummer}, contactLocale))
                 .setTemplateName(template)
-                .setTemplateVariables(ImmutableMap.of(
-                        "stellennummer", stellennummer,
-                        "jobCenter", jobCenter))
+                .setTemplateVariables(variables)
                 .setLocale(contactLocale)
                 .build());
     }
