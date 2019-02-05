@@ -90,7 +90,7 @@ public class JobAdvertisementSearchService {
     private static final String PATH_WORKLOAD_TIME_PERCENTAGE_MIN = PATH_CTX + "jobContent.employment.workloadPercentageMin";
     private static final String PATH_LANGUAGE_SKILL_CODE = PATH_CTX + "jobContent.languageSkills.languageIsoCode";
     private static final String FILTER_COMMUNAL_CODE_ABROAD = "9999";
-    private static final String COUNTRY_ISO_CODE = "CH";
+    private static final String SWITZERLAND_COUNTRY_ISO_CODE = "CH";
     private static final String RELEVANCE = "_score";
     private static final int ONLINE_SINCE_DAYS = 60;
     private static final String MANAGED_JOB_AD_KEYWORD_DELIMITER = "\\s+";
@@ -458,11 +458,10 @@ public class JobAdvertisementSearchService {
             localityFilter.should(termsQuery(PATH_LOCATION_REGION_CODE, jobSearchRequest.getRegionCodes()));
         }
         if (isNotEmpty(jobSearchRequest.getCommunalCodes())) {
-            if (FILTER_COMMUNAL_CODE_ABROAD.equals(jobSearchRequest.getCommunalCodes())) {
-                localityFilter.mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, COUNTRY_ISO_CODE));
-            } else {
-                localityFilter.should(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
+            if (Arrays.asList(jobSearchRequest.getCommunalCodes()).contains(FILTER_COMMUNAL_CODE_ABROAD)) {
+                localityFilter.should(boolQuery().mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, SWITZERLAND_COUNTRY_ISO_CODE)));
             }
+            localityFilter.should(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
         }
 
         return localityFilter;
