@@ -459,7 +459,7 @@ public class JobAdvertisementSearchService {
         }
         if (isNotEmpty(jobSearchRequest.getCommunalCodes())) {
             if (FILTER_COMMUNAL_CODE_ABROAD.equals(jobSearchRequest.getCommunalCodes())) {
-                localityFilter.mustNot(matchQuery(PATH_LOCATION_COUNTRY_ISO_CODE, COUNTRY_ISO_CODE));
+                localityFilter.mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, COUNTRY_ISO_CODE));
             } else {
                 localityFilter.should(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
             }
