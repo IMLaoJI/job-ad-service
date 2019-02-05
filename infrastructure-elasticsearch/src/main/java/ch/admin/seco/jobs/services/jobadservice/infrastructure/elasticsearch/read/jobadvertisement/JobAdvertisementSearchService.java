@@ -394,8 +394,7 @@ public class JobAdvertisementSearchService {
 
             return boolQuery()
                     .should(publishedPublicFilter)
-                    .should(publishedRestrictedFilter)
-                    ;
+                    .should(publishedRestrictedFilter);
         }
         return boolQuery().must(termQuery(PATH_PUBLICATION_PUBLIC_DISPLAY, true));
     }
