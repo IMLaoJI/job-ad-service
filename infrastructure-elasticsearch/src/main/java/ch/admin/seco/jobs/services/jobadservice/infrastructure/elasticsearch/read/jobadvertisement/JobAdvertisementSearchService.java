@@ -71,6 +71,7 @@ public class JobAdvertisementSearchService {
     private static final String PATH_LOCATION_COMMUNAL_CODE = PATH_CTX + "jobContent.location.communalCode";
     private static final String PATH_LOCATION_REGION_CODE = PATH_CTX + "jobContent.location.regionCode";
     private static final String PATH_LOCATION_CITY = PATH_CTX + "jobContent.location.city";
+    private static final String PATH_LOCATION_COUNTRY_ISO_CODE = PATH_CTX + "jobContent.location.countryIsoCode";
     private static final String PATH_OCCUPATIONS = PATH_CTX + "jobContent.occupations";
     private static final String PATH_OCCUPATIONS_AVAM_OCCUPATION_CODE = PATH_OCCUPATIONS + ".avamOccupationCode";
     private static final String PATH_OCCUPATIONS_BFS_CODE = PATH_OCCUPATIONS + ".bfsCode";
@@ -88,6 +89,8 @@ public class JobAdvertisementSearchService {
     private static final String PATH_WORKLOAD_PERCENTAGE_MAX = PATH_CTX + "jobContent.employment.workloadPercentageMax";
     private static final String PATH_WORKLOAD_TIME_PERCENTAGE_MIN = PATH_CTX + "jobContent.employment.workloadPercentageMin";
     private static final String PATH_LANGUAGE_SKILL_CODE = PATH_CTX + "jobContent.languageSkills.languageIsoCode";
+    private static final String FILTER_COMMUNAL_CODE_ABROAD = "9999";
+    private static final String COUNTRY_ISO_CODE = "CH";
     private static final String RELEVANCE = "_score";
     private static final int ONLINE_SINCE_DAYS = 60;
     private static final String MANAGED_JOB_AD_KEYWORD_DELIMITER = "\\s+";
@@ -392,7 +395,7 @@ public class JobAdvertisementSearchService {
             return boolQuery()
                     .should(publishedPublicFilter)
                     .should(publishedRestrictedFilter)
-            ;
+                    ;
         }
         return boolQuery().must(termQuery(PATH_PUBLICATION_PUBLIC_DISPLAY, true));
     }
@@ -456,7 +459,11 @@ public class JobAdvertisementSearchService {
             localityFilter.should(termsQuery(PATH_LOCATION_REGION_CODE, jobSearchRequest.getRegionCodes()));
         }
         if (isNotEmpty(jobSearchRequest.getCommunalCodes())) {
-            localityFilter.should(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
+            if (FILTER_COMMUNAL_CODE_ABROAD.equals(jobSearchRequest.getCommunalCodes())) {
+                localityFilter.mustNot(matchQuery(PATH_LOCATION_COUNTRY_ISO_CODE, COUNTRY_ISO_CODE));
+            } else {
+                localityFilter.should(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
+            }
         }
 
         return localityFilter;
