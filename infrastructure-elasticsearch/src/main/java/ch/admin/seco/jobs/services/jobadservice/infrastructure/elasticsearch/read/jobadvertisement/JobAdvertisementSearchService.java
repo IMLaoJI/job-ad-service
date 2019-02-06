@@ -458,13 +458,17 @@ public class JobAdvertisementSearchService {
             localityFilter.should(termsQuery(PATH_LOCATION_REGION_CODE, jobSearchRequest.getRegionCodes()));
         }
         if (isNotEmpty(jobSearchRequest.getCommunalCodes())) {
-            if (Arrays.asList(jobSearchRequest.getCommunalCodes()).contains(FILTER_COMMUNAL_CODE_ABROAD)) {
+            if (containsAbroadCode(jobSearchRequest.getCommunalCodes())) {
                 localityFilter.should(boolQuery().mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, SWITZERLAND_COUNTRY_ISO_CODE)));
             }
             localityFilter.should(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
         }
 
         return localityFilter;
+    }
+
+    private boolean containsAbroadCode(String[] communalCodes) {
+        return Arrays.asList(communalCodes).contains(FILTER_COMMUNAL_CODE_ABROAD);
     }
 
     private BoolQueryBuilder workingTimeFilter(JobAdvertisementSearchRequest jobSearchRequest) {
