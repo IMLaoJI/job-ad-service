@@ -169,7 +169,7 @@ public class JobAdvertisementFromAvamAssembler {
                 hasText(avamJobAdvertisement.getKpFragenEmail())) {
 
             return new PublicContactDto()
-                    .setSalutation(hasText(avamJobAdvertisement.getKpAnredeCode()) ? SALUTATIONS.getRight(avamJobAdvertisement.getKpFragenAnredeCode()) : Salutation.MR)
+                    .setSalutation(hasText(avamJobAdvertisement.getKpFragenAnredeCode()) ? SALUTATIONS.getRight(avamJobAdvertisement.getKpFragenAnredeCode()) : Salutation.MR)
                     .setFirstName(safeTrimOrNull(avamJobAdvertisement.getKpFragenVorname()))
                     .setLastName(safeTrimOrNull(avamJobAdvertisement.getKpFragenName()))
                     .setPhone(sanitizePhoneNumber(safeTrimOrNull(avamJobAdvertisement.getKpFragenTelefonNr()), avamJobAdvertisement))
