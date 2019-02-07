@@ -137,6 +137,77 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    public void shouldSearchForAbroadJobs() throws Exception {
+        // GIVEN
+        index(createJobWithLocation(job01.id(),
+                testLocation()
+                        .setCity("Bern")
+                        .setCommunalCode("351")
+                        .setRegionCode("BE01")
+                        .setCantonCode("BE")
+                        .setPostalCode("3000")
+                        .setCountryIsoCode("CH")
+                        .build()));
+        index(createJobWithLocation(job02.id(),
+                testLocation()
+                        .setCity("Ausland")
+                        .setCommunalCode("9999")
+                        .setRegionCode("A")
+                        .setCantonCode("99")
+                        .setPostalCode(null)
+                        .setCountryIsoCode(null)
+                        .build()));
+        index(createJobWithLocation(job03.id(),
+                testLocation()
+                        .setCity("Ausland")
+                        .setCommunalCode("9999")
+                        .setRegionCode("A")
+                        .setCantonCode("99")
+                        .setPostalCode(null)
+                        .setCountryIsoCode(null)
+                        .build()));
+        index(createJobWithLocation(job04.id(),
+                testLocation()
+                        .setCity("Ausland")
+                        .setCommunalCode("9999")
+                        .setRegionCode("A")
+                        .setCantonCode("99")
+                        .setPostalCode(null)
+                        .setCountryIsoCode(null)
+                        .build()));
+        index(createJobWithLocation(job05.id(),
+                testLocation()
+                        .setCity("Zürich")
+                        .setCommunalCode("261")
+                        .setRegionCode("ZH01")
+                        .setCantonCode("ZH")
+                        .setPostalCode("8000")
+                        .setCountryIsoCode("CH")
+                        .build()));
+
+
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"9999"});
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
+        );
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "3"));
+    }
+
+    private ResultActions post(Object request, String urlTemplate) throws Exception {
+        return mockMvc.perform(
+                MockMvcRequestBuilders.post(urlTemplate)
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(request))
+        );
+    }
+
+    @Test
     public void shouldNotSearchPeaJobsWithoutQuery() throws Exception {
         // GIVEN
         index(createJob(job01.id()));
@@ -1125,13 +1196,6 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("<em>ZurichA</em>")));
     }
 
-    private ResultActions post(Object request, String urlTemplate) throws Exception {
-        return mockMvc.perform(
-                MockMvcRequestBuilders.post(urlTemplate)
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(request))
-        );
-    }
 
     private void index(JobAdvertisement jobAdvertisement) {
         this.jobAdvertisementElasticsearchRepository.save(new JobAdvertisementDocument(jobAdvertisement));
@@ -1142,4 +1206,5 @@ public class JobAdvertisementSearchControllerIntTest {
             index(jobAdvertisementBuilder.build());
         }
     }
+
 }
