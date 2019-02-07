@@ -196,7 +196,14 @@ public class JobAdvertisementSearchControllerIntTest {
 
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(header().string("X-Total-Count", "3"));
+                .andExpect(header().string("X-Total-Count", "3"))
+                .andExpect(jsonPath("$.[0].id").value(equalTo("job02")))
+                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Ausland")))
+                .andExpect(jsonPath("$.[1].id").value(equalTo("job03")))
+                .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("Ausland")))
+                .andExpect(jsonPath("$.[2].id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("Ausland")));
+
     }
 
     private ResultActions post(Object request, String urlTemplate) throws Exception {
