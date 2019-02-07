@@ -139,52 +139,7 @@ public class JobAdvertisementSearchControllerIntTest {
     @Test
     public void shouldSearchForAbroadJobs() throws Exception {
         // GIVEN
-        index(createJobWithLocation(job01.id(),
-                testLocation()
-                        .setCity("Bern")
-                        .setCommunalCode("351")
-                        .setRegionCode("BE01")
-                        .setCantonCode("BE")
-                        .setPostalCode("3000")
-                        .setCountryIsoCode("CH")
-                        .build()));
-        index(createJobWithLocation(job02.id(),
-                testLocation()
-                        .setCity("Ausland")
-                        .setCommunalCode("9999")
-                        .setRegionCode("A")
-                        .setCantonCode("99")
-                        .setPostalCode(null)
-                        .setCountryIsoCode(null)
-                        .build()));
-        index(createJobWithLocation(job03.id(),
-                testLocation()
-                        .setCity("Ausland")
-                        .setCommunalCode("9999")
-                        .setRegionCode("A")
-                        .setCantonCode("99")
-                        .setPostalCode(null)
-                        .setCountryIsoCode(null)
-                        .build()));
-        index(createJobWithLocation(job04.id(),
-                testLocation()
-                        .setCity("Ausland")
-                        .setCommunalCode("9999")
-                        .setRegionCode("A")
-                        .setCantonCode("99")
-                        .setPostalCode(null)
-                        .setCountryIsoCode(null)
-                        .build()));
-        index(createJobWithLocation(job05.id(),
-                testLocation()
-                        .setCity("Zürich")
-                        .setCommunalCode("261")
-                        .setRegionCode("ZH01")
-                        .setCantonCode("ZH")
-                        .setPostalCode("8000")
-                        .setCountryIsoCode("CH")
-                        .build()));
-
+        createTestDataForAbroadJobs();
 
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
         jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"9999"});
@@ -206,12 +161,31 @@ public class JobAdvertisementSearchControllerIntTest {
 
     }
 
-    private ResultActions post(Object request, String urlTemplate) throws Exception {
-        return mockMvc.perform(
-                MockMvcRequestBuilders.post(urlTemplate)
+    @Test
+    public void shouldSearchForAbroadAndBernJobs() throws Exception {
+        // GIVEN
+        createTestDataForAbroadJobs();
+
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"9999", "351"});
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(request))
+                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
         );
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "4"))
+                .andExpect(jsonPath("$.[0].id").value(equalTo("job01")))
+                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Bern")))
+                .andExpect(jsonPath("$.[1].id").value(equalTo("job02")))
+                .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("Ausland")))
+                .andExpect(jsonPath("$.[2].id").value(equalTo("job03")))
+                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("Ausland")))
+                .andExpect(jsonPath("$.[3].id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[3].jobContent.location.city").value(equalTo("Ausland")));
+
     }
 
     @Test
@@ -1212,6 +1186,62 @@ public class JobAdvertisementSearchControllerIntTest {
         for (JobAdvertisement.Builder jobAdvertisementBuilder : jobAdvertisementBuilders) {
             index(jobAdvertisementBuilder.build());
         }
+    }
+
+    private void createTestDataForAbroadJobs() {
+        index(createJobWithLocation(job01.id(),
+                testLocation()
+                        .setCity("Bern")
+                        .setCommunalCode("351")
+                        .setRegionCode("BE01")
+                        .setCantonCode("BE")
+                        .setPostalCode("3000")
+                        .setCountryIsoCode("CH")
+                        .build()));
+        index(createJobWithLocation(job02.id(),
+                testLocation()
+                        .setCity("Ausland")
+                        .setCommunalCode("7001")
+                        .setRegionCode("A")
+                        .setCantonCode("FL")
+                        .setPostalCode("9490")
+                        .setCountryIsoCode("LI")
+                        .build()));
+        index(createJobWithLocation(job03.id(),
+                testLocation()
+                        .setCity("Ausland")
+                        .setCommunalCode(null)
+                        .setRegionCode(null)
+                        .setCantonCode(null)
+                        .setPostalCode("91244")
+                        .setCountryIsoCode("FR")
+                        .build()));
+        index(createJobWithLocation(job04.id(),
+                testLocation()
+                        .setCity("Ausland")
+                        .setCommunalCode(null)
+                        .setRegionCode(null)
+                        .setCantonCode(null)
+                        .setPostalCode("94541")
+                        .setCountryIsoCode("DE")
+                        .build()));
+        index(createJobWithLocation(job05.id(),
+                testLocation()
+                        .setCity("Zürich")
+                        .setCommunalCode("261")
+                        .setRegionCode("ZH01")
+                        .setCantonCode("ZH")
+                        .setPostalCode("8000")
+                        .setCountryIsoCode("CH")
+                        .build()));
+    }
+
+    private ResultActions post(Object request, String urlTemplate) throws Exception {
+        return mockMvc.perform(
+                MockMvcRequestBuilders.post(urlTemplate)
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(request))
+        );
     }
 
 }
