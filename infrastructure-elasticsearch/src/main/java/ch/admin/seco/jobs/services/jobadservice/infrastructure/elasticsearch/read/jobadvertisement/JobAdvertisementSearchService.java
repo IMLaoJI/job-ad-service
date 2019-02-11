@@ -459,7 +459,10 @@ public class JobAdvertisementSearchService {
         }
         if (isNotEmpty(jobSearchRequest.getCommunalCodes())) {
             if (containsAbroadCode(jobSearchRequest.getCommunalCodes())) {
-                localityFilter.should(boolQuery().mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, SWITZERLAND_COUNTRY_ISO_CODE)));
+                localityFilter.should(boolQuery()
+                        .must(existsQuery(PATH_LOCATION_COUNTRY_ISO_CODE))
+                        .mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, SWITZERLAND_COUNTRY_ISO_CODE))
+                );
             }
             localityFilter.should(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
         }

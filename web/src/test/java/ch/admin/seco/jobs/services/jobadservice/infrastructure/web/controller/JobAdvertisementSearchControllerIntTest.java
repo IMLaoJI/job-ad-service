@@ -1234,6 +1234,15 @@ public class JobAdvertisementSearchControllerIntTest {
                         .setPostalCode("8000")
                         .setCountryIsoCode("CH")
                         .build()));
+        index(createJobWithLocation(job06.id(),
+                testLocation()
+                        .setCity("Lausanne")
+                        .setCommunalCode(null)
+                        .setRegionCode(null)
+                        .setCantonCode(null)
+                        .setPostalCode("1000")
+                        .setCountryIsoCode(null)
+                        .build()));
     }
 
     private ResultActions post(Object request, String urlTemplate) throws Exception {
