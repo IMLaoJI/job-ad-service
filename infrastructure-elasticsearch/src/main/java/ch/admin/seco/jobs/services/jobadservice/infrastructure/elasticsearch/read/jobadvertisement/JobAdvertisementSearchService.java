@@ -72,6 +72,7 @@ public class JobAdvertisementSearchService {
     private static final String PATH_LOCATION_REGION_CODE = PATH_CTX + "jobContent.location.regionCode";
     private static final String PATH_LOCATION_CITY = PATH_CTX + "jobContent.location.city";
     private static final String PATH_LOCATION_COUNTRY_ISO_CODE = PATH_CTX + "jobContent.location.countryIsoCode";
+    private static final String PATH_LOCATION_COORDINATES = PATH_CTX + "jobContent.location.coordinates";
     private static final String PATH_OCCUPATIONS = PATH_CTX + "jobContent.occupations";
     private static final String PATH_OCCUPATIONS_AVAM_OCCUPATION_CODE = PATH_OCCUPATIONS + ".avamOccupationCode";
     private static final String PATH_OCCUPATIONS_BFS_CODE = PATH_OCCUPATIONS + ".bfsCode";
@@ -347,6 +348,7 @@ public class JobAdvertisementSearchService {
                 statusFilter(jobSearchRequest),
                 displayFilter(jobSearchRequest),
                 publicationStartDateFilter(onlineSinceDays),
+                geoDistanceFilter(jobSearchRequest),
                 localityFilter(jobSearchRequest),
                 workingTimeFilter(jobSearchRequest),
                 contractTypeFilter(jobSearchRequest),
@@ -446,6 +448,17 @@ public class JobAdvertisementSearchService {
         }
 
         return contractTypeFilter;
+    }
+
+    private BoolQueryBuilder geoDistanceFilter(JobAdvertisementSearchRequest jobSearchRequest) {
+        //TODO
+
+        BoolQueryBuilder geoDistanceFilter = boolQuery();
+        if (jobSearchRequest.getCoordinates() != null) {
+            geoDistanceFilter.should(termsQuery(PATH_LOCATION_COORDINATES, jobSearchRequest.getCoordinates()));
+        }
+
+        return null;
     }
 
     private BoolQueryBuilder localityFilter(JobAdvertisementSearchRequest jobSearchRequest) {

@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.GeoPoint;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.Valid;
@@ -16,6 +17,7 @@ public class JobAdvertisementSearchRequest {
     private String[] communalCodes;
     private String[] regionCodes;
     private String[] cantonCodes;
+    private GeoPoint coordinates;
     @Range(min = 0, max = 100)
     private Integer workloadPercentageMin;
     @Range(min = 0, max = 100)
@@ -132,6 +134,14 @@ public class JobAdvertisementSearchRequest {
         this.euresDisplay = euresDisplay;
     }
 
+    public GeoPoint getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCoordinates(GeoPoint coordinates) {
+        this.coordinates = coordinates;
+    }
+
     @Override
     public String toString() {
         return "JobAdvertisementSearchRequest{" +
@@ -141,6 +151,7 @@ public class JobAdvertisementSearchRequest {
                 ", communalCodes=" + Arrays.toString(communalCodes) +
                 ", regionCodes=" + Arrays.toString(regionCodes) +
                 ", cantonCodes=" + Arrays.toString(cantonCodes) +
+                ", coordinates=" + coordinates +
                 ", workloadPercentageMin=" + workloadPercentageMin +
                 ", workloadPercentageMax=" + workloadPercentageMax +
                 ", permanent=" + permanent +
