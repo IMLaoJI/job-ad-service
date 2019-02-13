@@ -36,7 +36,7 @@ deploy:
 - provider: script
   skip_cleanup: true
   script: >-
-    ./gradlew bootJar pushDockerImage publish registerApps -Pprod -Pzipkin -x test -Pversion=${TRAVIS_JOB_NUMBER}-SNAPSHOT -PaddLatestTagToDockerImage=true --stacktrace
+    ./gradlew bootJar pushDockerImage publish -Pprod -Pzipkin -x test -Pversion=${TRAVIS_JOB_NUMBER}-SNAPSHOT -PaddLatestTagToDockerImage=true --stacktrace
     && .ci-travis/push-version-bump.sh ${TRAVIS_JOB_NUMBER}-SNAPSHOT ${GIT_USER} ${GIT_PWD}
   on:
     all_branches: true
