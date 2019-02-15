@@ -9,6 +9,7 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.Ela
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.unit.DistanceUnit;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.Operator;
@@ -348,7 +349,6 @@ public class JobAdvertisementSearchService {
                 statusFilter(jobSearchRequest),
                 displayFilter(jobSearchRequest),
                 publicationStartDateFilter(onlineSinceDays),
-                geoDistanceFilter(jobSearchRequest),
                 localityFilter(jobSearchRequest),
                 workingTimeFilter(jobSearchRequest),
                 contractTypeFilter(jobSearchRequest),
@@ -450,19 +450,14 @@ public class JobAdvertisementSearchService {
         return contractTypeFilter;
     }
 
-    private BoolQueryBuilder geoDistanceFilter(JobAdvertisementSearchRequest jobSearchRequest) {
-        //TODO
-
-        BoolQueryBuilder geoDistanceFilter = boolQuery();
-        if (jobSearchRequest.getCoordinates() != null) {
-            geoDistanceFilter.should(termsQuery(PATH_LOCATION_COORDINATES, jobSearchRequest.getCoordinates()));
-        }
-
-        return null;
-    }
-
     private BoolQueryBuilder localityFilter(JobAdvertisementSearchRequest jobSearchRequest) {
         BoolQueryBuilder localityFilter = boolQuery();
+
+        if (jobSearchRequest.getCoordinates() != null && jobSearchRequest.getDistance() != null) {
+            localityFilter.should(geoDistanceQuery(PATH_LOCATION_COORDINATES)
+                    .point(jobSearchRequest.getCoordinates().getLat(), jobSearchRequest.getCoordinates().getLon())
+                    .distance(jobSearchRequest.getDistance(), DistanceUnit.KILOMETERS));
+        }
 
         if (isNotEmpty(jobSearchRequest.getCantonCodes())) {
             localityFilter.should(termsQuery(PATH_LOCATION_CANTON_CODE, jobSearchRequest.getCantonCodes()));

@@ -18,6 +18,7 @@ public class JobAdvertisementSearchRequest {
     private String[] regionCodes;
     private String[] cantonCodes;
     private GeoPoint coordinates;
+    private String distance;
     @Range(min = 0, max = 100)
     private Integer workloadPercentageMin;
     @Range(min = 0, max = 100)
@@ -142,6 +143,18 @@ public class JobAdvertisementSearchRequest {
         this.coordinates = coordinates;
     }
 
+    public String getDistance() {
+        return distance;
+    }
+
+    public void setDistance(String distance) {
+        this.distance = distance;
+    }
+
+    public Boolean getPermanent() {
+        return permanent;
+    }
+
     @Override
     public String toString() {
         return "JobAdvertisementSearchRequest{" +
@@ -152,6 +165,7 @@ public class JobAdvertisementSearchRequest {
                 ", regionCodes=" + Arrays.toString(regionCodes) +
                 ", cantonCodes=" + Arrays.toString(cantonCodes) +
                 ", coordinates=" + coordinates +
+                ", distance=" + distance +
                 ", workloadPercentageMin=" + workloadPercentageMin +
                 ", workloadPercentageMax=" + workloadPercentageMax +
                 ", permanent=" + permanent +
