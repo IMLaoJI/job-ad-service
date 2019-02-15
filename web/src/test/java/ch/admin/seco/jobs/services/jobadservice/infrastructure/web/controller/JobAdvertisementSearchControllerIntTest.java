@@ -162,6 +162,105 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    public void shouldIgnoreGeoDistance() throws Exception {
+        // GIVEN
+        createTestDataForGeoDistance();
+
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCoordinates(null);
+        jobAdvertisementSearchRequest.setDistance("20");
+
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
+        );
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "4"));
+    }
+    @Test
+    public void shouldSearchForJobsNearBern() throws Exception {
+        // GIVEN
+        createTestDataForGeoDistance();
+        GeoPoint BernGeoPoint = new GeoPoint(7.441,46.948);
+
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCantonCodes(new String[]{"BE"});
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"351"});
+        jobAdvertisementSearchRequest.setCoordinates(BernGeoPoint);
+        jobAdvertisementSearchRequest.setDistance("20");
+
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
+        );
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "1"))
+                .andExpect(jsonPath("$.[0].id").value(equalTo("job01")))
+                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Bern")));
+    }
+
+    @Test
+    public void shouldSearchForJobsNearLausanne() throws Exception {
+        // GIVEN
+        createTestDataForGeoDistance();
+        GeoPoint LausanneGeoPoint = new GeoPoint(6.6523078,	46.552043);
+
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCantonCodes(new String[]{"VD"});
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"5586"});
+        jobAdvertisementSearchRequest.setCoordinates(LausanneGeoPoint);
+        jobAdvertisementSearchRequest.setDistance("20");
+
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
+        );
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "1"))
+                .andExpect(jsonPath("$.[0].id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Lausanne")));
+    }
+
+    @Test
+    public void shouldSearchForJobsIn80KmRadiusOfSion() throws Exception {
+        // GIVEN
+        createTestDataForGeoDistance();
+        GeoPoint SionGeoPoint = new GeoPoint(7.359,	46.234);
+
+
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCantonCodes(new String[]{"VS"});
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"6266"});
+        jobAdvertisementSearchRequest.setCoordinates(SionGeoPoint);
+        jobAdvertisementSearchRequest.setDistance("80");
+
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
+        );
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "3"))
+                .andExpect(jsonPath("$.[0].id").value(equalTo("job01")))
+                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Bern")))
+                .andExpect(jsonPath("$.[1].id").value(equalTo("job03")))
+                .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("Sion")))
+                .andExpect(jsonPath("$.[2].id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("Lausanne")));
+    }
+
+    @Test
     public void shouldSearchForAbroadAndBernJobs() throws Exception {
         // GIVEN
         createTestDataForAbroadJobs();
@@ -1186,6 +1285,49 @@ public class JobAdvertisementSearchControllerIntTest {
         for (JobAdvertisement.Builder jobAdvertisementBuilder : jobAdvertisementBuilders) {
             index(jobAdvertisementBuilder.build());
         }
+    }
+
+    private void createTestDataForGeoDistance() {
+        index(createJobWithLocation(job01.id(),
+                testLocation()
+                        .setCity("Bern")
+                        .setCommunalCode("351")
+                        .setRegionCode("BE01")
+                        .setCantonCode("BE")
+                        .setPostalCode("3000")
+                        .setCountryIsoCode("CH")
+                        .setCoordinates(new GeoPoint(7.441,46.948))
+                        .build()));
+        index(createJobWithLocation(job02.id(),
+                testLocation()
+                        .setCity("Zürich")
+                        .setCommunalCode("261")
+                        .setRegionCode("ZH12")
+                        .setCantonCode("ZH12")
+                        .setPostalCode("8000")
+                        .setCountryIsoCode("CH")
+                        .setCoordinates(new GeoPoint(8.47,	47.360508))
+                        .build()));
+        index(createJobWithLocation(job03.id(),
+                testLocation()
+                        .setCity("Sion")
+                        .setCommunalCode("6266")
+                        .setRegionCode("VS06")
+                        .setCantonCode("VS")
+                        .setPostalCode("1950")
+                        .setCountryIsoCode("CH")
+                        .setCoordinates(new GeoPoint(7.359,	46.234))
+                        .build()));
+        index(createJobWithLocation(job04.id(),
+                testLocation()
+                        .setCity("Lausanne")
+                        .setCommunalCode("5586")
+                        .setRegionCode("VD01")
+                        .setCantonCode("VD")
+                        .setPostalCode("1000")
+                        .setCountryIsoCode("CH")
+                        .setCoordinates(new GeoPoint(6.6523078,	46.552043))
+                        .build()));
     }
 
     private void createTestDataForAbroadJobs() {
