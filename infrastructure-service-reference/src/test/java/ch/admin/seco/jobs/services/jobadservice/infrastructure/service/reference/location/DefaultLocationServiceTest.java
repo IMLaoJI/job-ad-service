@@ -53,8 +53,8 @@ public class DefaultLocationServiceTest {
         assertThat(enriched.getCountryIsoCode()).isEqualTo("CH");
         assertThat(enriched.getPostalCode()).isEqualTo("2222");
         assertThat(enriched.getRegionCode()).isEqualTo("Bern");
-        assertThat(enriched.getCoordinates().getLatitude()).isEqualTo(3.);
-        assertThat(enriched.getCoordinates().getLongitude()).isEqualTo(5.);
+        assertThat(enriched.getCoordinates().getLat()).isEqualTo(3.);
+        assertThat(enriched.getCoordinates().getLon()).isEqualTo(5.);
     }
 
     @Test

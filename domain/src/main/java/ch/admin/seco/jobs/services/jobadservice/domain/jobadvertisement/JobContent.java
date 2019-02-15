@@ -109,8 +109,8 @@ public class JobContent implements ValueObject<JobContent> {
             @AttributeOverride(name = "regionCode", column = @Column(name = "LOCATION_REGION_CODE")),
             @AttributeOverride(name = "cantonCode", column = @Column(name = "LOCATION_CANTON_CODE")),
             @AttributeOverride(name = "countryIsoCode", column = @Column(name = "LOCATION_COUNTRY_ISO_CODE")),
-            @AttributeOverride(name = "coordinates.longitude", column = @Column(name = "LOCATION_LONGITUDE")),
-            @AttributeOverride(name = "coordinates.latitude", column = @Column(name = "LOCATION_LATITUDE"))
+            @AttributeOverride(name = "coordinates.lon", column = @Column(name = "LOCATION_LON")),
+            @AttributeOverride(name = "coordinates.lat", column = @Column(name = "LOCATION_LAT"))
     })
     @Valid
     private Location location;
