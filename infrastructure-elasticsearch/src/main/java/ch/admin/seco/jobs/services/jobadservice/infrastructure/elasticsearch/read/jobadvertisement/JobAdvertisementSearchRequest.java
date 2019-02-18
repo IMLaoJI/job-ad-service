@@ -147,10 +147,6 @@ public class JobAdvertisementSearchRequest {
         this.radiusSearchDto = radiusSearchDto;
     }
 
-    public Boolean getPermanent() {
-        return permanent;
-    }
-
     @Override
     public String toString() {
         return "JobAdvertisementSearchRequest{" +
