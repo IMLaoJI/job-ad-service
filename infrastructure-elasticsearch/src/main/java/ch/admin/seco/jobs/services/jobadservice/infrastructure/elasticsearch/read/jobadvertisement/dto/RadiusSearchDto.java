@@ -7,11 +7,11 @@ import javax.validation.constraints.NotNull;
 public class RadiusSearchDto {
 
     @NotNull
-    GeoPointDto geoPoint;
+    private GeoPointDto geoPoint;
 
     @Min(10)
     @NotNull
-    Integer distance;
+    private Integer distance;
 
     public GeoPointDto getGeoPoint() {
         return geoPoint;
