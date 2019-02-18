@@ -57,7 +57,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
-@ActiveProfiles("local")
+@ActiveProfiles("dev")
 public class JobAdvertisementSearchControllerIntTest {
 
     private static final String DEFAULT_AVAM_CODE = "11111";
@@ -171,7 +171,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
         jobAdvertisementSearchRequest.setCoordinates(null);
-        jobAdvertisementSearchRequest.setDistance("20");
+        jobAdvertisementSearchRequest.setDistance(20);
 
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -202,7 +202,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
         jobAdvertisementSearchRequest.setCoordinates(BernGeoPoint);
-        jobAdvertisementSearchRequest.setDistance("200");
+        jobAdvertisementSearchRequest.setDistance(150);
 
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -226,7 +226,7 @@ public class JobAdvertisementSearchControllerIntTest {
         jobAdvertisementSearchRequest.setCantonCodes(new String[]{"BE"});
         jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"351"});
         jobAdvertisementSearchRequest.setCoordinates(BernGeoPoint);
-        jobAdvertisementSearchRequest.setDistance("20");
+        jobAdvertisementSearchRequest.setDistance(20);
 
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -251,7 +251,7 @@ public class JobAdvertisementSearchControllerIntTest {
         jobAdvertisementSearchRequest.setCantonCodes(new String[]{"VD"});
         jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"5586"});
         jobAdvertisementSearchRequest.setCoordinates(LausanneGeoPoint);
-        jobAdvertisementSearchRequest.setDistance("20");
+        jobAdvertisementSearchRequest.setDistance(20);
 
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -277,7 +277,7 @@ public class JobAdvertisementSearchControllerIntTest {
         jobAdvertisementSearchRequest.setCantonCodes(new String[]{"VS"});
         jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"6266"});
         jobAdvertisementSearchRequest.setCoordinates(SionGeoPoint);
-        jobAdvertisementSearchRequest.setDistance("80");
+        jobAdvertisementSearchRequest.setDistance(80);
 
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")

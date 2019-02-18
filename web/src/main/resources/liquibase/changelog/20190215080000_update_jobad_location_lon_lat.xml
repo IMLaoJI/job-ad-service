@@ -5,8 +5,8 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
     <changeSet author="fago" id="20190215080000-1">
-        <renameColumn tableName="JOB_ADVERTISEMENT" oldColumnName="location_latitude" newColumnName="location_lat"/>
-        <renameColumn tableName="JOB_ADVERTISEMENT" oldColumnName="location_longitude" newColumnName="location_lon"/>
+        <renameColumn tableName="JOB_ADVERTISEMENT" oldColumnName="LOCATION_LATITUDE" newColumnName="LOCATION_LAT"/>
+        <renameColumn tableName="JOB_ADVERTISEMENT" oldColumnName="LOCATION_LONGITUDE" newColumnName="LOCATION_LON"/>
     </changeSet>
 
 </databaseChangeLog>

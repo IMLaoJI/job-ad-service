@@ -18,7 +18,8 @@ public class JobAdvertisementSearchRequest {
     private String[] regionCodes;
     private String[] cantonCodes;
     private GeoPoint coordinates;
-    private String distance;
+    @Range(min = 10, max = 150)
+    private Integer distance;
     @Range(min = 0, max = 100)
     private Integer workloadPercentageMin;
     @Range(min = 0, max = 100)
@@ -143,11 +144,11 @@ public class JobAdvertisementSearchRequest {
         this.coordinates = coordinates;
     }
 
-    public String getDistance() {
+    public Integer getDistance() {
         return distance;
     }
 
-    public void setDistance(String distance) {
+    public void setDistance(Integer distance) {
         this.distance = distance;
     }
 
