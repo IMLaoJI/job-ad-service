@@ -1,6 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement;
 
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.GeoPoint;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.dto.RadiusSearchDto;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.Valid;
@@ -10,26 +10,37 @@ import java.util.Arrays;
 
 @ValidWorkingTimeRange
 public class JobAdvertisementSearchRequest {
+
     private String language;
+
     @Valid
     private ProfessionCode[] professionCodes;
+
     private String[] keywords;
+
     private String[] communalCodes;
-    private String[] regionCodes;
+
     private String[] cantonCodes;
-    private GeoPoint coordinates;
-    @Range(min = 10, max = 150)
-    private Integer distance;
+
+    @Valid
+    private RadiusSearchDto radiusSearchDto;
+
     @Range(min = 0, max = 100)
     private Integer workloadPercentageMin;
+
     @Range(min = 0, max = 100)
     private Integer workloadPercentageMax;
+
     private Boolean permanent;
+
     private String companyName;
+
     @Min(1)
     @Max(60)
     private Integer onlineSince;
+
     private Boolean displayRestricted;
+
     private Boolean euresDisplay;
 
     public String getLanguage() {
@@ -62,14 +73,6 @@ public class JobAdvertisementSearchRequest {
 
     public void setCommunalCodes(String[] communalCodes) {
         this.communalCodes = communalCodes;
-    }
-
-    public String[] getRegionCodes() {
-        return regionCodes;
-    }
-
-    public void setRegionCodes(String[] regionCodes) {
-        this.regionCodes = regionCodes;
     }
 
     public String[] getCantonCodes() {
@@ -136,20 +139,12 @@ public class JobAdvertisementSearchRequest {
         this.euresDisplay = euresDisplay;
     }
 
-    public GeoPoint getCoordinates() {
-        return coordinates;
+    public RadiusSearchDto getRadiusSearchDto() {
+        return radiusSearchDto;
     }
 
-    public void setCoordinates(GeoPoint coordinates) {
-        this.coordinates = coordinates;
-    }
-
-    public Integer getDistance() {
-        return distance;
-    }
-
-    public void setDistance(Integer distance) {
-        this.distance = distance;
+    public void setRadiusSearchDto(RadiusSearchDto radiusSearchDto) {
+        this.radiusSearchDto = radiusSearchDto;
     }
 
     public Boolean getPermanent() {
@@ -163,10 +158,8 @@ public class JobAdvertisementSearchRequest {
                 ", professionCodes=" + Arrays.toString(professionCodes) +
                 ", keywords=" + Arrays.toString(keywords) +
                 ", communalCodes=" + Arrays.toString(communalCodes) +
-                ", regionCodes=" + Arrays.toString(regionCodes) +
                 ", cantonCodes=" + Arrays.toString(cantonCodes) +
-                ", coordinates=" + coordinates +
-                ", distance=" + distance +
+                ", radiusSearchDto=" + radiusSearchDto +
                 ", workloadPercentageMin=" + workloadPercentageMin +
                 ", workloadPercentageMax=" + workloadPercentageMax +
                 ", permanent=" + permanent +
@@ -176,4 +169,5 @@ public class JobAdvertisementSearchRequest {
                 ", euresDisplay=" + euresDisplay +
                 '}';
     }
+
 }

@@ -6,6 +6,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUser
 import ch.admin.seco.jobs.services.jobadservice.application.security.Role;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.dto.RadiusSearchDto;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
 import org.elasticsearch.action.search.SearchResponse;
@@ -70,7 +71,6 @@ public class JobAdvertisementSearchService {
     private static final String PATH_DESCRIPTION = PATH_CTX + "jobContent.jobDescriptions.description";
     private static final String PATH_LOCATION_CANTON_CODE = PATH_CTX + "jobContent.location.cantonCode";
     private static final String PATH_LOCATION_COMMUNAL_CODE = PATH_CTX + "jobContent.location.communalCode";
-    private static final String PATH_LOCATION_REGION_CODE = PATH_CTX + "jobContent.location.regionCode";
     private static final String PATH_LOCATION_CITY = PATH_CTX + "jobContent.location.city";
     private static final String PATH_LOCATION_COUNTRY_ISO_CODE = PATH_CTX + "jobContent.location.countryIsoCode";
     private static final String PATH_LOCATION_COORDINATES = PATH_CTX + "jobContent.location.coordinates";
@@ -453,17 +453,15 @@ public class JobAdvertisementSearchService {
     private BoolQueryBuilder localityFilter(JobAdvertisementSearchRequest jobSearchRequest) {
         BoolQueryBuilder localityFilter = boolQuery();
 
-        if (jobSearchRequest.getCoordinates() != null && jobSearchRequest.getDistance() != null) {
+        if (hasGeoPointInformation(jobSearchRequest)) {
+            RadiusSearchDto radiusSearchDto = extractRadiusSearchDto(jobSearchRequest);
             localityFilter.should(geoDistanceQuery(PATH_LOCATION_COORDINATES)
-                    .point(jobSearchRequest.getCoordinates().getLat(), jobSearchRequest.getCoordinates().getLon())
-                    .distance(jobSearchRequest.getDistance(), DistanceUnit.KILOMETERS));
+                    .point(radiusSearchDto.getGeoPoint().getLat(), radiusSearchDto.getGeoPoint().getLon())
+                    .distance(radiusSearchDto.getDistance(), DistanceUnit.KILOMETERS));
         }
 
         if (isNotEmpty(jobSearchRequest.getCantonCodes())) {
             localityFilter.should(termsQuery(PATH_LOCATION_CANTON_CODE, jobSearchRequest.getCantonCodes()));
-        }
-        if (isNotEmpty(jobSearchRequest.getRegionCodes())) {
-            localityFilter.should(termsQuery(PATH_LOCATION_REGION_CODE, jobSearchRequest.getRegionCodes()));
         }
         if (isNotEmpty(jobSearchRequest.getCommunalCodes())) {
             if (containsAbroadCode(jobSearchRequest.getCommunalCodes())) {
@@ -476,6 +474,14 @@ public class JobAdvertisementSearchService {
         }
 
         return localityFilter;
+    }
+
+    private RadiusSearchDto extractRadiusSearchDto(JobAdvertisementSearchRequest jobSearchRequest) {
+        return jobSearchRequest.getRadiusSearchDto();
+    }
+
+    private boolean hasGeoPointInformation(JobAdvertisementSearchRequest jobSearchRequest) {
+        return jobSearchRequest.getRadiusSearchDto() != null;
     }
 
     private boolean containsAbroadCode(String[] communalCodes) {

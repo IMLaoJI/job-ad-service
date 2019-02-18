@@ -1,6 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
 import ch.admin.seco.jobs.services.jobadservice.Application;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.GeoPointDto;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
 import ch.admin.seco.jobs.services.jobadservice.application.security.Role;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
@@ -9,6 +10,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.*;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.dto.RadiusSearchDto;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
@@ -61,8 +63,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class JobAdvertisementSearchControllerIntTest {
 
     private static final String DEFAULT_AVAM_CODE = "11111";
+
     private static final String DEFAULT_BFS_CODE = "11111111";
+
     private static final String API_JOB_ADVERTISEMENTS = "/api/jobAdvertisements";
+
+    private static final String LAUSANNE_COMMUNAL_CODE = "5586";
+
+    private static final String BERN_COMMUNAL_CODE = "351";
+
+    private static final String SION_COMMUNAL_CODE = "6266";
+
+    private static final String ABROAD_COMMUNAL_CODE = "9999";
+
+    private static final GeoPointDto BERN_GEO_POINT = new GeoPointDto().setLat(46.948).setLon(7.441);
+
+    private static final GeoPointDto LAUSANNE_GEO_POINT = new GeoPointDto().setLat(46.552043).setLon(6.6523078);
+
+    private static final GeoPointDto SION_GEO_POINT =  new GeoPointDto().setLat(46.234).setLon(7.359);
 
     @Autowired
     private JobAdvertisementRepository jobAdvertisementJpaRepository;
@@ -75,7 +93,6 @@ public class JobAdvertisementSearchControllerIntTest {
 
     @Autowired
     private ElasticsearchConfiguration.CustomEntityMapper customEntityMapper;
-
 
     @Autowired
     private FormattingConversionService formattingConversionService;
@@ -144,6 +161,7 @@ public class JobAdvertisementSearchControllerIntTest {
         // GIVEN
         index(listOfJobAdsForAbroadSearchTests());
 
+        // WHEN
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
         jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"9999"});
         ResultActions resultActions = mockMvc.perform(
@@ -165,14 +183,13 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
-    public void shouldIgnoreGeoDistance() throws Exception {
+    public void shouldIgnoreGeoDistanceWhenNoRadiusSearchDtoProvided() throws Exception {
         // GIVEN
         index(listOfJobAdsForGeoDistanceTests());
 
+        // WHEN
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCoordinates(null);
-        jobAdvertisementSearchRequest.setDistance(20);
-
+        jobAdvertisementSearchRequest.setRadiusSearchDto(null);
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -187,12 +204,10 @@ public class JobAdvertisementSearchControllerIntTest {
     @Test
     public void shouldIgnoreJobWithoutGeoPoint() throws Exception {
         // GIVEN
-        GeoPoint BernGeoPoint = new GeoPoint(7.441, 46.948);
-
         index(createJobWithLocation(job01.id(),
                 testLocation()
                         .setCity("Bern")
-                        .setCommunalCode("351")
+                        .setCommunalCode(BERN_COMMUNAL_CODE)
                         .setRegionCode("BE01")
                         .setCantonCode("BE")
                         .setPostalCode("3000")
@@ -200,10 +215,9 @@ public class JobAdvertisementSearchControllerIntTest {
                         .setCoordinates(null)
                         .build()));
 
+        // WHEN
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCoordinates(BernGeoPoint);
-        jobAdvertisementSearchRequest.setDistance(150);
-
+        jobAdvertisementSearchRequest.setRadiusSearchDto(new RadiusSearchDto().setGeoPoint(BERN_GEO_POINT).setDistance(150));
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -217,17 +231,14 @@ public class JobAdvertisementSearchControllerIntTest {
 
 
     @Test
-    public void shouldSearchForJobsNearBern() throws Exception {
+    public void shouldSearchForJobsIn20KmRadiusOfBern() throws Exception {
         // GIVEN
         index(listOfJobAdsForGeoDistanceTests());
-        GeoPoint BernGeoPoint = new GeoPoint(7.441, 46.948);
 
+        // WHEN
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCantonCodes(new String[]{"BE"});
-        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"351"});
-        jobAdvertisementSearchRequest.setCoordinates(BernGeoPoint);
-        jobAdvertisementSearchRequest.setDistance(20);
-
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{BERN_COMMUNAL_CODE});
+        jobAdvertisementSearchRequest.setRadiusSearchDto(new RadiusSearchDto().setGeoPoint(BERN_GEO_POINT).setDistance(20));
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -242,16 +253,13 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
-    public void shouldSearchForJobsNearLausanne() throws Exception {
+    public void shouldSearchForJobsIn20KmRadiusOfLausanne() throws Exception {
         // GIVEN
         index(listOfJobAdsForGeoDistanceTests());
-        GeoPoint LausanneGeoPoint = new GeoPoint(6.6523078, 46.552043);
 
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCantonCodes(new String[]{"VD"});
-        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"5586"});
-        jobAdvertisementSearchRequest.setCoordinates(LausanneGeoPoint);
-        jobAdvertisementSearchRequest.setDistance(20);
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE});
+        jobAdvertisementSearchRequest.setRadiusSearchDto(new RadiusSearchDto().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(20));
 
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -270,14 +278,11 @@ public class JobAdvertisementSearchControllerIntTest {
     public void shouldSearchForJobsIn80KmRadiusOfSion() throws Exception {
         // GIVEN
         index(listOfJobAdsForGeoDistanceTests());
-        GeoPoint SionGeoPoint = new GeoPoint(7.359, 46.234);
 
 
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCantonCodes(new String[]{"VS"});
-        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"6266"});
-        jobAdvertisementSearchRequest.setCoordinates(SionGeoPoint);
-        jobAdvertisementSearchRequest.setDistance(80);
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{SION_COMMUNAL_CODE});
+        jobAdvertisementSearchRequest.setRadiusSearchDto(new RadiusSearchDto().setGeoPoint(SION_GEO_POINT).setDistance(80));
 
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -302,7 +307,7 @@ public class JobAdvertisementSearchControllerIntTest {
         index(listOfJobAdsForAbroadSearchTests());
 
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"9999", "351"});
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{ABROAD_COMMUNAL_CODE, BERN_COMMUNAL_CODE});
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
