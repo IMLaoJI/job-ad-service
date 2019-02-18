@@ -57,7 +57,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
-@ActiveProfiles("dev")
+@ActiveProfiles("local")
 public class JobAdvertisementSearchControllerIntTest {
 
     private static final String DEFAULT_AVAM_CODE = "11111";
@@ -183,6 +183,38 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "4"));
     }
+
+    @Test
+    public void shouldIgnoreJobWithoutGeoPoint() throws Exception {
+        // GIVEN
+        GeoPoint BernGeoPoint = new GeoPoint(7.441, 46.948);
+
+        index(createJobWithLocation(job01.id(),
+                testLocation()
+                        .setCity("Bern")
+                        .setCommunalCode("351")
+                        .setRegionCode("BE01")
+                        .setCantonCode("BE")
+                        .setPostalCode("3000")
+                        .setCountryIsoCode("CH")
+                        .setCoordinates(null)
+                        .build()));
+
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCoordinates(BernGeoPoint);
+        jobAdvertisementSearchRequest.setDistance("200");
+
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
+        );
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "0"));
+    }
+
 
     @Test
     public void shouldSearchForJobsNearBern() throws Exception {
