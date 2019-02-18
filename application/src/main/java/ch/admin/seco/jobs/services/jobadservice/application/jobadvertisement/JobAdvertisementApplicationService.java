@@ -253,8 +253,6 @@ public class JobAdvertisementApplicationService {
             publicationEndDate = publicationStartDate.plusDays(PUBLICATION_MAX_DAYS);
         }
         final JobAdvertisementCreator creator = new JobAdvertisementCreator.Builder(currentUserContext.getAuditUser())
-                .setStellennummerEgov(createJobAdvertisementFromX28Dto.getStellennummerEgov())
-                .setStellennummerAvam(createJobAdvertisementFromX28Dto.getStellennummerAvam())
                 .setFingerprint(createJobAdvertisementFromX28Dto.getFingerprint())
                 .setJobContent(jobContent)
                 .setContact(toContact(createJobAdvertisementFromX28Dto.toContactDto()))
