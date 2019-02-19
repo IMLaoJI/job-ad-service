@@ -452,7 +452,7 @@ public class JobAdvertisementSearchService {
     private BoolQueryBuilder localityFilter(JobAdvertisementSearchRequest jobSearchRequest) {
         BoolQueryBuilder localityFilter = boolQuery();
 
-        if (hasGeoPointInformation(jobSearchRequest)) {
+        if (hasRadiusSearchRequest(jobSearchRequest)) {
             RadiusSearchRequest radiusSearchRequest = jobSearchRequest.getRadiusSearchRequest();
             localityFilter.should(geoDistanceQuery(PATH_LOCATION_COORDINATES)
                     .point(radiusSearchRequest.getGeoPoint().getLat(), radiusSearchRequest.getGeoPoint().getLon())
@@ -475,7 +475,7 @@ public class JobAdvertisementSearchService {
         return localityFilter;
     }
 
-    private boolean hasGeoPointInformation(JobAdvertisementSearchRequest jobSearchRequest) {
+    private boolean hasRadiusSearchRequest(JobAdvertisementSearchRequest jobSearchRequest) {
         return jobSearchRequest.getRadiusSearchRequest() != null;
     }
 
