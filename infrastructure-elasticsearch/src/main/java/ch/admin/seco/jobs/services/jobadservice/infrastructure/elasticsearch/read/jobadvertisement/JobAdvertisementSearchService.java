@@ -6,7 +6,6 @@ import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUser
 import ch.admin.seco.jobs.services.jobadservice.application.security.Role;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.dto.RadiusSearchDto;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
 import org.elasticsearch.action.search.SearchResponse;
@@ -454,10 +453,10 @@ public class JobAdvertisementSearchService {
         BoolQueryBuilder localityFilter = boolQuery();
 
         if (hasGeoPointInformation(jobSearchRequest)) {
-            RadiusSearchDto radiusSearchDto = extractRadiusSearchDto(jobSearchRequest);
+            RadiusSearchRequest radiusSearchRequest = extractRadiusSearchDto(jobSearchRequest);
             localityFilter.should(geoDistanceQuery(PATH_LOCATION_COORDINATES)
-                    .point(radiusSearchDto.getGeoPoint().getLat(), radiusSearchDto.getGeoPoint().getLon())
-                    .distance(radiusSearchDto.getDistance(), DistanceUnit.KILOMETERS));
+                    .point(radiusSearchRequest.getGeoPoint().getLat(), radiusSearchRequest.getGeoPoint().getLon())
+                    .distance(radiusSearchRequest.getDistance(), DistanceUnit.KILOMETERS));
         }
 
         if (isNotEmpty(jobSearchRequest.getCantonCodes())) {
@@ -476,12 +475,12 @@ public class JobAdvertisementSearchService {
         return localityFilter;
     }
 
-    private RadiusSearchDto extractRadiusSearchDto(JobAdvertisementSearchRequest jobSearchRequest) {
-        return jobSearchRequest.getRadiusSearchDto();
+    private RadiusSearchRequest extractRadiusSearchDto(JobAdvertisementSearchRequest jobSearchRequest) {
+        return jobSearchRequest.getRadiusSearchRequest();
     }
 
     private boolean hasGeoPointInformation(JobAdvertisementSearchRequest jobSearchRequest) {
-        return jobSearchRequest.getRadiusSearchDto() != null;
+        return jobSearchRequest.getRadiusSearchRequest() != null;
     }
 
     private boolean containsAbroadCode(String[] communalCodes) {

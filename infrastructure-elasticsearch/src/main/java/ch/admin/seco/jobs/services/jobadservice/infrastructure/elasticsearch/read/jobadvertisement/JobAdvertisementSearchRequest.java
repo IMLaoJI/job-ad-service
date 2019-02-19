@@ -1,6 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement;
 
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.dto.RadiusSearchDto;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.Valid;
@@ -23,7 +22,7 @@ public class JobAdvertisementSearchRequest {
     private String[] cantonCodes;
 
     @Valid
-    private RadiusSearchDto radiusSearchDto;
+    private RadiusSearchRequest radiusSearchRequest;
 
     @Range(min = 0, max = 100)
     private Integer workloadPercentageMin;
@@ -139,12 +138,12 @@ public class JobAdvertisementSearchRequest {
         this.euresDisplay = euresDisplay;
     }
 
-    public RadiusSearchDto getRadiusSearchDto() {
-        return radiusSearchDto;
+    public RadiusSearchRequest getRadiusSearchRequest() {
+        return radiusSearchRequest;
     }
 
-    public void setRadiusSearchDto(RadiusSearchDto radiusSearchDto) {
-        this.radiusSearchDto = radiusSearchDto;
+    public void setRadiusSearchRequest(RadiusSearchRequest radiusSearchRequest) {
+        this.radiusSearchRequest = radiusSearchRequest;
     }
 
     @Override
@@ -155,7 +154,7 @@ public class JobAdvertisementSearchRequest {
                 ", keywords=" + Arrays.toString(keywords) +
                 ", communalCodes=" + Arrays.toString(communalCodes) +
                 ", cantonCodes=" + Arrays.toString(cantonCodes) +
-                ", radiusSearchDto=" + radiusSearchDto +
+                ", radiusSearchRequest=" + radiusSearchRequest +
                 ", workloadPercentageMin=" + workloadPercentageMin +
                 ", workloadPercentageMax=" + workloadPercentageMax +
                 ", permanent=" + permanent +

@@ -10,7 +10,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.*;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.dto.RadiusSearchDto;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.RadiusSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
@@ -189,7 +189,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         // WHEN
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setRadiusSearchDto(null);
+        jobAdvertisementSearchRequest.setRadiusSearchRequest(null);
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -217,7 +217,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         // WHEN
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setRadiusSearchDto(new RadiusSearchDto().setGeoPoint(BERN_GEO_POINT).setDistance(150));
+        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(BERN_GEO_POINT).setDistance(150));
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -238,7 +238,7 @@ public class JobAdvertisementSearchControllerIntTest {
         // WHEN
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
         jobAdvertisementSearchRequest.setCommunalCodes(new String[]{BERN_COMMUNAL_CODE});
-        jobAdvertisementSearchRequest.setRadiusSearchDto(new RadiusSearchDto().setGeoPoint(BERN_GEO_POINT).setDistance(20));
+        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(BERN_GEO_POINT).setDistance(20));
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -259,7 +259,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
         jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE});
-        jobAdvertisementSearchRequest.setRadiusSearchDto(new RadiusSearchDto().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(20));
+        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(20));
 
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
@@ -282,7 +282,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
         jobAdvertisementSearchRequest.setCommunalCodes(new String[]{SION_COMMUNAL_CODE});
-        jobAdvertisementSearchRequest.setRadiusSearchDto(new RadiusSearchDto().setGeoPoint(SION_GEO_POINT).setDistance(80));
+        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(SION_GEO_POINT).setDistance(80));
 
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")

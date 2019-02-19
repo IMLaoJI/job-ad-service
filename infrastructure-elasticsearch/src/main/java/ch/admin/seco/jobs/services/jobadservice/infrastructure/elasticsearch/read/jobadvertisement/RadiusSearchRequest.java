@@ -1,10 +1,10 @@
-package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.dto;
+package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.GeoPointDto;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-public class RadiusSearchDto {
+public class RadiusSearchRequest {
 
     @NotNull
     private GeoPointDto geoPoint;
@@ -17,7 +17,7 @@ public class RadiusSearchDto {
         return geoPoint;
     }
 
-    public RadiusSearchDto setGeoPoint(GeoPointDto geoPoint) {
+    public RadiusSearchRequest setGeoPoint(GeoPointDto geoPoint) {
         this.geoPoint = geoPoint;
         return this;
     }
@@ -26,7 +26,7 @@ public class RadiusSearchDto {
         return distance;
     }
 
-    public RadiusSearchDto setDistance(Integer distance) {
+    public RadiusSearchRequest setDistance(Integer distance) {
         this.distance = distance;
         return this;
     }
