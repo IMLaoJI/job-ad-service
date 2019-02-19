@@ -183,7 +183,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
-    public void shouldIgnoreGeoDistanceWhenNoRadiusSearchDtoProvided() throws Exception {
+    public void shouldIgnoreGeoDistanceWhenNoRadiusSearchRequestIsProvided() throws Exception {
         // GIVEN
         index(listOfJobAdsForGeoDistanceTests());
 
