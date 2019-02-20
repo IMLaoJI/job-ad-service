@@ -55,8 +55,8 @@ public class JobAdvertisementFromApiAssembler {
 	CancellationDto convert(CancellationResource cancellation) {
 		return new CancellationDto()
 				.setCancellationCode(cancellation.getCode())
-				.setSourceSystem(SourceSystem.API)
-				.setCancellationDate(TimeMachine.now().toLocalDate());
+				.setCancellationDate(TimeMachine.now().toLocalDate())
+				.setCancelledBy(SourceSystem.API);
 	}
 
 	private ContactDto convertContact(ApiContactDto apiContact) {
