@@ -996,7 +996,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
-    public void shouldSearchManagedJobAdBeSearchedAndSortedByDateAndCreatedDate() throws Exception {
+    public void shouldSearchManagedJobAdBeSearchedAndSortedByDateAndCreatedTime() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
 
