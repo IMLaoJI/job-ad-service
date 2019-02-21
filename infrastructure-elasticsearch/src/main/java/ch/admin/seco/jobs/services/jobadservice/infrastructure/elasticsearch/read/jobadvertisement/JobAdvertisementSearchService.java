@@ -165,6 +165,8 @@ public class JobAdvertisementSearchService {
             ManagedJobAdSearchRequest searchRequest,
             Pageable pageable) {
 
+        Pageable updatedPageable = appendUniqueSortingKey(pageable);
+
         SearchQuery query = new NativeSearchQueryBuilder()
                 .withQuery(createManagedJobAdsKeywordsQuery(searchRequest.getKeywordsText()))
                 .withFilter(mustAll(
@@ -172,7 +174,7 @@ public class JobAdvertisementSearchService {
                         ownerUserIdFilter(searchRequest.getOwnerUserId()),
                         ownerCompanyIdFilter(searchRequest.getCompanyId()),
                         stateFilter(searchRequest.getState())))
-                .withPageable(pageable)
+                .withPageable(updatedPageable)
                 .withHighlightFields(new HighlightBuilder.Field("*").fragmentSize(300).numOfFragments(1))
                 .build();
 
@@ -182,7 +184,13 @@ public class JobAdvertisementSearchService {
             LOG.trace("sort: {}", query.getSort());
         }
 
-        return elasticsearchTemplate.query(query, response -> extractHighlightedResults(pageable, response));
+        return elasticsearchTemplate.query(query, response -> extractHighlightedResults(updatedPageable, response));
+    }
+
+    private Pageable appendUniqueSortingKey(Pageable pageable) {
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort()
+                    .and(Sort.by(Sort.Direction.DESC, "jobAdvertisement.createdTime"))
+            );
     }
 
     private AggregatedPageImpl<JobAdvertisementDto> extractHighlightedResults(Pageable pageable, SearchResponse response) {
