@@ -6,11 +6,11 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
-import ch.admin.seco.jobs.services.jobadservice.application.security.Role;
 import org.springframework.stereotype.Component;
 
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUser;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
+import ch.admin.seco.jobs.services.jobadservice.application.security.Role;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
@@ -87,10 +87,12 @@ public class JobAdvertisementAuthorizationService {
     }
 
     private boolean canViewJob(JobAdvertisement jobAdvertisement) {
-        if(this.currentUserContext.hasRole(Role.SYSADMIN)) {
+        if (this.currentUserContext.hasRole(Role.SYSADMIN)) {
             return true;
         }
-        return (jobAdvertisement.getStatus() != JobAdvertisementStatus.PUBLISHED_RESTRICTED)
-                || (this.currentUserContext.getCurrentUser() != null);
+        if (jobAdvertisement.getStatus() != JobAdvertisementStatus.PUBLISHED_RESTRICTED) {
+            return true;
+        }
+        return this.currentUserContext.getCurrentUser() != null;
     }
 }
