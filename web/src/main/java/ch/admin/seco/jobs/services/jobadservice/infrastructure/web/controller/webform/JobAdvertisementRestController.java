@@ -139,6 +139,7 @@ public class JobAdvertisementRestController {
      * - 404 Not Found: No job ad has be found for the given id
      */
     @GetMapping("/{id}/events")
+    @PreAuthorize("hasRole(T(ch.admin.seco.jobs.services.jobadservice.application.security.Role).SYSADMIN.value)")
     public PageResource<EventData> getEventsOfJobAdvertisement(@PathVariable String id) throws AggregateNotFoundException {
         return PageResource.of(eventStore.findByAggregateId(id, JobAdvertisement.class.getSimpleName(), 0, 100));
     }
