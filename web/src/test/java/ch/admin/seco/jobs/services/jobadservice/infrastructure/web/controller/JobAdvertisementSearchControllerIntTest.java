@@ -597,7 +597,7 @@ public class JobAdvertisementSearchControllerIntTest {
     @Test
     public void shouldFilterByDisplayRestricted() throws Exception {
         // GIVEN
-        when(this.mockCurrentUserContext.hasRole(ArgumentMatchers.any())).thenReturn(true);
+        when(this.mockCurrentUserContext.hasAnyRoles(ArgumentMatchers.any())).thenReturn(true);
         index(createJob(job01.id()));
         index(createRestrictedJob(job02.id()));
         index(createJob(job03.id()));
@@ -709,7 +709,7 @@ public class JobAdvertisementSearchControllerIntTest {
     public void shouldShowRestrictedJobsForJobSeekers() throws Exception {
         // GIVEN
         //-----------------------------------------------------------------------------------publicDisplay restrictedDisplay status
-        when(this.mockCurrentUserContext.hasRole(ArgumentMatchers.any())).thenReturn(true);
+        when(this.mockCurrentUserContext.hasAnyRoles(ArgumentMatchers.any())).thenReturn(true);
         index(createJob(job01.id()));                                                           //1 0 PUBLISHED_PUBLIC
         index(createRestrictedJob(job02.id()));                                                 //1 0 PUBLISHED_RESTRICTED
         index(createRestrictedJobWithoutPublicDisplayAndWithoutRestrictedDisplay(job03.id()));  //0 0 PUBLISHED_RESTRICTED
