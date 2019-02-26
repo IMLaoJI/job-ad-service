@@ -3,6 +3,7 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.re
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
+import ch.admin.seco.jobs.services.jobadservice.application.IsSysAdmin;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -10,7 +11,6 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import ch.admin.seco.jobs.services.jobadservice.application.apiuser.dto.ApiUserDto;
@@ -33,7 +33,7 @@ public class ApiUserSearchService {
         this.apiUserElasticsearchRepository = apiUserElasticsearchRepository;
     }
 
-    @PreAuthorize("hasRole(T(ch.admin.seco.jobs.services.jobadservice.application.security.Role).SYSADMIN.value)")
+    @IsSysAdmin
     public Page<ApiUserDto> search(ApiUserSearchRequest searchRequest, Pageable pageable) {
         QueryBuilder query = StringUtils.isBlank(searchRequest.getQuery())
                 ? matchAllQuery()
