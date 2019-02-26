@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+    <changeSet author="fago" id="20190226080000-1">
+        <modifyDataType columnName="PUBLIC_CONTACT_FIRST_NAME"
+                        newDataType="VARCHAR(255)"
+                        tableName="JOB_ADVERTISEMENT"/>
+    </changeSet>
+    <changeSet author="fago" id="20190226080000-2">
+        <modifyDataType columnName="PUBLIC_CONTACT_LAST_NAME"
+                        newDataType="VARCHAR(255)"
+                        tableName="JOB_ADVERTISEMENT"/>
+    </changeSet>
+    <changeSet author="fago" id="20190226080000-3">
+        <modifyDataType columnName="PUBLIC_CONTACT_PHONE"
+                        newDataType="VARCHAR(20)"
+                        tableName="JOB_ADVERTISEMENT"/>
+    </changeSet>
+    <changeSet author="fago" id="20190226080000-4">
+        <modifyDataType columnName="COMPANY_POST_OFFICE_BOX_NUMBER"
+                        newDataType="VARCHAR(20)"
+                        tableName="JOB_ADVERTISEMENT"/>
+    </changeSet>
+    <changeSet author="fago" id="20190226080000-6">
+        <modifyDataType columnName="COMPANY_POST_OFFICE_BOX_POSTAL_CODE"
+                        newDataType="VARCHAR(10)"
+                        tableName="JOB_ADVERTISEMENT"/>
+    </changeSet>
+    <changeSet author="fago" id="20190226080000-7">
+        <modifyDataType columnName="DISPLAY_COMPANY_STREET"
+                        newDataType="VARCHAR(60)"
+                        tableName="JOB_ADVERTISEMENT"/>
+    </changeSet>
+    <changeSet author="fago" id="20190226080000-8">
+        <modifyDataType columnName="DISPLAY_COMPANY_POST_OFFICE_BOX_NUMBER"
+                        newDataType="VARCHAR(20)"
+                        tableName="JOB_ADVERTISEMENT"/>
+    </changeSet>
+    <changeSet author="fago" id="20190226080000-9">
+        <modifyDataType columnName="DISPLAY_COMPANY_POST_OFFICE_BOX_POSTAL_CODE"
+                        newDataType="VARCHAR(10)"
+                        tableName="JOB_ADVERTISEMENT"/>
+    </changeSet>
+    <changeSet author="fago" id="20190226080000-10">
+        <modifyDataType columnName="CONTACT_FIRST_NAME"
+                        newDataType="VARCHAR(255)"
+                        tableName="JOB_ADVERTISEMENT"/>
+    </changeSet>
+    <changeSet author="fago" id="20190226080000-11">
+        <modifyDataType columnName="CONTACT_LAST_NAME"
+                        newDataType="VARCHAR(255)"
+                        tableName="JOB_ADVERTISEMENT"/>
+    </changeSet>
+    <changeSet author="fago" id="20190226080000-12">
+        <modifyDataType columnName="NUMBER_OF_JOBS"
+                        newDataType="VARCHAR(3)"
+                        tableName="JOB_ADVERTISEMENT"/>
+    </changeSet>
+    <changeSet author="fago" id="20190226080000-13">
+        <modifyDataType columnName="EDUCATION_CODE"
+                        newDataType="VARCHAR(10)"
+                        tableName="JOB_ADVERTISEMENT_OCCUPATION"/>
+    </changeSet>
+</databaseChangeLog>
