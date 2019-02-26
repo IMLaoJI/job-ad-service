@@ -2,6 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
 import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogData;
 import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogger;
+import ch.admin.seco.jobs.services.jobadservice.application.IsSysAdmin;
 import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
@@ -302,7 +303,7 @@ public class JobAdvertisementApplicationService {
         );
     }
 
-    @PreAuthorize("hasRole(T(ch.admin.seco.jobs.services.jobadservice.application.security.Role).SYSADMIN.value)")
+    @IsSysAdmin
     public Page<JobAdvertisementDto> findAllPaginated(Pageable pageable) {
         Page<JobAdvertisement> jobAdvertisements = jobAdvertisementRepository.findAll(pageable);
         return new PageImpl<>(
