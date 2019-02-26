@@ -55,6 +55,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
+import ch.admin.seco.jobs.services.jobadservice.Application;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.GeoPointDto;
+import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.*;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.RadiusSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -76,28 +90,10 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import ch.admin.seco.jobs.services.jobadservice.Application;
-import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageSkill;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Location;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.JobAdvertisementSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.JobAdvertisementSearchService;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.ManagedJobAdSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.PeaJobAdvertisementSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.ProfessionCode;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.ProfessionCodeType;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors.ExceptionTranslator;
+import java.util.List;
+
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForAbroadSearchTests;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForGeoDistanceTests;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
@@ -105,8 +101,24 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.er
 public class JobAdvertisementSearchControllerIntTest {
 
     private static final String DEFAULT_AVAM_CODE = "11111";
+
     private static final String DEFAULT_BFS_CODE = "11111111";
+
     private static final String API_JOB_ADVERTISEMENTS = "/api/jobAdvertisements";
+
+    private static final String LAUSANNE_COMMUNAL_CODE = "5586";
+
+    private static final String BERN_COMMUNAL_CODE = "351";
+
+    private static final String SION_COMMUNAL_CODE = "6266";
+
+    private static final String ABROAD_COMMUNAL_CODE = "9999";
+
+    private static final GeoPointDto BERN_GEO_POINT = new GeoPointDto().setLat(46.948).setLon(7.441);
+
+    private static final GeoPointDto LAUSANNE_GEO_POINT = new GeoPointDto().setLat(46.552043).setLon(6.6523078);
+
+    private static final GeoPointDto SION_GEO_POINT =  new GeoPointDto().setLat(46.234).setLon(7.359);
 
     @Autowired
     private JobAdvertisementRepository jobAdvertisementJpaRepository;
@@ -119,7 +131,6 @@ public class JobAdvertisementSearchControllerIntTest {
 
     @Autowired
     private ElasticsearchConfiguration.CustomEntityMapper customEntityMapper;
-
 
     @Autowired
     private FormattingConversionService formattingConversionService;
@@ -186,8 +197,9 @@ public class JobAdvertisementSearchControllerIntTest {
     @Test
     public void shouldSearchForAbroadJobs() throws Exception {
         // GIVEN
-        createTestDataForAbroadJobs();
+        index(listOfJobAdsForAbroadSearchTests());
 
+        // WHEN
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
         jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"9999"});
         ResultActions resultActions = mockMvc.perform(
@@ -209,12 +221,131 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
-    public void shouldSearchForAbroadAndBernJobs() throws Exception {
+    public void shouldIgnoreGeoDistanceWhenNoRadiusSearchRequestIsProvided() throws Exception {
         // GIVEN
-        createTestDataForAbroadJobs();
+        index(listOfJobAdsForGeoDistanceTests());
+
+        // WHEN
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setRadiusSearchRequest(null);
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
+        );
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "4"));
+    }
+
+    @Test
+    public void shouldIgnoreJobWithoutGeoPoint() throws Exception {
+        // GIVEN
+        index(createJobWithLocation(job01.id(),
+                testLocation()
+                        .setCity("Bern")
+                        .setCommunalCode(BERN_COMMUNAL_CODE)
+                        .setRegionCode("BE01")
+                        .setCantonCode("BE")
+                        .setPostalCode("3000")
+                        .setCountryIsoCode("CH")
+                        .setCoordinates(null)
+                        .build()));
+
+        // WHEN
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(BERN_GEO_POINT).setDistance(150));
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
+        );
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "0"));
+    }
+
+
+    @Test
+    public void shouldSearchForJobsIn20KmRadiusOfBern() throws Exception {
+        // GIVEN
+        index(listOfJobAdsForGeoDistanceTests());
+
+        // WHEN
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{BERN_COMMUNAL_CODE});
+        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(BERN_GEO_POINT).setDistance(20));
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
+        );
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "1"))
+                .andExpect(jsonPath("$.[0].id").value(equalTo("job01")))
+                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Bern")));
+    }
+
+    @Test
+    public void shouldSearchForJobsIn20KmRadiusOfLausanne() throws Exception {
+        // GIVEN
+        index(listOfJobAdsForGeoDistanceTests());
 
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"9999", "351"});
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE});
+        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(20));
+
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
+        );
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "1"))
+                .andExpect(jsonPath("$.[0].id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Lausanne")));
+    }
+
+    @Test
+    public void shouldSearchForJobsIn80KmRadiusOfSion() throws Exception {
+        // GIVEN
+        index(listOfJobAdsForGeoDistanceTests());
+
+
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{SION_COMMUNAL_CODE});
+        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(SION_GEO_POINT).setDistance(80));
+
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
+        );
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "3"))
+                .andExpect(jsonPath("$.[0].id").value(equalTo("job01")))
+                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Bern")))
+                .andExpect(jsonPath("$.[1].id").value(equalTo("job03")))
+                .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("Sion")))
+                .andExpect(jsonPath("$.[2].id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("Lausanne")));
+    }
+
+    @Test
+    public void shouldSearchForAbroadAndBernJobs() throws Exception {
+        // GIVEN
+        index(listOfJobAdsForAbroadSearchTests());
+
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{ABROAD_COMMUNAL_CODE, BERN_COMMUNAL_CODE});
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -1307,72 +1438,10 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("<em>ZurichA</em>")));
     }
 
-
-    private void index(JobAdvertisement jobAdvertisement) {
-        this.jobAdvertisementElasticsearchRepository.save(new JobAdvertisementDocument(jobAdvertisement));
-    }
-
     private void saveJobAdvertisementDocuments(JobAdvertisement.Builder... jobAdvertisementBuilders) {
         for (JobAdvertisement.Builder jobAdvertisementBuilder : jobAdvertisementBuilders) {
             index(jobAdvertisementBuilder.build());
         }
-    }
-
-    private void createTestDataForAbroadJobs() {
-        index(createJobWithLocation(job01.id(),
-                testLocation()
-                        .setCity("Bern")
-                        .setCommunalCode("351")
-                        .setRegionCode("BE01")
-                        .setCantonCode("BE")
-                        .setPostalCode("3000")
-                        .setCountryIsoCode("CH")
-                        .build()));
-        index(createJobWithLocation(job02.id(),
-                testLocation()
-                        .setCity("Ausland")
-                        .setCommunalCode("7001")
-                        .setRegionCode("A")
-                        .setCantonCode("FL")
-                        .setPostalCode("9490")
-                        .setCountryIsoCode("LI")
-                        .build()));
-        index(createJobWithLocation(job03.id(),
-                testLocation()
-                        .setCity("Ausland")
-                        .setCommunalCode(null)
-                        .setRegionCode(null)
-                        .setCantonCode(null)
-                        .setPostalCode("91244")
-                        .setCountryIsoCode("FR")
-                        .build()));
-        index(createJobWithLocation(job04.id(),
-                testLocation()
-                        .setCity("Ausland")
-                        .setCommunalCode(null)
-                        .setRegionCode(null)
-                        .setCantonCode(null)
-                        .setPostalCode("94541")
-                        .setCountryIsoCode("DE")
-                        .build()));
-        index(createJobWithLocation(job05.id(),
-                testLocation()
-                        .setCity("Zürich")
-                        .setCommunalCode("261")
-                        .setRegionCode("ZH01")
-                        .setCantonCode("ZH")
-                        .setPostalCode("8000")
-                        .setCountryIsoCode("CH")
-                        .build()));
-        index(createJobWithLocation(job06.id(),
-                testLocation()
-                        .setCity("Lausanne")
-                        .setCommunalCode(null)
-                        .setRegionCode(null)
-                        .setCantonCode(null)
-                        .setPostalCode("1000")
-                        .setCountryIsoCode(null)
-                        .build()));
     }
 
     private ResultActions post(Object request, String urlTemplate) throws Exception {
@@ -1383,4 +1452,11 @@ public class JobAdvertisementSearchControllerIntTest {
         );
     }
 
+    private void index(List<JobAdvertisement> jobAdvertisements) {
+        jobAdvertisements.forEach(this::index);
+    }
+
+    private void index(JobAdvertisement jobAdvertisement) {
+        this.jobAdvertisementElasticsearchRepository.save(new JobAdvertisementDocument(jobAdvertisement));
+    }
 }

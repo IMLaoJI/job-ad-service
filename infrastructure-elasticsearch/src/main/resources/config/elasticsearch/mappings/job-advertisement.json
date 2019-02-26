@@ -205,6 +205,9 @@
                   },
                   "remarks": {
                     "type": "text"
+                  },
+                  "coordinates": {
+                    "type": "geo_point"
                   }
                 }
               },

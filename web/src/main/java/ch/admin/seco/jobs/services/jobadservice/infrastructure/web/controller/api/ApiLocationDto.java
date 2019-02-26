@@ -1,6 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.api;
 
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.GeoPoint;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.CountryIsoCode;
 
 import javax.validation.constraints.NotBlank;
@@ -27,7 +26,7 @@ public class ApiLocationDto {
     @CountryIsoCode
     private String countryIsoCode;
 
-    private GeoPoint coordinates;
+    private ApiGeoPointDto coordinates;
 
     public String getRemarks() {
         return remarks;
@@ -92,11 +91,11 @@ public class ApiLocationDto {
         return this;
     }
 
-    public GeoPoint getCoordinates() {
+    public ApiGeoPointDto getCoordinates() {
         return coordinates;
     }
 
-    public ApiLocationDto setCoordinates(GeoPoint coordinates) {
+    public ApiLocationDto setCoordinates(ApiGeoPointDto coordinates) {
         this.coordinates = coordinates;
         return this;
     }

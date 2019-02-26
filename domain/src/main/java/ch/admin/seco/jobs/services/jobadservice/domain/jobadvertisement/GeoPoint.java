@@ -8,23 +8,23 @@ import javax.persistence.Embeddable;
 @Access(AccessType.FIELD)
 public class GeoPoint {
 
-    private double longitude;
-    private double latitude;
+    private double lon;
+    private double lat;
 
     protected GeoPoint() {
         // For reflection libs
     }
 
-    public GeoPoint(double longitude, double latitude) {
-        this.longitude = longitude;
-        this.latitude = latitude;
+    public GeoPoint(double lon, double lat) {
+        this.lon = lon;
+        this.lat = lat;
     }
 
-    public double getLongitude() {
-        return longitude;
+    public double getLon() {
+        return lon;
     }
 
-    public double getLatitude() {
-        return latitude;
+    public double getLat() {
+        return lat;
     }
 }
