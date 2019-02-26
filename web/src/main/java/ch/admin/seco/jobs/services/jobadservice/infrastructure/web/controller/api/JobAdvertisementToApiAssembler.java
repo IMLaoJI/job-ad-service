@@ -2,6 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.a
 
 import ch.admin.seco.jobs.services.jobadservice.application.HtmlToMarkdownConverter;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.GeoPoint;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Component;
@@ -155,7 +156,14 @@ public class JobAdvertisementToApiAssembler {
                 .setRegionCode(location.getRegionCode())
                 .setCantonCode(location.getCantonCode())
                 .setCountryIsoCode(location.getCountryIsoCode())
-                .setCoordinates(location.getCoordinates());
+                .setCoordinates(convertCoordinates(location.getCoordinates()));
+    }
+
+    private ApiGeoPointDto convertCoordinates(GeoPoint coordinates) {
+        if (coordinates == null){
+            return null;
+        }
+        return new ApiGeoPointDto().setLatitude(coordinates.getLat()).setLongitude(coordinates.getLon());
     }
 
     private List<ApiOccupationDto> convertOccupations(List<OccupationDto> occupations) {

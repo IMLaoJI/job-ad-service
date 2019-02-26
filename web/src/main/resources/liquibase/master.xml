@@ -34,4 +34,5 @@
     <include file="classpath:/liquibase/changelog/20181221080000_update_qualification_property.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20190108080000_update_owner_user_display_name.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20190115080000_update_events_index.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/liquibase/changelog/20190215080000_update_jobad_location_lon_lat.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

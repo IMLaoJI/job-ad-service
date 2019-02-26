@@ -12,6 +12,7 @@ import static org.apache.commons.lang3.ArrayUtils.toStringArray;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
+import static org.elasticsearch.index.query.QueryBuilders.geoDistanceQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchPhrasePrefixQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.unit.DistanceUnit;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.Operator;
@@ -87,9 +89,9 @@ public class JobAdvertisementSearchService {
     private static final String PATH_DESCRIPTION = PATH_CTX + "jobContent.jobDescriptions.description";
     private static final String PATH_LOCATION_CANTON_CODE = PATH_CTX + "jobContent.location.cantonCode";
     private static final String PATH_LOCATION_COMMUNAL_CODE = PATH_CTX + "jobContent.location.communalCode";
-    private static final String PATH_LOCATION_REGION_CODE = PATH_CTX + "jobContent.location.regionCode";
     private static final String PATH_LOCATION_CITY = PATH_CTX + "jobContent.location.city";
     private static final String PATH_LOCATION_COUNTRY_ISO_CODE = PATH_CTX + "jobContent.location.countryIsoCode";
+    private static final String PATH_LOCATION_COORDINATES = PATH_CTX + "jobContent.location.coordinates";
     private static final String PATH_OCCUPATIONS = PATH_CTX + "jobContent.occupations";
     private static final String PATH_OCCUPATIONS_AVAM_OCCUPATION_CODE = PATH_OCCUPATIONS + ".avamOccupationCode";
     private static final String PATH_OCCUPATIONS_BFS_CODE = PATH_OCCUPATIONS + ".bfsCode";
@@ -477,11 +479,15 @@ public class JobAdvertisementSearchService {
     private BoolQueryBuilder localityFilter(JobAdvertisementSearchRequest jobSearchRequest) {
         BoolQueryBuilder localityFilter = boolQuery();
 
+        if (hasRadiusSearchRequest(jobSearchRequest)) {
+            RadiusSearchRequest radiusSearchRequest = jobSearchRequest.getRadiusSearchRequest();
+            localityFilter.should(geoDistanceQuery(PATH_LOCATION_COORDINATES)
+                    .point(radiusSearchRequest.getGeoPoint().getLat(), radiusSearchRequest.getGeoPoint().getLon())
+                    .distance(radiusSearchRequest.getDistance(), DistanceUnit.KILOMETERS));
+        }
+
         if (isNotEmpty(jobSearchRequest.getCantonCodes())) {
             localityFilter.should(termsQuery(PATH_LOCATION_CANTON_CODE, jobSearchRequest.getCantonCodes()));
-        }
-        if (isNotEmpty(jobSearchRequest.getRegionCodes())) {
-            localityFilter.should(termsQuery(PATH_LOCATION_REGION_CODE, jobSearchRequest.getRegionCodes()));
         }
         if (isNotEmpty(jobSearchRequest.getCommunalCodes())) {
             if (containsAbroadCode(jobSearchRequest.getCommunalCodes())) {
@@ -494,6 +500,10 @@ public class JobAdvertisementSearchService {
         }
 
         return localityFilter;
+    }
+
+    private boolean hasRadiusSearchRequest(JobAdvertisementSearchRequest jobSearchRequest) {
+        return jobSearchRequest.getRadiusSearchRequest() != null;
     }
 
     private boolean containsAbroadCode(String[] communalCodes) {

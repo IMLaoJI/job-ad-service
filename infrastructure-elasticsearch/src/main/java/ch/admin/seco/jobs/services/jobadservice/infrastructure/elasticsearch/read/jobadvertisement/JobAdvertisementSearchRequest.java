@@ -9,23 +9,37 @@ import java.util.Arrays;
 
 @ValidWorkingTimeRange
 public class JobAdvertisementSearchRequest {
+
     private String language;
+
     @Valid
     private ProfessionCode[] professionCodes;
+
     private String[] keywords;
+
     private String[] communalCodes;
-    private String[] regionCodes;
+
     private String[] cantonCodes;
+
+    @Valid
+    private RadiusSearchRequest radiusSearchRequest;
+
     @Range(min = 0, max = 100)
     private Integer workloadPercentageMin;
+
     @Range(min = 0, max = 100)
     private Integer workloadPercentageMax;
+
     private Boolean permanent;
+
     private String companyName;
+
     @Min(1)
     @Max(60)
     private Integer onlineSince;
+
     private Boolean displayRestricted;
+
     private Boolean euresDisplay;
 
     public String getLanguage() {
@@ -58,14 +72,6 @@ public class JobAdvertisementSearchRequest {
 
     public void setCommunalCodes(String[] communalCodes) {
         this.communalCodes = communalCodes;
-    }
-
-    public String[] getRegionCodes() {
-        return regionCodes;
-    }
-
-    public void setRegionCodes(String[] regionCodes) {
-        this.regionCodes = regionCodes;
     }
 
     public String[] getCantonCodes() {
@@ -132,6 +138,14 @@ public class JobAdvertisementSearchRequest {
         this.euresDisplay = euresDisplay;
     }
 
+    public RadiusSearchRequest getRadiusSearchRequest() {
+        return radiusSearchRequest;
+    }
+
+    public void setRadiusSearchRequest(RadiusSearchRequest radiusSearchRequest) {
+        this.radiusSearchRequest = radiusSearchRequest;
+    }
+
     @Override
     public String toString() {
         return "JobAdvertisementSearchRequest{" +
@@ -139,8 +153,8 @@ public class JobAdvertisementSearchRequest {
                 ", professionCodes=" + Arrays.toString(professionCodes) +
                 ", keywords=" + Arrays.toString(keywords) +
                 ", communalCodes=" + Arrays.toString(communalCodes) +
-                ", regionCodes=" + Arrays.toString(regionCodes) +
                 ", cantonCodes=" + Arrays.toString(cantonCodes) +
+                ", radiusSearchRequest=" + radiusSearchRequest +
                 ", workloadPercentageMin=" + workloadPercentageMin +
                 ", workloadPercentageMax=" + workloadPercentageMax +
                 ", permanent=" + permanent +
@@ -150,4 +164,5 @@ public class JobAdvertisementSearchRequest {
                 ", euresDisplay=" + euresDisplay +
                 '}';
     }
+
 }
