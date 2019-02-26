@@ -1,6 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.webform;
 
-import ch.admin.seco.jobs.services.jobadservice.application.IsSystemAdmin;
+import ch.admin.seco.jobs.services.jobadservice.application.IsSysAdmin;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
@@ -140,7 +140,7 @@ public class JobAdvertisementRestController {
      * - 404 Not Found: No job ad has be found for the given id
      */
     @GetMapping("/{id}/events")
-    @IsSystemAdmin
+    @IsSysAdmin
     public PageResource<EventData> getEventsOfJobAdvertisement(@PathVariable String id) throws AggregateNotFoundException {
         return PageResource.of(eventStore.findByAggregateId(id, JobAdvertisement.class.getSimpleName(), 0, 100));
     }
@@ -154,7 +154,7 @@ public class JobAdvertisementRestController {
      */
     @PostMapping("/{id}/retry/inspect")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @IsSystemAdmin
+    @IsSysAdmin
     public void retryInspect(@PathVariable String id) {
         jobAdvertisementApplicationService.inspect(new JobAdvertisementId(id));
     }
@@ -167,7 +167,7 @@ public class JobAdvertisementRestController {
      */
     @GetMapping("/_actions/update-job-centers")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @IsSystemAdmin
+    @IsSysAdmin
     public void updateJobCenters() {
         this.jobAdvertisementApplicationService.updateJobCenters();
     }
@@ -181,7 +181,7 @@ public class JobAdvertisementRestController {
      */
     @GetMapping("/_actions/update-job-centers/{jobCenterCode}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @IsSystemAdmin
+    @IsSysAdmin
     public void updateJobCenter(@PathVariable String jobCenterCode) {
         this.jobAdvertisementApplicationService.updateJobCenter(jobCenterCode);
     }

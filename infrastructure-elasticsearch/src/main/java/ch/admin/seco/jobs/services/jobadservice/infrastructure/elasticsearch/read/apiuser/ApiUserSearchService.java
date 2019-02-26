@@ -3,7 +3,7 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.re
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
-import ch.admin.seco.jobs.services.jobadservice.application.IsSystemAdmin;
+import ch.admin.seco.jobs.services.jobadservice.application.IsSysAdmin;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -33,7 +33,7 @@ public class ApiUserSearchService {
         this.apiUserElasticsearchRepository = apiUserElasticsearchRepository;
     }
 
-    @IsSystemAdmin
+    @IsSysAdmin
     public Page<ApiUserDto> search(ApiUserSearchRequest searchRequest, Pageable pageable) {
         QueryBuilder query = StringUtils.isBlank(searchRequest.getQuery())
                 ? matchAllQuery()

@@ -1,6 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
-import ch.admin.seco.jobs.services.jobadservice.application.IsSystemAdmin;
+import ch.admin.seco.jobs.services.jobadservice.application.IsSysAdmin;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.ElasticsearchIndexService;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.HeaderUtil;
 import com.codahale.metrics.annotation.Timed;
@@ -24,7 +24,7 @@ public class ElasticsearchIndexRestController {
 
     @PostMapping(value = "/index", produces = MediaType.TEXT_PLAIN_VALUE)
     @Timed
-    @IsSystemAdmin
+    @IsSysAdmin
     public ResponseEntity<Void> reindexAll() {
         elasticsearchIndexService.reindexAll();
         return ResponseEntity.accepted()

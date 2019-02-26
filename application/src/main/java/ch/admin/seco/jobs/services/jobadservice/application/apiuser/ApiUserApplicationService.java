@@ -1,6 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.application.apiuser;
 
-import ch.admin.seco.jobs.services.jobadservice.application.IsSystemAdmin;
+import ch.admin.seco.jobs.services.jobadservice.application.IsSysAdmin;
 import ch.admin.seco.jobs.services.jobadservice.application.apiuser.dto.*;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.AggregateNotFoundException;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPublisher;
@@ -29,7 +29,7 @@ public class ApiUserApplicationService {
         this.passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-    @IsSystemAdmin
+    @IsSysAdmin
     public ApiUserId create(CreateApiUserDto createApiUserDto) {
         ApiUser apiUser = new ApiUser.Builder()
                 .setId(new ApiUserId())
@@ -47,20 +47,20 @@ public class ApiUserApplicationService {
         return newApiUser.getId();
     }
 
-    @IsSystemAdmin
+    @IsSysAdmin
     public Page<ApiUserDto> findAll(Pageable pageable) {
         return apiUserRepository.findAll(pageable)
                 .map(ApiUserDto::toDto);
     }
 
-    @IsSystemAdmin
+    @IsSysAdmin
     public ApiUserDto findById(ApiUserId apiUserId) {
         return apiUserRepository.findById(apiUserId)
                 .map(ApiUserDto::toDto)
                 .orElse(null);
     }
 
-    @IsSystemAdmin
+    @IsSysAdmin
     public ApiUserDto changeDetails(ApiUserId apiUserId, UpdateDetailsApiUserDto updateDetailsApiUserDto) {
         ApiUser apiUser = getById(apiUserId);
         apiUser.updateDetails(new ApiUser.Builder()
@@ -73,19 +73,19 @@ public class ApiUserApplicationService {
         return ApiUserDto.toDto(apiUser);
     }
 
-    @IsSystemAdmin
+    @IsSysAdmin
     public void changePassword(ApiUserId apiUserId, UpdatePasswordApiUserDto updatePasswordApiUserDto) {
         ApiUser apiUser = getById(apiUserId);
         apiUser.changePassword(passwordEncoder.encode(updatePasswordApiUserDto.getPassword()));
     }
 
-    @IsSystemAdmin
+    @IsSysAdmin
     public void changeStatus(ApiUserId apiUserId, UpdateStatusApiUserDto updateStatusApiUserDto) {
         ApiUser apiUser = getById(apiUserId);
         apiUser.changeStatus(updateStatusApiUserDto.isActive());
     }
 
-    @IsSystemAdmin
+    @IsSysAdmin
     private ApiUser getById(ApiUserId id) {
         return apiUserRepository.findById(id).orElseThrow(() -> new AggregateNotFoundException(ApiUser.class, id.getValue()));
     }
