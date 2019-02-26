@@ -253,8 +253,6 @@ public class JobAdvertisementApplicationService {
             publicationEndDate = publicationStartDate.plusDays(PUBLICATION_MAX_DAYS);
         }
         final JobAdvertisementCreator creator = new JobAdvertisementCreator.Builder(currentUserContext.getAuditUser())
-                .setStellennummerEgov(createJobAdvertisementFromX28Dto.getStellennummerEgov())
-                .setStellennummerAvam(createJobAdvertisementFromX28Dto.getStellennummerAvam())
                 .setFingerprint(createJobAdvertisementFromX28Dto.getFingerprint())
                 .setJobContent(jobContent)
                 .setContact(toContact(createJobAdvertisementFromX28Dto.toContactDto()))
@@ -490,7 +488,7 @@ public class JobAdvertisementApplicationService {
         Condition.notNull(jobAdvertisementId, "JobAdvertisementId can't be null");
         JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
         LOG.debug("Starting cancel for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
-        jobAdvertisement.cancel(cancellationDto.getCancellationDate(), cancellationDto.getCancellationCode(), cancellationDto.getSourceSystem());
+        jobAdvertisement.cancel(cancellationDto.getCancellationDate(), cancellationDto.getCancellationCode(), cancellationDto.getCancelledBy());
     }
 
     public void refining(JobAdvertisementId jobAdvertisementId) {

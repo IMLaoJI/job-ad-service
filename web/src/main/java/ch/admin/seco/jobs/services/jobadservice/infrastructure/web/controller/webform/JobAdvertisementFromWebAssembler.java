@@ -47,8 +47,8 @@ public class JobAdvertisementFromWebAssembler {
     CancellationDto convert(CancellationResource cancellation) {
         return new CancellationDto()
                 .setCancellationCode(cancellation.getCode())
-                .setSourceSystem(SourceSystem.JOBROOM)
-                .setCancellationDate(TimeMachine.now().toLocalDate());
+                .setCancellationDate(TimeMachine.now().toLocalDate())
+                .setCancelledBy(SourceSystem.JOBROOM);
     }
 
     private ApplyChannelDto convertApplyChannel(ApplyChannelDto createApplyChannelDto) {

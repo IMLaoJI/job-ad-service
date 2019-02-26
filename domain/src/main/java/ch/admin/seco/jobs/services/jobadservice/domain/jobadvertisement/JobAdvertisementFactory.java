@@ -98,9 +98,7 @@ public class JobAdvertisementFactory {
         JobAdvertisement jobAdvertisement = new JobAdvertisement.Builder()
                 .setId(new JobAdvertisementId())
                 .setStatus(JobAdvertisementStatus.PUBLISHED_PUBLIC)
-                .setSourceSystem(findSourceSystemForExtern(creator))
-                .setStellennummerEgov(creator.getStellennummerEgov())
-                .setStellennummerAvam(creator.getStellennummerAvam())
+                .setSourceSystem(SourceSystem.EXTERN)
                 .setFingerprint(creator.getFingerprint())
                 .setReportToAvam(false)
                 .setJobContent(creator.getJobContent())
@@ -127,16 +125,6 @@ public class JobAdvertisementFactory {
                     .setAccessToken(accessTokenGenerator.generateToken())
                     .build();
         }
-    }
-
-    private SourceSystem findSourceSystemForExtern(JobAdvertisementCreator creator){
-        if(creator.getStellennummerEgov() != null) {
-            return SourceSystem.JOBROOM;
-        }
-        if(creator.getStellennummerAvam() != null) {
-            return SourceSystem.RAV;
-        }
-        return SourceSystem.EXTERN;
     }
 
 }

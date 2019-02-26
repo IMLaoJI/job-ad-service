@@ -16,6 +16,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromAvamDto;
 import ch.admin.seco.jobs.services.jobadservice.core.utils.MappingBuilder;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkForm;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.WorkingTimePercentage;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.source.WSArbeitsformArray;
@@ -139,7 +140,8 @@ public class JobAdvertisementFromAvamAssembler {
                 .setSourceSystem(resolveMapping(SOURCE_SYSTEM, avamJobAdvertisement.getQuelleCode(), "SOURCE_SYSTEM"))
                 .setJobDescriptionTitle(safeTrimOrNull(avamJobAdvertisement.getBezeichnung()))
                 .setContactEmail(safeTrimOrNull(avamJobAdvertisement.getKpEmail()))
-                .setJobCenterCode(safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()));
+                .setJobCenterCode(safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()))
+                .setCancelledBy(SourceSystem.RAV);
     }
 
     private ContactDto createContactDto(WSOsteEgov avamJobAdvertisement) {

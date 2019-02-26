@@ -1136,6 +1136,89 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    public void shouldSearchManagedJobAdBeSearchedAndSortedByDateAndCreatedTime() throws Exception {
+        // GIVEN
+        saveJobAdvertisementDocuments(
+
+                JobAdvertisementFixture.of(job01.id())
+                        .setJobContent(JobContentFixture.of(job01.id())
+                                .setJobDescriptions(asList(
+                                        testJobDescription().setTitle("desc1").build()
+                                ))
+                                .build())
+                        .setPublication(testPublication().setStartDate(LocalDate.now()).build()),
+
+                JobAdvertisementFixture.of(job02.id())
+                        .setJobContent(JobContentFixture.of(job02.id())
+                                .setJobDescriptions(asList(
+                                        testJobDescription().setTitle("desc2").build()
+                                ))
+                                .build())
+                        .setPublication(testPublication().setStartDate(LocalDate.now()).build()),
+
+                JobAdvertisementFixture.of(job03.id())
+                        .setJobContent(JobContentFixture.of(job03.id())
+                                .setJobDescriptions(asList(
+                                        testJobDescription().setTitle("desc3").build()
+                                ))
+                                .build())
+                        .setPublication(testPublication().setStartDate(LocalDate.now().minusDays(10)).build()),
+                JobAdvertisementFixture.of(job04.id())
+                        .setJobContent(JobContentFixture.of(job04.id())
+                                .setJobDescriptions(asList(
+                                        testJobDescription().setTitle("desc4").build()
+                                ))
+                                .build())
+                        .setPublication(testPublication().setStartDate(LocalDate.now()).build()),
+
+                JobAdvertisementFixture.of(job05.id())
+                        .setJobContent(JobContentFixture.of(job05.id())
+                                .setJobDescriptions(asList(
+                                        testJobDescription().setTitle("desc5").build()
+                                ))
+                                .build())
+                        .setPublication(testPublication().setStartDate(LocalDate.now()).build())
+        );
+
+        ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
+                .setCompanyId("companyId");
+
+        // WHEN SORTED ASCENDING
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search/managed")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(request))
+                        .param("sort", "jobAdvertisement.publication.startDate,ASC")
+        ).andExpect(status().isOk());
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "5"))
+                .andExpect(jsonPath("$.[0].jobContent.jobDescriptions[0].title").value(equalTo("desc3")))
+                .andExpect(jsonPath("$.[1].jobContent.jobDescriptions[0].title").value(equalTo("desc5")))
+                .andExpect(jsonPath("$.[2].jobContent.jobDescriptions[0].title").value(equalTo("desc4")))
+                .andExpect(jsonPath("$.[3].jobContent.jobDescriptions[0].title").value(equalTo("desc2")))
+                .andExpect(jsonPath("$.[4].jobContent.jobDescriptions[0].title").value(equalTo("desc1")));
+
+        // WHEN SORTED DESCENDING
+        resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search/managed")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(request))
+                        .param("sort", "jobAdvertisement.publication.startDate,DESC")
+        ).andExpect(status().isOk());
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "5"))
+                .andExpect(jsonPath("$.[0].jobContent.jobDescriptions[0].title").value(equalTo("desc5")))
+                .andExpect(jsonPath("$.[1].jobContent.jobDescriptions[0].title").value(equalTo("desc4")))
+                .andExpect(jsonPath("$.[2].jobContent.jobDescriptions[0].title").value(equalTo("desc2")))
+                .andExpect(jsonPath("$.[3].jobContent.jobDescriptions[0].title").value(equalTo("desc1")))
+                .andExpect(jsonPath("$.[4].jobContent.jobDescriptions[0].title").value(equalTo("desc3")));
+    }
+
+    @Test
     public void shouldSearchManagedJobAdBeSearchedAndSortedByTitle() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(

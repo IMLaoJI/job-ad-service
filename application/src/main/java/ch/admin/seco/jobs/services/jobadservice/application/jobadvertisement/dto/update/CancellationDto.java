@@ -15,27 +15,10 @@ public class CancellationDto {
 
     private CancellationCode cancellationCode;
 
-    private SourceSystem sourceSystem;
-
+    private SourceSystem cancelledBy;
 
     public String getStellennummerEgov() {
         return stellennummerEgov;
-    }
-
-    public String getStellennummerAvam() {
-        return stellennummerAvam;
-    }
-
-    public LocalDate getCancellationDate() {
-        return cancellationDate;
-    }
-
-    public CancellationCode getCancellationCode() {
-        return cancellationCode;
-    }
-
-    public SourceSystem getSourceSystem() {
-        return sourceSystem;
     }
 
     public CancellationDto setStellennummerEgov(String stellennummerEgov) {
@@ -43,14 +26,26 @@ public class CancellationDto {
         return this;
     }
 
+    public String getStellennummerAvam() {
+        return stellennummerAvam;
+    }
+
     public CancellationDto setStellennummerAvam(String stellennummerAvam) {
         this.stellennummerAvam = stellennummerAvam;
         return this;
     }
 
-    public CancellationDto setCancellationDate(LocalDate date) {
-        this.cancellationDate = date;
+    public LocalDate getCancellationDate() {
+        return cancellationDate;
+    }
+
+    public CancellationDto setCancellationDate(LocalDate cancellationDate) {
+        this.cancellationDate = cancellationDate;
         return this;
+    }
+
+    public CancellationCode getCancellationCode() {
+        return cancellationCode;
     }
 
     public CancellationDto setCancellationCode(CancellationCode cancellationCode) {
@@ -58,8 +53,12 @@ public class CancellationDto {
         return this;
     }
 
-    public CancellationDto setSourceSystem(SourceSystem sourceSystem) {
-        this.sourceSystem = sourceSystem;
+    public SourceSystem getCancelledBy() {
+        return cancelledBy;
+    }
+
+    public CancellationDto setCancelledBy(SourceSystem cancelledBy) {
+        this.cancelledBy = cancelledBy;
         return this;
     }
 }

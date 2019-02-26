@@ -15,14 +15,17 @@ public class AvamCancellationDto {
     @NotBlank
     private String stellennummerAvam;
 
-    @NotBlank
-    private String jobDescriptionTitle;
-
     @NotNull
     private LocalDate cancellationDate;
 
     @NotNull
     private CancellationCode cancellationCode;
+
+    @NotNull
+    private SourceSystem cancelledBy;
+
+    @NotBlank
+    private String jobDescriptionTitle;
 
     @NotNull
     private SourceSystem sourceSystem;
@@ -37,37 +40,13 @@ public class AvamCancellationDto {
         return stellennummerEgov;
     }
 
-    public String getStellennummerAvam() {
-        return stellennummerAvam;
-    }
-
-    public String getJobDescriptionTitle() {
-        return jobDescriptionTitle;
-    }
-
-    public LocalDate getCancellationDate() {
-        return cancellationDate;
-    }
-
-    public CancellationCode getCancellationCode() {
-        return cancellationCode;
-    }
-
-    public String getContactEmail() {
-        return contactEmail;
-    }
-
-    public String getJobCenterCode() {
-        return jobCenterCode;
-    }
-
-    public SourceSystem getSourceSystem() {
-        return sourceSystem;
-    }
-
     public AvamCancellationDto setStellennummerEgov(String stellennummerEgov) {
         this.stellennummerEgov = stellennummerEgov;
         return this;
+    }
+
+    public String getStellennummerAvam() {
+        return stellennummerAvam;
     }
 
     public AvamCancellationDto setStellennummerAvam(String stellennummerAvam) {
@@ -75,9 +54,8 @@ public class AvamCancellationDto {
         return this;
     }
 
-    public AvamCancellationDto setJobDescriptionTitle(String jobDescriptionTitle) {
-        this.jobDescriptionTitle = jobDescriptionTitle;
-        return this;
+    public LocalDate getCancellationDate() {
+        return cancellationDate;
     }
 
     public AvamCancellationDto setCancellationDate(LocalDate cancellationDate) {
@@ -85,9 +63,44 @@ public class AvamCancellationDto {
         return this;
     }
 
+    public CancellationCode getCancellationCode() {
+        return cancellationCode;
+    }
+
     public AvamCancellationDto setCancellationCode(CancellationCode cancellationCode) {
         this.cancellationCode = cancellationCode;
         return this;
+    }
+
+    public SourceSystem getCancelledBy() {
+        return cancelledBy;
+    }
+
+    public AvamCancellationDto setCancelledBy(SourceSystem cancelledBy) {
+        this.cancelledBy = cancelledBy;
+        return this;
+    }
+
+    public String getJobDescriptionTitle() {
+        return jobDescriptionTitle;
+    }
+
+    public AvamCancellationDto setJobDescriptionTitle(String jobDescriptionTitle) {
+        this.jobDescriptionTitle = jobDescriptionTitle;
+        return this;
+    }
+
+    public SourceSystem getSourceSystem() {
+        return sourceSystem;
+    }
+
+    public AvamCancellationDto setSourceSystem(SourceSystem sourceSystem) {
+        this.sourceSystem = sourceSystem;
+        return this;
+    }
+
+    public String getContactEmail() {
+        return contactEmail;
     }
 
     public AvamCancellationDto setContactEmail(String contactEmail) {
@@ -95,13 +108,12 @@ public class AvamCancellationDto {
         return this;
     }
 
-    public AvamCancellationDto setJobCenterCode(String jobCenterCode) {
-        this.jobCenterCode = jobCenterCode;
-        return this;
+    public String getJobCenterCode() {
+        return jobCenterCode;
     }
 
-    public AvamCancellationDto setSourceSystem(SourceSystem sourceSystem) {
-        this.sourceSystem = sourceSystem;
+    public AvamCancellationDto setJobCenterCode(String jobCenterCode) {
+        this.jobCenterCode = jobCenterCode;
         return this;
     }
 
@@ -111,7 +123,7 @@ public class AvamCancellationDto {
                 .setStellennummerAvam(avamCancellationDto.getStellennummerAvam())
                 .setCancellationCode(avamCancellationDto.getCancellationCode())
                 .setCancellationDate(avamCancellationDto.getCancellationDate())
-                .setSourceSystem(avamCancellationDto.getSourceSystem());
+                .setCancelledBy(avamCancellationDto.getCancelledBy());
     }
 
 }
