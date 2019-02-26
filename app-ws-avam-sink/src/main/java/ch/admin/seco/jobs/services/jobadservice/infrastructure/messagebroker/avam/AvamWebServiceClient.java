@@ -42,9 +42,7 @@ public class AvamWebServiceClient {
         LOG.debug(jobAdvertisement.toString());
         AvamAction action = AvamAction.ABMELDUNG;
         TOsteEgov tOsteEgov = assembler.toOsteEgov(jobAdvertisement, action);
-        // FIXME Remove suppression!!!
-        LOG.warn("Suppressed sending cancellation");
-        //send(jobAdvertisement.getId(), action, tOsteEgov);
+        send(jobAdvertisement.getId(), action, tOsteEgov);
     }
 
     protected void send(JobAdvertisementId jobAdvertisementId, AvamAction action, TOsteEgov tOsteEgov) {
