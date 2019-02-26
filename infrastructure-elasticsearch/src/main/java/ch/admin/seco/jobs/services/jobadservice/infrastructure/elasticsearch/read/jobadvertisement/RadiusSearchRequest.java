@@ -9,6 +9,7 @@ public class RadiusSearchRequest {
     @NotNull
     private GeoPointDto geoPoint;
 
+    //default distance unit: kilometers
     @Min(10)
     @NotNull
     private Integer distance;
