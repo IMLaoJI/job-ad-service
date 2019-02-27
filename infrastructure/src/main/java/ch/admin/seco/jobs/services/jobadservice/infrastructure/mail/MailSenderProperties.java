@@ -1,5 +1,8 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.mail;
 
+import java.util.Collections;
+import java.util.Set;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -15,7 +18,7 @@ public class MailSenderProperties {
     private String fromAddress;
 
     @NotEmpty
-    private String[] bccAddress;
+    private Set<String> bccAddress = Collections.emptySet();
 
     private String baseUrl;
 
@@ -31,16 +34,16 @@ public class MailSenderProperties {
         return fromAddress;
     }
 
-    public String[] getBccAddress() {
+    public void setFromAddress(String fromAddress) {
+        this.fromAddress = fromAddress;
+    }
+
+    public Set<String> getBccAddress() {
         return bccAddress;
     }
 
-    public void setBccAddress(String[] bccAddress) {
+    public void setBccAddress(Set<String> bccAddress) {
         this.bccAddress = bccAddress;
-    }
-
-    public void setFromAddress(String fromAddress) {
-        this.fromAddress = fromAddress;
     }
 
     public String getBaseUrl() {

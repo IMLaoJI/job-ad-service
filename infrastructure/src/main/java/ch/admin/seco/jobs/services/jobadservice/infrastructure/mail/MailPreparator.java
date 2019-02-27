@@ -2,6 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.mail;
 
 import java.nio.charset.StandardCharsets;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
@@ -25,7 +26,7 @@ class MailPreparator implements MimeMessagePreparator {
     }
 
     @Override
-    public void prepare(MimeMessage mimeMessage) throws Exception {
+    public void prepare(MimeMessage mimeMessage) throws MessagingException {
         MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, CONTENT_ENCODING);
         messageHelper.setFrom(mailSendingTaskData.getFrom());
         messageHelper.setReplyTo(mailSendingTaskData.getFrom());
