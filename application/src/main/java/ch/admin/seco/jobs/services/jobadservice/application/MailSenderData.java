@@ -1,6 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.application;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -19,9 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 
 @Validated
-public class MailSenderData implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class MailSenderData {
 
     @NotBlank
     private final String subject;

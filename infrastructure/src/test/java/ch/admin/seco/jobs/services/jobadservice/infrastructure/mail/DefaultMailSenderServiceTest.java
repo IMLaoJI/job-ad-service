@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.Locale;
 
 import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,9 +27,6 @@ public class DefaultMailSenderServiceTest {
 
     @Autowired
     private MailSenderService mailSenderService;
-
-    @Autowired
-    private Validator validator;
 
     @Test
     public void testSend() {
