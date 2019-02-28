@@ -1,28 +1,38 @@
 package ch.admin.seco.jobs.services.jobadservice.application;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+
+import org.springframework.validation.annotation.Validated;
 
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 
-public class MailSenderData implements Serializable {
+@Validated
+public class MailSenderData {
 
-    private static final long serialVersionUID = 1L;
-
+    @NotBlank
     private final String subject;
 
+    @NotBlank
+    @Email
     private final String from;
 
-    private final String[] to;
+    @NotEmpty
+    private final Set<@Email String> to = new HashSet<>();
 
-    private final String[] cc;
+    private final Set<@Email String> cc = new HashSet<>();
 
-    private final String[] bcc;
+    private final Set<@Email String> bcc = new HashSet<>();
 
     private final String templateName;
 
@@ -33,9 +43,9 @@ public class MailSenderData implements Serializable {
     private MailSenderData(Builder builder) {
         this.subject = Condition.notBlank(builder.subject, "E-Mail must contain a subject.");
         this.from = builder.from;
-        this.to = Condition.notNull(builder.to);
-        this.cc = builder.cc;
-        this.bcc = builder.bcc;
+        this.to.addAll(builder.to);
+        this.cc.addAll(builder.cc);
+        this.bcc.addAll(builder.bcc);
         this.templateName = Condition.notBlank(builder.templateName, "E-Mail must contain a template.");
         if (builder.templateVariables != null) {
             this.templateVariables = builder.templateVariables;
@@ -43,7 +53,7 @@ public class MailSenderData implements Serializable {
             this.templateVariables = Collections.emptyMap();
         }
         this.locale = Condition.notNull(builder.locale, "E-Mail must contain a locale.");
-        Condition.isTrue(builder.to.length > 0, "E-Mail must contain at least one receiver.");
+        Condition.notEmpty(builder.to, "E-Mail must contain at least one receiver.");
     }
 
     @Override
@@ -53,9 +63,9 @@ public class MailSenderData implements Serializable {
         MailSenderData that = (MailSenderData) o;
         return Objects.equals(subject, that.subject) &&
                 Objects.equals(from, that.from) &&
-                Arrays.equals(to, that.to) &&
-                Arrays.equals(cc, that.cc) &&
-                Arrays.equals(bcc, that.bcc) &&
+                Objects.equals(to, that.to) &&
+                Objects.equals(cc, that.cc) &&
+                Objects.equals(bcc, that.bcc) &&
                 Objects.equals(templateName, that.templateName) &&
                 Objects.equals(templateVariables, that.templateVariables) &&
                 Objects.equals(locale, that.locale);
@@ -63,11 +73,7 @@ public class MailSenderData implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(subject, from, templateName, templateVariables, locale);
-        result = 31 * result + Arrays.hashCode(to);
-        result = 31 * result + Arrays.hashCode(cc);
-        result = 31 * result + Arrays.hashCode(bcc);
-        return result;
+        return Objects.hash(subject, from, to, cc, bcc, templateName, templateVariables, locale);
     }
 
     public String getSubject() {
@@ -78,15 +84,15 @@ public class MailSenderData implements Serializable {
         return Optional.ofNullable(from);
     }
 
-    public String[] getTo() {
+    public Set<String> getTo() {
         return to;
     }
 
-    public String[] getCc() {
+    public Set<String> getCc() {
         return cc;
     }
 
-    public Optional<String[]> getBcc() {
+    public Optional<Set<String>> getBcc() {
         return Optional.ofNullable(bcc);
     }
 
@@ -108,11 +114,11 @@ public class MailSenderData implements Serializable {
 
         private String from;
 
-        private String[] to;
+        private Set<String> to = new HashSet<>();
 
-        private String[] cc;
+        private Set<String> cc = new HashSet<>();
 
-        private String[] bcc;
+        private Set<String> bcc = new HashSet<>();
 
         private String templateName;
 
@@ -131,17 +137,17 @@ public class MailSenderData implements Serializable {
         }
 
         public Builder setTo(String... to) {
-            this.to = to;
+            this.to.addAll(Arrays.asList(to));
             return this;
         }
 
         public Builder setCc(String... cc) {
-            this.cc = cc;
+            this.cc.addAll(Arrays.asList(cc));
             return this;
         }
 
         public Builder setBcc(String... bcc) {
-            this.bcc = bcc;
+            this.bcc.addAll(Arrays.asList(bcc));
             return this;
         }
 
@@ -171,9 +177,9 @@ public class MailSenderData implements Serializable {
         return "MailSenderData{" +
                 "subject='" + subject + '\'' +
                 ", from='" + from + '\'' +
-                ", to=" + Arrays.toString(to) +
-                ", cc=" + Arrays.toString(cc) +
-                ", bcc=" + Arrays.toString(bcc) +
+                ", to=" + to +
+                ", cc=" + cc +
+                ", bcc=" + bcc +
                 ", templateName='" + templateName + '\'' +
                 ", templateVariables=" + templateVariables +
                 ", locale=" + locale +

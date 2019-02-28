@@ -1,6 +1,9 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.mail;
 
+import java.util.Set;
 import java.util.stream.Stream;
+
+import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.util.IDNEmailAddressConverter;
@@ -10,10 +13,12 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import org.springframework.context.MessageSource;
+import org.springframework.validation.annotation.Validated;
 
 import ch.admin.seco.jobs.services.jobadservice.application.MailSenderData;
 import ch.admin.seco.jobs.services.jobadservice.application.MailSenderService;
 
+@Validated
 class DefaultMailSenderService implements MailSenderService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultMailSenderService.class);
@@ -37,11 +42,10 @@ class DefaultMailSenderService implements MailSenderService {
     }
 
     @Override
-    public void send(MailSenderData mailSenderData) {
+    public void send(@Valid MailSenderData mailSenderData) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Save email with MailSenderData={}", mailSenderData);
         }
-
         mailSendingTaskRepository.save(new MailSendingTask(toMailData(mailSenderData)));
     }
 
@@ -49,14 +53,14 @@ class DefaultMailSenderService implements MailSenderService {
         String subject = messageSource.getMessage(mailSenderData.getSubject(), null, mailSenderData.getSubject(), mailSenderData.getLocale());
         String content = createContent(mailSenderData);
         String from = mailSenderData.getFrom().orElse(mailSenderProperties.getFromAddress());
-        String[] bcc = mailSenderData.getBcc().orElse(mailSenderProperties.getBccAddress());
+        Set<String> bcc = mailSenderData.getBcc().orElse(mailSenderProperties.getBccAddress());
         return MailSendingTask.builder()
-                .setBcc(bcc)
-                .setCc(encodeEmailAddresses(mailSenderData.getCc()))
+                .setBcc(bcc.toArray(new String[0]))
+                .setCc(encodeEmailAddresses(mailSenderData.getCc().toArray(new String[0])))
                 .setContent(content)
                 .setFrom(from)
                 .setSubject(subject)
-                .setTo(encodeEmailAddresses(mailSenderData.getTo()))
+                .setTo(encodeEmailAddresses(mailSenderData.getTo().toArray(new String[0])))
                 .build();
     }
 
