@@ -23,7 +23,6 @@ public class MailSenderData {
     @NotBlank
     private final String subject;
 
-    @NotBlank
     @Email
     private final String from;
 
