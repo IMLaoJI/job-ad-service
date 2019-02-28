@@ -52,13 +52,12 @@ class DefaultMailSenderService implements MailSenderService {
     private MailSendingTask.MailSendingTaskData toMailData(MailSenderData mailSenderData) {
         String subject = messageSource.getMessage(mailSenderData.getSubject(), null, mailSenderData.getSubject(), mailSenderData.getLocale());
         String content = createContent(mailSenderData);
-        String from = mailSenderData.getFrom().orElse(mailSenderProperties.getFromAddress());
         Set<String> bcc = mailSenderData.getBcc().orElse(mailSenderProperties.getBccAddress());
         return MailSendingTask.builder()
                 .setBcc(bcc.toArray(new String[0]))
                 .setCc(encodeEmailAddresses(mailSenderData.getCc().toArray(new String[0])))
                 .setContent(content)
-                .setFrom(from)
+                .setFrom(mailSenderProperties.getFromAddress())
                 .setSubject(subject)
                 .setTo(encodeEmailAddresses(mailSenderData.getTo().toArray(new String[0])))
                 .build();

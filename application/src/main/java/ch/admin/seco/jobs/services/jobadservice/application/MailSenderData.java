@@ -23,9 +23,6 @@ public class MailSenderData {
     @NotBlank
     private final String subject;
 
-    @Email
-    private final String from;
-
     @NotEmpty
     private final Set<@Email String> to = new HashSet<>();
 
@@ -41,7 +38,6 @@ public class MailSenderData {
 
     private MailSenderData(Builder builder) {
         this.subject = Condition.notBlank(builder.subject, "E-Mail must contain a subject.");
-        this.from = builder.from;
         this.to.addAll(builder.to);
         this.cc.addAll(builder.cc);
         this.bcc.addAll(builder.bcc);
@@ -61,7 +57,6 @@ public class MailSenderData {
         if (o == null || getClass() != o.getClass()) { return false; }
         MailSenderData that = (MailSenderData) o;
         return Objects.equals(subject, that.subject) &&
-                Objects.equals(from, that.from) &&
                 Objects.equals(to, that.to) &&
                 Objects.equals(cc, that.cc) &&
                 Objects.equals(bcc, that.bcc) &&
@@ -72,15 +67,11 @@ public class MailSenderData {
 
     @Override
     public int hashCode() {
-        return Objects.hash(subject, from, to, cc, bcc, templateName, templateVariables, locale);
+        return Objects.hash(subject, to, cc, bcc, templateName, templateVariables, locale);
     }
 
     public String getSubject() {
         return subject;
-    }
-
-    public Optional<String> getFrom() {
-        return Optional.ofNullable(from);
     }
 
     public Set<String> getTo() {
@@ -111,8 +102,6 @@ public class MailSenderData {
 
         private String subject;
 
-        private String from;
-
         private Set<String> to = new HashSet<>();
 
         private Set<String> cc = new HashSet<>();
@@ -127,11 +116,6 @@ public class MailSenderData {
 
         public Builder setSubject(String subject) {
             this.subject = subject;
-            return this;
-        }
-
-        public Builder setFrom(String from) {
-            this.from = from;
             return this;
         }
 
@@ -175,7 +159,6 @@ public class MailSenderData {
     public String toString() {
         return "MailSenderData{" +
                 "subject='" + subject + '\'' +
-                ", from='" + from + '\'' +
                 ", to=" + to +
                 ", cc=" + cc +
                 ", bcc=" + bcc +

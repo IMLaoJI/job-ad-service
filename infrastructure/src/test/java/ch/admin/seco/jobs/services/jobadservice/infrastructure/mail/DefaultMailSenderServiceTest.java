@@ -32,7 +32,6 @@ public class DefaultMailSenderServiceTest {
     public void testSend() {
         MailSenderData mailSenderData = new MailSenderData.Builder()
                 .setSubject("Test-Subject")
-                .setFrom("no-reply@example.com")
                 .setTo("test@example.com")
                 .setLocale(Locale.ENGLISH)
                 .setTemplateName("TestMail.html")
@@ -44,7 +43,6 @@ public class DefaultMailSenderServiceTest {
     public void testSendInvalidFails() {
         MailSenderData mailSenderData = new MailSenderData.Builder()
                 .setSubject("Test-Subject")
-                .setFrom("invalid.com")
                 .setTo("invalid.com")
                 .setLocale(Locale.ENGLISH)
                 .setTemplateName("TestMail.html")
