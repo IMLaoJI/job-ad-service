@@ -53,7 +53,7 @@ public class MailSenderData {
             this.templateVariables = Collections.emptyMap();
         }
         this.locale = Condition.notNull(builder.locale, "E-Mail must contain a locale.");
-        Condition.isTrue(builder.to.size() > 0, "E-Mail must contain at least one receiver.");
+        Condition.notEmpty(builder.to, "E-Mail must contain at least one receiver.");
     }
 
     @Override
