@@ -68,26 +68,25 @@ public class JobAdvertisementFromAvamAssembler {
     }
 
     AvamCreateJobAdvertisementDto createCreateJobAdvertisementAvamDto(WSOsteEgov avamJobAdvertisement) {
-        return new AvamCreateJobAdvertisementDto(
-                safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()),
-                safeTrimOrNull(avamJobAdvertisement.getBezeichnung()),
-                safeTrimOrNull(avamJobAdvertisement.getBeschreibung()),
-                "de", // Not defined in this AVAM version
-                safeTrimOrNull(avamJobAdvertisement.getGleicheOste()),
-                avamJobAdvertisement.isMeldepflicht(),
-                parseToLocalDate(avamJobAdvertisement.getSperrfrist()),
-                safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()),
-                parseToLocalDate(avamJobAdvertisement.getAnmeldeDatum()),
-                createEmploymentDto(avamJobAdvertisement),
-                createApplyChannelDto(avamJobAdvertisement),
-                createCompanyDto(avamJobAdvertisement),
-                createContactDto(avamJobAdvertisement),
-                createCreateLocationDto(avamJobAdvertisement),
-                createOccupationDtos(avamJobAdvertisement),
-                createLanguageSkillDtos(avamJobAdvertisement),
-                createPublicationDto(avamJobAdvertisement),
-                createPublicContactDto(avamJobAdvertisement)
-        );
+        return new AvamCreateJobAdvertisementDto()
+                .setStellennummerAvam(safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()))
+                .setTitle(safeTrimOrNull(avamJobAdvertisement.getBezeichnung()))
+                .setDescription(safeTrimOrNull(avamJobAdvertisement.getBeschreibung()))
+                .setLanguageIsoCode("de") // Not defined in this AVAM version
+                .setNumberOfJobs(safeTrimOrNull(avamJobAdvertisement.getGleicheOste()))
+                .setReportingObligation(avamJobAdvertisement.isMeldepflicht())
+                .setReportingObligationEndDate(parseToLocalDate(avamJobAdvertisement.getSperrfrist()))
+                .setJobCenterCode(safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()))
+                .setApprovalDate(parseToLocalDate(avamJobAdvertisement.getAnmeldeDatum()))
+                .setEmployment(createEmploymentDto(avamJobAdvertisement))
+                .setApplyChannel(createApplyChannelDto(avamJobAdvertisement))
+                .setCompany(createCompanyDto(avamJobAdvertisement))
+                .setContact(createContactDto(avamJobAdvertisement))
+                .setLocation(createCreateLocationDto(avamJobAdvertisement))
+                .setOccupations(createOccupationDtos(avamJobAdvertisement))
+                .setLanguageSkills(createLanguageSkillDtos(avamJobAdvertisement))
+                .setPublication(createPublicationDto(avamJobAdvertisement))
+                .setPublicContact(createPublicContactDto(avamJobAdvertisement));
     }
 
     ApprovalDto createApprovaldDto(WSOsteEgov avamJobAdvertisement) {

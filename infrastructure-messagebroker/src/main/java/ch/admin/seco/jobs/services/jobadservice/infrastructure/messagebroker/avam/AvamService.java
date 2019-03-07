@@ -5,6 +5,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.Job
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
@@ -98,6 +99,7 @@ public class AvamService {
     @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CREATE_FROM_AVAM_CONDITION)
     public void handleCreateAction(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
         try {
+            CreateJobAdvertisementDto createJobAdvertisementDto = AvamCreateJobAdvertisementDto.toDto(createJobAdvertisementFromAvamDto);
             jobAdvertisementApplicationService.createFromAvam(createJobAdvertisementFromAvamDto);
         } catch (JobAdvertisementAlreadyExistsException e) {
             LOG.debug(e.getMessage());
