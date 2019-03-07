@@ -1,17 +1,18 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.webform;
 
 import ch.admin.seco.jobs.services.jobadservice.application.HtmlToMarkdownConverter;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.AddressDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
-import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.CancellationResource;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import org.springframework.stereotype.Component;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PhoneNumberUtil.sanitizePhoneNumber;
+import java.util.Collections;
+
+import static java.util.Collections.singletonList;
 import static org.springframework.util.StringUtils.hasText;
 import static org.springframework.util.StringUtils.trimWhitespace;
 
@@ -30,8 +31,8 @@ public class JobAdvertisementFromWebAssembler {
         return new CreateJobAdvertisementDto()
                 .setReportToAvam(true)
                 .setApplyChannel(convertApplyChannel(createJobAdvertisementFromWebDto.getApplyChannel()))
-                .setCompany(convertCompany(createJobAdvertisementFromWebDto.getCompany()))
-                .setContact(sanitizeContactPhone(createJobAdvertisementFromWebDto.getContact()))
+                .setCompany(createJobAdvertisementFromWebDto.getCompany())
+                .setContact(createJobAdvertisementFromWebDto.getContact())
                 .setEmployer(createJobAdvertisementFromWebDto.getEmployer())
                 .setExternalReference(createJobAdvertisementFromWebDto.getExternalReference())
                 .setLanguageSkills(createJobAdvertisementFromWebDto.getLanguageSkills())
@@ -41,26 +42,9 @@ public class JobAdvertisementFromWebAssembler {
                 .setPublication(createJobAdvertisementFromWebDto.getPublication())
                 .setReportToAvam(createJobAdvertisementFromWebDto.isReportToAvam())
                 .setExternalUrl(createJobAdvertisementFromWebDto.getExternalUrl())
-                .setPublicContact(sanitizePublicPhone(createJobAdvertisementFromWebDto.getPublicContact()))
+                .setPublicContact(createJobAdvertisementFromWebDto.getPublicContact())
                 .setLocation(createJobAdvertisementFromWebDto.getLocation())
-                .setOccupation(createJobAdvertisementFromWebDto.getOccupation());
-    }
-
-    private PublicContactDto sanitizePublicPhone(PublicContactDto publicContact) {
-        if (publicContact == null) {
-            return null;
-        }
-        publicContact.setPhone(sanitizePhoneNumber(publicContact.getPhone(), PhoneNumberUtil.PhoneNumberFormat.E164));
-        return publicContact;
-    }
-
-    private ContactDto sanitizeContactPhone(ContactDto contact) {
-        if (contact == null) {
-            return null;
-        }
-        contact.setPhone(sanitizePhoneNumber(contact.getPhone(), PhoneNumberUtil.PhoneNumberFormat.E164));
-        return contact;
-
+                .setOccupations(singletonList(createJobAdvertisementFromWebDto.getOccupation()));
     }
 
     CancellationDto convert(CancellationResource cancellation) {
@@ -70,91 +54,39 @@ public class JobAdvertisementFromWebAssembler {
                 .setCancelledBy(SourceSystem.JOBROOM);
     }
 
-    ApplyChannelDto convertApplyChannel(WebformCreateApplyChannelDto createApplyChannelDto) {
+    private ApplyChannelDto convertApplyChannel(ApplyChannelDto createApplyChannelDto) {
         if (createApplyChannelDto == null) {
             return null;
         }
-
-        validateApplyChannelIsNotEmpty(createApplyChannelDto);
-
         return new ApplyChannelDto()
+                .setRawPostAddress(trimOrNull(createApplyChannelDto.getRawPostAddress()))
                 .setPostAddress(convertPostAddress(createApplyChannelDto.getPostAddress()))
                 .setEmailAddress(trimOrNull(createApplyChannelDto.getEmailAddress()))
-                .setPhoneNumber(sanitizePhoneNumber(createApplyChannelDto.getPhoneNumber(), PhoneNumberUtil.PhoneNumberFormat.E164))
+                .setPhoneNumber(trimOrNull(createApplyChannelDto.getPhoneNumber()))
                 .setFormUrl(trimOrNull(createApplyChannelDto.getFormUrl()))
                 .setAdditionalInfo(trimOrNull(createApplyChannelDto.getAdditionalInfo()));
     }
 
-    CompanyDto convertCompany(WebformCreateCompanyDto createCompanyDto) {
-        if (createCompanyDto == null) {
+    private AddressDto convertPostAddress(AddressDto createPostAddressDto) {
+        if (createPostAddressDto == null) {
             return null;
         }
-
-        validateAddressNormalOrPOBox(createCompanyDto.getStreet(), createCompanyDto.getPostOfficeBoxNumber());
-
-        CompanyDto companyDto = new CompanyDto();
-        if (hasText(createCompanyDto.getPostOfficeBoxNumber())) {
-            companyDto
-                    .setPostOfficeBoxNumber(trimOrNull(createCompanyDto.getPostOfficeBoxNumber()))
-                    .setPostOfficeBoxPostalCode(trimOrNull(createCompanyDto.getPostalCode()))
-                    .setPostOfficeBoxCity(trimOrNull(createCompanyDto.getCity()));
-        }
-        if (hasText(createCompanyDto.getStreet())) {
-            companyDto
-                    .setStreet(trimOrNull(createCompanyDto.getStreet()))
-                    .setHouseNumber(trimOrNull(createCompanyDto.getHouseNumber()))
-                    .setPostalCode(trimOrNull(createCompanyDto.getPostalCode()))
-                    .setCity(trimOrNull(createCompanyDto.getCity()));
-        }
-
-        return companyDto
-                .setName(trimOrNull(createCompanyDto.getName()))
-                .setCountryIsoCode(trimOrNull(createCompanyDto.getCountryIsoCode()))
-                .setSurrogate(createCompanyDto.isSurrogate());
-    }
-
-    AddressDto convertPostAddress(WebformCreateAddressDto createAddressDto) {
-        if (createAddressDto == null) {
+        if (!hasText(createPostAddressDto.getName())) {
             return null;
         }
-
-        validateAddressNormalOrPOBox(createAddressDto.getStreet(), createAddressDto.getPostOfficeBoxNumber());
-
-        AddressDto addressDto = new AddressDto();
-
-        if (hasText(createAddressDto.getPostOfficeBoxNumber())) {
-            addressDto
-                    .setPostOfficeBoxNumber(trimOrNull(createAddressDto.getPostOfficeBoxNumber()))
-                    .setPostOfficeBoxPostalCode(trimOrNull(createAddressDto.getPostalCode()))
-                    .setPostOfficeBoxCity(trimOrNull(createAddressDto.getCity()));
-        } else {
-            addressDto
-                    .setStreet(trimOrNull(createAddressDto.getStreet()))
-                    .setHouseNumber(trimOrNull(createAddressDto.getHouseNumber()))
-                    .setPostalCode(trimOrNull(createAddressDto.getPostalCode()))
-                    .setCity(trimOrNull(createAddressDto.getCity()));
-        }
-
-        return addressDto
-                .setName(trimOrNull(createAddressDto.getName()))
-                .setCountryIsoCode(trimOrNull(createAddressDto.getCountryIsoCode()));
-    }
-
-    private void validateApplyChannelIsNotEmpty(WebformCreateApplyChannelDto createApplyChannelDto) {
-        boolean isNotEmpty = (createApplyChannelDto.getPostAddress() != null)
-                || hasText(createApplyChannelDto.getEmailAddress())
-                || hasText(createApplyChannelDto.getPhoneNumber())
-                || hasText(createApplyChannelDto.getFormUrl());
-
-        Condition.isTrue(isNotEmpty, "One of the apply channel must be set");
-    }
-
-    private void validateAddressNormalOrPOBox(String street, String postOfficeBoxNumber) {
-        Condition.isTrue(hasText(street) || hasText(postOfficeBoxNumber), "Street or post office box number must be set");
+        return new AddressDto()
+                .setName(trimOrNull(createPostAddressDto.getName()))
+                .setStreet(trimOrNull(createPostAddressDto.getStreet()))
+                .setHouseNumber(trimOrNull(createPostAddressDto.getHouseNumber()))
+                .setPostalCode(trimOrNull(createPostAddressDto.getPostalCode()))
+                .setCity(trimOrNull(createPostAddressDto.getCity()))
+                .setPostOfficeBoxNumber(trimOrNull(createPostAddressDto.getPostOfficeBoxNumber()))
+                .setPostOfficeBoxPostalCode(trimOrNull(createPostAddressDto.getPostOfficeBoxPostalCode()))
+                .setPostOfficeBoxCity(trimOrNull(createPostAddressDto.getPostOfficeBoxCity()))
+                .setCountryIsoCode(trimOrNull(createPostAddressDto.getCountryIsoCode()));
     }
 
     private String trimOrNull(String value) {
         return hasText(value) ? trimWhitespace(value) : null;
     }
-
 }
