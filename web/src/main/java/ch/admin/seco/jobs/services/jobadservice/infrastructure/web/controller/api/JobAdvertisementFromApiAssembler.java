@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.singletonList;
 import static org.springframework.util.StringUtils.hasText;
 
 @Component
@@ -46,7 +47,7 @@ public class JobAdvertisementFromApiAssembler {
 				.setEmployer(convertEmployer(apiCreateDto.getEmployer()))
 				.setEmployment(convertEmployment(apiCreateDto.getEmployment()))
 				.setLocation(convertCreateLocation(apiCreateDto.getLocation()))
-				.setOccupation(convertOccupation(apiCreateDto.getOccupation()))
+				.setOccupations(singletonList(convertOccupation(apiCreateDto.getOccupation())))
 				.setLanguageSkills(convertLanguageSkills(apiCreateDto.getLanguageSkills()))
 				.setApplyChannel(convertApplyChannel(apiCreateDto))
 				.setPublicContact(convertPublicContact(apiCreateDto.getPublicContact()));

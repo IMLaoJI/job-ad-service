@@ -19,7 +19,6 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
@@ -152,7 +151,7 @@ public class JobAdvertisementApplicationService {
         return jobAdvertisement.getId();
     }
 
-    public JobAdvertisementId createFromAvam(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
+    public JobAdvertisementId createFromAvam(CreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
         LOG.debug("Start creating new job ad from AVAM");
 
         Condition.notNull(createJobAdvertisementFromAvamDto, "CreateJobAdvertisementFromAvamDto can't be null");
@@ -181,8 +180,8 @@ public class JobAdvertisementApplicationService {
                 .setJobDescriptions(Collections.singletonList(
                         new JobDescription.Builder()
                                 .setLanguage(Locale.GERMAN)
-                                .setTitle(createJobAdvertisementFromAvamDto.getTitle())
-                                .setDescription(createJobAdvertisementFromAvamDto.getDescription())
+                                .setTitle(createJobAdvertisementFromAvamDto.getJobDescriptions().get(0).getTitle()) // TODO: 07/03/2019 Fago check this
+                                .setDescription(createJobAdvertisementFromAvamDto.getJobDescriptions().get(0).getDescription()) // TODO: 07/03/2019 Fago check this
                                 .build()
                 ))
                 .setLocation(location)
@@ -413,7 +412,7 @@ public class JobAdvertisementApplicationService {
         }
     }
 
-    private JobAdvertisementUpdater prepareUpdaterFromAvam(AvamCreateJobAdvertisementDto createJobAdvertisement) {
+    private JobAdvertisementUpdater prepareUpdaterFromAvam(CreateJobAdvertisementDto createJobAdvertisement) {
         Condition.notNull(createJobAdvertisement.getLocation(), "Location can't be null");
         Location location = toLocation(createJobAdvertisement.getLocation());
         location = locationService.enrichCodes(location);
@@ -425,7 +424,7 @@ public class JobAdvertisementApplicationService {
         Company company = toCompany(createJobAdvertisement.getCompany());
         return new JobAdvertisementUpdater.Builder(currentUserContext.getAuditUser())
                 .setNumberOfJobs(createJobAdvertisement.getNumberOfJobs())
-                .setJobDescription(createJobAdvertisement.getTitle(), createJobAdvertisement.getDescription())
+                .setJobDescription(createJobAdvertisement.getJobDescriptions().get(0).getTitle(), createJobAdvertisement.getJobDescriptions().get(0).getDescription())
                 .setReportingObligation(createJobAdvertisement.isReportingObligation(), createJobAdvertisement.getReportingObligationEndDate())
                 .setJobCenterCode(createJobAdvertisement.getJobCenterCode())
                 .setDisplayCompany(determineDisplayCompany(createJobAdvertisement))
@@ -580,7 +579,7 @@ public class JobAdvertisementApplicationService {
         });
     }
 
-    private void checkIfJobAdvertisementAlreadyExists(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
+    private void checkIfJobAdvertisementAlreadyExists(CreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
         Optional<JobAdvertisement> jobAdvertisement = jobAdvertisementRepository.findByStellennummerAvam(createJobAdvertisementFromAvamDto.getStellennummerAvam());
         jobAdvertisement.ifPresent(jobAd -> {
             String message = String.format("JobAdvertisement '%s' with stellennummerAvam '%s' already exists", jobAd.getId().getValue(), jobAd.getStellennummerAvam());
@@ -591,9 +590,9 @@ public class JobAdvertisementApplicationService {
     private JobAdvertisementCreator getJobAdvertisementCreatorFromInternal(CreateJobAdvertisementDto createJobAdvertisementDto) {
         Location location = convertCreateLocationToEnrichedLocation(createJobAdvertisementDto.getLocation());
 
-        Condition.notNull(createJobAdvertisementDto.getOccupation(), "Occupation can't be null");
+        Condition.notNull(createJobAdvertisementDto.getOccupations(), "Occupations can't be null");
 
-        Occupation occupation = toOccupation(createJobAdvertisementDto.getOccupation());
+        Occupation occupation = toOccupation(createJobAdvertisementDto.getOccupations().get(0));
         occupation = enrichOccupationWithProfessionCodes(occupation);
         List<Occupation> occupations = Collections.singletonList(occupation);
 
@@ -799,7 +798,7 @@ public class JobAdvertisementApplicationService {
                 .build();
     }
 
-    private Company determineDisplayCompany(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
+    private Company determineDisplayCompany(CreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
         return this.determineDisplayCompany(
                 toCompany(createJobAdvertisementFromAvamDto.getCompany()),
                 createJobAdvertisementFromAvamDto.getPublication().isCompanyAnonymous(),
@@ -836,7 +835,7 @@ public class JobAdvertisementApplicationService {
         return toCompany(jobCenter);
     }
 
-    private ApplyChannel determineApplyChannel(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
+    private ApplyChannel determineApplyChannel(CreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
         return this.determineApplyChannel(
                 toApplyChannel(createJobAdvertisementFromAvamDto.getApplyChannel()),
                 createJobAdvertisementFromAvamDto.getPublication().isCompanyAnonymous(),

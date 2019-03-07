@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -24,6 +25,16 @@ public class CreateJobAdvertisementDto {
     private String externalUrl;
 
     private String externalReference;
+
+    private String stellennummerAvam;
+
+    private Boolean reportingObligation;
+
+    private LocalDate reportingObligationEndDate;
+
+    private String JobCenterCode;
+
+    private LocalDate approvalDate;
 
     @Valid
     @NotNull
@@ -57,7 +68,7 @@ public class CreateJobAdvertisementDto {
 
     @Valid
     @NotNull
-    private OccupationDto occupation;
+    private List<OccupationDto> occupations;
 
     @Valid
     private List<LanguageSkillDto> languageSkills;
@@ -92,6 +103,51 @@ public class CreateJobAdvertisementDto {
 
     public CreateJobAdvertisementDto setExternalReference(String externalReference) {
         this.externalReference = externalReference;
+        return this;
+    }
+
+    public String getStellennummerAvam() {
+        return stellennummerAvam;
+    }
+
+    public CreateJobAdvertisementDto setStellennummerAvam(String stellennummerAvam) {
+        this.stellennummerAvam = stellennummerAvam;
+        return this;
+    }
+
+    public Boolean isReportingObligation() {
+        return reportingObligation;
+    }
+
+    public CreateJobAdvertisementDto setReportingObligation(Boolean reportingObligation) {
+        this.reportingObligation = reportingObligation;
+        return this;
+    }
+
+    public LocalDate getReportingObligationEndDate() {
+        return reportingObligationEndDate;
+    }
+
+    public CreateJobAdvertisementDto setReportingObligationEndDate(LocalDate reportingObligationEndDate) {
+        this.reportingObligationEndDate = reportingObligationEndDate;
+        return this;
+    }
+
+    public String getJobCenterCode() {
+        return JobCenterCode;
+    }
+
+    public CreateJobAdvertisementDto setJobCenterCode(String jobCenterCode) {
+        JobCenterCode = jobCenterCode;
+        return this;
+    }
+
+    public LocalDate getApprovalDate() {
+        return approvalDate;
+    }
+
+    public CreateJobAdvertisementDto setApprovalDate(LocalDate approvalDate) {
+        this.approvalDate = approvalDate;
         return this;
     }
 
@@ -167,12 +223,12 @@ public class CreateJobAdvertisementDto {
         return this;
     }
 
-    public OccupationDto getOccupation() {
-        return occupation;
+    public List<OccupationDto> getOccupations() {
+        return occupations;
     }
 
-    public CreateJobAdvertisementDto setOccupation(OccupationDto occupation) {
-        this.occupation = occupation;
+    public CreateJobAdvertisementDto setOccupations(List<OccupationDto> occupations) {
+        this.occupations = occupations;
         return this;
     }
 
@@ -203,12 +259,14 @@ public class CreateJobAdvertisementDto {
         return this;
     }
 
+
     @Override
     public String toString() {
         return "CreateJobAdvertisementDto{" +
                 "reportToAvam=" + reportToAvam +
                 ", externalUrl='" + externalUrl + '\'' +
                 ", externalReference='" + externalReference + '\'' +
+                ", stellennummerAvam='" + stellennummerAvam + '\'' +
                 ", contact=" + contact +
                 ", publication=" + publication +
                 ", numberOfJobs='" + numberOfJobs + '\'' +
@@ -217,7 +275,7 @@ public class CreateJobAdvertisementDto {
                 ", employer=" + employer +
                 ", employment=" + employment +
                 ", location=" + location +
-                ", occupation=" + occupation +
+                ", occupations=" + occupations +
                 ", languageSkills=" + languageSkills +
                 ", applyChannel=" + applyChannel +
                 ", publicContact=" + publicContact +

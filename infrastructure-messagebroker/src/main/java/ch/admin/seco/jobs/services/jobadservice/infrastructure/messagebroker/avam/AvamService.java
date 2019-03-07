@@ -100,7 +100,7 @@ public class AvamService {
     public void handleCreateAction(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
         try {
             CreateJobAdvertisementDto createJobAdvertisementDto = AvamCreateJobAdvertisementDto.toDto(createJobAdvertisementFromAvamDto);
-            jobAdvertisementApplicationService.createFromAvam(createJobAdvertisementFromAvamDto);
+            jobAdvertisementApplicationService.createFromAvam(createJobAdvertisementDto);
         } catch (JobAdvertisementAlreadyExistsException e) {
             LOG.debug(e.getMessage());
         }

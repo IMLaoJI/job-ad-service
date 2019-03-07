@@ -245,7 +245,7 @@ public class AvamCreateJobAdvertisementDto {
                 .setEmployer(null)
                 .setEmployment(createJobAdvertisementDto.getEmployment())
                 .setLocation(createJobAdvertisementDto.getLocation())
-                .setOccupation(createJobAdvertisementDto.getOccupations().get(0))// TODO: 07/03/2019 fago check this
+                .setOccupations(createJobAdvertisementDto.getOccupations())
                 .setLanguageSkills(createJobAdvertisementDto.getLanguageSkills())
                 .setApplyChannel(createJobAdvertisementDto.getApplyChannel())
                 .setPublicContact(createJobAdvertisementDto.getPublicContact());

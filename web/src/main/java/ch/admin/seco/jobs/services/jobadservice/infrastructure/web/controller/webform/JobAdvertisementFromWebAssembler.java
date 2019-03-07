@@ -10,6 +10,9 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSy
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.CancellationResource;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
+
+import static java.util.Collections.singletonList;
 import static org.springframework.util.StringUtils.hasText;
 import static org.springframework.util.StringUtils.trimWhitespace;
 
@@ -41,7 +44,7 @@ public class JobAdvertisementFromWebAssembler {
                 .setExternalUrl(createJobAdvertisementFromWebDto.getExternalUrl())
                 .setPublicContact(createJobAdvertisementFromWebDto.getPublicContact())
                 .setLocation(createJobAdvertisementFromWebDto.getLocation())
-                .setOccupation(createJobAdvertisementFromWebDto.getOccupation());
+                .setOccupations(singletonList(createJobAdvertisementFromWebDto.getOccupation()));
     }
 
     CancellationDto convert(CancellationResource cancellation) {
