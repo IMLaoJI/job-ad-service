@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
+import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto.toDto;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.ApprovalDtoTestFixture.testApprovalDto;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementFromAvamDtoTestFixture.testCreateJobAdvertisementDto;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementFromAvamDtoTestFixture.testCreateJobAdvertisementDtoWithCompanyAnonymous;
@@ -10,7 +11,6 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.J
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.INSPECTING;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REJECTED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_ADJOURNED_PUBLICATION;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_APPROVED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_REJECTED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_UPDATED;
@@ -28,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -111,7 +112,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         AvamCreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto();
 
         //when
-        JobAdvertisementId jobAdvertisementId = sut.createFromAvam(createJobAdvertisementDto);
+        JobAdvertisementId jobAdvertisementId = sut.createFromAvam(toDto(createJobAdvertisementDto));
 
         //then
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(jobAdvertisementId);
@@ -143,7 +144,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         AvamCreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDtoWithCompanyAnonymous();
 
         //when
-        JobAdvertisementId jobAdvertisementId = sut.createFromAvam(createJobAdvertisementDto);
+        JobAdvertisementId jobAdvertisementId = sut.createFromAvam(toDto(createJobAdvertisementDto));
 
         //then
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(jobAdvertisementId);
@@ -185,7 +186,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         AvamCreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto();
 
         // when
-        sut.createFromAvam(createJobAdvertisementDto);
+        sut.createFromAvam(toDto(createJobAdvertisementDto));
 
         // then
         JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
@@ -219,7 +220,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         );
 
         // when
-        sut.createFromAvam(createJobAdvertisementDto);
+        sut.createFromAvam(toDto(createJobAdvertisementDto));
 
         // then
         JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());

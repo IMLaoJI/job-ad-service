@@ -11,11 +11,14 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.LanguageIsoCode;
+
+import static java.util.Collections.singletonList;
 
 public class AvamCreateJobAdvertisementDto {
 
@@ -237,10 +240,21 @@ public class AvamCreateJobAdvertisementDto {
                 .setReportToAvam(false) // TODO: 07/03/2019 fago check this
                 .setExternalUrl("") // TODO: 07/03/2019 fago check this
                 .setExternalReference("")  // TODO: 07/03/2019 fago check this
+                .setStellennummerAvam(createJobAdvertisementDto.getStellennummerAvam())
+                .setReportingObligation(createJobAdvertisementDto.isReportingObligation())
+                .setReportingObligationEndDate(createJobAdvertisementDto.getReportingObligationEndDate())
+                .setJobCenterCode(createJobAdvertisementDto.getJobCenterCode())
+                .setApprovalDate(createJobAdvertisementDto.getApprovalDate())
                 .setContact(createJobAdvertisementDto.getContact())
                 .setPublication(createJobAdvertisementDto.getPublication())
                 .setNumberOfJobs(createJobAdvertisementDto.getNumberOfJobs())
-                .setJobDescriptions(null) // TODO: 07/03/2019 fago check this
+                .setJobDescriptions(
+                        singletonList(
+                                new JobDescriptionDto()
+                                        .setDescription(createJobAdvertisementDto.getDescription())
+                                        .setTitle(createJobAdvertisementDto.getTitle())
+                        )
+                )
                 .setCompany(createJobAdvertisementDto.getCompany())
                 .setEmployer(null)
                 .setEmployment(createJobAdvertisementDto.getEmployment())

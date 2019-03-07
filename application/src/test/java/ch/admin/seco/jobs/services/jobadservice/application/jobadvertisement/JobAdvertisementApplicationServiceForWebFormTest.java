@@ -104,7 +104,7 @@ public class JobAdvertisementApplicationServiceForWebFormTest {
 
 
         Occupation occupation = jobAdvertisement.getJobContent().getOccupations().get(0);
-        OccupationDto occupationDto = createJobAdvertisementDto.getOccupation();
+        OccupationDto occupationDto = createJobAdvertisementDto.getOccupations().get(0);
         assertThat(occupation.getWorkExperience()).isEqualByComparingTo(occupationDto.getWorkExperience());
         assertThat(occupation.getAvamOccupationCode()).isEqualToIgnoringCase(occupationDto.getAvamOccupationCode());
         assertThat(occupation.getEducationCode()).isEqualToIgnoringCase(occupationDto.getEducationCode());

@@ -1,9 +1,9 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture;
 
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.CompanyFixture.testCompany;
+import static java.util.Collections.singletonList;
 
 import java.time.LocalDate;
-import java.util.Collections;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.AddressDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
@@ -48,7 +48,7 @@ public class CreateJobAdvertisementDtoTestFixture {
                         .setCompanyAnonymous(false)
                 )
                 .setNumberOfJobs(null)
-                .setJobDescriptions(Collections.singletonList(new JobDescriptionDto()
+                .setJobDescriptions(singletonList(new JobDescriptionDto()
                         .setTitle("de")
                         .setTitle("title")
                         .setDescription("description")))
@@ -68,13 +68,13 @@ public class CreateJobAdvertisementDtoTestFixture {
                         .setCity("city")
                         .setPostalCode("postalCode")
                         .setCountryIsoCode("CH"))
-                .setOccupation(
+                .setOccupations(singletonList(
                         new OccupationDto()
                                 .setAvamOccupationCode("avamCode")
                                 .setWorkExperience(WorkExperience.MORE_THAN_1_YEAR)
                                 .setEducationCode("educationCode")
-                                .setQualificationCode(Qualification.SKILLED))
-                .setLanguageSkills(Collections.singletonList(new LanguageSkillDto()
+                                .setQualificationCode(Qualification.SKILLED)))
+                .setLanguageSkills(singletonList(new LanguageSkillDto()
                         .setLanguageIsoCode("de")
                         .setSpokenLevel(LanguageLevel.PROFICIENT)
                         .setWrittenLevel(LanguageLevel.PROFICIENT)))
