@@ -202,4 +202,25 @@ public class CreateJobAdvertisementDto {
         this.publicContact = publicContact;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "CreateJobAdvertisementDto{" +
+                "reportToAvam=" + reportToAvam +
+                ", externalUrl='" + externalUrl + '\'' +
+                ", externalReference='" + externalReference + '\'' +
+                ", contact=" + contact +
+                ", publication=" + publication +
+                ", numberOfJobs='" + numberOfJobs + '\'' +
+                ", jobDescriptions=" + jobDescriptions +
+                ", company=" + company +
+                ", employer=" + employer +
+                ", employment=" + employment +
+                ", location=" + location +
+                ", occupation=" + occupation +
+                ", languageSkills=" + languageSkills +
+                ", applyChannel=" + applyChannel +
+                ", publicContact=" + publicContact +
+                '}';
+    }
 }

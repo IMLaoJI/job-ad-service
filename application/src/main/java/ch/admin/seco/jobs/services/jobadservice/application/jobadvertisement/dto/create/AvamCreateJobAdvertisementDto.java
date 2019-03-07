@@ -39,8 +39,6 @@ public class AvamCreateJobAdvertisementDto {
 
     private String jobCenterCode;
 
-    private String jobCenterUserId;
-
     @NotNull
     private LocalDate approvalDate;
 
@@ -68,187 +66,213 @@ public class AvamCreateJobAdvertisementDto {
     @NotNull
     private PublicationDto publication;
 
-
-    protected AvamCreateJobAdvertisementDto() {
+    public AvamCreateJobAdvertisementDto() {
         // For reflection libs
-    }
-
-    public AvamCreateJobAdvertisementDto(String stellennummerAvam, String title, String description, String languageIsoCode, String numberOfJobs,
-                                         boolean reportingObligation, LocalDate reportingObligationEndDate, String jobCenterCode, String jobCenterUserId, LocalDate approvalDate,
-                                         EmploymentDto employment, ApplyChannelDto applyChannel, CompanyDto company, ContactDto contact, CreateLocationDto location,
-                                         List<OccupationDto> occupations, List<LanguageSkillDto> languageSkills, PublicationDto publication, PublicContactDto publicContact
-    ) {
-        this.stellennummerAvam = stellennummerAvam;
-        this.title = title;
-        this.description = description;
-        this.languageIsoCode = languageIsoCode;
-        this.numberOfJobs = numberOfJobs;
-        this.reportingObligation = reportingObligation;
-        this.reportingObligationEndDate = reportingObligationEndDate;
-        this.jobCenterCode = jobCenterCode;
-        this.jobCenterUserId = jobCenterUserId;
-        this.approvalDate = approvalDate;
-        this.employment = employment;
-        this.applyChannel = applyChannel;
-        this.company = company;
-        this.contact = contact;
-        this.location = location;
-        this.occupations = occupations;
-        this.languageSkills = languageSkills;
-        this.publication = publication;
-        this.publicContact = publicContact;
-
     }
 
     public String getStellennummerAvam() {
         return stellennummerAvam;
     }
 
-    public void setStellennummerAvam(String stellennummerAvam) {
+    public AvamCreateJobAdvertisementDto setStellennummerAvam(String stellennummerAvam) {
         this.stellennummerAvam = stellennummerAvam;
+        return this;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public AvamCreateJobAdvertisementDto setTitle(String title) {
         this.title = title;
+        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public AvamCreateJobAdvertisementDto setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     public String getLanguageIsoCode() {
         return languageIsoCode;
     }
 
-    public void setLanguageIsoCode(String languageIsoCode) {
+    public AvamCreateJobAdvertisementDto setLanguageIsoCode(String languageIsoCode) {
         this.languageIsoCode = languageIsoCode;
+        return this;
     }
 
     public String getNumberOfJobs() {
         return numberOfJobs;
     }
 
-    public void setNumberOfJobs(String numberOfJobs) {
+    public AvamCreateJobAdvertisementDto setNumberOfJobs(String numberOfJobs) {
         this.numberOfJobs = numberOfJobs;
-    }
-
-    public String getJobCenterCode() {
-        return jobCenterCode;
-    }
-
-    public void setJobCenterCode(String jobCenterCode) {
-        this.jobCenterCode = jobCenterCode;
-    }
-
-    public String getJobCenterUserId() {
-        return jobCenterUserId;
-    }
-
-    public void setJobCenterUserId(String jobCenterUserId) {
-        this.jobCenterUserId = jobCenterUserId;
-    }
-
-    public LocalDate getApprovalDate() {
-        return approvalDate;
-    }
-
-    public void setApprovalDate(LocalDate approvalDate) {
-        this.approvalDate = approvalDate;
+        return this;
     }
 
     public boolean isReportingObligation() {
         return reportingObligation;
     }
 
-    public void setReportingObligation(boolean reportingObligation) {
+    public AvamCreateJobAdvertisementDto setReportingObligation(boolean reportingObligation) {
         this.reportingObligation = reportingObligation;
+        return this;
     }
 
     public LocalDate getReportingObligationEndDate() {
         return reportingObligationEndDate;
     }
 
-    public void setReportingObligationEndDate(LocalDate reportingObligationEndDate) {
+    public AvamCreateJobAdvertisementDto setReportingObligationEndDate(LocalDate reportingObligationEndDate) {
         this.reportingObligationEndDate = reportingObligationEndDate;
+        return this;
+    }
+
+    public String getJobCenterCode() {
+        return jobCenterCode;
+    }
+
+    public AvamCreateJobAdvertisementDto setJobCenterCode(String jobCenterCode) {
+        this.jobCenterCode = jobCenterCode;
+        return this;
+    }
+
+    public LocalDate getApprovalDate() {
+        return approvalDate;
+    }
+
+    public AvamCreateJobAdvertisementDto setApprovalDate(LocalDate approvalDate) {
+        this.approvalDate = approvalDate;
+        return this;
     }
 
     public EmploymentDto getEmployment() {
         return employment;
     }
 
-    public void setEmployment(EmploymentDto employment) {
+    public AvamCreateJobAdvertisementDto setEmployment(EmploymentDto employment) {
         this.employment = employment;
+        return this;
     }
 
     public ApplyChannelDto getApplyChannel() {
         return applyChannel;
     }
 
-    public void setApplyChannel(ApplyChannelDto applyChannel) {
+    public AvamCreateJobAdvertisementDto setApplyChannel(ApplyChannelDto applyChannel) {
         this.applyChannel = applyChannel;
+        return this;
     }
 
     public CompanyDto getCompany() {
         return company;
     }
 
-    public void setCompany(CompanyDto company) {
+    public AvamCreateJobAdvertisementDto setCompany(CompanyDto company) {
         this.company = company;
+        return this;
     }
 
     public ContactDto getContact() {
         return contact;
     }
 
-    public void setContact(ContactDto contact) {
+    public AvamCreateJobAdvertisementDto setContact(ContactDto contact) {
         this.contact = contact;
-    }
-
-    public CreateLocationDto getLocation() {
-        return location;
-    }
-
-    public void setLocation(CreateLocationDto location) {
-        this.location = location;
-    }
-
-    public List<OccupationDto> getOccupations() {
-        return occupations;
-    }
-
-    public void setOccupations(List<OccupationDto> occupations) {
-        this.occupations = occupations;
-    }
-
-    public List<LanguageSkillDto> getLanguageSkills() {
-        return languageSkills;
-    }
-
-    public void setLanguageSkills(List<LanguageSkillDto> languageSkills) {
-        this.languageSkills = languageSkills;
-    }
-
-    public PublicationDto getPublication() {
-        return publication;
-    }
-
-    public void setPublication(PublicationDto publication) {
-        this.publication = publication;
+        return this;
     }
 
     public PublicContactDto getPublicContact() {
         return publicContact;
     }
 
-    public void setPublicContact(PublicContactDto publicContact) {
+    public AvamCreateJobAdvertisementDto setPublicContact(PublicContactDto publicContact) {
         this.publicContact = publicContact;
+        return this;
+    }
+
+    public CreateLocationDto getLocation() {
+        return location;
+    }
+
+    public AvamCreateJobAdvertisementDto setLocation(CreateLocationDto location) {
+        this.location = location;
+        return this;
+    }
+
+    public List<OccupationDto> getOccupations() {
+        return occupations;
+    }
+
+    public AvamCreateJobAdvertisementDto setOccupations(List<OccupationDto> occupations) {
+        this.occupations = occupations;
+        return this;
+    }
+
+    public List<LanguageSkillDto> getLanguageSkills() {
+        return languageSkills;
+    }
+
+    public AvamCreateJobAdvertisementDto setLanguageSkills(List<LanguageSkillDto> languageSkills) {
+        this.languageSkills = languageSkills;
+        return this;
+    }
+
+    public PublicationDto getPublication() {
+        return publication;
+    }
+
+    public AvamCreateJobAdvertisementDto setPublication(PublicationDto publication) {
+        this.publication = publication;
+        return this;
+    }
+
+    public static CreateJobAdvertisementDto toDto(AvamCreateJobAdvertisementDto createJobAdvertisementDto) {
+        return new CreateJobAdvertisementDto()
+                .setReportToAvam(false) // TODO: 07/03/2019 fago check this
+                .setExternalUrl("") // TODO: 07/03/2019 fago check this
+                .setExternalReference("")  // TODO: 07/03/2019 fago check this
+                .setContact(createJobAdvertisementDto.getContact())
+                .setPublication(createJobAdvertisementDto.getPublication())
+                .setNumberOfJobs(createJobAdvertisementDto.getNumberOfJobs())
+                .setJobDescriptions(null) // TODO: 07/03/2019 fago check this
+                .setCompany(createJobAdvertisementDto.getCompany())
+                .setEmployer(null)
+                .setEmployment(createJobAdvertisementDto.getEmployment())
+                .setLocation(createJobAdvertisementDto.getLocation())
+                .setOccupation(createJobAdvertisementDto.getOccupations().get(0))// TODO: 07/03/2019 fago check this
+                .setLanguageSkills(createJobAdvertisementDto.getLanguageSkills())
+                .setApplyChannel(createJobAdvertisementDto.getApplyChannel())
+                .setPublicContact(createJobAdvertisementDto.getPublicContact());
+    }
+
+
+    @Override
+    public String toString() {
+        return "AvamCreateJobAdvertisementDto{" +
+                "stellennummerAvam='" + stellennummerAvam + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", languageIsoCode='" + languageIsoCode + '\'' +
+                ", numberOfJobs='" + numberOfJobs + '\'' +
+                ", reportingObligation=" + reportingObligation +
+                ", reportingObligationEndDate=" + reportingObligationEndDate +
+                ", jobCenterCode='" + jobCenterCode + '\'' +
+                ", approvalDate=" + approvalDate +
+                ", employment=" + employment +
+                ", applyChannel=" + applyChannel +
+                ", company=" + company +
+                ", contact=" + contact +
+                ", publicContact=" + publicContact +
+                ", location=" + location +
+                ", occupations=" + occupations +
+                ", languageSkills=" + languageSkills +
+                ", publication=" + publication +
+                '}';
     }
 }
