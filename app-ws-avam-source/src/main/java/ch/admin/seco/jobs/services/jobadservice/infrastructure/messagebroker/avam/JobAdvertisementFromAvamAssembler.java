@@ -88,7 +88,7 @@ public class JobAdvertisementFromAvamAssembler {
                 .setPublicContact(createPublicContactDto(avamJobAdvertisement));
     }
 
-    ApprovalDto createApprovaldDto(WSOsteEgov avamJobAdvertisement) {
+    ApprovalDto createApprovalDto(WSOsteEgov avamJobAdvertisement) {
         return new ApprovalDto(
                 safeTrimOrNull(avamJobAdvertisement.getStellennummerEgov()),
                 safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()),
