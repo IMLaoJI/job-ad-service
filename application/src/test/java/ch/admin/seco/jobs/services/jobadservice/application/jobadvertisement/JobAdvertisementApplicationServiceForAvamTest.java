@@ -1,6 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
-import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto.toDto;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.ApprovalDtoTestFixture.testApprovalDto;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementFromAvamDtoTestFixture.testCreateJobAdvertisementDto;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementFromAvamDtoTestFixture.testCreateJobAdvertisementDtoWithCompanyAnonymous;
@@ -47,7 +46,6 @@ import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromAvamDto;
@@ -109,10 +107,10 @@ public class JobAdvertisementApplicationServiceForAvamTest {
     @Test
     public void createFromAvam() {
         //given
-        AvamCreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto();
+        CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto();
 
         //when
-        JobAdvertisementId jobAdvertisementId = sut.createFromAvam(toDto(createJobAdvertisementDto));
+        JobAdvertisementId jobAdvertisementId = sut.createFromAvam(createJobAdvertisementDto);
 
         //then
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(jobAdvertisementId);
@@ -141,10 +139,10 @@ public class JobAdvertisementApplicationServiceForAvamTest {
     @Test
     public void createFromAvamWithCompanyAnonymous() {
         //given
-        AvamCreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDtoWithCompanyAnonymous();
+        CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDtoWithCompanyAnonymous();
 
         //when
-        JobAdvertisementId jobAdvertisementId = sut.createFromAvam(toDto(createJobAdvertisementDto));
+        JobAdvertisementId jobAdvertisementId = sut.createFromAvam(createJobAdvertisementDto);
 
         //then
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(jobAdvertisementId);
@@ -183,10 +181,10 @@ public class JobAdvertisementApplicationServiceForAvamTest {
                         .setCancellationCode(null)
                         .build()
         );
-        AvamCreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto();
+        CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto();
 
         // when
-        sut.createFromAvam(toDto(createJobAdvertisementDto));
+        sut.createFromAvam(createJobAdvertisementDto);
 
         // then
         JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
@@ -212,7 +210,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
                                 .build())
                         .build()
         );
-        AvamCreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(
+        CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(
                 inspectingJobAd.getJobContent().getCompany(),
                 new PublicationDto()
                         .setStartDate(now().plusDays(10))
@@ -220,7 +218,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         );
 
         // when
-        sut.createFromAvam(toDto(createJobAdvertisementDto));
+        sut.createFromAvam(createJobAdvertisementDto);
 
         // then
         JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());

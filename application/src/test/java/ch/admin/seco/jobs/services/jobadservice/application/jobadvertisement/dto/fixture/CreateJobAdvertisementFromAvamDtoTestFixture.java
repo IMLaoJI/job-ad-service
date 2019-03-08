@@ -11,6 +11,8 @@ import static java.time.LocalDate.now;
 import java.time.LocalDate;
 import java.util.Collections;
 
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import org.assertj.core.util.Sets;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.AddressDto;
@@ -22,7 +24,6 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Company;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Qualification;
@@ -30,20 +31,18 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutati
 
 public class CreateJobAdvertisementFromAvamDtoTestFixture {
 
-    public static AvamCreateJobAdvertisementDto testCreateJobAdvertisementDto() {
+    public static CreateJobAdvertisementDto testCreateJobAdvertisementDto() {
         return testCreateJobAdvertisementDto(testCompany().build(), testPublicationDto());
     }
 
-    public static AvamCreateJobAdvertisementDto testCreateJobAdvertisementDtoWithCompanyAnonymous() {
+    public static CreateJobAdvertisementDto testCreateJobAdvertisementDtoWithCompanyAnonymous() {
         return testCreateJobAdvertisementDto(testCompany().build(), testPublicationDtoWithCompanyAnonymous());
     }
 
-    public static AvamCreateJobAdvertisementDto testCreateJobAdvertisementDto(Company company, PublicationDto publicationDto) {
-        return new AvamCreateJobAdvertisementDto()
+    public static CreateJobAdvertisementDto testCreateJobAdvertisementDto(Company company, PublicationDto publicationDto) {
+        return new CreateJobAdvertisementDto()
                 .setStellennummerAvam(STELLENNUMMER_AVAM)
-                .setTitle("title")
-                .setDescription("description")
-                .setLanguageIsoCode("de")
+                .setJobDescriptions(Collections.singletonList(new JobDescriptionDto().setTitle("title").setDescription("description").setLanguageIsoCode("de")))
                 .setNumberOfJobs(null)
                 .setReportingObligation(true)
                 .setReportingObligationEndDate(LocalDate.of(2018, 1, 1))
