@@ -71,10 +71,6 @@ public class AvamCreateJobAdvertisementDto {
     @NotNull
     private PublicationDto publication;
 
-    public AvamCreateJobAdvertisementDto() {
-        // For reflection libs
-    }
-
     public String getStellennummerAvam() {
         return stellennummerAvam;
     }
