@@ -53,7 +53,7 @@ public class AvamSource {
                 .build());
     }
 
-    public void create(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
+    public void create(@Valid AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
         LOG.debug("Create JobAdvertisement stellennummerAvam={}", createJobAdvertisementFromAvamDto.getStellennummerAvam());
         output.send(MessageBuilder
                 .withPayload(createJobAdvertisementFromAvamDto)

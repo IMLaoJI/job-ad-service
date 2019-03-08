@@ -19,9 +19,11 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.LanguageIsoCode;
+import org.springframework.validation.annotation.Validated;
 
 import static java.util.Collections.singletonList;
 
+@Validated
 public class AvamCreateJobAdvertisementDto {
 
     @NotEmpty
