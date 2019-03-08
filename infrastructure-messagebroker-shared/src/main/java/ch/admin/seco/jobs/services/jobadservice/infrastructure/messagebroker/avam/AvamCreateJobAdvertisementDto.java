@@ -253,6 +253,7 @@ public class AvamCreateJobAdvertisementDto {
                                 new JobDescriptionDto()
                                         .setDescription(createJobAdvertisementDto.getDescription())
                                         .setTitle(createJobAdvertisementDto.getTitle())
+                                        .setLanguageIsoCode(createJobAdvertisementDto.getLanguageIsoCode())
                         )
                 )
                 .setCompany(createJobAdvertisementDto.getCompany())
