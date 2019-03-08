@@ -1,4 +1,4 @@
-package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create;
+package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,6 +16,8 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.LanguageIsoCode;
 
 import static java.util.Collections.singletonList;
