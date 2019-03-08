@@ -68,6 +68,7 @@ public class CreateJobAdvertisementDto {
 
     @Valid
     @NotNull
+    @NotEmpty
     private List<OccupationDto> occupations;
 
     @Valid
