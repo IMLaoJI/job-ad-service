@@ -47,7 +47,7 @@ public class CreateJobAdvertisementFromAvamDtoTestFixture {
                 .setReportingObligation(true)
                 .setReportingObligationEndDate(LocalDate.of(2018, 1, 1))
                 .setJobCenterCode("jobCenter")
-                .setApprovalDate(now())
+                .setApprovalDate(LocalDate.of(2017, 12, 26))
                 .setEmployment(new EmploymentDto()
                         .setStartDate(LocalDate.of(2018, 1, 1))
                         .setEndDate(LocalDate.of(2018, 12, 31))

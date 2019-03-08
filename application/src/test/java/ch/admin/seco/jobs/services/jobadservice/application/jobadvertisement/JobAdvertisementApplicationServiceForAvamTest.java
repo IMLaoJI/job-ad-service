@@ -58,6 +58,8 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupati
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
 
+import java.time.LocalDate;
+
 @SpringBootTest
 @RunWith(SpringRunner.class)
 @Transactional
@@ -122,6 +124,9 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         assertThat(jobAdvertisement.getPublication().isCompanyAnonymous()).isFalse();
 
         assertThat(jobAdvertisement.isReportingObligation()).isTrue();
+        assertThat(jobAdvertisement.getReportingObligationEndDate()).isEqualTo(LocalDate.of(2018, 1, 1));
+        assertThat(jobAdvertisement.getJobCenterCode()).isEqualTo("jobCenter");
+        assertThat(jobAdvertisement.getApprovalDate()).isEqualTo(LocalDate.of(2017, 12, 26));
         assertThat(jobAdvertisement.getJobContent().getDisplayCompany()).isEqualTo(testCompany().build());
         assertThat(jobAdvertisement.getJobContent().getDisplayApplyChannel()).isEqualTo(testApplyChannel().build());
 
