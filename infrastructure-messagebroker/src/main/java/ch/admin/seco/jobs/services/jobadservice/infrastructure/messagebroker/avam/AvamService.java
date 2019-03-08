@@ -18,6 +18,8 @@ import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
 
+import javax.validation.Valid;
+
 import static ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition.notNull;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_CANCELLED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_INSPECTING;
@@ -96,7 +98,7 @@ public class AvamService {
     }
 
     @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CREATE_FROM_AVAM_CONDITION)
-    public void handleCreateAction(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
+    public void handleCreateAction(@Valid AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
         try {
             CreateJobAdvertisementDto createJobAdvertisementDto = AvamCreateJobAdvertisementDto.toDto(createJobAdvertisementFromAvamDto);
             jobAdvertisementApplicationService.createFromAvam(createJobAdvertisementDto);
@@ -106,7 +108,7 @@ public class AvamService {
     }
 
     @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CANCEL_CONDITION)
-    public void handleCancelAction(AvamCancellationDto avamCancellationDto) {
+    public void handleCancelAction(@Valid AvamCancellationDto avamCancellationDto) {
         JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerEgovOrAvam(avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerAvam());
 
         if ((jobAdvertisementDto == null) && (avamCancellationDto.getSourceSystem() == SourceSystem.RAV) && (avamCancellationDto.getContactEmail() != null)) {
