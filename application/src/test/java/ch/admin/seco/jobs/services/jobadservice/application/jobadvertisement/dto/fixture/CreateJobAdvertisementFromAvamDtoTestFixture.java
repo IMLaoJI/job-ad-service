@@ -7,9 +7,9 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.L
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience.MORE_THAN_1_YEAR;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.CompanyFixture.testCompany;
 import static java.time.LocalDate.now;
+import static java.util.Collections.singletonList;
 
 import java.time.LocalDate;
-import java.util.Collections;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
@@ -42,7 +42,7 @@ public class CreateJobAdvertisementFromAvamDtoTestFixture {
     public static CreateJobAdvertisementDto testCreateJobAdvertisementDto(Company company, PublicationDto publicationDto) {
         return new CreateJobAdvertisementDto()
                 .setStellennummerAvam(STELLENNUMMER_AVAM)
-                .setJobDescriptions(Collections.singletonList(new JobDescriptionDto().setTitle("title").setDescription("description").setLanguageIsoCode("de")))
+                .setJobDescriptions(singletonList(new JobDescriptionDto().setTitle("title").setDescription("description").setLanguageIsoCode("de")))
                 .setNumberOfJobs(null)
                 .setReportingObligation(true)
                 .setReportingObligationEndDate(LocalDate.of(2018, 1, 1))
@@ -93,12 +93,12 @@ public class CreateJobAdvertisementFromAvamDtoTestFixture {
                         .setCity("city")
                         .setPostalCode("postalCode")
                         .setCountryIsoCode("CH"))
-                .setOccupations(Collections.singletonList(new OccupationDto()
+                .setOccupations(singletonList(new OccupationDto()
                         .setAvamOccupationCode("avamCode")
                         .setWorkExperience(MORE_THAN_1_YEAR)
                         .setEducationCode("educationCode")
                         .setQualificationCode(Qualification.SKILLED)))
-                .setLanguageSkills(Collections.singletonList(new LanguageSkillDto()
+                .setLanguageSkills(singletonList(new LanguageSkillDto()
                         .setLanguageIsoCode("de")
                         .setSpokenLevel(PROFICIENT)
                         .setWrittenLevel(PROFICIENT)))
