@@ -1,6 +1,8 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
@@ -25,11 +27,13 @@ import org.springframework.ws.test.server.MockWebServiceClient;
 import org.springframework.ws.test.server.ResponseMatchers;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.APPROVE;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.CANCEL;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.CREATE_FROM_AVAM;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.REJECT;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCreateJobAdvertisementDto.toDto;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.ACTION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.ws.test.server.RequestCreators.withPayload;
@@ -51,6 +55,9 @@ public class AvamEndpointTest {
 
     @Autowired
     private MessageCollector messageCollector;
+
+    @Autowired
+    private JobAdvertisementFromAvamAssembler assembler;
 
     @Autowired
     private Source source;
@@ -127,7 +134,68 @@ public class AvamEndpointTest {
     }
 
     @Test
-    public void cancelJobAdvertisement() throws IOException {
+    public void createAvamCreateJobAdvertisementDtoAndAndAssembleToCreateJobAdvertisementDto() throws IOException {
+
+        // given
+        mockWebServiceClient.sendRequest(withPayload(getAsResource("soap/messages/insertOste-create-1.xml")))
+                .andExpect(ResponseMatchers.noFault())
+                .andExpect(ResponseMatchers.validPayload(secoEgovServiceXsdResource));
+
+        Message<String> received = (Message<String>) messageCollector.forChannel(source.output()).poll();
+        assertThat(received).isNotNull();
+        assertThat(received.getHeaders().get(ACTION)).isEqualTo(CREATE_FROM_AVAM.name());
+
+        AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto = createJobAdvertisementAvamDtoJacksonTester.parse(received.getPayload()).getObject();
+        assertThat(createJobAdvertisementFromAvamDto.getStellennummerAvam()).isEqualTo("AVAM-0003");
+        assertThat(createJobAdvertisementFromAvamDto.getTitle()).isEqualTo("Test Title");
+        assertThat(createJobAdvertisementFromAvamDto.getDescription()).isEqualTo("Test Description");
+
+        //when
+        CreateJobAdvertisementDto createJobAdvertisementDto = toDto(createJobAdvertisementFromAvamDto);
+
+        //then
+        assertThat(createJobAdvertisementDto.getStellennummerAvam()).isEqualTo("AVAM-0003");
+        assertThat(createJobAdvertisementDto.getJobDescriptions().get(0).getTitle()).isEqualTo("Test Title");
+        assertThat(createJobAdvertisementDto.getJobDescriptions().get(0).getDescription()).isEqualTo("Test Description");
+        assertThat(createJobAdvertisementDto.getJobCenterCode()).isEqualTo("BEA12");
+        assertThat(createJobAdvertisementDto.getApprovalDate()).isEqualTo(LocalDate.of(2012,3,1));
+    }
+
+    @Test
+    public void createAvamCancellationDtoAndAssembleToCancellationDto() throws IOException {
+
+        // process
+        mockWebServiceClient.sendRequest(withPayload(getAsResource("soap/messages/insertOste-cancel-1.xml")))
+                .andExpect(ResponseMatchers.noFault())
+                .andExpect(ResponseMatchers.validPayload(secoEgovServiceXsdResource));
+
+        // assert
+        Message<String> received = (Message<String>) messageCollector.forChannel(source.output()).poll();
+        assertThat(received).isNotNull();
+        assertThat(received.getHeaders().get(ACTION)).isEqualTo(CANCEL.name());
+
+        AvamCancellationDto avamCancellationDto = cancellationDtoJacksonTester.parse(received.getPayload()).getObject();
+        assertThat(avamCancellationDto.getStellennummerEgov()).isEqualTo("EGOV-0004");
+        assertThat(avamCancellationDto.getStellennummerAvam()).isEqualTo("AVAM-0004");
+        assertThat(avamCancellationDto.getCancellationDate()).isEqualTo("2018-03-04");
+        assertThat(avamCancellationDto.getJobCenterCode()).isEqualTo("BEA12");
+        assertThat(avamCancellationDto.getContactEmail()).isEqualTo("kpemail");
+        assertThat(avamCancellationDto.getJobDescriptionTitle()).isEqualTo("Dies ist ein Test (Florist)");
+        assertThat(avamCancellationDto.getCancellationCode()).isEqualTo(CancellationCode.OCCUPIED_JOBCENTER);
+        assertThat(avamCancellationDto.getSourceSystem()).isEqualTo(SourceSystem.JOBROOM);
+
+        //when
+        CancellationDto cancellationDto = AvamCancellationDto.toDto(avamCancellationDto);
+
+        //then
+        assertThat(cancellationDto.getStellennummerEgov()).isEqualTo("EGOV-0004");
+        assertThat(cancellationDto.getStellennummerAvam()).isEqualTo("AVAM-0004");
+        assertThat(cancellationDto.getCancellationDate()).isEqualTo("2018-03-04");
+        assertThat(cancellationDto.getCancellationCode()).isEqualTo(CancellationCode.OCCUPIED_JOBCENTER);
+    }
+
+    @Test
+    public void cancelJobAdvertisementFromAvamAndMapToCancellationDto() throws IOException {
 
         // process
         mockWebServiceClient.sendRequest(withPayload(getAsResource("soap/messages/insertOste-cancel-1.xml")))
@@ -149,6 +217,8 @@ public class AvamEndpointTest {
         assertThat(cancellationDto.getCancellationCode()).isEqualTo(CancellationCode.OCCUPIED_JOBCENTER);
         assertThat(cancellationDto.getSourceSystem()).isEqualTo(SourceSystem.JOBROOM);
     }
+
+
 
     private ClassPathResource getAsResource(String payloadFile) {
         return new ClassPathResource(payloadFile);

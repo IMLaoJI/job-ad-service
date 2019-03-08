@@ -256,7 +256,7 @@ public class AvamCreateJobAdvertisementDto {
                         )
                 )
                 .setCompany(createJobAdvertisementDto.getCompany())
-                .setEmployer(null)
+                .setEmployer(null) // TODO: 08/03/2019 fago check this
                 .setEmployment(createJobAdvertisementDto.getEmployment())
                 .setLocation(createJobAdvertisementDto.getLocation())
                 .setOccupations(createJobAdvertisementDto.getOccupations())
