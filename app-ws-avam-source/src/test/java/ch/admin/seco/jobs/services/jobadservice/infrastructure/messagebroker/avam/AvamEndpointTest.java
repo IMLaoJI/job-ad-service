@@ -164,12 +164,11 @@ public class AvamEndpointTest {
     @Test
     public void createAvamCancellationDtoAndAssembleToCancellationDto() throws IOException {
 
-        // process
+        //given
         mockWebServiceClient.sendRequest(withPayload(getAsResource("soap/messages/insertOste-cancel-1.xml")))
                 .andExpect(ResponseMatchers.noFault())
                 .andExpect(ResponseMatchers.validPayload(secoEgovServiceXsdResource));
 
-        // assert
         Message<String> received = (Message<String>) messageCollector.forChannel(source.output()).poll();
         assertThat(received).isNotNull();
         assertThat(received.getHeaders().get(ACTION)).isEqualTo(CANCEL.name());
@@ -217,8 +216,6 @@ public class AvamEndpointTest {
         assertThat(cancellationDto.getCancellationCode()).isEqualTo(CancellationCode.OCCUPIED_JOBCENTER);
         assertThat(cancellationDto.getSourceSystem()).isEqualTo(SourceSystem.JOBROOM);
     }
-
-
 
     private ClassPathResource getAsResource(String payloadFile) {
         return new ClassPathResource(payloadFile);
