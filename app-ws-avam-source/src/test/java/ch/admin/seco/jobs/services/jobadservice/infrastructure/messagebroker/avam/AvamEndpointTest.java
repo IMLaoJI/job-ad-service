@@ -131,6 +131,7 @@ public class AvamEndpointTest {
         assertThat(createJobAdvertisementFromAvamDto.getStellennummerAvam()).isEqualTo("AVAM-0003");
         assertThat(createJobAdvertisementFromAvamDto.getTitle()).isEqualTo("Test Title");
         assertThat(createJobAdvertisementFromAvamDto.getDescription()).isEqualTo("Test Description");
+        assertThat(createJobAdvertisementFromAvamDto.getLanguageIsoCode()).isEqualTo("de");
     }
 
     @Test
@@ -159,6 +160,7 @@ public class AvamEndpointTest {
         assertThat(createJobAdvertisementDto.getJobDescriptions().get(0).getDescription()).isEqualTo("Test Description");
         assertThat(createJobAdvertisementDto.getJobCenterCode()).isEqualTo("BEA12");
         assertThat(createJobAdvertisementDto.getApprovalDate()).isEqualTo(LocalDate.of(2012,3,1));
+        assertThat(createJobAdvertisementDto.getJobDescriptions().get(0).getLanguageIsoCode()).isEqualTo("de");
     }
 
     @Test
