@@ -53,8 +53,12 @@ public class MailSenderData {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MailSenderData that = (MailSenderData) o;
         return Objects.equals(subject, that.subject) &&
                 Objects.equals(to, that.to) &&
@@ -82,8 +86,8 @@ public class MailSenderData {
         return cc;
     }
 
-    public Optional<Set<String>> getBcc() {
-        return Optional.ofNullable(bcc);
+    public Set<String> getBcc() {
+        return this.bcc;
     }
 
     public String getTemplateName() {

@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.mail;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -52,7 +53,7 @@ class DefaultMailSenderService implements MailSenderService {
     private MailSendingTask.MailSendingTaskData toMailData(MailSenderData mailSenderData) {
         String subject = messageSource.getMessage(mailSenderData.getSubject(), null, mailSenderData.getSubject(), mailSenderData.getLocale());
         String content = createContent(mailSenderData);
-        Set<String> bcc = mailSenderData.getBcc().orElse(mailSenderProperties.getBccAddress());
+        Set<String> bcc = extractAllBccAddresses(mailSenderData);
         return MailSendingTask.builder()
                 .setBcc(bcc.toArray(new String[0]))
                 .setCc(encodeEmailAddresses(mailSenderData.getCc().toArray(new String[0])))
@@ -61,6 +62,12 @@ class DefaultMailSenderService implements MailSenderService {
                 .setSubject(subject)
                 .setTo(encodeEmailAddresses(mailSenderData.getTo().toArray(new String[0])))
                 .build();
+    }
+
+    private Set<String> extractAllBccAddresses(MailSenderData mailSenderData) {
+        Set<String> allBcc = new HashSet<>(mailSenderData.getBcc());
+        allBcc.addAll(this.mailSenderProperties.getBccAddress());
+        return allBcc;
     }
 
     private String createContent(MailSenderData mailSenderData) {
