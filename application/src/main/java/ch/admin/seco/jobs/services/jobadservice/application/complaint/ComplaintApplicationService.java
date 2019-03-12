@@ -4,7 +4,6 @@ import ch.admin.seco.jobs.services.jobadservice.application.MailSenderData;
 import ch.admin.seco.jobs.services.jobadservice.application.MailSenderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
@@ -19,15 +18,15 @@ public class ComplaintApplicationService {
 
     private final MessageSource messageSource;
 
-    @Value("${mail.sender.complaintAddress}")
-    private String complaintAddress;
+    private final ComplaintProperties complaintProperties;
 
     private static final String COMPLAINT_SUBJECT = "mail.complaint.subject";
     private static final String COMPLAINT_TEMPLATE = "Complaint.html";
 
-    public ComplaintApplicationService(MailSenderService mailSenderService, MessageSource messageSource) {
+    public ComplaintApplicationService(MailSenderService mailSenderService, MessageSource messageSource, ComplaintProperties complaintProperties) {
         this.mailSenderService = mailSenderService;
         this.messageSource = messageSource;
+        this.complaintProperties = complaintProperties;
     }
 
     private static Logger LOG = LoggerFactory.getLogger(ComplaintApplicationService.class);
@@ -41,7 +40,7 @@ public class ComplaintApplicationService {
         variables.put("complaintMessage", complaintDto.getComplaintMessage());
 
         mailSenderService.send(new MailSenderData.Builder()
-                .setTo(complaintAddress)
+                .setTo(complaintProperties.getMailAddress())
                 .setSubject(messageSource.getMessage(COMPLAINT_SUBJECT, new Object[]{complaintDto.getJobAdvertisementId()}, Locale.GERMAN))
                 .setTemplateName(COMPLAINT_TEMPLATE)
                 .setTemplateVariables(variables)
