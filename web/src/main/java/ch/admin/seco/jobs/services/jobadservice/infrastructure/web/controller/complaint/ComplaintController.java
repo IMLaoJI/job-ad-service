@@ -1,4 +1,4 @@
-package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
+package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.complaint;
 
 import ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintApplicationService;
 import ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintDto;
