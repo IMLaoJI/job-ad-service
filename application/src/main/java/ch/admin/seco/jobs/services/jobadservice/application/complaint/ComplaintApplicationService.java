@@ -14,6 +14,8 @@ import java.util.Map;
 @Service
 public class ComplaintApplicationService {
 
+    private static Logger LOG = LoggerFactory.getLogger(ComplaintApplicationService.class);
+
     private final MailSenderService mailSenderService;
 
     private final MessageSource messageSource;
@@ -28,8 +30,6 @@ public class ComplaintApplicationService {
         this.messageSource = messageSource;
         this.complaintProperties = complaintProperties;
     }
-
-    private static Logger LOG = LoggerFactory.getLogger(ComplaintApplicationService.class);
 
     public void sendComplaint(ComplaintDto complaintDto) {
         LOG.info("Sending complaint for JobAdvertisement with ID: " + complaintDto.getJobAdvertisementId());
