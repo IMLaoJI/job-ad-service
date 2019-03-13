@@ -5,23 +5,20 @@
     <link rel="shortcut icon" th:href="@{|${baseUrl}/favicon.ico|}"/>
 </head>
 <body>
-<p th:text="#{mail.complaint.body}"></p>
+<p th:text="#{mail.complaint.body(${jobAdvertisementId})}"></p>
 <div th:text="${complaintMessage}"></div>
 <p th:text="#{mail.complaint.body2}"></p>
 
-<span th:text="#{mail.contactinformation.salutation}"></span>
+<span th:text="#{mail.complaint.contactinformation.salutation}"></span>
 <span th:text="${contactInformation?.salutation}"></span>
 
-<span th:text="#{mail.contactinformation.firstname}"></span>
-<span th:text="${contactInformation?.firstName}"></span>
+<span th:text="#{mail.complaint.contactinformation.name}"></span>
+<span th:text="${contactInformation?.name}"></span>
 
-<span th:text="#{mail.contactinformation.lastname}"></span>
-<span th:text="${contactInformation?.lastName}"></span>
-
-<span th:text="#{mail.contactinformation.phone}"></span>
+<span th:text="#{mail.complaint.contactinformation.phone}"></span>
 <span th:text="${contactInformation?.phone}"></span>
 
-<span th:text="#{mail.contactinformation.email}"></span>
+<span th:text="#{mail.complaint.contactinformation.email}"></span>
 <span th:text="${contactInformation?.email}"></span>
 
 </body>

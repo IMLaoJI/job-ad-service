@@ -12,10 +12,7 @@ public class ContactInformationDto {
     private Salutation salutation;
 
     @NotBlank
-    private String firstName;
-
-    @NotBlank
-    private String lastName;
+    private String name;
 
     private String phone;
 
@@ -32,21 +29,12 @@ public class ContactInformationDto {
         return this;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getName() {
+        return name;
     }
 
-    public ContactInformationDto setFirstName(String firstName) {
-        this.firstName = firstName;
-        return this;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public ContactInformationDto setLastName(String lastName) {
-        this.lastName = lastName;
+    public ContactInformationDto setName(String name) {
+        this.name = name;
         return this;
     }
 
@@ -72,8 +60,7 @@ public class ContactInformationDto {
     public String toString() {
         return "ContactInformationDto{" +
                 "salutation=" + salutation +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
+                ", name='" + name + '\'' +
                 ", phone='" + phone + '\'' +
                 ", email='" + email + '\'' +
                 '}';

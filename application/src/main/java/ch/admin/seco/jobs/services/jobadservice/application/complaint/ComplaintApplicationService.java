@@ -39,13 +39,15 @@ public class ComplaintApplicationService {
         variables.put("contactInformation", complaintDto.getContactInformation());
         variables.put("complaintMessage", complaintDto.getComplaintMessage());
 
-        mailSenderService.send(new MailSenderData.Builder()
+        MailSenderData mailSenderData = new MailSenderData.Builder()
                 .setTo(complaintProperties.getMailAddress())
-                .setSubject(messageSource.getMessage(COMPLAINT_SUBJECT, new Object[]{complaintDto.getJobAdvertisementId()}, Locale.GERMAN))
+                .setSubject(COMPLAINT_SUBJECT)
                 .setTemplateName(COMPLAINT_TEMPLATE)
                 .setTemplateVariables(variables)
                 .setLocale(Locale.GERMAN)
-                .build());
+                .build();
+
+        mailSenderService.send(mailSenderData);
     }
 
 }
