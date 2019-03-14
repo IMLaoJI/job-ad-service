@@ -5,21 +5,20 @@
     <link rel="shortcut icon" th:href="@{|${baseUrl}/favicon.ico|}"/>
 </head>
 <body>
-<p th:text="#{mail.complaint.body(${jobAdvertisementId})}"></p>
-<div th:text="${complaintMessage}"></div>
+<p th:text="#{mail.complaint.body}"></p>
+
 <p th:text="#{mail.complaint.body2}"></p>
+<span th:if="${sourceSystem}" th:text="#{mail.complaint.jobad.sourcesystem(${sourceSystem})}"></span>
+<span th:if="${jobAdvertisementId}" th:text="#{mail.complaint.jobad.id(${jobAdvertisementId})}"></span>
+<span th:if="${stellennummerEgov}" th:text="#{mail.complaint.jobad.stellennummeregov(${stellennummerEgov})}"></span>
+<span th:if="${stellennummerAvam}" th:text="#{mail.complaint.jobad.stellennummeravam(${stellennummerAvam})}"></span>
 
-<span th:text="#{mail.complaint.contactinformation.salutation}"></span>
-<span th:text="${contactInformation?.salutation}"></span>
-
-<span th:text="#{mail.complaint.contactinformation.name}"></span>
-<span th:text="${contactInformation?.name}"></span>
-
-<span th:text="#{mail.complaint.contactinformation.phone}"></span>
-<span th:text="${contactInformation?.phone}"></span>
-
-<span th:text="#{mail.complaint.contactinformation.email}"></span>
-<span th:text="${contactInformation?.email}"></span>
+<p th:text="#{mail.complaint.body3}"></p>
+<span th:if="${contactInformation?.salutation}" th:text="#{mail.complaint.contactinformation.salutation(${contactInformation?.salutation})}"></span>
+<span th:if="${contactInformation?.name}" th:text="#{mail.complaint.contactinformation.name(${contactInformation?.name})}"></span>
+<span th:if="${contactInformation?.phone}" th:text="#{mail.complaint.contactinformation.phone(${contactInformation?.phone})}"></span>
+<span th:if="${contactInformation?.email}"th:text="#{mail.complaint.contactinformation.email(${contactInformation?.email})}"></span>
+<span th:text="#{mail.complaint.complaintmessage(${complaintMessage})}"></span>
 
 </body>
 </html>

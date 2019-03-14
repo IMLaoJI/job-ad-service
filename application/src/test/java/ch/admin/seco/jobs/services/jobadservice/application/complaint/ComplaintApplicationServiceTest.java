@@ -5,7 +5,10 @@ import ch.admin.seco.jobs.services.jobadservice.application.MailSenderService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementEventListener;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementMailEventListener;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementFactory;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,14 +16,17 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.MessageSource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Optional;
+
 import static ch.admin.seco.jobs.services.jobadservice.application.complaint.dto.fixture.ComplaintDtoFixture.testComplaintDto;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture.testJobAdvertisement;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -35,7 +41,7 @@ public class ComplaintApplicationServiceTest {
     private MailSenderService mailSenderService;
 
     @MockBean
-    private MessageSource messageSource;
+    JobAdvertisementRepository jobAdvertisementRepository;
 
     @MockBean
     MailSenderData mailSenderData;
@@ -56,15 +62,17 @@ public class ComplaintApplicationServiceTest {
 
     @Before
     public void setUp() {
-        this.complaintProperties.setMailAddress("test");
-        this.complaintApplicationService = new ComplaintApplicationService(mailSenderService, messageSource, complaintProperties);
-
+        this.complaintProperties.setReceiverEmailAddress("test");
+        this.complaintApplicationService = new ComplaintApplicationService(mailSenderService, complaintProperties, jobAdvertisementRepository);
     }
 
     @Test
     public void sendComplaint() {
         //given
         ComplaintDto complaint = testComplaintDto();
+        JobAdvertisement jobAdvertisement = testJobAdvertisement().build();
+        when(jobAdvertisementRepository.findById(new JobAdvertisementId(testComplaintDto().getJobAdvertisementId())))
+                .thenReturn(Optional.of(jobAdvertisement));
 
         //when
         this.complaintApplicationService.sendComplaint(complaint);
@@ -81,4 +89,3 @@ public class ComplaintApplicationServiceTest {
         assertThat(mailSenderData.getSubject()).isEqualToIgnoringCase("mail.complaint.subject");
     }
 }
-

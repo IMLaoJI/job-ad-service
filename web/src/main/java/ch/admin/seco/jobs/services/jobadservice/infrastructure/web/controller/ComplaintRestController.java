@@ -1,4 +1,4 @@
-package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.complaint;
+package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
 import ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintApplicationService;
 import ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintDto;
@@ -13,10 +13,10 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/complaint")
-public class ComplaintController {
+public class ComplaintRestController {
     private final ComplaintApplicationService complaintApplicationService;
 
-    public ComplaintController(ComplaintApplicationService complaintApplicationService) {
+    public ComplaintRestController(ComplaintApplicationService complaintApplicationService) {
         this.complaintApplicationService = complaintApplicationService;
     }
 

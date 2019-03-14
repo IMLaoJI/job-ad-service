@@ -1,8 +1,8 @@
 package ch.admin.seco.jobs.services.jobadservice.application.complaint;
 
 import ch.admin.seco.jobs.services.jobadservice.application.MailSenderService;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,17 +14,16 @@ public class ComplaintConfig {
 
     private final MailSenderService mailSenderService;
 
-    private final MessageSource messageSource;
+    private final JobAdvertisementRepository jobAdvertisementRepository;
 
-
-    public ComplaintConfig(ComplaintProperties complaintProperties, MailSenderService mailSenderService, MessageSource messageSource) {
+    public ComplaintConfig(ComplaintProperties complaintProperties, MailSenderService mailSenderService, JobAdvertisementRepository jobAdvertisementRepository) {
         this.complaintProperties = complaintProperties;
         this.mailSenderService = mailSenderService;
-        this.messageSource = messageSource;
+        this.jobAdvertisementRepository = jobAdvertisementRepository;
     }
 
     @Bean
     public ComplaintApplicationService complaintApplicationService() {
-        return new ComplaintApplicationService(this.mailSenderService, this.messageSource, this.complaintProperties);
+        return new ComplaintApplicationService(this.mailSenderService, this.complaintProperties, this.jobAdvertisementRepository);
     }
 }

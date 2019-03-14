@@ -5,6 +5,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutati
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 public class ContactInformationDto {
 
@@ -12,12 +13,14 @@ public class ContactInformationDto {
     private Salutation salutation;
 
     @NotBlank
+    @Size(max = 255)
     private String name;
 
     private String phone;
 
     @Email
     @NotBlank
+    @Size(max = 255)
     private String email;
 
     public Salutation getSalutation() {

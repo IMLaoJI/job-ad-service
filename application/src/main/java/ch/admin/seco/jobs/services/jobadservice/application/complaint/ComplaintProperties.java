@@ -7,13 +7,13 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class ComplaintProperties {
 
-    private String mailAddress;
+    private String receiverEmailAddress;
 
-    public String getMailAddress() {
-        return mailAddress;
+    public String getReceiverEmailAddress() {
+        return receiverEmailAddress;
     }
 
-    public void setMailAddress(String mailAddress) {
-        this.mailAddress = mailAddress;
+    public void setReceiverEmailAddress(String receiverEmailAddress) {
+        this.receiverEmailAddress = receiverEmailAddress;
     }
 }

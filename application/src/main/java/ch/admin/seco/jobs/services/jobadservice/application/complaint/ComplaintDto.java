@@ -2,6 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.application.complaint;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public class ComplaintDto {
@@ -10,6 +11,7 @@ public class ComplaintDto {
     private String jobAdvertisementId;
 
     @Valid
+    @NotNull
     private ContactInformationDto contactInformation;
 
     @NotBlank
