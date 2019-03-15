@@ -36,4 +36,5 @@
     <include file="classpath:/liquibase/changelog/20190115080000_update_events_index.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20190215080000_update_jobad_location_lon_lat.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20190226080000_update_field_lengths.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/liquibase/changelog/20190315080000_drop_dlq_item_table.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
