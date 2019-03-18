@@ -14,7 +14,6 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.rea
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.apiuser.ApiUserSearchService;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.apiuser.ApiUserDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.apiuser.ApiUserElasticsearchRepository;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.service.reference.location.LocationApiClient;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors.ExceptionTranslator;
 import org.junit.After;
@@ -95,9 +94,6 @@ public class ApiUserRestControllerIntTest {
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
-
-    @Autowired
-    private LocationApiClient locationApiClient;
 
     private MockMvc mockMvc;
 
