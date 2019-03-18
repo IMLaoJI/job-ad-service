@@ -1,12 +1,12 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.service.reference.jobcenter;
 
-import java.util.List;
-
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "referenceservice", url = "${feign.referenceservice.url:}", fallback = JobCenterApiClientFallback.class, decode404 = true)
+import java.util.List;
+
+@FeignClient(name = "referenceservice", contextId = "job-center-api", url = "${feign.referenceservice.url:}", fallback = JobCenterApiClientFallback.class, decode404 = true)
 interface JobCenterApiClient {
 
     @GetMapping(value = "/api/job-centers/by-location")
