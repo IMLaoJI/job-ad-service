@@ -1,14 +1,10 @@
 package ch.admin.seco.jobs.services.jobadservice.integration.x28.exporter.config;
 
 
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -22,7 +18,8 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
 
 @Configuration
 @EnableConfigurationProperties({JobAdServiceDataSourceProperties.class, JpaProperties.class})
@@ -101,7 +98,7 @@ public class DataSourceConfig {
         return builder
                 .dataSource(jobAdServiceDataSource())
                 .packages(JobAdvertisement.class)
-                .properties(jpaProperties.getHibernateProperties(new HibernateSettings().ddlAuto(() -> "none")))
+                //.properties(jpaProperties.getHibernateProperties(new HibernateSettings().ddlAuto(() -> "none")))
                 .persistenceUnit("job-ad")
                 .build();
     }
