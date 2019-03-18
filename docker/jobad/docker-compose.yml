@@ -30,6 +30,7 @@ services:
         - xpack.monitoring.enabled=false
         - discovery.type=single-node
         - network.host=0.0.0.0
+        - cluster.name=elasticsearch
 
     kibana:
         image: kibana:6.5.0
