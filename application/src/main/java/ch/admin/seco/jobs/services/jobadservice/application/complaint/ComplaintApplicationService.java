@@ -25,7 +25,6 @@ public class ComplaintApplicationService {
 
     private final JobAdvertisementRepository jobAdvertisementRepository;
 
-
     private final ComplaintProperties complaintProperties;
 
     private static final String COMPLAINT_SUBJECT = "mail.complaint.subject";
@@ -40,7 +39,7 @@ public class ComplaintApplicationService {
     public void sendComplaint(ComplaintDto complaintDto) {
         Condition.notNull(complaintDto);
         Condition.notEmpty(complaintDto.getJobAdvertisementId());
-        JobAdvertisement jobAdvertisement = Condition.notNull(getJobAdvertisement(new JobAdvertisementId(complaintDto.getJobAdvertisementId())));
+        JobAdvertisement jobAdvertisement = getJobAdvertisement(new JobAdvertisementId(complaintDto.getJobAdvertisementId()));
 
         LOG.info("Sending complaint for JobAdvertisement with ID: " + complaintDto.getJobAdvertisementId());
 
