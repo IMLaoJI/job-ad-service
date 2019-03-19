@@ -17,7 +17,6 @@ public class ContactInformationDto {
     @Size(max = 255)
     private String name;
 
-    @PhoneNumber
     private String phone;
 
     @Email
