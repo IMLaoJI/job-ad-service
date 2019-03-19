@@ -17,6 +17,9 @@ import javax.sql.DataSource;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * JPA Configuration to read {@link JobAdvertisement}
+ */
 @Configuration
 @EnableJpaRepositories(
         entityManagerFactoryRef = "jobAdEntityManagerFactory",
@@ -48,7 +51,7 @@ class CustomJpaConfiguration {
         return builder
                 .dataSource(this.jobAdServiceDataSource)
                 .packages(JobAdvertisement.class)
-                .persistenceUnit("stes")
+                .persistenceUnit("job-advertisement")
                 .properties(getVendorProperties())
                 .build();
     }

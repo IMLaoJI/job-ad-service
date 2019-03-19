@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 
+/**
+ * Spring Task Configuration for the batch-data-source
+ */
 @Component
 public class CustomTaskConfigurer {
 

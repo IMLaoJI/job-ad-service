@@ -2,33 +2,33 @@ package ch.admin.seco.jobs.services.jobadservice.integration.x28.exporter.config
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
 
-import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
 
 /**
- * Custom Transaction
+ * Custom Transaction Management for Spring-Batch
  */
 @Configuration
 @EnableTransactionManagement
-public class CustomTXManagementConfiguration implements TransactionManagementConfigurer {
+public class BatchTXManagementConfiguration implements TransactionManagementConfigurer {
 
-    private final EntityManagerFactory entityManagerFactory;
+    private final DataSource batchDataSource;
 
-    public CustomTXManagementConfiguration(EntityManagerFactory entityManagerFactory) {
-        this.entityManagerFactory = entityManagerFactory;
+    public BatchTXManagementConfiguration(DataSource batchDataSource) {
+        this.batchDataSource = batchDataSource;
     }
 
     @Bean
-    PlatformTransactionManager transactionManager() {
-        return new JpaTransactionManager(entityManagerFactory);
+    PlatformTransactionManager batchTransactionManager() {
+        return new DataSourceTransactionManager(this.batchDataSource);
     }
 
     @Override
     public PlatformTransactionManager annotationDrivenTransactionManager() {
-        return this.transactionManager();
+        return this.batchTransactionManager();
     }
 }
