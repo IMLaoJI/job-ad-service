@@ -9,10 +9,10 @@
             <column name="ID" type="varchar(36)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="CREATED_TIME" type="date">
+            <column name="CREATED_TIME" type="timestamp">
                 <constraints nullable="false"/>
             </column>
-            <column name="UPDATED_TIME" type="date">
+            <column name="UPDATED_TIME" type="timestamp">
                 <constraints nullable="false"/>
             </column>
             <column name="NOTE" type="varchar(1000)">
