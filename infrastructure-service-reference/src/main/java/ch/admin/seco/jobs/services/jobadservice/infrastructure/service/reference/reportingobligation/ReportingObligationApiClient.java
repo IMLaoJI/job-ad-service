@@ -1,14 +1,12 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.service.reference.reportingobligation;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType;
-
-@FeignClient(name = "referenceservice", url = "${feign.referenceservice.url:}", fallback = ReportingObligationApiClientFallback.class, decode404 = true)
+@FeignClient(name = "referenceservice", contextId = "reporting-obligations-api", url = "${feign.referenceservice.url:}", fallback = ReportingObligationApiClientFallback.class, decode404 = true)
 public interface ReportingObligationApiClient {
 
     @GetMapping(value = "/api/reporting-obligations/check-by-canton/{codeType}/{code}", consumes = "application/json")

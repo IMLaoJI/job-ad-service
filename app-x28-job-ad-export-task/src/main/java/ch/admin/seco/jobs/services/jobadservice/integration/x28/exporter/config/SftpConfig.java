@@ -1,20 +1,28 @@
 package ch.admin.seco.jobs.services.jobadservice.integration.x28.exporter.config;
 
-import static java.util.Objects.nonNull;
-import static org.springframework.util.StringUtils.quote;
-
-import java.util.Properties;
-
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.sftp.outbound.SftpMessageHandler;
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
 
+import java.util.Properties;
+
+import static java.util.Objects.nonNull;
+import static org.springframework.util.StringUtils.quote;
+
 @Configuration
+@EnableConfigurationProperties(X28Properties.class)
 public class SftpConfig {
 
+    private final X28Properties x28Properties;
+
+    public SftpConfig(X28Properties x28Properties) {
+        this.x28Properties = x28Properties;
+    }
+
     @Bean
-    public DefaultSftpSessionFactory x28SftpSessionFactory(X28Properties x28Properties) {
+    public DefaultSftpSessionFactory x28SftpSessionFactory() {
         DefaultSftpSessionFactory factory = new DefaultSftpSessionFactory();
         factory.setHost(x28Properties.getHost());
         if (nonNull(x28Properties.getPort())) {
@@ -30,9 +38,9 @@ public class SftpConfig {
     }
 
     @Bean
-    public SftpMessageHandler sftpMessageHandler(X28Properties x28Properties, DefaultSftpSessionFactory sftpSessionFactory) {
-        SftpMessageHandler sftpMessageHandler = new SftpMessageHandler(sftpSessionFactory);
-        sftpMessageHandler.setRemoteDirectoryExpressionString(quote(x28Properties.getRemoteDirectory()));
+    public SftpMessageHandler sftpMessageHandler() {
+        SftpMessageHandler sftpMessageHandler = new SftpMessageHandler(this.x28SftpSessionFactory());
+        sftpMessageHandler.setRemoteDirectoryExpressionString(quote(this.x28Properties.getRemoteDirectory()));
         return sftpMessageHandler;
     }
 
