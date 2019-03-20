@@ -1,20 +1,17 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.eureka;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.springframework.boot.actuate.health.CompositeHealthIndicator;
 import org.springframework.boot.actuate.health.HealthAggregator;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.cloud.netflix.eureka.EurekaHealthCheckHandler;
-import org.springframework.util.ReflectionUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 class IgnoreAwareEurekaHealthCheckHandler extends EurekaHealthCheckHandler {
-
-    private static final String INDICATORS_FIELD_NAME = "indicators";
 
     private final List<String> ignoredHealthIndicators = new ArrayList<>();
 
@@ -36,12 +33,6 @@ class IgnoreAwareEurekaHealthCheckHandler extends EurekaHealthCheckHandler {
     }
 
     private Map<String, HealthIndicator> getHealthIndicatorMap(CompositeHealthIndicator healthIndicator) {
-        Field indicatorsFields = ReflectionUtils.findField(CompositeHealthIndicator.class, INDICATORS_FIELD_NAME);
-        if (indicatorsFields == null) {
-            throw new IllegalStateException("Could not find the field 'indicators' on class: " + CompositeHealthIndicator.class);
-        }
-        indicatorsFields.setAccessible(true);
-        Object field = ReflectionUtils.getField(indicatorsFields, healthIndicator);
-        return (Map<String, HealthIndicator>) field;
+        return new HashMap<>(healthIndicator.getRegistry().getAll());
     }
 }
