@@ -1,6 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.events;
 
-import ch.admin.seco.jobs.services.jobadservice.core.domain.AggregateId;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItem;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
@@ -16,7 +15,7 @@ public abstract class FavouriteItemEvent extends DomainEvent<FavouriteItemId> {
     }
 
     @Override
-    public AggregateId<FavouriteItemId> getAggregateId() {
+    public FavouriteItemId getAggregateId() {
         return this.favouriteItemId;
     }
 }
