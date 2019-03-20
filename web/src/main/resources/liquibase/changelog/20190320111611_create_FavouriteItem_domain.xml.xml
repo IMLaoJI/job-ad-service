@@ -1,0 +1,202 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <changeSet author="madv (generated)" id="1553076980995-1">
+        <createTable tableName="job_advertisement">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" primaryKeyName="job_advertisementPK"/>
+            </column>
+            <column name="approval_date" type="date"/>
+            <column name="cancellation_code" type="VARCHAR(255)"/>
+            <column name="cancellation_date" type="date"/>
+            <column name="contact_email" type="VARCHAR(255)"/>
+            <column name="contact_first_name" type="VARCHAR(255)"/>
+            <column name="contact_language" type="VARCHAR(255)"/>
+            <column name="contact_last_name" type="VARCHAR(255)"/>
+            <column name="contact_phone" type="VARCHAR(255)"/>
+            <column name="contact_salutation" type="VARCHAR(255)"/>
+            <column name="created_time" type="TIMESTAMP"/>
+            <column name="external_reference" type="VARCHAR(255)"/>
+            <column name="fingerprint" type="VARCHAR(255)"/>
+            <column name="job_center_code" type="VARCHAR(255)"/>
+            <column name="apply_channel_additional_info" type="VARCHAR(255)"/>
+            <column name="apply_channel_email_address" type="VARCHAR(255)"/>
+            <column name="apply_channel_form_url" type="VARCHAR(255)"/>
+            <column name="apply_channel_phone_number" type="VARCHAR(255)"/>
+            <column name="apply_channel_post_address_city" type="VARCHAR(255)"/>
+            <column name="apply_channel_post_address_country_iso_code" type="VARCHAR(255)"/>
+            <column name="apply_channel_post_address_house_number" type="VARCHAR(255)"/>
+            <column name="apply_channel_post_address_name" type="VARCHAR(255)"/>
+            <column name="apply_channel_post_address_post_office_box_city" type="VARCHAR(255)"/>
+            <column name="apply_channel_post_address_post_office_box_number" type="VARCHAR(255)"/>
+            <column name="apply_channel_post_address_post_office_box_postal_code" type="VARCHAR(255)"/>
+            <column name="apply_channel_post_address_postal_code" type="VARCHAR(255)"/>
+            <column name="apply_channel_post_address_street" type="VARCHAR(255)"/>
+            <column name="apply_channel_raw_post_address" type="VARCHAR(255)"/>
+            <column name="company_city" type="VARCHAR(255)"/>
+            <column name="company_country_iso_code" type="VARCHAR(255)"/>
+            <column name="company_house_number" type="VARCHAR(255)"/>
+            <column name="company_name" type="VARCHAR(255)"/>
+            <column name="company_post_office_box_city" type="VARCHAR(255)"/>
+            <column name="company_post_office_box_number" type="VARCHAR(255)"/>
+            <column name="company_post_office_box_postal_code" type="VARCHAR(255)"/>
+            <column name="company_postal_code" type="VARCHAR(255)"/>
+            <column name="company_street" type="VARCHAR(255)"/>
+            <column name="company_email" type="VARCHAR(255)"/>
+            <column name="company_phone" type="VARCHAR(255)"/>
+            <column name="company_surrogate" type="BOOLEAN"/>
+            <column name="company_website" type="VARCHAR(255)"/>
+            <column name="display_apply_channel_additional_info" type="VARCHAR(255)"/>
+            <column name="display_apply_channel_email_address" type="VARCHAR(255)"/>
+            <column name="display_apply_channel_form_url" type="VARCHAR(255)"/>
+            <column name="display_apply_channel_phone_number" type="VARCHAR(255)"/>
+            <column name="display_apply_channel_post_address_city" type="VARCHAR(255)"/>
+            <column name="display_apply_channel_post_address_country_iso_code" type="VARCHAR(255)"/>
+            <column name="display_apply_channel_post_address_house_number" type="VARCHAR(255)"/>
+            <column name="display_apply_channel_post_address_name" type="VARCHAR(255)"/>
+            <column name="display_apply_channel_post_address_post_office_box_city" type="VARCHAR(255)"/>
+            <column name="display_apply_channel_post_address_post_office_box_number" type="VARCHAR(255)"/>
+            <column name="display_apply_channel_post_address_post_office_box_postal_code" type="VARCHAR(255)"/>
+            <column name="display_apply_channel_post_address_postal_code" type="VARCHAR(255)"/>
+            <column name="display_apply_channel_post_address_street" type="VARCHAR(255)"/>
+            <column name="display_apply_channel_raw_post_address" type="VARCHAR(255)"/>
+            <column name="display_company_city" type="VARCHAR(255)"/>
+            <column name="display_company_country_iso_code" type="VARCHAR(255)"/>
+            <column name="display_company_house_number" type="VARCHAR(255)"/>
+            <column name="display_company_name" type="VARCHAR(255)"/>
+            <column name="display_company_post_office_box_city" type="VARCHAR(255)"/>
+            <column name="display_company_post_office_box_number" type="VARCHAR(255)"/>
+            <column name="display_company_post_office_box_postal_code" type="VARCHAR(255)"/>
+            <column name="display_company_postal_code" type="VARCHAR(255)"/>
+            <column name="display_company_street" type="VARCHAR(255)"/>
+            <column name="display_company_email" type="VARCHAR(255)"/>
+            <column name="display_company_phone" type="VARCHAR(255)"/>
+            <column name="display_company_surrogate" type="BOOLEAN"/>
+            <column name="display_company_website" type="VARCHAR(255)"/>
+            <column name="employer_city" type="VARCHAR(255)"/>
+            <column name="employer_country_iso_code" type="VARCHAR(255)"/>
+            <column name="employer_name" type="VARCHAR(255)"/>
+            <column name="employer_postal_code" type="VARCHAR(255)"/>
+            <column name="employment_end_date" type="date"/>
+            <column name="employment_immediately" type="BOOLEAN"/>
+            <column name="employment_permanent" type="BOOLEAN"/>
+            <column name="short_employment" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="employment_start_date" type="date"/>
+            <column name="employment_workload_percentage_max" type="INT"/>
+            <column name="employment_workload_percentage_min" type="INT"/>
+            <column name="external_url" type="VARCHAR(255)"/>
+            <column name="location_canton_code" type="VARCHAR(255)"/>
+            <column name="location_city" type="VARCHAR(255)"/>
+            <column name="location_communal_code" type="VARCHAR(255)"/>
+            <column name="location_lat" type="DOUBLE"/>
+            <column name="location_lon" type="DOUBLE"/>
+            <column name="location_country_iso_code" type="VARCHAR(255)"/>
+            <column name="location_postal_code" type="VARCHAR(255)"/>
+            <column name="location_region_code" type="VARCHAR(255)"/>
+            <column name="location_remarks" type="VARCHAR(255)"/>
+            <column name="number_of_jobs" type="VARCHAR(255)"/>
+            <column name="public_contact_email" type="VARCHAR(255)"/>
+            <column name="public_contact_first_name" type="VARCHAR(255)"/>
+            <column name="public_contact_last_name" type="VARCHAR(255)"/>
+            <column name="public_contact_phone" type="VARCHAR(255)"/>
+            <column name="public_contact_salutation" type="VARCHAR(255)"/>
+            <column name="x28_occupation_codes" type="VARCHAR(255)"/>
+            <column name="owner_access_token" type="VARCHAR(255)"/>
+            <column name="owner_company_id" type="VARCHAR(255)"/>
+            <column name="owner_user_display_name" type="VARCHAR(255)"/>
+            <column name="owner_user_id" type="VARCHAR(255)"/>
+            <column name="publication_company_anonymous" type="BOOLEAN"/>
+            <column name="publication_end_date" type="date"/>
+            <column name="publication_eures_anonymous" type="BOOLEAN"/>
+            <column name="publication_eures_display" type="BOOLEAN"/>
+            <column name="publication_public_display" type="BOOLEAN"/>
+            <column name="publication_restricted_display" type="BOOLEAN"/>
+            <column name="publication_start_date" type="date"/>
+            <column name="rejection_code" type="VARCHAR(255)"/>
+            <column name="rejection_date" type="date"/>
+            <column name="rejection_reason" type="VARCHAR(255)"/>
+            <column name="report_to_avam" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reporting_obligation" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reporting_obligation_end_date" type="date"/>
+            <column name="source_system" type="VARCHAR(255)"/>
+            <column name="status" type="VARCHAR(255)"/>
+            <column name="stellennummer_avam" type="VARCHAR(255)"/>
+            <column name="stellennummer_egov" type="VARCHAR(255)"/>
+            <column name="updated_time" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="madv (generated)" id="1553076980995-2">
+        <createTable tableName="job_advertisement_description">
+            <column name="job_advertisement_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="language" type="VARCHAR(255)"/>
+            <column name="title" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="madv (generated)" id="1553076980995-3">
+        <createTable tableName="job_advertisement_language_skill">
+            <column name="job_advertisement_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="language_iso_code" type="VARCHAR(255)"/>
+            <column name="spoken_level" type="VARCHAR(255)"/>
+            <column name="written_level" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="madv (generated)" id="1553076980995-4">
+        <createTable tableName="job_advertisement_occupation">
+            <column name="job_advertisement_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="avam_occupation_code" type="VARCHAR(255)"/>
+            <column name="bfs_code" type="VARCHAR(255)"/>
+            <column name="education_code" type="VARCHAR(255)"/>
+            <column name="label" type="VARCHAR(255)"/>
+            <column name="qualification_code" type="VARCHAR(255)"/>
+            <column name="sbn3_code" type="VARCHAR(255)"/>
+            <column name="sbn5_code" type="VARCHAR(255)"/>
+            <column name="work_experience" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="madv (generated)" id="1553076980995-5">
+        <createTable tableName="job_advertisement_work_form">
+            <column name="job_advertisement_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="work_forms" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="madv (generated)" id="1553076980995-6">
+        <addForeignKeyConstraint baseColumnNames="job_advertisement_id" baseTableName="job_advertisement_work_form"
+                                 constraintName="FK1tk8s8r1ffewvlrkt234hrme4" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id"
+                                 referencedTableName="job_advertisement" validate="true"/>
+    </changeSet>
+    <changeSet author="madv (generated)" id="1553076980995-7">
+        <addForeignKeyConstraint baseColumnNames="job_advertisement_id" baseTableName="job_advertisement_occupation"
+                                 constraintName="FK22esve6y7p2i6imn5qk8pwpnr" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id"
+                                 referencedTableName="job_advertisement" validate="true"/>
+    </changeSet>
+    <changeSet author="madv (generated)" id="1553076980995-8">
+        <addForeignKeyConstraint baseColumnNames="job_advertisement_id" baseTableName="job_advertisement_language_skill"
+                                 constraintName="FKg4s18pd2jpeayaxr665afpdq9" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id"
+                                 referencedTableName="job_advertisement" validate="true"/>
+    </changeSet>
+    <changeSet author="madv (generated)" id="1553076980995-9">
+        <addForeignKeyConstraint baseColumnNames="job_advertisement_id" baseTableName="job_advertisement_description"
+                                 constraintName="FKpe15o2vbm0vaysdmh922fsp4t" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id"
+                                 referencedTableName="job_advertisement" validate="true"/>
+    </changeSet>
+</databaseChangeLog>
