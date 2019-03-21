@@ -12,6 +12,7 @@
 <div th:if="${jobAdvertisementId}" th:text="#{mail.complaint.body.jobad.id(${jobAdvertisementId})}"></div>
 <div th:if="${stellennummerEgov}" th:text="#{mail.complaint.body.jobad.stellennummeregov(${stellennummerEgov})}"></div>
 <div th:if="${stellennummerAvam}" th:text="#{mail.complaint.body.jobad.stellennummeravam(${stellennummerAvam})}"></div>
+<div th:if="${linkToJobAd}" th:text="#{mail.complaint.body.jobad.linkToJobAd(${linkToJobAd})}"></div>
 
 <p th:text="#{mail.complaint.body.contactinformation}"></p>
 <div th:if="${contactInformation?.salutation}" th:text="#{mail.complaint.body.contactinformation.salutation(${contactInformation?.salutation})}"></div>

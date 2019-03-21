@@ -9,11 +9,21 @@ public class ComplaintProperties {
 
     private String receiverEmailAddress;
 
+    private String linkToJobAdSearch;
+
     public String getReceiverEmailAddress() {
         return receiverEmailAddress;
     }
 
     public void setReceiverEmailAddress(String receiverEmailAddress) {
         this.receiverEmailAddress = receiverEmailAddress;
+    }
+
+    public String getLinkToJobAdSearch() {
+        return linkToJobAdSearch;
+    }
+
+    public void setLinkToJobAdSearch(String linkToJobAdSearch) {
+        this.linkToJobAdSearch = linkToJobAdSearch;
     }
 }
