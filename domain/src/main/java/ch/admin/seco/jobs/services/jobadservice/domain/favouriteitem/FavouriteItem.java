@@ -38,6 +38,7 @@ public class FavouriteItem implements Aggregate<FavouriteItem, FavouriteItemId> 
     private String ownerId;
 
     @NotNull
+    @AttributeOverride(name = "value", column = @Column(name = "JOB_ADVERTISEMENT_ID"))
     private JobAdvertisementId jobAdvertisementId;
 
     private FavouriteItem(Builder builder) {

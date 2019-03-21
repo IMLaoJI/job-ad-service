@@ -1,6 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.application.complaint;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.PhoneNumber;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
