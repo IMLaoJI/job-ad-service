@@ -2,10 +2,11 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.JobAdvertisementSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.JobAdvertisementSearchService;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.ManagedJobAdSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.PeaJobAdvertisementSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.ElasticJobAdvertisementSearchService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ManagedJobAdSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.PeaJobAdvertisementSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PaginationUtil;
 import io.micrometer.core.annotation.Timed;
 import org.jsoup.Jsoup;
@@ -28,6 +29,7 @@ import static org.springframework.util.StringUtils.hasText;
 @RestController
 @RequestMapping("/api/jobAdvertisements")
 public class JobAdvertisementSearchController {
+
     private final JobAdvertisementSearchService jobAdvertisementSearchService;
 
     public JobAdvertisementSearchController(JobAdvertisementSearchService jobAdvertisementSearchService) {
@@ -40,7 +42,7 @@ public class JobAdvertisementSearchController {
             @RequestBody @Valid JobAdvertisementSearchRequest jobAdvertisementSearchRequest,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "20") int size,
-            @RequestParam(defaultValue = "score") JobAdvertisementSearchService.SearchSort sort
+            @RequestParam(defaultValue = "score") ElasticJobAdvertisementSearchService.SearchSort sort
     ) {
 
         Page<JobAdvertisementDto> resultPage = jobAdvertisementSearchService.search(jobAdvertisementSearchRequest, page, size, sort)
@@ -50,19 +52,6 @@ public class JobAdvertisementSearchController {
         return new ResponseEntity<>(resultPage.getContent(), headers, HttpStatus.OK);
     }
 
-    /**
-     * @deprecated Implementation for the JobRoom. It will be removed after go live of the eServiceUi.
-     */
-    @Deprecated
-    @PostMapping("/_search/pea")
-    @Timed
-    public ResponseEntity<List<JobAdvertisementDto>> searchPeaJobs(
-            @RequestBody @Valid PeaJobAdvertisementSearchRequest searchRequest, Pageable pageable) {
-
-        Page<JobAdvertisementDto> resultPage = jobAdvertisementSearchService.searchPeaJobAdvertisements(searchRequest, pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(resultPage, "/api/_search/pea");
-        return new ResponseEntity<>(resultPage.getContent(), headers, HttpStatus.OK);
-    }
 
     @PostMapping("/_search/managed")
     @Timed

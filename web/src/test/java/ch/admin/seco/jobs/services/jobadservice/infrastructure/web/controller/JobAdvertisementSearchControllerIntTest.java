@@ -56,6 +56,12 @@ import java.time.LocalDate;
 import java.util.stream.Stream;
 
 import ch.admin.seco.jobs.services.jobadservice.Application;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ManagedJobAdSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.PeaJobAdvertisementSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCode;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCodeType;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.GeoPointDto;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
@@ -64,7 +70,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.*;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.RadiusSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.RadiusSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
@@ -156,7 +162,7 @@ public class JobAdvertisementSearchControllerIntTest {
         this.jobAdvertisementJpaRepository.deleteAll();
         this.mockCurrentUserContext = mock(CurrentUserContext.class);
 
-        this.jobAdvertisementSearchService = new JobAdvertisementSearchService(mockCurrentUserContext,
+        this.jobAdvertisementSearchService = new ElasticJobAdvertisementSearchService(mockCurrentUserContext,
                 this.elasticsearchTemplate,
                 this.customEntityMapper,
                 this.jobAdvertisementElasticsearchRepository

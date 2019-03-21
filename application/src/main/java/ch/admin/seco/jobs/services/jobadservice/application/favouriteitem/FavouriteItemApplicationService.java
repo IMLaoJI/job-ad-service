@@ -4,8 +4,6 @@ import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.Fa
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.create.CreateFavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.read.ReadFavouriteItemByJobAdvertisementIdDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.update.UpdateFavouriteItemDto;
-import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUser;
-import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.AggregateNotFoundException;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPublisher;
@@ -18,14 +16,11 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static java.util.stream.Collectors.toList;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -37,17 +32,13 @@ public class FavouriteItemApplicationService {
 
     private final JobAdvertisementRepository jobAdvertisementRepository;
 
-    private final CurrentUserContext currentUserContext;
-
-    public FavouriteItemApplicationService(FavouriteItemRepository favouriteItemRepository, JobAdvertisementRepository jobAdvertisementRepository, CurrentUserContext currentUserContext) {
+    public FavouriteItemApplicationService(FavouriteItemRepository favouriteItemRepository, JobAdvertisementRepository jobAdvertisementRepository) {
         this.favouriteItemRepository = favouriteItemRepository;
         this.jobAdvertisementRepository = jobAdvertisementRepository;
-        this.currentUserContext = currentUserContext;
     }
 
-    // TODO WEB
-    // POST -> /api/favourite-items
-    @PreAuthorize("isAuthenticated()")
+    // TODO check that Im the owner
+    @PreAuthorize("isAuthenticated() and @favouriteItemAuthorizationService.matchesCurrentUserId(#createFavouriteItemDto.ownerId)")
     public FavouriteItemId create(CreateFavouriteItemDto createFavouriteItemDto) {
         Condition.notNull(createFavouriteItemDto, "CreateFavouriteItemDto can't be null");
         if (!this.jobAdvertisementRepository.existsById(createFavouriteItemDto.getJobAdvertisementId())) {
@@ -59,23 +50,23 @@ public class FavouriteItemApplicationService {
                 .setOwnerId(createFavouriteItemDto.getOwnerId())
                 .setJobAdvertismentId(createFavouriteItemDto.getJobAdvertisementId()).build();
         DomainEventPublisher.publish(new FavouriteItemCreatedEvent(favouriteItem));
+        // TODO a check that the given owner hasn't yet created a FavouriteItem for the given JobAdvertisementId
+
         this.favouriteItemRepository.save(favouriteItem);
         LOG.info("Favourite Item " + favouriteItem.getId() + " has been created for user " + favouriteItem.getOwnerId() + ".");
         return favouriteItem.getId();
     }
 
-    // PUT -> /api/favourite-items/<id>/<note>
-    @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.canUpdate(#updateFavouriteItemDto.id)")
+    @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.isCurrentUserOwner(#updateFavouriteItemDto.id)")
     public void update(UpdateFavouriteItemDto updateFavouriteItemDto) {
         Condition.notNull(updateFavouriteItemDto, "UpdateFavouriteItemDto can't be null");
         FavouriteItem favouriteItem = this.favouriteItemRepository.findById(updateFavouriteItemDto.getId())
                 .orElseThrow(() -> new FavoriteItemNotExitsException(updateFavouriteItemDto.getId()));
         favouriteItem.update(updateFavouriteItemDto.getNote());
-        LOG.info("Favourite Item " + favouriteItem.getId() + " has been updated for user " + favouriteItem.getOwnerId() + ".");
+        LOG.info("Favourite Item " + favouriteItem.getId() + " has been updated for user " + favouriteItem.getOwnerId() + " with note " + favouriteItem.getNote() + ".");
     }
 
-    // DELETE  -> /api/favourite-items/<id>
-    @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.canUpdate(#favouriteItemId)")
+    @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.isCurrentUserOwner(#favouriteItemId)")
     public void delete(FavouriteItemId favouriteItemId) {
         Condition.notNull(favouriteItemId, "FavouriteItemId can't be null");
         FavouriteItem favouriteItem = this.favouriteItemRepository.findById(favouriteItemId)
@@ -85,16 +76,19 @@ public class FavouriteItemApplicationService {
         LOG.info("Favourite Item " + favouriteItem.getId() + " has been deleted for user " + favouriteItem.getOwnerId() + ".");
     }
 
-    // GET  -> /api/favourite-items/<id>
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated() and favouriteItemAuthorizationService.matchesCurrentUserId(#readFavouriteItemByJobAdvertismentIdDto.ownerId)")
+    public Optional<FavouriteItem> findByJobAdvertisementIdAndOwnerId(ReadFavouriteItemByJobAdvertisementIdDto readFavouriteItemByJobAdvertismentIdDto) {
+        Condition.notNull(readFavouriteItemByJobAdvertismentIdDto, "FavouriteItemId can't be null");
+        return this.favouriteItemRepository.findByJobAdvertisementIdAndOwnerId(readFavouriteItemByJobAdvertismentIdDto.getJobAdvertisementId(), readFavouriteItemByJobAdvertismentIdDto.getOwnerId());
+    }
+
+    @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.isCurrentUserOwner(#favouriteItemId)")
     public FavouriteItemDto findById(FavouriteItemId favouriteItemId) {
         Condition.notNull(favouriteItemId, "FavouriteItemId can't be null");
         return this.favouriteItemRepository.findById(favouriteItemId).map(FavouriteItemDto::toDto)
                 .orElse(null);
     }
-
-
-    // GET -> /api/favourite-items/find-by-owner-id/{ownerId}
+/*
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.matchesCurrentUserId(#ownerId)")
     public Page<FavouriteItemDto> findByOwnerId(Pageable pageable, String ownerId) {
         CurrentUser currentUser = currentUserContext.getCurrentUser();
@@ -105,20 +99,6 @@ public class FavouriteItemApplicationService {
                 jobAdvertisements.getPageable(),
                 jobAdvertisements.getTotalElements()
         );
-    }
+    }*/
 
-    // GET -> /api/favourite-items/find-by-job-advertisement-id/{jobAdvertisementId}
-    @PreAuthorize("isAuthenticated()&& @favouriteItemAuthorizationService.matchesCurrentUserId(#readFavouriteItemByJobAdvertismentIdDto.ownerId)")
-    public Page<FavouriteItemDto> findByJobAdvertisementId(Pageable pageable, ReadFavouriteItemByJobAdvertisementIdDto readFavouriteItemByJobAdvertismentIdDto) {
-        Condition.notNull(readFavouriteItemByJobAdvertismentIdDto.getJobAdvertisementId(), "ReadFavouriteItemByJobAdvertisementIdDto can't be null");
-        if (!jobAdvertisementRepository.existsById(readFavouriteItemByJobAdvertismentIdDto.getJobAdvertisementId())) {
-            throw new AggregateNotFoundException(JobAdvertisement.class, readFavouriteItemByJobAdvertismentIdDto.getJobAdvertisementId().getValue());
-        }
-        Page<FavouriteItem> jobAdvertisements = favouriteItemRepository.findByJobAdvertisementId(pageable, readFavouriteItemByJobAdvertismentIdDto.getJobAdvertisementId(), readFavouriteItemByJobAdvertismentIdDto.getOwnerId());
-        return new PageImpl<>(
-                jobAdvertisements.getContent().stream().map(FavouriteItemDto::toDto).collect(toList()),
-                jobAdvertisements.getPageable(),
-                jobAdvertisements.getTotalElements()
-        );
-    }
 }

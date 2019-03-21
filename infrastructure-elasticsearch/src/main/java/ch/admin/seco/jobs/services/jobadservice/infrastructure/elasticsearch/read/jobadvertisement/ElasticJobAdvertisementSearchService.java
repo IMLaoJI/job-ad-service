@@ -1,5 +1,55 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement;
 
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdveristementSearchResult;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ManagedJobAdSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.PeaJobAdvertisementSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCode;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.RadiusSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
+import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
+import ch.admin.seco.jobs.services.jobadservice.application.security.Role;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.unit.DistanceUnit;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MultiMatchQueryBuilder;
+import org.elasticsearch.index.query.Operator;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.core.DefaultResultMapper;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ResultsMapper;
+import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
+import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.SearchQuery;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
@@ -23,61 +73,11 @@ import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
 import static org.springframework.data.domain.Sort.Order.asc;
 import static org.springframework.data.domain.Sort.Order.desc;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.unit.DistanceUnit;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.Operator;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.elasticsearch.core.DefaultResultMapper;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.core.ResultsMapper;
-import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
-import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.SearchQuery;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
-
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
-import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
-import ch.admin.seco.jobs.services.jobadservice.application.security.Role;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
-
 @Service
-public class JobAdvertisementSearchService {
+public class ElasticJobAdvertisementSearchService implements JobAdvertisementSearchService {
 
-    public enum SearchSort {
-        score,
-        date_asc,
-        date_desc
-    }
 
-    private static Logger LOG = LoggerFactory.getLogger(JobAdvertisementSearchService.class);
+    private static Logger LOG = LoggerFactory.getLogger(ElasticJobAdvertisementSearchService.class);
 
     private static final String PATH_CTX = "jobAdvertisement.";
     private static final String PATH_AVAM_JOB_ID = PATH_CTX + "stellennummerAvam";
@@ -120,16 +120,17 @@ public class JobAdvertisementSearchService {
     private final ResultsMapper resultsMapper;
     private final JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository;
 
-    public JobAdvertisementSearchService(CurrentUserContext currentUserContext,
-            ElasticsearchTemplate elasticsearchTemplate,
-            ElasticsearchConfiguration.CustomEntityMapper customEntityMapper,
-            JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository) {
+    public ElasticJobAdvertisementSearchService(CurrentUserContext currentUserContext,
+                                                ElasticsearchTemplate elasticsearchTemplate,
+                                                ElasticsearchConfiguration.CustomEntityMapper customEntityMapper,
+                                                JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository) {
         this.currentUserContext = currentUserContext;
         this.elasticsearchTemplate = elasticsearchTemplate;
         this.resultsMapper = new DefaultResultMapper(elasticsearchTemplate.getElasticsearchConverter().getMappingContext(), customEntityMapper);
         this.jobAdvertisementElasticsearchRepository = jobAdvertisementElasticsearchRepository;
     }
 
+    @Override
     public Page<JobAdvertisementDto> search(JobAdvertisementSearchRequest jobSearchRequest, int page, int size, SearchSort sort) {
         Pageable pageable = PageRequest.of(page, size, createSort(sort));
         SearchQuery searchQuery = createSearchQueryBuilder(jobSearchRequest)
@@ -159,27 +160,13 @@ public class JobAdvertisementSearchService {
         });
     }
 
-    /**
-     * @deprecated Implementation for the JobRoom. It will be removed after go live of the eServiceUi.
-     */
-    @Deprecated
-    public Page<JobAdvertisementDto> searchPeaJobAdvertisements(
-            PeaJobAdvertisementSearchRequest searchRequest,
-            Pageable pageable) {
-
-        SearchQuery query = new NativeSearchQueryBuilder()
-                .withFilter(mustAll(
-                        titleFilter(searchRequest),
-                        publicationStartDateFilter(searchRequest.getOnlineSinceDays()),
-                        ownerCompanyIdFilter(searchRequest.getCompanyId())))
-                .withPageable(pageable)
-                .build();
-
-        return jobAdvertisementElasticsearchRepository.search(query)
-                .map(JobAdvertisementDocument::getJobAdvertisement)
-                .map(JobAdvertisementDto::toDto);
+    @Override
+    // TODO Pre-authorization-checks
+    public Page<JobAdveristementSearchResult> findByUserId(String ownerId, int page, int size) {
+        return Page.empty();
     }
 
+    @Override
     @PreAuthorize("@jobAdvertisementAuthorizationService.isCurrentUserMemberOfCompany(#searchRequest.companyId)")
     public Page<JobAdvertisementDto> searchManagedJobAds(
             ManagedJobAdSearchRequest searchRequest,
@@ -264,6 +251,7 @@ public class JobAdvertisementSearchService {
         return query;
     }
 
+    @Override
     public long count(JobAdvertisementSearchRequest jobSearchRequest) {
         SearchQuery countQuery = createSearchQueryBuilder(jobSearchRequest).build();
         return elasticsearchTemplate.count(countQuery, JobAdvertisementDocument.class);

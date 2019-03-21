@@ -31,7 +31,7 @@ public class FavouriteItemAuthorizationService {
         return (userId != null) && userId.equals(ownerId);
     }
 
-    public boolean canUpdate(FavouriteItemId favouriteItemId) {
+    public boolean isCurrentUserOwner(FavouriteItemId favouriteItemId) {
         Optional<FavouriteItem> favouriteItemById = this.favouriteItemRepository.findById(favouriteItemId);
         if (!favouriteItemById.isPresent()) {
             return true;
