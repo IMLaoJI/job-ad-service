@@ -66,8 +66,8 @@ public class FavouriteItemRestController {
         return favouriteItemApplicationService.findByOwnerId(pageable, ownerId);
     }
 
-    @GetMapping("/find-by-job-advertisement-id/{ownerId}")
-    public Page<FavouriteItemDto> findByJobAdvertisementId(Pageable pageable, @PathVariable String ownerId, @RequestParam String jobAdvertisementId) {
+    @GetMapping("/find-by-job-advertisement-id/{jobAdvertisementId}")
+    public Page<FavouriteItemDto> findByJobAdvertisementId(Pageable pageable, @PathVariable String jobAdvertisementId, @RequestParam String ownerId) {
         JobAdvertisementId searchedJobAdvertisementId = new JobAdvertisementId(jobAdvertisementId);
         ReadFavouriteItemByJobAdvertisementIdDto readFavouriteItemByJobAdvertisementIdDto = new ReadFavouriteItemByJobAdvertisementIdDto(ownerId, searchedJobAdvertisementId);
         return favouriteItemApplicationService.findByJobAdvertisementId(pageable, readFavouriteItemByJobAdvertisementIdDto);

@@ -64,7 +64,7 @@ public class FavouriteItemApplicationService {
         return favouriteItem.getId();
     }
 
-    // PUT/POST -> /api/favourite-items/<id>/note
+    // PUT -> /api/favourite-items/<id>/<note>
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.canUpdate(#updateFavouriteItemDto.id)")
     public void update(UpdateFavouriteItemDto updateFavouriteItemDto) {
         Condition.notNull(updateFavouriteItemDto, "UpdateFavouriteItemDto can't be null");
@@ -94,7 +94,7 @@ public class FavouriteItemApplicationService {
     }
 
 
-    // GET -> /api/favourite-items/?ownerid=<ownerid>
+    // GET -> /api/favourite-items/find-by-owner-id/{ownerId}
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.matchesCurrentUserId(#ownerId)")
     public Page<FavouriteItemDto> findByOwnerId(Pageable pageable, String ownerId) {
         CurrentUser currentUser = currentUserContext.getCurrentUser();
@@ -107,7 +107,7 @@ public class FavouriteItemApplicationService {
         );
     }
 
-    // GET -> /api/favourite-items/?ownerid=<ownerid>
+    // GET -> /api/favourite-items/find-by-job-advertisement-id/{jobAdvertisementId}
     @PreAuthorize("isAuthenticated()&& @favouriteItemAuthorizationService.matchesCurrentUserId(#readFavouriteItemByJobAdvertismentIdDto.ownerId)")
     public Page<FavouriteItemDto> findByJobAdvertisementId(Pageable pageable, ReadFavouriteItemByJobAdvertisementIdDto readFavouriteItemByJobAdvertismentIdDto) {
         Condition.notNull(readFavouriteItemByJobAdvertismentIdDto.getJobAdvertisementId(), "ReadFavouriteItemByJobAdvertisementIdDto can't be null");
