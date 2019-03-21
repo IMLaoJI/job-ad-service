@@ -1,15 +1,11 @@
-package ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.create;
+package ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.read;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
-public class CreateFavouriteItemDto {
-
-    @Size(max = 1000)
-    private String note;
+public class ReadFavouriteItemByJobAdvertisementIdDto {
 
     @NotBlank
     private String ownerId;
@@ -17,14 +13,9 @@ public class CreateFavouriteItemDto {
     @NotNull
     private JobAdvertisementId jobAdvertisementId;
 
-    public CreateFavouriteItemDto(String note, String ownerId, JobAdvertisementId jobAdvertisementId) {
-        this.note = note;
+    public ReadFavouriteItemByJobAdvertisementIdDto(@NotBlank String ownerId, @NotNull JobAdvertisementId jobAdvertisementId) {
         this.ownerId = ownerId;
         this.jobAdvertisementId = jobAdvertisementId;
-    }
-
-    public String getNote() {
-        return note;
     }
 
     public String getOwnerId() {

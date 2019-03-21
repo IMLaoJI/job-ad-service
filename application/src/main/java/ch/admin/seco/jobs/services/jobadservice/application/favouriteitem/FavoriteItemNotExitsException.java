@@ -4,7 +4,7 @@ import ch.admin.seco.jobs.services.jobadservice.core.domain.AggregateNotFoundExc
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItem;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
 
-class FavoriteItemNotExitsException extends AggregateNotFoundException {
+public class FavoriteItemNotExitsException extends AggregateNotFoundException {
 
     FavoriteItemNotExitsException(FavouriteItemId favouriteItemId) {
         super(FavouriteItem.class, favouriteItemId.getValue());
