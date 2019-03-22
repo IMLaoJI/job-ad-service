@@ -10,7 +10,7 @@ import org.springframework.data.elasticsearch.annotations.Setting;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.ElasticsearchIndexService.TYPE_JOB_ADVERTISEMENT;
 
-@Document(indexName = INDEX_NAME_JOB_ADVERTISEMENT, type = TYPE_JOB_ADVERTISEMENT)
+@Document(indexName = INDEX_NAME_JOB_ADVERTISEMENT, type = TYPE_JOB_ADVERTISEMENT, shards = 1)
 @Mapping(mappingPath = "config/elasticsearch/mappings/job-advertisement.json")
 @Setting(settingPath = "config/elasticsearch/settings/folding-analyzer.json")
 public class JobAdvertisementDocument {

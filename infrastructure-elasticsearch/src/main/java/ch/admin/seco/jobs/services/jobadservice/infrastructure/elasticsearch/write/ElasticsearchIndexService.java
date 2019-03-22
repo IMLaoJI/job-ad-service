@@ -35,10 +35,8 @@ public class ElasticsearchIndexService {
     private static final int BUFFER_SIZE = 100;
     public static final String INDEX_NAME_JOB_ADVERTISEMENT = "job-advertisements";
     public static final String INDEX_NAME_API_USER = "api-users";
-    public static final String INDEX_NAME_FAVOURITE_ITEM = "favourite-items";
     public static final String TYPE_JOB_ADVERTISEMENT = "job-advertisement";
     public static final String TYPE_API_USER = "api-user";
-    public static final String TYPE_FAVOURITE_ITEM = "favourite-item";
 
     private final Logger log = LoggerFactory.getLogger(ElasticsearchIndexService.class);
 

@@ -2,28 +2,31 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.wr
 
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItem;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Mapping;
-import org.springframework.data.elasticsearch.annotations.Setting;
+import org.springframework.data.elasticsearch.annotations.*;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.ElasticsearchIndexService.INDEX_NAME_FAVOURITE_ITEM;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.ElasticsearchIndexService.TYPE_FAVOURITE_ITEM;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.ElasticsearchIndexService.*;
 
-@Document(indexName = INDEX_NAME_FAVOURITE_ITEM, type = TYPE_FAVOURITE_ITEM)
-@Mapping(mappingPath = "config/elasticsearch/mappings/favourite-item.json")
+@Document(indexName = INDEX_NAME_JOB_ADVERTISEMENT, type = TYPE_JOB_ADVERTISEMENT)
 @Setting(settingPath = "config/elasticsearch/settings/folding-analyzer.json")
 public class FavouriteItemDocument {
 
+    private static final String PARENT_TYPE = "jobAdvertisement";
+
     @Id
     private String id;
+
+    @Parent(type = PARENT_TYPE)
+    private String parentId;
 
     private FavouriteItem favouriteItem;
 
     protected FavouriteItemDocument() {}
 
+
     public FavouriteItemDocument(FavouriteItem favouriteItem) {
         this.favouriteItem = favouriteItem;
         this.id = favouriteItem.getId().getValue();
+        this.parentId = favouriteItem.getJobAdvertisementId().getValue();
     }
 
     public String getId() {
@@ -32,5 +35,9 @@ public class FavouriteItemDocument {
 
     public FavouriteItem getFavouriteItem() {
         return favouriteItem;
+    }
+
+    public String getParentId() {
+        return parentId;
     }
 }

@@ -312,6 +312,38 @@
             "type": "keyword"
           }
         }
+      },
+      "favouriteItem": {
+        "properties": {
+          "id": {
+            "properties": {
+              "value": {
+                "type": "keyword"
+              }
+            }
+          },
+          "note": {
+            "type": "text"
+          },
+          "ownerId": {
+            "type": "text"
+          },
+          "jobAdvertisementId": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          }
+        }
+      },
+      "jobAdvertisementRelations" : {
+        "type" : "join",
+        "relations" : {
+          "jobAdvertisement" : "favouriteItem"
+        }
       }
     }
   }

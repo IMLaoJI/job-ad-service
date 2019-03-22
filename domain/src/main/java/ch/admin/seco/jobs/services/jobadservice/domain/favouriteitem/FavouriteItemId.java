@@ -14,7 +14,7 @@ public class FavouriteItemId implements AggregateId<FavouriteItemId> {
         this(IdGenerator.timeBasedUUID().toString());
     }
 
-    private FavouriteItemId(String value) {
+    public FavouriteItemId(String value) {
         this.value = Condition.notBlank(value);
     }
 
