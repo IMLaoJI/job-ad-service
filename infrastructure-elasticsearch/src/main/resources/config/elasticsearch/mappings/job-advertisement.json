@@ -355,7 +355,7 @@
       "jobAdvertisementRelations" : {
         "type" : "join",
         "relations" : {
-          "jobAdvertisement" : "favourite-item"
+          "jobAdvertisement" : "favouriteItem"
         }
       }
     }

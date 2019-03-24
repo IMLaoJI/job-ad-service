@@ -9,11 +9,16 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.wri
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.favouriteitem.FavouriteItemElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.scheduling.annotation.Async;
@@ -23,6 +28,7 @@ import org.springframework.util.StopWatch;
 import reactor.core.publisher.Flux;
 
 import javax.persistence.EntityManager;
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -37,7 +43,6 @@ public class ElasticsearchIndexService {
     public static final String INDEX_NAME_API_USER = "api-users";
     public static final String TYPE_JOB_ADVERTISEMENT = "job-advertisement";
     public static final String TYPE_API_USER = "api-user";
-    public static final String TYPE_FAVOURITE_ITEM = "favourite-item";
 
     private final Logger log = LoggerFactory.getLogger(ElasticsearchIndexService.class);
 
@@ -139,5 +144,32 @@ public class ElasticsearchIndexService {
 
     private void removeAllElementFromHibernatePrimaryCache() {
         entityManager.clear();
+    }
+
+    public void saveChildWithUpdateRequest(FavouriteItemDocument favouriteItemDocument, String parent) {
+        UpdateRequest updateRequest = new UpdateRequest(INDEX_NAME_JOB_ADVERTISEMENT, TYPE_JOB_ADVERTISEMENT, favouriteItemDocument.getId());
+        updateRequest.routing(parent);
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(favouriteItemDocument);
+
+            log.debug("json dump: {}", json);
+
+            updateRequest.doc(json, XContentType.JSON);
+
+            UpdateQuery updateQuery = new UpdateQuery();
+            updateQuery.setUpdateRequest(updateRequest);
+            updateQuery.setClazz(FavouriteItemDocument.class);
+            updateQuery.setId(favouriteItemDocument.getId());
+            updateQuery.setIndexName(INDEX_NAME_JOB_ADVERTISEMENT);
+            updateQuery.setType(TYPE_JOB_ADVERTISEMENT);
+            updateQuery.setDoUpsert(true);
+
+            UpdateResponse response = elasticsearchTemplate.update(updateQuery);
+            log.info("Response {}", response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
