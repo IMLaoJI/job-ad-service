@@ -6,16 +6,13 @@ import org.springframework.data.elasticsearch.annotations.*;
 
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.ElasticsearchIndexService.*;
 
-@Document(indexName = INDEX_NAME_JOB_ADVERTISEMENT, type = TYPE_JOB_ADVERTISEMENT)
+@Document(indexName = INDEX_NAME_JOB_ADVERTISEMENT, type = TYPE_JOB_ADVERTISEMENT, shards = 1)
 @Setting(settingPath = "config/elasticsearch/settings/folding-analyzer.json")
 public class FavouriteItemDocument {
-
-    private static final String PARENT_TYPE = "jobAdvertisement";
 
     @Id
     private String id;
 
-    @Parent(type = PARENT_TYPE)
     private String parentId;
 
     private FavouriteItem favouriteItem;
