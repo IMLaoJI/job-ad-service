@@ -1,4 +1,4 @@
-package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement;
+package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;

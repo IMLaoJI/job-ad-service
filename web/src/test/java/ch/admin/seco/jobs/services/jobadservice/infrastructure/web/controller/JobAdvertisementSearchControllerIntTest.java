@@ -1,6 +1,12 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
 import ch.admin.seco.jobs.services.jobadservice.Application;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ManagedJobAdSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.PeaJobAdvertisementSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCode;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCodeType;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.GeoPointDto;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItem;
@@ -14,6 +20,7 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.Ela
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.*;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.favouriteitem.FavouriteItemDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.favouriteitem.FavouriteItemElasticsearchRepository;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.RadiusSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
@@ -131,7 +138,7 @@ public class JobAdvertisementSearchControllerIntTest {
         this.favouriteItemElasticsearchRepository.deleteAll();
         this.mockCurrentUserContext = mock(CurrentUserContext.class);
 
-        this.jobAdvertisementSearchService = new JobAdvertisementSearchService(mockCurrentUserContext,
+        this.jobAdvertisementSearchService = new ElasticJobAdvertisementSearchService(mockCurrentUserContext,
                 this.elasticsearchTemplate,
                 this.customEntityMapper,
                 this.jobAdvertisementElasticsearchRepository
