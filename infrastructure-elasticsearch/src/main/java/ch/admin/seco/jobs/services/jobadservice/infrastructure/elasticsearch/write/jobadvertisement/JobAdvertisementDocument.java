@@ -22,7 +22,7 @@ public class JobAdvertisementDocument {
 
     private JobAdvertisement jobAdvertisement;
 
-    private ParentRelation parentRelation;
+    private ParentRelation jobAdvertisementRelations;
 
     protected JobAdvertisementDocument() {
     }
@@ -30,7 +30,7 @@ public class JobAdvertisementDocument {
     public JobAdvertisementDocument(JobAdvertisement jobAdvertisement) {
         this.jobAdvertisement = jobAdvertisement;
         this.id = jobAdvertisement.getId().getValue();
-        this.parentRelation = new ParentRelation.Builder()
+        this.jobAdvertisementRelations = new ParentRelation.Builder()
                 .setName(JOB_ADVERTISEMENT)
                 .build();
     }
@@ -43,7 +43,7 @@ public class JobAdvertisementDocument {
         return jobAdvertisement;
     }
 
-    public ParentRelation getParentRelation() {
-        return parentRelation;
+    public ParentRelation getJobAdvertisementRelations() {
+        return jobAdvertisementRelations;
     }
 }

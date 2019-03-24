@@ -22,7 +22,7 @@ public class FavouriteItemDocument {
 
     private FavouriteItem favouriteItem;
 
-    private ChildRelation childRelation;
+    private ChildRelation jobAdvertisementRelations;
 
     protected FavouriteItemDocument() {}
 
@@ -30,7 +30,7 @@ public class FavouriteItemDocument {
     public FavouriteItemDocument(FavouriteItem favouriteItem) {
         this.favouriteItem = favouriteItem;
         this.id = favouriteItem.getId().getValue();
-        this.childRelation = new ChildRelation.Builder()
+        this.jobAdvertisementRelations = new ChildRelation.Builder()
                 .setName(FAVOURITE_ITEM)
                 .setParent(favouriteItem.getJobAdvertisementId().getValue())
                 .build();
@@ -44,7 +44,7 @@ public class FavouriteItemDocument {
         return favouriteItem;
     }
 
-    public ChildRelation getChildRelation() {
-        return childRelation;
+    public ChildRelation getJobAdvertisementRelations() {
+        return jobAdvertisementRelations;
     }
 }
