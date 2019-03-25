@@ -49,37 +49,34 @@ public class FavouriteItemApplicationService {
                 .setNote(createFavouriteItemDto.getNote())
                 .setOwnerId(createFavouriteItemDto.getOwnerId())
                 .setJobAdvertismentId(createFavouriteItemDto.getJobAdvertisementId()).build();
-        DomainEventPublisher.publish(new FavouriteItemCreatedEvent(favouriteItem));
-
         //check that the given owner hasn't yet created a FavouriteItem for the given JobAdvertisementId
         ReadFavouriteItemByJobAdvertisementIdDto readFavouriteItemByJobAdvertisementIdDto = new ReadFavouriteItemByJobAdvertisementIdDto(createFavouriteItemDto.getOwnerId(), createFavouriteItemDto.getJobAdvertisementId());
         Optional<FavouriteItem> byJobAdvertisementIdAndOwnerId = this.findByJobAdvertisementIdAndOwnerId(readFavouriteItemByJobAdvertisementIdDto);
         if (byJobAdvertisementIdAndOwnerId.isPresent()) {
-            throw new FavouriteItemAlreadyExistsForJobAdvertisementId(byJobAdvertisementIdAndOwnerId.get().getId(), favouriteItem.getJobAdvertisementId(), favouriteItem.getOwnerId());
+            throw new FavouriteItemAlreadyExistsForJobAdvertisementIdException(byJobAdvertisementIdAndOwnerId.get().getId(), favouriteItem.getJobAdvertisementId(), favouriteItem.getOwnerId());
         }
 
-        this.favouriteItemRepository.save(favouriteItem);
-        LOG.info("Favourite Item " + favouriteItem.getId() + " has been created for user " + favouriteItem.getOwnerId() + ".");
-        return favouriteItem.getId();
+        FavouriteItem newFavouriteItem = this.favouriteItemRepository.save(favouriteItem);
+        LOG.info("Favourite Item " + newFavouriteItem.getId().getValue() + " has been created for user " + newFavouriteItem.getOwnerId() + ".");
+        DomainEventPublisher.publish(new FavouriteItemCreatedEvent(newFavouriteItem));
+        return newFavouriteItem.getId();
     }
 
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.isCurrentUserOwner(#updateFavouriteItemDto.id)")
     public void update(UpdateFavouriteItemDto updateFavouriteItemDto) {
         Condition.notNull(updateFavouriteItemDto, "UpdateFavouriteItemDto can't be null");
-        FavouriteItem favouriteItem = this.favouriteItemRepository.findById(updateFavouriteItemDto.getId())
-                .orElseThrow(() -> new FavoriteItemNotExitsException(updateFavouriteItemDto.getId()));
+        FavouriteItem favouriteItem = getFavouriteItem(updateFavouriteItemDto.getId());
         favouriteItem.update(updateFavouriteItemDto.getNote());
-        LOG.info("Favourite Item " + favouriteItem.getId() + " has been updated for user " + favouriteItem.getOwnerId() + " with note " + favouriteItem.getNote() + ".");
+        LOG.info("Favourite Item " + favouriteItem.getId().getValue() + " has been updated for user " + favouriteItem.getOwnerId() + " with note " + favouriteItem.getNote() + ".");
     }
 
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.isCurrentUserOwner(#favouriteItemId)")
     public void delete(FavouriteItemId favouriteItemId) {
         Condition.notNull(favouriteItemId, "FavouriteItemId can't be null");
-        FavouriteItem favouriteItem = this.favouriteItemRepository.findById(favouriteItemId)
-                .orElseThrow(() -> new FavoriteItemNotExitsException(favouriteItemId));
+        FavouriteItem favouriteItem = getFavouriteItem(favouriteItemId);
         DomainEventPublisher.publish(new FavouriteItemDeletedEvent(favouriteItem));
         this.favouriteItemRepository.delete(favouriteItem);
-        LOG.info("Favourite Item " + favouriteItem.getId() + " has been deleted for user " + favouriteItem.getOwnerId() + ".");
+        LOG.info("Favourite Item " + favouriteItem.getId().getValue() + " has been deleted for user " + favouriteItem.getOwnerId() + ".");
     }
 
     @PreAuthorize("isAuthenticated() and favouriteItemAuthorizationService.matchesCurrentUserId(#readFavouriteItemByJobAdvertismentIdDto.ownerId)")
@@ -93,6 +90,11 @@ public class FavouriteItemApplicationService {
         Condition.notNull(favouriteItemId, "FavouriteItemId can't be null");
         return this.favouriteItemRepository.findById(favouriteItemId).map(FavouriteItemDto::toDto)
                 .orElse(null);
+    }
+
+    private FavouriteItem getFavouriteItem(FavouriteItemId id) {
+        return this.favouriteItemRepository.findById(id)
+                .orElseThrow(() -> new FavoriteItemNotExitsException(id));
     }
 /*
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.matchesCurrentUserId(#ownerId)")

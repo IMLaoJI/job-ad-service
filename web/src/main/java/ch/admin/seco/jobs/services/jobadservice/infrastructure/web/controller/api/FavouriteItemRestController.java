@@ -50,11 +50,13 @@ public class FavouriteItemRestController {
     }
 
     @PutMapping("/{id}/note")
-    public void updateFavouriteItem(@PathVariable FavouriteItemId favouriteItemId, @RequestBody FavouriteItemUpdate favouriteItemUpdate) throws FavoriteItemNotExitsException {
-        favouriteItemApplicationService.update(new UpdateFavouriteItemDto(favouriteItemId, favouriteItemUpdate.note));
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateFavouriteItem(@PathVariable String id, @RequestBody FavouriteItemUpdate favouriteItemUpdate) throws FavoriteItemNotExitsException {
+        favouriteItemApplicationService.update(new UpdateFavouriteItemDto(new FavouriteItemId(id), favouriteItemUpdate.note));
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFavouriteItem(@PathVariable String id) throws FavoriteItemNotExitsException {
         FavouriteItemId favouriteItemId = new FavouriteItemId(id);
         favouriteItemApplicationService.delete(favouriteItemId);
