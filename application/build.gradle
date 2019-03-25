@@ -4,6 +4,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-security'
     compile 'com.google.guava:guava'
     compile 'org.hibernate.validator:hibernate-validator'
+    compile 'com.fasterxml.jackson.core:jackson-annotations'
 
     testCompile files(this.project(':domain').sourceSets.test.output)
     testCompile files(this.project(':core').sourceSets.test.output)
