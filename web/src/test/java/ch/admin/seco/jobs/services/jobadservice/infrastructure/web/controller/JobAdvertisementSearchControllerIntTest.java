@@ -1444,9 +1444,19 @@ public class JobAdvertisementSearchControllerIntTest {
     public void indexParentWithChildTest() {
         //given
         index(createJob(job01.id()));
+        index(createJob(job02.id()));
+        index(createJob(job03.id()));
         //when
-        indexChildDocument(createFavouriteItem("child-1", job01.id(), "john"));
-        indexChildDocument(createFavouriteItem("child-2", job01.id(), "emma"));
+        indexChildDocument(createFavouriteItem("child-01", job01.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-02", job02.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-03", job03.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-04", job01.id(), "Emma"));
+        indexChildDocument(createFavouriteItem("child-05", job03.id(), "Emma"));
+        indexChildDocument(createFavouriteItem("child-06", job03.id(), "Tom"));
+        indexChildDocument(createFavouriteItem("child-07", job01.id(), "Jane"));
+        indexChildDocument(createFavouriteItem("child-08", job02.id(), "Jane"));
+        indexChildDocument(createFavouriteItem("child-09", job03.id(), "Jane"));
+        indexChildDocument(createFavouriteItem("child-10", job03.id(), "Paul"));
         //then
     }
 
