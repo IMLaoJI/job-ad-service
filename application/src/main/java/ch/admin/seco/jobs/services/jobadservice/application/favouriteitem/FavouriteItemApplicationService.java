@@ -37,20 +37,26 @@ public class FavouriteItemApplicationService {
         this.jobAdvertisementRepository = jobAdvertisementRepository;
     }
 
-    // TODO check that Im the owner
     @PreAuthorize("isAuthenticated() and @favouriteItemAuthorizationService.matchesCurrentUserId(#createFavouriteItemDto.ownerId)")
     public FavouriteItemId create(CreateFavouriteItemDto createFavouriteItemDto) {
         Condition.notNull(createFavouriteItemDto, "CreateFavouriteItemDto can't be null");
         if (!this.jobAdvertisementRepository.existsById(createFavouriteItemDto.getJobAdvertisementId())) {
             throw new AggregateNotFoundException(JobAdvertisement.class, createFavouriteItemDto.getJobAdvertisementId().getValue());
         }
+
         FavouriteItem favouriteItem = new FavouriteItem.Builder()
                 .setId(new FavouriteItemId())
                 .setNote(createFavouriteItemDto.getNote())
                 .setOwnerId(createFavouriteItemDto.getOwnerId())
                 .setJobAdvertismentId(createFavouriteItemDto.getJobAdvertisementId()).build();
         DomainEventPublisher.publish(new FavouriteItemCreatedEvent(favouriteItem));
-        // TODO a check that the given owner hasn't yet created a FavouriteItem for the given JobAdvertisementId
+
+        //check that the given owner hasn't yet created a FavouriteItem for the given JobAdvertisementId
+        ReadFavouriteItemByJobAdvertisementIdDto readFavouriteItemByJobAdvertisementIdDto = new ReadFavouriteItemByJobAdvertisementIdDto(createFavouriteItemDto.getOwnerId(), createFavouriteItemDto.getJobAdvertisementId());
+        Optional<FavouriteItem> byJobAdvertisementIdAndOwnerId = this.findByJobAdvertisementIdAndOwnerId(readFavouriteItemByJobAdvertisementIdDto);
+        if (byJobAdvertisementIdAndOwnerId.isPresent()) {
+            throw new FavouriteItemAlreadyExistsForJobAdvertisementId(byJobAdvertisementIdAndOwnerId.get().getId(), favouriteItem.getJobAdvertisementId(), favouriteItem.getOwnerId());
+        }
 
         this.favouriteItemRepository.save(favouriteItem);
         LOG.info("Favourite Item " + favouriteItem.getId() + " has been created for user " + favouriteItem.getOwnerId() + ".");
