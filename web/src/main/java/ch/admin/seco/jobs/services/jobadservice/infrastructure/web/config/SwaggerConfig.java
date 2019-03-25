@@ -1,7 +1,20 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.config;
 
-import static java.util.Collections.singletonList;
-import static springfox.documentation.builders.PathSelectors.regex;
+import ch.admin.seco.jobs.services.jobadservice.application.ProfileRegistry;
+import com.google.common.base.Predicate;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.oauth2.OAuth2ClientProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import springfox.documentation.builders.OAuthBuilder;
+import springfox.documentation.service.*;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.service.contexts.SecurityContext;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger.web.SecurityConfiguration;
+import springfox.documentation.swagger.web.SecurityConfigurationBuilder;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,30 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Predicate;
-import springfox.documentation.builders.OAuthBuilder;
-import springfox.documentation.service.ApiKey;
-import springfox.documentation.service.AuthorizationCodeGrant;
-import springfox.documentation.service.AuthorizationScope;
-import springfox.documentation.service.GrantType;
-import springfox.documentation.service.SecurityReference;
-import springfox.documentation.service.SecurityScheme;
-import springfox.documentation.service.TokenEndpoint;
-import springfox.documentation.service.TokenRequestEndpoint;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spi.service.contexts.SecurityContext;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger.web.SecurityConfiguration;
-import springfox.documentation.swagger.web.SecurityConfigurationBuilder;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.security.oauth2.OAuth2ClientProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-
-import ch.admin.seco.jobs.services.jobadservice.application.ProfileRegistry;
+import static java.util.Collections.singletonList;
+import static springfox.documentation.builders.PathSelectors.regex;
 
 @Configuration
 @EnableSwagger2
@@ -53,7 +44,9 @@ class SwaggerConfig {
                     .paths(regex("/api/.*"))
                     .build()
                     .directModelSubstitute(LocalDate.class, java.sql.Date.class)
-                    .directModelSubstitute(LocalDateTime.class, java.util.Date.class);
+                    .directModelSubstitute(LocalDateTime.class, java.util.Date.class)
+                    .securityContexts(Collections.singletonList(securityContext()))
+                    .securitySchemes(Collections.singletonList(apiKey()));
         }
 
         @Bean

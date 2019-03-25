@@ -18,22 +18,22 @@ services:
         ports:
         - 8761:8761
     elasticsearch:
-        image: elasticsearch:5.6.5
+        image: elasticsearch:6.5.0
         # volumes:
         #     - ~/volumes/jhipster/jobadservice/elasticsearch/:/usr/share/elasticsearch/data/
         ports:
         - 9200:9200
         - 9300:9300
-        command: -Enetwork.host=0.0.0.0 -Ediscovery.type=single-node
         networks: ['elasticstack']
         environment:
         - xpack.security.enabled=false
         - xpack.monitoring.enabled=false
+        - discovery.type=single-node
+        - network.host=0.0.0.0
+        - cluster.name=elasticsearch
 
     kibana:
-        image: kibana:5.6.5
-        container_name: kibana
-        hostname: kibana
+        image: kibana:6.5.0
         ports: ['5601:5601']
         networks: ['elasticstack']
         depends_on: ['elasticsearch']
@@ -53,5 +53,10 @@ services:
         ports:
         - 5434:5432
 
+    mail:
+        image: mailhog/mailhog
+        ports:
+            - 8025:8025
+            - 1025:1025
 networks:
   elasticstack:
