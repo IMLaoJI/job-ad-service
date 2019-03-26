@@ -20,6 +20,12 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.job
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors.ExceptionTranslator;
+import org.apache.lucene.search.join.ScoreMode;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.join.query.HasChildQueryBuilder;
+import org.elasticsearch.join.query.HasParentQueryBuilder;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -53,10 +59,14 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobDescriptionFixture.testJobDescription;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument.FAVOURITE_ITEM;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument.JOB_ADVERTISEMENT;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForAbroadSearchTests;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForGeoDistanceTests;
 import static java.time.LocalDate.now;
 import static java.util.Arrays.asList;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.CombinableMatcher.both;
 import static org.mockito.Mockito.mock;
@@ -1348,7 +1358,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
-    public void indexParentWithChildTest() {
+    public void indexParentWithChildTest() throws Exception {
         //given
         index(createJob(job01.id()));
         index(createJob(job02.id()));
@@ -1365,11 +1375,34 @@ public class JobAdvertisementSearchControllerIntTest {
         indexChildDocument(createFavouriteItem("child-09", job03.id(), "Jane"));
         indexChildDocument(createFavouriteItem("child-10", job03.id(), "Paul"));
         //then
+
+        QueryBuilder queryChild = matchAllQuery();
+        HasChildQueryBuilder childQueryBuilder = new HasChildQueryBuilder(FAVOURITE_ITEM, queryChild, ScoreMode.None);
+
+        SearchResponse responseChild = this.elasticsearchTemplate.getClient()
+                .prepareSearch(INDEX_NAME_JOB_ADVERTISEMENT).setQuery(childQueryBuilder).execute().actionGet();
+
+        Assert.assertNotNull(responseChild);
+        Assert.assertNotNull(responseChild.getHits());
+        Assert.assertNotNull(responseChild.getHits().getTotalHits());
+        Assert.assertEquals(3, responseChild.getHits().getTotalHits());
+
+        QueryBuilder queryParent = matchAllQuery();
+        HasParentQueryBuilder parentQueryBuilder = new HasParentQueryBuilder(JOB_ADVERTISEMENT, queryParent, true);
+
+        SearchResponse responseParent = this.elasticsearchTemplate.getClient()
+                .prepareSearch(INDEX_NAME_JOB_ADVERTISEMENT).setQuery(parentQueryBuilder).execute().actionGet();
+
+        Assert.assertNotNull(responseParent);
+        Assert.assertNotNull(responseParent.getHits());
+        Assert.assertNotNull(responseParent.getHits().getTotalHits());
+        Assert.assertEquals(10, responseParent.getHits().getTotalHits());
+
     }
 
     private void indexChildDocument(FavouriteItem favouriteItem) {
         this.elasticsearchIndexService.saveChildWithUpdateRequest(new FavouriteItemDocument(favouriteItem),
-                favouriteItem.getJobAdvertisementId().getValue(), ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT);
+                favouriteItem.getJobAdvertisementId().getValue(), INDEX_NAME_JOB_ADVERTISEMENT);
     }
 
     private FavouriteItem createFavouriteItem(String favouriteItemId, JobAdvertisementId id, String ownerId) {
