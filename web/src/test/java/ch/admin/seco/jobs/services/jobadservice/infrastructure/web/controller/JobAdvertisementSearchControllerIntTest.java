@@ -130,10 +130,10 @@ public class JobAdvertisementSearchControllerIntTest {
 
     @Before
     public void setUp() {
-        this.jobAdvertisementElasticsearchRepository.deleteAll();
-        this.jobAdvertisementJpaRepository.deleteAll();
-        this.favouriteItemRepository.deleteAll();
         this.favouriteItemElasticsearchRepository.deleteAll();
+        this.jobAdvertisementElasticsearchRepository.deleteAll();
+        this.favouriteItemRepository.deleteAll();
+        this.jobAdvertisementJpaRepository.deleteAll();
         this.mockCurrentUserContext = mock(CurrentUserContext.class);
 
         this.jobAdvertisementSearchService = new ElasticJobAdvertisementSearchService(mockCurrentUserContext,

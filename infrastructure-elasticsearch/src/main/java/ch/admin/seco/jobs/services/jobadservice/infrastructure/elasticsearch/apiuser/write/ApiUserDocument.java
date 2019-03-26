@@ -10,7 +10,7 @@ import javax.persistence.Id;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_API_USER;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.TYPE_DOC;
 
-@Document(indexName = INDEX_NAME_API_USER, type = TYPE_DOC)
+@Document(indexName = INDEX_NAME_API_USER, type = TYPE_DOC, shards = 1, replicas = 0)
 @Mapping(mappingPath = "config/elasticsearch/mappings/api-user.json")
 @Setting(settingPath = "config/elasticsearch/settings/folding-analyzer.json")
 public class ApiUserDocument {
