@@ -343,7 +343,7 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
     }
 
     public void cancel(LocalDate date, CancellationCode cancellationCode, SourceSystem cancelledBy) {
-        if(status.equals(JobAdvertisementStatus.CANCELLED)) {
+        if(!status.equals(JobAdvertisementStatus.CANCELLED)) {
             this.cancellationDate = Condition.notNull(date);
             this.cancellationCode = Condition.notNull(cancellationCode);
             this.status = status.validateTransitionTo(JobAdvertisementStatus.CANCELLED);
