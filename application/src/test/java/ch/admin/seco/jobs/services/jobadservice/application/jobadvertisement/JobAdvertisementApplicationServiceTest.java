@@ -80,25 +80,21 @@ public class JobAdvertisementApplicationServiceTest {
 
     private static final String TEST_STELLEN_NUMMER_EGOV = "1000000";
 
-    @MockBean
     private DomainEventMockUtils domainEventMockUtils;
 
-    @MockBean
+    @Autowired
     private ReportingObligationService reportingObligationService;
 
-    @MockBean
+    @Autowired
     private LocationService locationService;
 
-    @MockBean
-    private ProfessionService professionService;
-
-    @MockBean
+    @Autowired
     private JobCenterService jobCenterService;
 
     @Autowired
     private JobAdvertisementRepository jobAdvertisementRepository;
 
-    @MockBean
+    @Autowired
     private DataFieldMaxValueIncrementer egovNumberGenerator;
 
     @Autowired

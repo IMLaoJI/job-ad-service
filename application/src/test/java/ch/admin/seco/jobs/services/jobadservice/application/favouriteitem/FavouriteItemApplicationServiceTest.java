@@ -185,7 +185,7 @@ public class FavouriteItemApplicationServiceTest {
         Optional<FavouriteItemDto> optionalFavouriteItemDto = this.sut.findByJobAdvertisementIdAndOwnerId(jobAdvertisementId, ownerId);
 
         // then
-        assertThat(!optionalFavouriteItemDto.isPresent());
+        assertThat(optionalFavouriteItemDto).isPresent();
     }
 
     private void createAndSaveToDBFavouriteItem(FavouriteItemId favouriteItemId, JobAdvertisementId jobAdvertisementId, String note, String ownerId) {
