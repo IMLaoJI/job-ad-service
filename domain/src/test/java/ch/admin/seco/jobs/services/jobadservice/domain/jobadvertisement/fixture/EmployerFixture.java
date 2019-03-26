@@ -10,8 +10,8 @@ public class EmployerFixture {
     public static Builder testEmployer() {
         return testEmployerEmty()
              .setName("name")
-             .setPostalCode("postalCode")
+             .setPostalCode("3000")
              .setCity("city")
-             .setCountryIsoCode("countryIsoCode");
+             .setCountryIsoCode("CH");
     }
 }

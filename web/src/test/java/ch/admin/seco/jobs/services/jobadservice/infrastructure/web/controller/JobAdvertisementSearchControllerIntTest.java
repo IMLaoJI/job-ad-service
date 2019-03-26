@@ -104,6 +104,7 @@ import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.contro
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 @ActiveProfiles("dev")
+@WithJobSeeker()
 public class JobAdvertisementSearchControllerIntTest {
 
     private static final String DEFAULT_AVAM_CODE = "11111";

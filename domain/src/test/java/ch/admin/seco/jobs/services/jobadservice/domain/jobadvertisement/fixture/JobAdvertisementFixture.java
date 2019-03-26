@@ -29,20 +29,20 @@ public class JobAdvertisementFixture {
                 .setSourceSystem(JOBROOM)
                 .setExternalReference("externalReference")
                 .setStellennummerEgov(job01.name())
-                .setStellennummerAvam("stellennummerAvam")
+                .setStellennummerAvam("12345678")
                 .setFingerprint("fingerprint")
                 .setReportingObligationEndDate(now().plusWeeks(4))
-                .setJobCenterCode("jobCenterCode")
+                .setJobCenterCode("12345")
                 .setApprovalDate(now().plusWeeks(3))
                 .setRejectionDate(now().plusWeeks(2))
-                .setRejectionCode("rejectionCode")
+                .setRejectionCode("1234")
                 .setRejectionReason("rejectionReason")
                 .setCancellationDate(now().plusWeeks(1))
                 .setCancellationCode(OCCUPIED_JOBCENTER)
                 .setJobContent(testJobContent().build())
                 .setOwner(testOwner().build())
                 .setContact(testContact().build())
-                .setPublication(testPublicationEmpty().build());
+                .setPublication(testPublication().build());
     }
 
     public static JobAdvertisement.Builder of(JobAdvertisementId jobAdvertisementId) {

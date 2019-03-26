@@ -37,7 +37,7 @@ public class JobContentFixture {
         return testJobContentEmpty()
                 .setExternalUrl("externalUr")
                 .setX28OccupationCodes("x28OccupationCodes")
-                .setNumberOfJobs("numberOfJobs")
+                .setNumberOfJobs("1")
                 .setJobDescriptions(singletonList(testJobDescription().build()))
                 .setDisplayCompany(testDisplayCompany(testJobCenter()).build())
                 .setCompany(testCompany().build())
@@ -46,7 +46,7 @@ public class JobContentFixture {
                 .setLocation(testLocation().build())
                 .setOccupations(singletonList(
                         testOccupationEmpty()
-                                .setAvamOccupationCode("avamOccupationCode")
+                                .setAvamOccupationCode("9999")
                                 .build()))
                 .setLanguageSkills(singletonList(testLanguageSkill().build()))
                 .setApplyChannel(testApplyChannel().build())
