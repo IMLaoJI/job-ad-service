@@ -1,17 +1,16 @@
-package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.apiuser;
+package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.apiuser.write;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.ElasticsearchIndexService.INDEX_NAME_API_USER;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.ElasticsearchIndexService.TYPE_API_USER;
-
-import javax.persistence.Id;
-
+import ch.admin.seco.jobs.services.jobadservice.domain.apiuser.ApiUser;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Mapping;
 import org.springframework.data.elasticsearch.annotations.Setting;
 
-import ch.admin.seco.jobs.services.jobadservice.domain.apiuser.ApiUser;
+import javax.persistence.Id;
 
-@Document(indexName = INDEX_NAME_API_USER, type = TYPE_API_USER)
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_API_USER;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.TYPE_DOC;
+
+@Document(indexName = INDEX_NAME_API_USER, type = TYPE_DOC, shards = 1, replicas = 0)
 @Mapping(mappingPath = "config/elasticsearch/mappings/api-user.json")
 @Setting(settingPath = "config/elasticsearch/settings/folding-analyzer.json")
 public class ApiUserDocument {

@@ -1,4 +1,4 @@
-package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.apiuser;
+package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.apiuser.read;
 
 public class ApiUserSearchRequest {
 

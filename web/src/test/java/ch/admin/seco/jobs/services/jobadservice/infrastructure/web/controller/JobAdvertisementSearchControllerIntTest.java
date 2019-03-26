@@ -1,88 +1,38 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REJECTED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.API;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.EXTERN;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture.testJobAdvertisement;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job02;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job03;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job04;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job05;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job06;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job07;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job08;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job09;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job10;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createArchivedJob;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithCompanyName;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithContractType;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithDescription;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithDescriptionAndOwnerCompanyId;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithLanguageSkills;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithLocation;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithOccupation;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithOwnerAndPublicationStartDate;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithPublicDisplayAndWithRestrictedDisplay;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithPublicDisplayAndWithoutRestrictedDisplay;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithWorkload;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithX28Code;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithoutPublicDisplayAndWithRestrictedDisplay;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithoutPublicDisplayAndWithoutRestrictedDisplay;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJob;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJobWithoutPublicDisplayAndWithRestrictedDisplay;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJobWithoutPublicDisplayAndWithoutRestrictedDisplay;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobDescriptionFixture.testJobDescription;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
-import static java.time.LocalDate.now;
-import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.core.CombinableMatcher.both;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.LocalDate;
-import java.util.stream.Stream;
-
 import ch.admin.seco.jobs.services.jobadservice.Application;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchService;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ManagedJobAdSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.PeaJobAdvertisementSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCode;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCodeType;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.GeoPointDto;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
+import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItem;
+import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
+import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.*;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.RadiusSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.read.ElasticJobAdvertisementSearchService;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors.ExceptionTranslator;
+import org.apache.lucene.search.join.ScoreMode;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.join.query.HasChildQueryBuilder;
+import org.elasticsearch.join.query.HasParentQueryBuilder;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
-import reactor.util.function.Tuples;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -95,11 +45,33 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import reactor.util.function.Tuples;
 
 import java.util.List;
+import java.util.stream.Stream;
 
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.API;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.EXTERN;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture.testJobAdvertisement;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobDescriptionFixture.testJobDescription;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument.FAVOURITE_ITEM;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument.JOB_ADVERTISEMENT;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForAbroadSearchTests;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForGeoDistanceTests;
+import static java.time.LocalDate.now;
+import static java.util.Arrays.asList;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.core.CombinableMatcher.both;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
@@ -125,13 +97,20 @@ public class JobAdvertisementSearchControllerIntTest {
 
     private static final GeoPointDto LAUSANNE_GEO_POINT = new GeoPointDto().setLat(46.552043).setLon(6.6523078);
 
-    private static final GeoPointDto SION_GEO_POINT =  new GeoPointDto().setLat(46.234).setLon(7.359);
+    private static final GeoPointDto SION_GEO_POINT = new GeoPointDto().setLat(46.234).setLon(7.359);
 
+    @Qualifier("jobAdvertisementRepository")
     @Autowired
     private JobAdvertisementRepository jobAdvertisementJpaRepository;
 
     @Autowired
     private JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository;
+
+    @Autowired
+    private FavouriteItemRepository favouriteItemRepository;
+
+    @Autowired
+    private FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository;
 
     @Autowired
     private ElasticsearchTemplate elasticsearchTemplate;
@@ -149,6 +128,9 @@ public class JobAdvertisementSearchControllerIntTest {
     private ExceptionTranslator exceptionTranslator;
 
     @Autowired
+    private ElasticsearchIndexService elasticsearchIndexService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     private JobAdvertisementSearchService jobAdvertisementSearchService;
@@ -159,7 +141,9 @@ public class JobAdvertisementSearchControllerIntTest {
 
     @Before
     public void setUp() {
+        this.favouriteItemElasticsearchRepository.deleteAll();
         this.jobAdvertisementElasticsearchRepository.deleteAll();
+        this.favouriteItemRepository.deleteAll();
         this.jobAdvertisementJpaRepository.deleteAll();
         this.mockCurrentUserContext = mock(CurrentUserContext.class);
 
@@ -965,9 +949,9 @@ public class JobAdvertisementSearchControllerIntTest {
         saveJobAdvertisementDocuments(
                 JobAdvertisementFixture.of(job01.id()),
                 JobAdvertisementFixture.of(job02.id())
-                        .setPublication(testPublication().setStartDate(LocalDate.now().minusDays(10)).build()),
+                        .setPublication(testPublication().setStartDate(now().minusDays(10)).build()),
                 JobAdvertisementFixture.of(job03.id())
-                        .setPublication(testPublication().setStartDate(LocalDate.now().minusDays(11)).build())
+                        .setPublication(testPublication().setStartDate(now().minusDays(11)).build())
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
@@ -1098,7 +1082,7 @@ public class JobAdvertisementSearchControllerIntTest {
                                         testJobDescription().setTitle("desc1").build()
                                 ))
                                 .build())
-                        .setPublication(testPublication().setStartDate(LocalDate.now()).build()),
+                        .setPublication(testPublication().setStartDate(now()).build()),
 
                 JobAdvertisementFixture.of(job02.id())
                         .setJobContent(JobContentFixture.of(job02.id())
@@ -1106,7 +1090,7 @@ public class JobAdvertisementSearchControllerIntTest {
                                         testJobDescription().setTitle("desc2").build()
                                 ))
                                 .build())
-                        .setPublication(testPublication().setStartDate(LocalDate.now()).build()),
+                        .setPublication(testPublication().setStartDate(now()).build()),
 
                 JobAdvertisementFixture.of(job03.id())
                         .setJobContent(JobContentFixture.of(job03.id())
@@ -1114,14 +1098,14 @@ public class JobAdvertisementSearchControllerIntTest {
                                         testJobDescription().setTitle("desc3").build()
                                 ))
                                 .build())
-                        .setPublication(testPublication().setStartDate(LocalDate.now().minusDays(10)).build()),
+                        .setPublication(testPublication().setStartDate(now().minusDays(10)).build()),
                 JobAdvertisementFixture.of(job04.id())
                         .setJobContent(JobContentFixture.of(job04.id())
                                 .setJobDescriptions(asList(
                                         testJobDescription().setTitle("desc4").build()
                                 ))
                                 .build())
-                        .setPublication(testPublication().setStartDate(LocalDate.now()).build()),
+                        .setPublication(testPublication().setStartDate(now()).build()),
 
                 JobAdvertisementFixture.of(job05.id())
                         .setJobContent(JobContentFixture.of(job05.id())
@@ -1129,7 +1113,7 @@ public class JobAdvertisementSearchControllerIntTest {
                                         testJobDescription().setTitle("desc5").build()
                                 ))
                                 .build())
-                        .setPublication(testPublication().setStartDate(LocalDate.now()).build())
+                        .setPublication(testPublication().setStartDate(now()).build())
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
@@ -1373,4 +1357,62 @@ public class JobAdvertisementSearchControllerIntTest {
     private void index(JobAdvertisement jobAdvertisement) {
         this.jobAdvertisementElasticsearchRepository.save(new JobAdvertisementDocument(jobAdvertisement));
     }
+
+    @Test
+    public void indexParentWithChildTest() throws Exception {
+        //given
+        index(createJob(job01.id()));
+        index(createJob(job02.id()));
+        index(createJob(job03.id()));
+        //when
+        indexChildDocument(createFavouriteItem("child-01", job01.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-02", job02.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-03", job03.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-04", job01.id(), "Emma"));
+        indexChildDocument(createFavouriteItem("child-05", job03.id(), "Emma"));
+        indexChildDocument(createFavouriteItem("child-06", job03.id(), "Tom"));
+        indexChildDocument(createFavouriteItem("child-07", job01.id(), "Jane"));
+        indexChildDocument(createFavouriteItem("child-08", job02.id(), "Jane"));
+        indexChildDocument(createFavouriteItem("child-09", job03.id(), "Jane"));
+        indexChildDocument(createFavouriteItem("child-10", job03.id(), "Paul"));
+        //then
+
+        QueryBuilder queryChild = matchAllQuery();
+        HasChildQueryBuilder childQueryBuilder = new HasChildQueryBuilder(FAVOURITE_ITEM, queryChild, ScoreMode.None);
+
+        SearchResponse responseChild = this.elasticsearchTemplate.getClient()
+                .prepareSearch(INDEX_NAME_JOB_ADVERTISEMENT).setQuery(childQueryBuilder).execute().actionGet();
+
+        Assert.assertNotNull(responseChild);
+        Assert.assertNotNull(responseChild.getHits());
+        Assert.assertNotNull(responseChild.getHits().getTotalHits());
+        Assert.assertEquals(3, responseChild.getHits().getTotalHits());
+
+        QueryBuilder queryParent = matchAllQuery();
+        HasParentQueryBuilder parentQueryBuilder = new HasParentQueryBuilder(JOB_ADVERTISEMENT, queryParent, true);
+
+        SearchResponse responseParent = this.elasticsearchTemplate.getClient()
+                .prepareSearch(INDEX_NAME_JOB_ADVERTISEMENT).setQuery(parentQueryBuilder).execute().actionGet();
+
+        Assert.assertNotNull(responseParent);
+        Assert.assertNotNull(responseParent.getHits());
+        Assert.assertNotNull(responseParent.getHits().getTotalHits());
+        Assert.assertEquals(10, responseParent.getHits().getTotalHits());
+
+    }
+
+    private void indexChildDocument(FavouriteItem favouriteItem) {
+        this.elasticsearchIndexService.saveChildWithUpdateRequest(new FavouriteItemDocument(favouriteItem),
+                favouriteItem.getJobAdvertisementId().getValue(), INDEX_NAME_JOB_ADVERTISEMENT);
+    }
+
+    private FavouriteItem createFavouriteItem(String favouriteItemId, JobAdvertisementId id, String ownerId) {
+        return new FavouriteItem.Builder()
+                .setId(new FavouriteItemId(favouriteItemId))
+                .setJobAdvertismentId(id)
+                .setOwnerId(ownerId)
+                .setNote("Favourite Item Note")
+                .build();
+    }
+
 }
