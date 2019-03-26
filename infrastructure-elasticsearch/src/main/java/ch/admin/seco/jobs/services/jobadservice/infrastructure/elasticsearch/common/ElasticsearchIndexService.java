@@ -30,6 +30,7 @@ import reactor.core.publisher.Flux;
 import javax.persistence.EntityManager;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -84,9 +85,9 @@ public class ElasticsearchIndexService {
     @Async
     @Transactional(readOnly = true)
     public void reindexAll() {
+        reindexForClass(FavouriteItemDocument.class, favouriteItemRepository, favouriteItemElasticsearchRepository, FavouriteItemDocument::new, "streamAll");
         reindexForClass(JobAdvertisementDocument.class, jobAdvertisementRepository, jobAdvertisementElasticsearchRepository, JobAdvertisementDocument::new, "streamAll");
         reindexForClass(ApiUserDocument.class, apiUserRepository, apiUserElasticsearchRepository, ApiUserDocument::new, "streamAll");
-        reindexForClass(FavouriteItemDocument.class, favouriteItemRepository, favouriteItemElasticsearchRepository, FavouriteItemDocument::new, "streamAll");
 
         log.info("Elasticsearch: Successfully performed reindexing");
     }
@@ -104,7 +105,7 @@ public class ElasticsearchIndexService {
 
         if (jpaRepository.count() > 0) {
             reindexWithStream(jpaRepository, elasticsearchRepository,
-                entityToDocumentMapper, documentClass, methodName);
+                    entityToDocumentMapper, documentClass, methodName);
         }
         log.info("Elasticsearch: Indexed all rows for " + documentClass.getSimpleName());
     }
@@ -124,14 +125,14 @@ public class ElasticsearchIndexService {
             stopWatch.start();
             Stream<JPA> stream = Stream.class.cast(m.invoke(jpaRepository));
             Flux.fromStream(stream)
-                .map(entityToDocumentMapper)
-                .buffer(BUFFER_SIZE)
-                .doOnNext(elasticsearchRepository::saveAll)
-                .doOnNext(jobs ->
-                    log.info("Index {} chunk #{}, {} / {}", entityClass.getSimpleName(), index.incrementAndGet(), counter.addAndGet(jobs.size()), total))
-                .doOnComplete(stopWatch::stop)
-                .doOnComplete(() -> log.info("Indexed {} of {} entities from {} in {} s", elasticsearchRepository.count(), jpaRepository.count(), entityClass.getSimpleName(), stopWatch.getTotalTimeSeconds()))
-                .subscribe(jobs -> removeAllElementFromHibernatePrimaryCache());
+                    .map(entityToDocumentMapper)
+                    .buffer(BUFFER_SIZE)
+                    .doOnNext(elasticsearchRepository::saveAll)
+                    .doOnNext(jobs ->
+                            log.info("Index {} chunk #{}, {} / {}", entityClass.getSimpleName(), index.incrementAndGet(), counter.addAndGet(jobs.size()), total))
+                    .doOnComplete(stopWatch::stop)
+                    .doOnComplete(() -> log.info("Indexed {} of {} entities from {} in {} s", elasticsearchRepository.count(), jpaRepository.count(), entityClass.getSimpleName(), stopWatch.getTotalTimeSeconds()))
+                    .subscribe(jobs -> removeAllElementFromHibernatePrimaryCache());
         } catch (Exception e) {
             log.error("ReindexWithStream failed", e);
         }
@@ -145,13 +146,12 @@ public class ElasticsearchIndexService {
         entityManager.clear();
     }
 
-    public void saveChildWithUpdateRequest(FavouriteItemDocument favouriteItemDocument, String parent) {
-        UpdateRequest updateRequest = new UpdateRequest(INDEX_NAME_JOB_ADVERTISEMENT, TYPE_DOC, favouriteItemDocument.getId());
+    public void saveChildWithUpdateRequest(ElasticsearchDocument document, String parent, String indexName) {
+        UpdateRequest updateRequest = new UpdateRequest(indexName, TYPE_DOC, document.getId());
         updateRequest.routing(parent);
-
         try {
             ObjectMapper mapper = new ObjectMapper();
-            String json = mapper.writeValueAsString(favouriteItemDocument);
+            String json = mapper.writeValueAsString(document);
 
             log.debug("json dump: {}", json);
 
@@ -160,15 +160,15 @@ public class ElasticsearchIndexService {
             UpdateQuery updateQuery = new UpdateQuery();
             updateQuery.setUpdateRequest(updateRequest);
             updateQuery.setClazz(FavouriteItemDocument.class);
-            updateQuery.setId(favouriteItemDocument.getId());
-            updateQuery.setIndexName(INDEX_NAME_JOB_ADVERTISEMENT);
+            updateQuery.setId(document.getId());
+            updateQuery.setIndexName(indexName);
             updateQuery.setType(TYPE_DOC);
             updateQuery.setDoUpsert(true);
 
             UpdateResponse response = elasticsearchTemplate.update(updateQuery);
             log.info("Response {}", response);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new UncheckedIOException(e);
         }
     }
 }
