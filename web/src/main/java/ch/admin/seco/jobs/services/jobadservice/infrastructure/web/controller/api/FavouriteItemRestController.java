@@ -9,6 +9,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.Job
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchService;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.AggregateNotFoundException;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PaginationUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -51,8 +53,8 @@ public class FavouriteItemRestController {
 
     @PutMapping("/{id}/note")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateFavouriteItem(@PathVariable String id, @RequestBody FavouriteItemUpdate favouriteItemUpdate) throws FavoriteItemNotExitsException {
-        favouriteItemApplicationService.update(new UpdateFavouriteItemDto(new FavouriteItemId(id), favouriteItemUpdate.note));
+    public void updateFavouriteItem(@PathVariable String id, @RequestBody FavouriteItemUpdateResource favouriteItemUpdateResource) throws FavoriteItemNotExitsException {
+        favouriteItemApplicationService.update(new UpdateFavouriteItemDto(new FavouriteItemId(id), favouriteItemUpdateResource.note));
     }
 
     @DeleteMapping("/{id}")
@@ -68,6 +70,12 @@ public class FavouriteItemRestController {
         return favouriteItemApplicationService.findById(favouriteItemId);
     }
 
+    @GetMapping("/_search/byJobAdIdAndOwnerId")
+    public FavouriteItemDto findByJobAdIdAndOwnerId(@RequestBody @Valid SearchByJobAdIdAndOwnerIdResource searchByJobAdIdAndOwnerIdResource) {
+        return favouriteItemApplicationService.findByJobAdvertisementIdAndOwnerId(new JobAdvertisementId(searchByJobAdIdAndOwnerIdResource.jobAdId), searchByJobAdIdAndOwnerIdResource.ownerId)
+                .orElse(null);
+    }
+
     @GetMapping("/_search/byUserId}")
     public ResponseEntity<List<JobAdveristementSearchResult>> findByUserId(Pageable pageable, @RequestParam String userId) {
         Page<JobAdveristementSearchResult> userFavorites = jobAdvertisementSearchService.findByUserId(userId, pageable.getPageNumber(), pageable.getPageSize());
@@ -75,8 +83,17 @@ public class FavouriteItemRestController {
         return new ResponseEntity<>(userFavorites.getContent(), headers, HttpStatus.OK);
     }
 
+    static class SearchByJobAdIdAndOwnerIdResource {
 
-    static class FavouriteItemUpdate {
+        @NotBlank
+        public String ownerId;
+
+        @NotBlank
+        public String jobAdId;
+
+    }
+
+    static class FavouriteItemUpdateResource {
 
         @Size(max = 1000)
         public String note;

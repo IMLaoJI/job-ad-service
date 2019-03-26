@@ -23,6 +23,9 @@ public class CreateFavouriteItemDto {
         this.jobAdvertisementId = jobAdvertisementId;
     }
 
+    public CreateFavouriteItemDto() {
+    }
+
     public String getNote() {
         return note;
     }
@@ -33,5 +36,17 @@ public class CreateFavouriteItemDto {
 
     public JobAdvertisementId getJobAdvertisementId() {
         return jobAdvertisementId;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public void setJobAdvertisementId(JobAdvertisementId jobAdvertisementId) {
+        this.jobAdvertisementId = jobAdvertisementId;
     }
 }

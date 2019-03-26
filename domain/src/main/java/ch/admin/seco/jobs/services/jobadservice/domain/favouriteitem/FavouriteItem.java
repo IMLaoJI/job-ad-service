@@ -9,6 +9,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.validation.Valid;
@@ -38,6 +39,7 @@ public class FavouriteItem implements Aggregate<FavouriteItem, FavouriteItemId> 
     private String ownerId;
 
     @NotNull
+    @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "JOB_ADVERTISEMENT_ID"))
     private JobAdvertisementId jobAdvertisementId;
 
@@ -48,6 +50,10 @@ public class FavouriteItem implements Aggregate<FavouriteItem, FavouriteItemId> 
         this.note = builder.note;
         this.ownerId = Condition.notBlank(builder.ownerId);
         this.jobAdvertisementId = Condition.notNull(builder.jobAdvertismentId);
+    }
+
+    private FavouriteItem() {
+        // FOR REFLECTION
     }
 
     public FavouriteItemId getId() {

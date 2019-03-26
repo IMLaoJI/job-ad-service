@@ -2,7 +2,6 @@ package ch.admin.seco.jobs.services.jobadservice.application.favouriteitem;
 
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.FavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.create.CreateFavouriteItemDto;
-import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.read.ReadFavouriteItemByJobAdvertisementIdDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.update.UpdateFavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.AggregateNotFoundException;
@@ -13,6 +12,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteIt
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.events.FavouriteItemCreatedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.events.FavouriteItemDeletedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,17 +44,16 @@ public class FavouriteItemApplicationService {
             throw new AggregateNotFoundException(JobAdvertisement.class, createFavouriteItemDto.getJobAdvertisementId().getValue());
         }
 
+        this.favouriteItemRepository.findByJobAdvertisementIdAndOwnerId(createFavouriteItemDto.getJobAdvertisementId(), createFavouriteItemDto.getOwnerId())
+                .ifPresent(favouriteItem -> {
+                    throw new FavouriteItemAlreadyExists(favouriteItem.getId(), favouriteItem.getJobAdvertisementId(), favouriteItem.getOwnerId());
+                });
+
         FavouriteItem favouriteItem = new FavouriteItem.Builder()
                 .setId(new FavouriteItemId())
                 .setNote(createFavouriteItemDto.getNote())
                 .setOwnerId(createFavouriteItemDto.getOwnerId())
                 .setJobAdvertismentId(createFavouriteItemDto.getJobAdvertisementId()).build();
-        //check that the given owner hasn't yet created a FavouriteItem for the given JobAdvertisementId
-        ReadFavouriteItemByJobAdvertisementIdDto readFavouriteItemByJobAdvertisementIdDto = new ReadFavouriteItemByJobAdvertisementIdDto(createFavouriteItemDto.getOwnerId(), createFavouriteItemDto.getJobAdvertisementId());
-        Optional<FavouriteItem> byJobAdvertisementIdAndOwnerId = this.findByJobAdvertisementIdAndOwnerId(readFavouriteItemByJobAdvertisementIdDto);
-        if (byJobAdvertisementIdAndOwnerId.isPresent()) {
-            throw new FavouriteItemAlreadyExistsForJobAdvertisementIdException(byJobAdvertisementIdAndOwnerId.get().getId(), favouriteItem.getJobAdvertisementId(), favouriteItem.getOwnerId());
-        }
 
         FavouriteItem newFavouriteItem = this.favouriteItemRepository.save(favouriteItem);
         LOG.info("Favourite Item " + newFavouriteItem.getId().getValue() + " has been created for user " + newFavouriteItem.getOwnerId() + ".");
@@ -79,17 +78,17 @@ public class FavouriteItemApplicationService {
         LOG.info("Favourite Item " + favouriteItem.getId().getValue() + " has been deleted for user " + favouriteItem.getOwnerId() + ".");
     }
 
-    @PreAuthorize("isAuthenticated() and favouriteItemAuthorizationService.matchesCurrentUserId(#readFavouriteItemByJobAdvertismentIdDto.ownerId)")
-    public Optional<FavouriteItem> findByJobAdvertisementIdAndOwnerId(ReadFavouriteItemByJobAdvertisementIdDto readFavouriteItemByJobAdvertismentIdDto) {
-        Condition.notNull(readFavouriteItemByJobAdvertismentIdDto, "FavouriteItemId can't be null");
-        return this.favouriteItemRepository.findByJobAdvertisementIdAndOwnerId(readFavouriteItemByJobAdvertismentIdDto.getJobAdvertisementId(), readFavouriteItemByJobAdvertismentIdDto.getOwnerId());
+    @PreAuthorize("isAuthenticated() and favouriteItemAuthorizationService.matchesCurrentUserId(#ownerId)")
+    public Optional<FavouriteItemDto> findByJobAdvertisementIdAndOwnerId(JobAdvertisementId jobAdvertisementId, String ownerId) {
+        return this.favouriteItemRepository.findByJobAdvertisementIdAndOwnerId(jobAdvertisementId, ownerId)
+                .map(FavouriteItemDto::toDto);
     }
 
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.isCurrentUserOwner(#favouriteItemId)")
-    public FavouriteItemDto findById(FavouriteItemId favouriteItemId) {
+    public FavouriteItemDto findById(FavouriteItemId favouriteItemId) throws FavoriteItemNotExitsException {
         Condition.notNull(favouriteItemId, "FavouriteItemId can't be null");
         return this.favouriteItemRepository.findById(favouriteItemId).map(FavouriteItemDto::toDto)
-                .orElse(null);
+                .orElseThrow(() -> new FavoriteItemNotExitsException(favouriteItemId));
     }
 
     private FavouriteItem getFavouriteItem(FavouriteItemId id) {
