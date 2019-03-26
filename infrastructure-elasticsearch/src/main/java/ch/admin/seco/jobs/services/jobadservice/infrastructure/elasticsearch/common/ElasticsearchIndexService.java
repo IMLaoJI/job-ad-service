@@ -1,14 +1,14 @@
-package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write;
+package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.apiuser.ApiUserRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.apiuser.ApiUserDocument;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.apiuser.ApiUserElasticsearchRepository;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.favouriteitem.FavouriteItemDocument;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.favouriteitem.FavouriteItemElasticsearchRepository;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.apiuser.write.ApiUserDocument;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.apiuser.write.ApiUserElasticsearchRepository;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
@@ -41,8 +41,7 @@ public class ElasticsearchIndexService {
     private static final int BUFFER_SIZE = 100;
     public static final String INDEX_NAME_JOB_ADVERTISEMENT = "job-advertisements";
     public static final String INDEX_NAME_API_USER = "api-users";
-    public static final String TYPE_JOB_ADVERTISEMENT = "job-advertisement";
-    public static final String TYPE_API_USER = "api-user";
+    public static final String TYPE_DOC = "doc";
 
     private final Logger log = LoggerFactory.getLogger(ElasticsearchIndexService.class);
 
@@ -147,7 +146,7 @@ public class ElasticsearchIndexService {
     }
 
     public void saveChildWithUpdateRequest(FavouriteItemDocument favouriteItemDocument, String parent) {
-        UpdateRequest updateRequest = new UpdateRequest(INDEX_NAME_JOB_ADVERTISEMENT, TYPE_JOB_ADVERTISEMENT, favouriteItemDocument.getId());
+        UpdateRequest updateRequest = new UpdateRequest(INDEX_NAME_JOB_ADVERTISEMENT, TYPE_DOC, favouriteItemDocument.getId());
         updateRequest.routing(parent);
 
         try {
@@ -163,7 +162,7 @@ public class ElasticsearchIndexService {
             updateQuery.setClazz(FavouriteItemDocument.class);
             updateQuery.setId(favouriteItemDocument.getId());
             updateQuery.setIndexName(INDEX_NAME_JOB_ADVERTISEMENT);
-            updateQuery.setType(TYPE_JOB_ADVERTISEMENT);
+            updateQuery.setType(TYPE_DOC);
             updateQuery.setDoUpsert(true);
 
             UpdateResponse response = elasticsearchTemplate.update(updateQuery);

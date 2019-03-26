@@ -1,5 +1,5 @@
 {
-  "job-advertisement": {
+  "doc": {
     "properties": {
       "id": {
         "type": "text",

@@ -1,4 +1,4 @@
-package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write;
+package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common;
 
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 
