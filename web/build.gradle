@@ -32,9 +32,7 @@ dependencies {
     compile "org.springframework.cloud:spring-cloud-starter-openfeign"
 
     compile "org.springframework.security:spring-security-web"
-    compile "org.springframework.security.oauth:spring-security-oauth2"
     compile "org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure"
-    compile "org.springframework.security:spring-security-jwt"
 
     compile "io.jsonwebtoken:jjwt"
     compile "io.springfox:springfox-swagger2"
@@ -45,13 +43,7 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-databind"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
     compile "com.fasterxml.jackson.module:jackson-module-afterburner"
-
-    compile "io.dropwizard.metrics:metrics-core"
-    compile "io.dropwizard.metrics:metrics-json"
-    compile "io.dropwizard.metrics:metrics-jvm"
-    compile "io.dropwizard.metrics:metrics-servlet"
-    compile "io.dropwizard.metrics:metrics-servlets"
-    compile "com.ryantenney.metrics:metrics-spring"
+    
     compile "net.logstash.logback:logstash-logback-encoder"
     compile "org.zalando:problem-spring-web"
     compile "org.jsoup:jsoup:1.11.3"

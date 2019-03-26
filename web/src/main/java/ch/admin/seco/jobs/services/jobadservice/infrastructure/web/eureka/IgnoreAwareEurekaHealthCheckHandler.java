@@ -1,47 +1,41 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.eureka;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.springframework.boot.actuate.health.CompositeHealthIndicator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.health.HealthAggregator;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.cloud.netflix.eureka.EurekaHealthCheckHandler;
-import org.springframework.util.ReflectionUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Filter out certain {@link org.springframework.boot.actuate.health.HealthIndicator} that are not relevant for eureka
+ * Why? We don't wan't the Registry to indicate that this service is down due to the ignored {@link org.springframework.boot.actuate.health.HealthIndicator}
+ * For Example: if the {@link org.springframework.boot.actuate.mail.MailHealthIndicator} indicates 'DOWN' this won't be
+ * a problem for our JobAdService since the Mails are saved to the Database until the {@link org.springframework.boot.actuate.mail.MailHealthIndicator} is 'UP'
+ */
 class IgnoreAwareEurekaHealthCheckHandler extends EurekaHealthCheckHandler {
 
-    private static final String INDICATORS_FIELD_NAME = "indicators";
+    private static Logger LOGGER = LoggerFactory.getLogger(IgnoreAwareEurekaHealthCheckHandler.class);
 
     private final List<String> ignoredHealthIndicators = new ArrayList<>();
 
     IgnoreAwareEurekaHealthCheckHandler(HealthAggregator healthAggregator, List<String> ignoredHealthIndicators) {
         super(healthAggregator);
-        this.ignoredHealthIndicators.addAll(
-                ignoredHealthIndicators.stream()
-                        .map(String::toLowerCase)
-                        .collect(Collectors.toList())
-        );
+        this.ignoredHealthIndicators.addAll(ignoredHealthIndicators);
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
-        Map<String, HealthIndicator> healthIndicators = getHealthIndicatorMap(super.getHealthIndicator());
-        healthIndicators.keySet()
-                .removeIf(healthIndicator -> ignoredHealthIndicators.contains(healthIndicator.toLowerCase()));
-    }
-
-    private Map<String, HealthIndicator> getHealthIndicatorMap(CompositeHealthIndicator healthIndicator) {
-        Field indicatorsFields = ReflectionUtils.findField(CompositeHealthIndicator.class, INDICATORS_FIELD_NAME);
-        if (indicatorsFields == null) {
-            throw new IllegalStateException("Could not find the field 'indicators' on class: " + CompositeHealthIndicator.class);
+        for (String ignoredHealthIndicatorName : ignoredHealthIndicators) {
+            HealthIndicator unregisteredHealthIndicator = super.getHealthIndicator().getRegistry().unregister(ignoredHealthIndicatorName);
+            if (unregisteredHealthIndicator != null) {
+                LOGGER.info("Ignored the HealthIndicator: {} for the Eureka-Registry", ignoredHealthIndicatorName);
+            } else {
+                LOGGER.warn("Can not ignore the HealthIndicator: {} since it was not found", ignoredHealthIndicatorName);
+            }
         }
-        indicatorsFields.setAccessible(true);
-        Object field = ReflectionUtils.getField(indicatorsFields, healthIndicator);
-        return (Map<String, HealthIndicator>) field;
     }
 }

@@ -7,8 +7,7 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.rea
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.ManagedJobAdSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.PeaJobAdvertisementSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PaginationUtil;
-
-import com.codahale.metrics.annotation.Timed;
+import io.micrometer.core.annotation.Timed;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;

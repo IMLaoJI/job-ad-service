@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="shortcut icon" th:href="@{|${baseUrl}/favicon.ico|}"/>
+</head>
+<body>
+<p th:text="#{mail.complaint.body.introduction}"></p>
+
+<p th:text="#{mail.complaint.body.jobad}"></p>
+<div th:if="${sourceSystem}" th:text="#{mail.complaint.body.jobad.sourcesystem(${sourceSystem})}"></div>
+<div th:if="${jobAdvertisementId}" th:text="#{mail.complaint.body.jobad.id(${jobAdvertisementId})}"></div>
+<div th:if="${stellennummerEgov}" th:text="#{mail.complaint.body.jobad.stellennummeregov(${stellennummerEgov})}"></div>
+<div th:if="${stellennummerAvam}" th:text="#{mail.complaint.body.jobad.stellennummeravam(${stellennummerAvam})}"></div>
+
+<p th:text="#{mail.complaint.body.contactinformation}"></p>
+<div th:if="${contactInformation?.salutation}" th:text="#{mail.complaint.body.contactinformation.salutation(${contactInformation?.salutation})}"></div>
+<div th:if="${contactInformation?.name}" th:text="#{mail.complaint.body.contactinformation.name(${contactInformation?.name})}"></div>
+<div th:if="${contactInformation?.phone}" th:text="#{mail.complaint.body.contactinformation.phone(${contactInformation?.phone})}"></div>
+<div th:if="${contactInformation?.email}"th:text="#{mail.complaint.body.contactinformation.email(${contactInformation?.email})}"></div>
+<div th:text="#{mail.complaint.body.complaintmessage(${complaintMessage})}"></div>
+
+</body>
+</html>
