@@ -16,15 +16,15 @@ public class FavouriteItemDto {
 
     private String ownerUserId;
 
-    private String String;
+    private String jobAdvertisementId;
 
-    private FavouriteItemDto(String id, LocalDateTime createdTime, LocalDateTime updatedTime, String note, String ownerUserId, String String) {
+    private FavouriteItemDto(String id, LocalDateTime createdTime, LocalDateTime updatedTime, String note, String ownerUserId, String jobAdvertisementId) {
         this.id = id;
         this.createdTime = createdTime;
         this.updatedTime = updatedTime;
         this.note = note;
         this.ownerUserId = ownerUserId;
-        this.String = String;
+        this.jobAdvertisementId = jobAdvertisementId;
     }
 
     public String getId() {
@@ -67,12 +67,12 @@ public class FavouriteItemDto {
         this.ownerUserId = ownerUserId;
     }
 
-    public String getString() {
-        return String;
+    public String getJobAdvertisementId() {
+        return jobAdvertisementId;
     }
 
-    public void setString(String String) {
-        this.String = String;
+    public void setJobAdvertisementId(String String) {
+        this.jobAdvertisementId = String;
     }
 
     public static FavouriteItemDto toDto(FavouriteItem favouriteItem) {

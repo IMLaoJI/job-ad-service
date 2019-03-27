@@ -117,7 +117,7 @@ public class FavouriteItemApplicationServiceTest {
         FavouriteItemDto favouriteItem = this.sut.findById(favouriteItemId);
 
         // then
-        assertThat(favouriteItem.getId().getValue()).isEqualTo(favouriteItemId.getValue());
+        assertThat(favouriteItem.getId()).isEqualTo(favouriteItemId.getValue());
     }
 
     @Test
@@ -163,7 +163,7 @@ public class FavouriteItemApplicationServiceTest {
         createAndSaveToDBFavouriteItem(favouriteItemId, jobAdvertisementId, note, ownerId);
 
         // when
-        assertThat(this.sut.findById(favouriteItemId).getJobAdvertisementId().getValue()).isEqualTo(jobAdvertisementId.getValue());
+        assertThat(this.sut.findById(favouriteItemId).getJobAdvertisementId()).isEqualTo(jobAdvertisementId.getValue());
         this.sut.delete(favouriteItemId);
         // then
         assertThatThrownBy(() -> this.sut.findById(favouriteItemId))

@@ -37,7 +37,7 @@ public class FavouriteItemApplicationService {
         this.jobAdvertisementRepository = jobAdvertisementRepository;
     }
 
-    @PreAuthorize("isAuthenticated() and @favouriteItemAuthorizationService.matchesCurrentUserId(#createFavouriteItemDto.ownerId)")
+    @PreAuthorize("isAuthenticated() and @favouriteItemAuthorizationService.matchesCurrentUserId(#createFavouriteItemDto.ownerUserId)")
     public FavouriteItemId create(CreateFavouriteItemDto createFavouriteItemDto) {
         Condition.notNull(createFavouriteItemDto, "CreateFavouriteItemDto can't be null");
         if (!this.jobAdvertisementRepository.existsById(createFavouriteItemDto.getJobAdvertisementId())) {
