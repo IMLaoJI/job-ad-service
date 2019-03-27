@@ -44,7 +44,7 @@ public class FavouriteItemApplicationService {
             throw new AggregateNotFoundException(JobAdvertisement.class, createFavouriteItemDto.getJobAdvertisementId().getValue());
         }
 
-        this.favouriteItemRepository.findByJobAdvertisementIdAndOwnerId(createFavouriteItemDto.getJobAdvertisementId(), createFavouriteItemDto.getOwnerId())
+        this.favouriteItemRepository.findByJobAdvertisementIdAndOwnerId(createFavouriteItemDto.getJobAdvertisementId(), createFavouriteItemDto.getOwnerUserId())
                 .ifPresent(favouriteItem -> {
                     throw new FavouriteItemAlreadyExists(favouriteItem.getId(), favouriteItem.getJobAdvertisementId(), favouriteItem.getOwnerId());
                 });
@@ -52,7 +52,7 @@ public class FavouriteItemApplicationService {
         FavouriteItem favouriteItem = new FavouriteItem.Builder()
                 .setId(new FavouriteItemId())
                 .setNote(createFavouriteItemDto.getNote())
-                .setOwnerId(createFavouriteItemDto.getOwnerId())
+                .setOwnerId(createFavouriteItemDto.getOwnerUserId())
                 .setJobAdvertismentId(createFavouriteItemDto.getJobAdvertisementId()).build();
 
         FavouriteItem newFavouriteItem = this.favouriteItemRepository.save(favouriteItem);
@@ -79,7 +79,7 @@ public class FavouriteItemApplicationService {
     }
 
     @PreAuthorize("isAuthenticated() and favouriteItemAuthorizationService.matchesCurrentUserId(#ownerId)")
-    public Optional<FavouriteItemDto> findByJobAdvertisementIdAndOwnerId(JobAdvertisementId jobAdvertisementId, String ownerId) {
+    public Optional<FavouriteItemDto> findByJobAdvertisementIdAndUserId(JobAdvertisementId jobAdvertisementId, String ownerId) {
         return this.favouriteItemRepository.findByJobAdvertisementIdAndOwnerId(jobAdvertisementId, ownerId)
                 .map(FavouriteItemDto::toDto);
     }

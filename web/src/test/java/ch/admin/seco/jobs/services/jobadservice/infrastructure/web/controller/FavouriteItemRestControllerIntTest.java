@@ -78,7 +78,7 @@ public class FavouriteItemRestControllerIntTest {
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.save(JobAdvertisementFixture.testJobAdvertisement().build());
 
         CreateFavouriteItemDto createFavouriteItemDto = new CreateFavouriteItemDto();
-        createFavouriteItemDto.setOwnerId(WithJobSeeker.USER_ID);
+        createFavouriteItemDto.setOwnerUserId(WithJobSeeker.USER_ID);
         createFavouriteItemDto.setNote("hurray");
         createFavouriteItemDto.setJobAdvertisementId(jobAdvertisement.getId());
 

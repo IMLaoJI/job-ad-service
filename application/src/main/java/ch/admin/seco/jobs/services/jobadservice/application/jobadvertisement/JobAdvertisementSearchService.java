@@ -3,7 +3,6 @@ package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 public interface JobAdvertisementSearchService {
 

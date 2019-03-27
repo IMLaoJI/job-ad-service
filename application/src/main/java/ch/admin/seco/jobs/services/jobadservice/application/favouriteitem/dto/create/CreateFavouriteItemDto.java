@@ -12,14 +12,14 @@ public class CreateFavouriteItemDto {
     private String note;
 
     @NotBlank
-    private String ownerId;
+    private String ownerUserId;
 
     @NotNull
     private JobAdvertisementId jobAdvertisementId;
 
-    public CreateFavouriteItemDto(String note, String ownerId, JobAdvertisementId jobAdvertisementId) {
+    public CreateFavouriteItemDto(String note, String ownerUserId, JobAdvertisementId jobAdvertisementId) {
         this.note = note;
-        this.ownerId = ownerId;
+        this.ownerUserId = ownerUserId;
         this.jobAdvertisementId = jobAdvertisementId;
     }
 
@@ -30,8 +30,8 @@ public class CreateFavouriteItemDto {
         return note;
     }
 
-    public String getOwnerId() {
-        return ownerId;
+    public String getOwnerUserId() {
+        return ownerUserId;
     }
 
     public JobAdvertisementId getJobAdvertisementId() {
@@ -42,8 +42,8 @@ public class CreateFavouriteItemDto {
         this.note = note;
     }
 
-    public void setOwnerId(String ownerId) {
-        this.ownerId = ownerId;
+    public void setOwnerUserId(String ownerUserId) {
+        this.ownerUserId = ownerUserId;
     }
 
     public void setJobAdvertisementId(JobAdvertisementId jobAdvertisementId) {

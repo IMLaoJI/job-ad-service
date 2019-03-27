@@ -61,7 +61,7 @@ public class FavouriteItemApplicationServiceTest {
         CreateFavouriteItemDto createFavouriteItemDto = new CreateFavouriteItemDto();
         createFavouriteItemDto.setJobAdvertisementId(new JobAdvertisementId("JOB_AD_ID_1"));
         createFavouriteItemDto.setNote("My Note");
-        createFavouriteItemDto.setOwnerId("USER-1");
+        createFavouriteItemDto.setOwnerUserId("USER-1");
 
         when(jobAdvertisementRepository.existsById(any())).thenReturn(true);
 
@@ -95,7 +95,7 @@ public class FavouriteItemApplicationServiceTest {
         CreateFavouriteItemDto createFavouriteItemDto = new CreateFavouriteItemDto();
         createFavouriteItemDto.setJobAdvertisementId(jobAdvertisementId);
         createFavouriteItemDto.setNote("My other note");
-        createFavouriteItemDto.setOwnerId(ownerId);
+        createFavouriteItemDto.setOwnerUserId(ownerId);
 
         // then
         assertThatThrownBy(() -> this.sut.create(createFavouriteItemDto))
@@ -182,7 +182,7 @@ public class FavouriteItemApplicationServiceTest {
         createAndSaveToDBFavouriteItem(favouriteItemId, jobAdvertisementId, originalNote, ownerId);
 
         // when
-        Optional<FavouriteItemDto> optionalFavouriteItemDto = this.sut.findByJobAdvertisementIdAndOwnerId(jobAdvertisementId, ownerId);
+        Optional<FavouriteItemDto> optionalFavouriteItemDto = this.sut.findByJobAdvertisementIdAndUserId(jobAdvertisementId, ownerId);
 
         // then
         assertThat(optionalFavouriteItemDto).isPresent();
