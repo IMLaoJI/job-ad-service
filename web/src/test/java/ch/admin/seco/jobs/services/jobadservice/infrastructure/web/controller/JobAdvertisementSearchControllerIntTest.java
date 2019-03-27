@@ -25,6 +25,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.join.query.HasChildQueryBuilder;
 import org.elasticsearch.join.query.HasParentQueryBuilder;
+import org.elasticsearch.join.query.JoinQueryBuilders;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -35,6 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
@@ -69,6 +72,7 @@ import static java.util.Arrays.asList;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.CombinableMatcher.both;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -1378,6 +1382,26 @@ public class JobAdvertisementSearchControllerIntTest {
         //then
 
         QueryBuilder queryChild = matchAllQuery();
+        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(queryChild)
+                .withFilter(JoinQueryBuilders.hasChildQuery(FAVOURITE_ITEM, queryChild, ScoreMode.None))
+                .build();
+
+        List<String> jobAdvertisementIdList = this.elasticsearchTemplate.queryForIds(searchQuery);
+        assertThat(jobAdvertisementIdList, is(notNullValue()));
+        assertThat(jobAdvertisementIdList, is(hasSize(1)));
+        assertThat(jobAdvertisementIdList.get(0), is("3"));
+//        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+//                .withQuery(QueryBuilders.matchQuery("title", "cook"))
+//                .withFilter(JoinQueryBuilders.hasChildQuery(FAVOURITE_ITEM_DOCUMENT_TYPE, QueryBuilders.matchQuery("note", "interesting"), ScoreMode.None))
+//                .build();
+//
+//        List<String> jobAdvertisementIdList = this.elasticsearchTemplate.queryForIds(searchQuery);
+//        assertThat(jobAdvertisementIdList, is(notNullValue()));
+//        assertThat(jobAdvertisementIdList, is(hasSize(1)));
+//        assertThat(jobAdvertisementIdList.get(0), is("3"))
+
+        QueryBuilder queryChild2 = matchAllQuery();
         HasChildQueryBuilder childQueryBuilder = new HasChildQueryBuilder(FAVOURITE_ITEM, queryChild, ScoreMode.None);
 
         SearchResponse responseChild = this.elasticsearchTemplate.getClient()
