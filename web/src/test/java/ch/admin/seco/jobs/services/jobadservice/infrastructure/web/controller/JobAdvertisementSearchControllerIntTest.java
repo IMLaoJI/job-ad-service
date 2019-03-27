@@ -1381,16 +1381,16 @@ public class JobAdvertisementSearchControllerIntTest {
         indexChildDocument(createFavouriteItem("child-10", job03.id(), "Paul"));
         //then
 
-        QueryBuilder queryChild = matchAllQuery();
+        QueryBuilder query = matchAllQuery();
         SearchQuery searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(queryChild)
-                .withFilter(JoinQueryBuilders.hasChildQuery(FAVOURITE_ITEM, queryChild, ScoreMode.None))
+                .withQuery(query)
+                .withFilter(JoinQueryBuilders.hasChildQuery(FAVOURITE_ITEM, query, ScoreMode.None))
                 .build();
 
-        List<String> jobAdvertisementIdList = this.elasticsearchTemplate.queryForIds(searchQuery);
+        List<JobAdvertisementDocument> jobAdvertisementIdList = this.elasticsearchTemplate.queryForList(searchQuery, JobAdvertisementDocument.class);
         assertThat(jobAdvertisementIdList, is(notNullValue()));
-        assertThat(jobAdvertisementIdList, is(hasSize(1)));
-        assertThat(jobAdvertisementIdList.get(0), is("3"));
+        assertThat(jobAdvertisementIdList, is(hasSize(3)));
+        assertThat(jobAdvertisementIdList.get(0).getId(), is("job01"));
 //        SearchQuery searchQuery = new NativeSearchQueryBuilder()
 //                .withQuery(QueryBuilders.matchQuery("title", "cook"))
 //                .withFilter(JoinQueryBuilders.hasChildQuery(FAVOURITE_ITEM_DOCUMENT_TYPE, QueryBuilders.matchQuery("note", "interesting"), ScoreMode.None))
@@ -1401,7 +1401,7 @@ public class JobAdvertisementSearchControllerIntTest {
 //        assertThat(jobAdvertisementIdList, is(hasSize(1)));
 //        assertThat(jobAdvertisementIdList.get(0), is("3"))
 
-        QueryBuilder queryChild2 = matchAllQuery();
+        QueryBuilder queryChild = matchAllQuery();
         HasChildQueryBuilder childQueryBuilder = new HasChildQueryBuilder(FAVOURITE_ITEM, queryChild, ScoreMode.None);
 
         SearchResponse responseChild = this.elasticsearchTemplate.getClient()
