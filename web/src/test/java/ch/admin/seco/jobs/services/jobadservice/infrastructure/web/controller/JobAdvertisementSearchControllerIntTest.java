@@ -1433,7 +1433,7 @@ public class JobAdvertisementSearchControllerIntTest {
     private FavouriteItem createFavouriteItem(String favouriteItemId, JobAdvertisementId id, String ownerId) {
         return new FavouriteItem.Builder()
                 .setId(new FavouriteItemId(favouriteItemId))
-                .setJobAdvertismentId(id)
+                .setJobAdvertisementId(id)
                 .setOwnerId(ownerId)
                 .setNote("Favourite Item Note")
                 .build();

@@ -125,8 +125,8 @@ public class FavouriteItem implements Aggregate<FavouriteItem, FavouriteItemId> 
             return this;
         }
 
-        public Builder setJobAdvertismentId(JobAdvertisementId jobAdvertismentId) {
-            this.jobAdvertismentId = jobAdvertismentId;
+        public Builder setJobAdvertisementId(JobAdvertisementId jobAdvertisementId) {
+            this.jobAdvertismentId = jobAdvertisementId;
             return this;
         }
     }

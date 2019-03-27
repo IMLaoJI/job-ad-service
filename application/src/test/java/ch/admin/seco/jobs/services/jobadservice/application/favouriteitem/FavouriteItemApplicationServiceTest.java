@@ -191,7 +191,7 @@ public class FavouriteItemApplicationServiceTest {
     private void createAndSaveToDBFavouriteItem(FavouriteItemId favouriteItemId, JobAdvertisementId jobAdvertisementId, String note, String ownerId) {
         FavouriteItem favouriteItem = new FavouriteItem.Builder()
                 .setId(favouriteItemId)
-                .setJobAdvertismentId(jobAdvertisementId)
+                .setJobAdvertisementId(jobAdvertisementId)
                 .setNote(note)
                 .setOwnerId(ownerId)
                 .build();
