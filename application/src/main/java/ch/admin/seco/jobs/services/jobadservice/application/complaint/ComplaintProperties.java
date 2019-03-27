@@ -9,7 +9,7 @@ public class ComplaintProperties {
 
     private String receiverEmailAddress;
 
-    private String linkToJobAdSearch;
+    private String linkToJobAdDetail;
 
     public String getReceiverEmailAddress() {
         return receiverEmailAddress;
@@ -19,11 +19,11 @@ public class ComplaintProperties {
         this.receiverEmailAddress = receiverEmailAddress;
     }
 
-    public String getLinkToJobAdSearch() {
-        return linkToJobAdSearch;
+    public String getLinkToJobAdDetail() {
+        return linkToJobAdDetail;
     }
 
-    public void setLinkToJobAdSearch(String linkToJobAdSearch) {
-        this.linkToJobAdSearch = linkToJobAdSearch;
+    public void setLinkToJobAdDetail(String linkToJobAdDetail) {
+        this.linkToJobAdDetail = linkToJobAdDetail;
     }
 }

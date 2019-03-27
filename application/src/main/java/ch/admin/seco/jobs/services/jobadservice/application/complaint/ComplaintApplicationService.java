@@ -49,7 +49,7 @@ public class ComplaintApplicationService {
         variables.put("stellennummerAvam", jobAdvertisement.getStellennummerAvam());
         variables.put("contactInformation", complaintDto.getContactInformation());
         variables.put("complaintMessage", complaintDto.getComplaintMessage());
-        variables.put("linkToJobAd", complaintProperties.getLinkToJobAdSearch() + complaintDto.getJobAdvertisementId());
+        variables.put("linkToJobAd", complaintProperties.getLinkToJobAdDetail() + complaintDto.getJobAdvertisementId());
 
         MailSenderData mailSenderData = new MailSenderData.Builder()
                 .setTo(complaintProperties.getReceiverEmailAddress())
