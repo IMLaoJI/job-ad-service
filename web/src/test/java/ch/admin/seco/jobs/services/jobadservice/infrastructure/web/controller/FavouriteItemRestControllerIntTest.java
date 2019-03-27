@@ -2,11 +2,14 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
 import ch.admin.seco.jobs.services.jobadservice.Application;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.create.CreateFavouriteItemDto;
+import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors.ExceptionTranslator;
+import org.codehaus.jettison.json.JSONArray;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +25,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.awaitility.Awaitility.await;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -49,6 +53,12 @@ public class FavouriteItemRestControllerIntTest {
     @Autowired
     private JobAdvertisementRepository jobAdvertisementRepository;
 
+    @Autowired
+    private FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository;
+
+    @Autowired
+    private FavouriteItemRepository favouriteItemRepository;
+
     private MockMvc mockMvc;
 
     @Before
@@ -73,13 +83,19 @@ public class FavouriteItemRestControllerIntTest {
         createFavouriteItemDto.setJobAdvertisementId(jobAdvertisement.getId());
 
         //when
-        post(createFavouriteItemDto, URL)
-                .andExpect(status().isCreated());
+        ResultActions post = post(createFavouriteItemDto, URL);
+        post.andExpect(status().isCreated());
 
-        // check that it is in elasticseach
+        String contentAsString = post.andReturn().getResponse().getContentAsString();
+        JSONArray ja = new JSONArray("["+contentAsString+"]");
+        String id = ja.getJSONObject(0).getString("value");
+        // TODO extract from the success response
+
+        // check that the document is now in elasticsearch
+         await().until(() -> favouriteItemElasticsearchRepository.findById(id).isPresent());
+
 
     }
-
     private ResultActions post(Object request, String urlTemplate) throws Exception {
         return mockMvc.perform(
                 MockMvcRequestBuilders.post(urlTemplate)
