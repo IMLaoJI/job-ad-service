@@ -56,34 +56,14 @@ public class CustomizedFavouriteItemElasticsearchRepositoryImpl implements Custo
         }
     }
 
-    /**
-     * GET job-advertisements/_search
-     * {
-     * "query": {
-     * "bool": {
-     * "must": [
-     * {
-     * "parent_id": {
-     * "type": "favouriteItem",
-     * "id": "job01"
-     * }
-     * },
-     * {
-     * "match": {
-     * "id": {
-     * "query": "child-01"
-     * }
-     * }
-     * }
-     * ]
-     * }
-     * }
-     * }
-     *
-     * @param jobAdvertisementId
-     * @param favouriteItemId
-     * @return
-     */
+    @Override
+    public List<FavouriteItemDocument> findByParent(String jobAdvertisementId) {
+        SearchQuery searchFavouriteQuery = new NativeSearchQueryBuilder()
+                .withQuery(new ParentIdQueryBuilder(FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME, jobAdvertisementId))
+                .build();
+        return this.elasticsearchTemplate.queryForList(searchFavouriteQuery, FavouriteItemDocument.class);
+    }
+
     @Override
     public Optional<FavouriteItemDocument> findByIdAndParent(String jobAdvertisementId, String favouriteItemId) {
         BoolQueryBuilder parentId = boolQuery()

@@ -7,6 +7,8 @@ public interface CustomizedFavouriteItemElasticsearchRepository {
 
     void customSave(FavouriteItemDocument favouriteItemDocument);
 
+    List<FavouriteItemDocument> findByParent(String jobAdvertisementId);
+
     Optional<FavouriteItemDocument> findByIdAndParent(String jobAdvertisementId, String favouriteItemId);
 
     List<FavouriteItemDocument> findByOwnerAndParentIds(List<String> jobAdvertisementId, String ownerId);
