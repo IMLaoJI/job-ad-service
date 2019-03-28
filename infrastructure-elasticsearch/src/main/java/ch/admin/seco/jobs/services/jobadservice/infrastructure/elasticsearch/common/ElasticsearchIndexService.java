@@ -17,6 +17,7 @@ import org.hibernate.CacheMode;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
@@ -61,6 +62,9 @@ public class ElasticsearchIndexService {
     private FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository;
 
     private final ElasticsearchTemplate elasticsearchTemplate;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
 
     public ElasticsearchIndexService(
@@ -146,12 +150,11 @@ public class ElasticsearchIndexService {
         entityManager.clear();
     }
 
-    public void saveChildWithUpdateRequest(ElasticsearchDocument document, String parent, String indexName) {
+    public void saveChildWithUpdateRequest(FavouriteItemDocument document, String parent, String indexName) {
         UpdateRequest updateRequest = new UpdateRequest(indexName, TYPE_DOC, document.getId());
         updateRequest.routing(parent);
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            String json = mapper.writeValueAsString(document);
+            String json = this.objectMapper.writeValueAsString(document);
 
             log.debug("json dump: {}", json);
 

@@ -1,12 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.read;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdveristementSearchResult;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchService;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ManagedJobAdSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.PeaJobAdvertisementSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCode;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.RadiusSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
@@ -41,12 +35,7 @@ import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -54,22 +43,10 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.J
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.TYPE_DOC;
-import static net.logstash.logback.encoder.org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
-import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
-import static org.apache.commons.lang3.ArrayUtils.toArray;
-import static org.apache.commons.lang3.ArrayUtils.toStringArray;
+import static org.apache.commons.lang3.ArrayUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
-import static org.elasticsearch.index.query.QueryBuilders.geoDistanceQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchPhrasePrefixQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import static org.elasticsearch.index.query.QueryBuilders.multiMatchQuery;
-import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
-import static org.elasticsearch.index.query.QueryBuilders.termQuery;
-import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
+import static org.elasticsearch.index.query.QueryBuilders.*;
 import static org.springframework.data.domain.Sort.Order.asc;
 import static org.springframework.data.domain.Sort.Order.desc;
 
@@ -150,19 +127,19 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
             SearchHits searchHits = response.getHits();
             Iterator<SearchHit> searchHitIterator = searchHits.iterator();
 
-            List<JobAdvertisementDto> highLigtedResults = searchResults.getContent().stream()
+            List<JobAdvertisementDto> highLightedResults = searchResults.getContent().stream()
                     .map(JobAdvertisementDocument::getJobAdvertisement)
                     .map(JobAdvertisementDto::toDto)
                     .map(jobAdvertisementDto -> highlightFields(jobAdvertisementDto, searchHitIterator.next().getHighlightFields()))
                     .collect(Collectors.toList());
 
-            return new AggregatedPageImpl<>(highLigtedResults, pageable, searchHits.totalHits, searchResults.getAggregations(), searchResults.getScrollId());
+            return new AggregatedPageImpl<>(highLightedResults, pageable, searchHits.totalHits, searchResults.getAggregations(), searchResults.getScrollId());
         });
     }
 
     @Override
     // TODO Pre-authorization-checks
-    public Page<JobAdveristementSearchResult> findByUserId(String ownerId, int page, int size) {
+    public Page<JobAdvertisementSearchResult> findByUserId(String ownerId, int page, int size) {
         return Page.empty();
     }
 

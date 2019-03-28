@@ -55,6 +55,8 @@ services:
 
     mail:
         image: mailhog/mailhog
+        environment:
+            - MH_HOSTNAME=arbeit.swiss
         ports:
             - 8025:8025
             - 1025:1025

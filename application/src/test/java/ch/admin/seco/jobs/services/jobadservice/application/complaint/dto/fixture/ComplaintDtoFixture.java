@@ -4,6 +4,8 @@ import ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintD
 import ch.admin.seco.jobs.services.jobadservice.application.complaint.ContactInformationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
 
+import java.util.Locale;
+
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
 
 public class ComplaintDtoFixture {
@@ -17,6 +19,7 @@ public class ComplaintDtoFixture {
                                 .setSalutation(Salutation.MR)
                                 .setName("name")
                                 .setPhone("phone")
-                                .setEmail("email"));
+                                .setEmail("email")
+                                .setContactLanguage(new Locale("de")));
     }
 }

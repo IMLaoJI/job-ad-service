@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -50,13 +49,15 @@ public class ComplaintApplicationService {
         variables.put("stellennummerAvam", jobAdvertisement.getStellennummerAvam());
         variables.put("contactInformation", complaintDto.getContactInformation());
         variables.put("complaintMessage", complaintDto.getComplaintMessage());
+        variables.put("linkToJobAdDetail", complaintProperties.getLinkToJobAdDetail() + complaintDto.getJobAdvertisementId());
 
         MailSenderData mailSenderData = new MailSenderData.Builder()
                 .setTo(complaintProperties.getReceiverEmailAddress())
+                .setCc(complaintDto.getContactInformation().getEmail())
                 .setSubject(COMPLAINT_SUBJECT)
                 .setTemplateName(COMPLAINT_TEMPLATE)
                 .setTemplateVariables(variables)
-                .setLocale(Locale.GERMAN)
+                .setLocale(complaintDto.getContactInformation().getContactLanguage())
                 .build();
 
         mailSenderService.send(mailSenderData);
