@@ -27,24 +27,27 @@ public class FavouriteItemElasticsearchRepositoryTest {
     private JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository;
 
     @Test
-    public void testFindByIdAndParent() {
+    public void testFindByIdAndParent() throws InterruptedException {
         // given
         index(createJob(job01.id()));
         index(createJob(job02.id()));
         index(createJob(job04.id()));
 
-        indexChildDocument(createFavouriteItem("child-01", job01.id(), "John"));
-        indexChildDocument(createFavouriteItem("child-02", job01.id(), "Paul"));
-        indexChildDocument(createFavouriteItem("child-03", job01.id(), "Lisa"));
+        indexChildDocument(createFavouriteItem("child01", job01.id(), "John"));
+        indexChildDocument(createFavouriteItem("child02", job01.id(), "Paul"));
+        indexChildDocument(createFavouriteItem("child03", job01.id(), "Lisa"));
 
-        indexChildDocument(createFavouriteItem("child-04", job02.id(), "Lisa"));
+        indexChildDocument(createFavouriteItem("child04", job02.id(), "Lisa"));
+
+        // TODO replace with awaitility
+        Thread.sleep(1000);
 
         // then
-        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child-01")).isPresent();
-        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child-02")).isPresent();
-        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child-03")).isPresent();
-        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child-04")).isNotPresent();
-        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job02.id().getValue(), "child-04")).isPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child01")).isPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child02")).isPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child03")).isPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child04")).isNotPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job02.id().getValue(), "child04")).isPresent();
     }
 
     private void index(JobAdvertisement jobAdvertisement) {

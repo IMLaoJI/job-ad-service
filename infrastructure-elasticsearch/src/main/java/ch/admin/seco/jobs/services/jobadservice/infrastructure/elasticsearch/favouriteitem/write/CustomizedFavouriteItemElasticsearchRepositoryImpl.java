@@ -87,8 +87,8 @@ public class CustomizedFavouriteItemElasticsearchRepositoryImpl implements Custo
     @Override
     public Optional<FavouriteItemDocument> findByIdAndParent(String jobAdvertisementId, String favouriteItemId) {
         BoolQueryBuilder parentId = boolQuery()
-                .must(new ParentIdQueryBuilder("favouriteItem", jobAdvertisementId))
-                .must(QueryBuilders.matchQuery("id", favouriteItemId));
+                .must(new ParentIdQueryBuilder(FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME, jobAdvertisementId))
+                .must(QueryBuilders.termQuery("_id", favouriteItemId));
         SearchQuery searchFavouriteQuery = new NativeSearchQueryBuilder()
                 .withQuery(parentId)
                 .build();

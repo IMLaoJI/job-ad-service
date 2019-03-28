@@ -16,7 +16,7 @@ import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsea
 @Setting(settingPath = "config/elasticsearch/settings/folding-analyzer.json")
 public class FavouriteItemDocument implements ElasticsearchDocument {
 
-    public static final String FAVOURITE_ITEM = "favouriteItem";
+    public static final String FAVOURITE_ITEM_RELATION_NAME = "rel_favouriteItem";
 
     @Id
     private String id;
@@ -32,7 +32,7 @@ public class FavouriteItemDocument implements ElasticsearchDocument {
         this.favouriteItem = favouriteItem;
         this.id = favouriteItem.getId().getValue();
         this.jobAdvertisementRelations = new ChildRelation.Builder()
-                .setName(FAVOURITE_ITEM)
+                .setName(FAVOURITE_ITEM_RELATION_NAME)
                 .setParent(favouriteItem.getJobAdvertisementId().getValue())
                 .build();
     }

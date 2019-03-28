@@ -15,7 +15,7 @@ import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsea
 @Setting(settingPath = "config/elasticsearch/settings/folding-analyzer.json")
 public class JobAdvertisementDocument {
 
-    public static final String JOB_ADVERTISEMENT_PARENT_RELATION_NAME = "jobAdvertisement";
+    public static final String JOB_ADVERTISEMENT_PARENT_RELATION_NAME = "rel_jobAdvertisement";
 
     @Id
     private String id;
