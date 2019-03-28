@@ -4,8 +4,6 @@ import ch.admin.seco.jobs.services.jobadservice.Application;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItem;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemRepository;
-import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItem;
-import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture;
@@ -111,7 +109,7 @@ public class FavouriteItemRestControllerIntTest {
     public void create() throws Exception {
         // given
         JobAdvertisement jobAdvertisement = this.jobAdvertisementRepository.save(JobAdvertisementFixture.of(job02.id()).build());
-        JobAdvertisementDocument document = this.jobAdvertisementElasticsearchRepository.index(new JobAdvertisementDocument(jobAdvertisement));
+        this.jobAdvertisementElasticsearchRepository.index(new JobAdvertisementDocument(jobAdvertisement));
 
         //when
         FavouriteItemRestController.CreateFavouriteItemResource createFavouriteItemResource = new FavouriteItemRestController.CreateFavouriteItemResource();
@@ -137,7 +135,7 @@ public class FavouriteItemRestControllerIntTest {
     public void indexAndSearch() throws Exception {
         // given
         JobAdvertisement jobAdvertisement = this.jobAdvertisementRepository.save(JobAdvertisementFixture.of(job02.id()).build());
-        JobAdvertisementDocument document = this.jobAdvertisementElasticsearchRepository.index(new JobAdvertisementDocument(jobAdvertisement));
+        this.jobAdvertisementElasticsearchRepository.index(new JobAdvertisementDocument(jobAdvertisement));
 
         FavouriteItem createFavouriteItem = new FavouriteItem.Builder()
                 .setId(new FavouriteItemId("child-01"))
@@ -169,10 +167,5 @@ public class FavouriteItemRestControllerIntTest {
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
                         .content(TestUtil.convertObjectToJsonBytes(request))
         );
-    }
-
-    private class FavouriteItemId extends ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId {
-        public FavouriteItemId(String s) {
-        }
     }
 }
