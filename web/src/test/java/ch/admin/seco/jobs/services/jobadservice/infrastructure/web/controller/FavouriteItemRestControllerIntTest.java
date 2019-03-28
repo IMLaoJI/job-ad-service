@@ -1,11 +1,11 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
 import ch.admin.seco.jobs.services.jobadservice.Application;
-import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.create.CreateFavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors.ExceptionTranslator;
@@ -25,6 +25,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -73,29 +76,75 @@ public class FavouriteItemRestControllerIntTest {
 
     @Test
     @WithJobSeeker
-    public void create() throws Exception {
+    public void createFavouriteItem() throws Exception {
         // given
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.save(JobAdvertisementFixture.testJobAdvertisement().build());
 
         //when
+        String id = createTestFavouriteItem(jobAdvertisement);
+
+        // then check that the document is now in elasticsearch
+        await().until(() -> favouriteItemElasticsearchRepository.findById(id).isPresent());
+    }
+
+    @Test
+    @WithJobSeeker
+    public void updateFavouriteItem() throws Exception {
+        // given
+        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.save(JobAdvertisementFixture.testJobAdvertisement().build());
+        String id = createTestFavouriteItem(jobAdvertisement);
+        FavouriteItemRestController.FavouriteItemUpdateResource favouriteItemUpdateResource = new FavouriteItemRestController.FavouriteItemUpdateResource();
+        String adjustedNote = "My adjusted note";
+        favouriteItemUpdateResource.note = adjustedNote;
+
+        //when
+        mockMvc.perform(
+                MockMvcRequestBuilders.put(URL + "/" + id + "/note")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(favouriteItemUpdateResource)));
+
+        // then check that the updated document is now in elasticsearch
+        await().until(() -> {
+            Optional<FavouriteItemDocument> favouriteItemDocumentOptional = favouriteItemElasticsearchRepository.findById(id);
+            if (favouriteItemDocumentOptional.isPresent()) {
+                assertThat(favouriteItemDocumentOptional.get().getFavouriteItem().getNote()).isEqualTo(adjustedNote);
+                return true;
+            } else
+                return false;
+        });
+    }
+
+    @Test
+    @WithJobSeeker
+    public void deleteFavouriteItem() throws Exception {
+        // given
+        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.save(JobAdvertisementFixture.testJobAdvertisement().build());
+        String id = createTestFavouriteItem(jobAdvertisement);
+        await().until(() -> favouriteItemElasticsearchRepository.findById(id).isPresent());
+
+        // when
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete(URL + "/" + id)
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8));
+
+        // then
+        await().until(() -> !favouriteItemElasticsearchRepository.findById(id).isPresent());
+    }
+
+    private String createTestFavouriteItem(JobAdvertisement jobAdvertisement) throws Exception {
         FavouriteItemRestController.CreateFavouriteItemResource createFavouriteItemResource = new FavouriteItemRestController.CreateFavouriteItemResource();
-        createFavouriteItemResource.jobAdvertisementId=jobAdvertisement.getId().getValue();
-        createFavouriteItemResource.userId=WithJobSeeker.USER_ID;
-        createFavouriteItemResource.note="Test Note";
+        createFavouriteItemResource.jobAdvertisementId = jobAdvertisement.getId().getValue();
+        createFavouriteItemResource.userId = WithJobSeeker.USER_ID;
+        createFavouriteItemResource.note = "Test Note";
 
         ResultActions post = post(createFavouriteItemResource, URL);
         post.andExpect(status().isCreated());
 
         String contentAsString = post.andReturn().getResponse().getContentAsString();
-        JSONArray ja = new JSONArray("["+contentAsString+"]");
-        String id = ja.getJSONObject(0).getString("value");
-        // TODO extract from the success response
-
-        // check that the document is now in elasticsearch
-        // await().until(() -> favouriteItemElasticsearchRepository.findById(id).isPresent());
-
-
+        JSONArray ja = new JSONArray("[" + contentAsString + "]");
+        return ja.getJSONObject(0).getString("value");
     }
+
     private ResultActions post(Object request, String urlTemplate) throws Exception {
         return mockMvc.perform(
                 MockMvcRequestBuilders.post(urlTemplate)
@@ -103,5 +152,6 @@ public class FavouriteItemRestControllerIntTest {
                         .content(TestUtil.convertObjectToJsonBytes(request))
         );
     }
+
 
 }
