@@ -18,6 +18,7 @@ import java.util.Optional;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -33,7 +34,7 @@ public class JobAdvertisementElasticsearchRepositoryTest {
     private ElasticsearchIndexService elasticsearchIndexService;
 
     @Test
-    public void testFindX() {
+    public void testFindByIdAndParent() {
         // given
         index(createJob(job01.id()));
         index(createJob(job02.id()));
@@ -41,8 +42,11 @@ public class JobAdvertisementElasticsearchRepositoryTest {
 
         indexChildDocument(createFavouriteItem("child-01", job01.id(), "John"));
 
+        // when
         Optional<FavouriteItemDocument> byIdAndParent = this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child-01");
-        System.out.println(byIdAndParent);
+
+        // then
+        assertThat(byIdAndParent).isPresent();
     }
 
 
