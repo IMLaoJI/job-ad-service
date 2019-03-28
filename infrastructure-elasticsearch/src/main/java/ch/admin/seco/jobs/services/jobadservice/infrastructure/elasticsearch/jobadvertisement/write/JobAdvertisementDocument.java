@@ -15,7 +15,7 @@ import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsea
 @Setting(settingPath = "config/elasticsearch/settings/folding-analyzer.json")
 public class JobAdvertisementDocument {
 
-    public static final String JOB_ADVERTISEMENT = "jobAdvertisement";
+    public static final String JOB_ADVERTISEMENT_PARENT_RELATION_NAME = "jobAdvertisement";
 
     @Id
     private String id;
@@ -31,7 +31,7 @@ public class JobAdvertisementDocument {
         this.jobAdvertisement = jobAdvertisement;
         this.id = jobAdvertisement.getId().getValue();
         this.jobAdvertisementRelations = new ParentRelation.Builder()
-                .setName(JOB_ADVERTISEMENT)
+                .setName(JOB_ADVERTISEMENT_PARENT_RELATION_NAME)
                 .build();
     }
 

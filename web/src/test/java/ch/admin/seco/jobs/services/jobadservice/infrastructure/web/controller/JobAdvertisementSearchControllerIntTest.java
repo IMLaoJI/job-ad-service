@@ -72,7 +72,7 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument.FAVOURITE_ITEM;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument.JOB_ADVERTISEMENT;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument.JOB_ADVERTISEMENT_PARENT_RELATION_NAME;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForAbroadSearchTests;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForGeoDistanceTests;
 import static java.time.LocalDate.now;
@@ -1448,7 +1448,7 @@ public class JobAdvertisementSearchControllerIntTest {
         BoolQueryBuilder boolQueryJob = boolQuery()
                 .should(matchQuery("id", job02.id().getValue()))
                 .should(matchQuery("id", job03.id().getValue()));
-        HasParentQueryBuilder parentQuery = new HasParentQueryBuilder(JOB_ADVERTISEMENT, boolQueryJob, true);
+        HasParentQueryBuilder parentQuery = new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, boolQueryJob, true);
 
 
         QueryBuilder queryOwner = QueryBuilders.matchQuery("favouriteItem.ownerId", "John");
@@ -1510,7 +1510,7 @@ public class JobAdvertisementSearchControllerIntTest {
         BoolQueryBuilder boolQueryJob = boolQuery().should(matchQuery("id", job04.id().getValue()));
 
         QueryBuilder queryOwner = QueryBuilders.matchQuery("favouriteItem.ownerId", "Paul");
-        HasParentQueryBuilder parentQuery = new HasParentQueryBuilder(JOB_ADVERTISEMENT, boolQueryJob, true);
+        HasParentQueryBuilder parentQuery = new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, boolQueryJob, true);
 
         BoolQueryBuilder boolQuery = boolQuery()
                 .must(parentQuery)
