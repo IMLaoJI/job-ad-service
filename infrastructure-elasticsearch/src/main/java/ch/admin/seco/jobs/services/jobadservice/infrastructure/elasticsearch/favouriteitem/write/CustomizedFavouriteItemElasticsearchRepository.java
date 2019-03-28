@@ -5,6 +5,8 @@ import java.util.Optional;
 
 public interface CustomizedFavouriteItemElasticsearchRepository {
 
+    void customSave(FavouriteItemDocument favouriteItemDocument);
+
     Optional<FavouriteItemDocument> findByIdAndParent(String jobAdvertisementId, String favouriteItemId);
 
     List<FavouriteItemDocument> findByOwnerAndParentIds(List<String> jobAdvertisementId, String ownerId);

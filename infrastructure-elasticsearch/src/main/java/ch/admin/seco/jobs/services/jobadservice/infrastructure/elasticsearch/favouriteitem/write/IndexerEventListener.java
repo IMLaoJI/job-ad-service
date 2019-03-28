@@ -12,8 +12,6 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.Optional;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
-
 @Component("favourite-item-event-listener")
 public class IndexerEventListener {
 
@@ -46,8 +44,7 @@ public class IndexerEventListener {
         Optional<FavouriteItem> favouriteItemOptional = this.favouriteItemRepository.findById(event.getAggregateId());
         if (favouriteItemOptional.isPresent()) {
             FavouriteItem favouriteItem = favouriteItemOptional.get();
-            this.elasticsearchIndexService.saveChildWithUpdateRequest(new FavouriteItemDocument(favouriteItem),
-                    favouriteItem.getJobAdvertisementId().getValue(), INDEX_NAME_JOB_ADVERTISEMENT);
+            this.favouriteItemElasticsearchRepository.customSave(new FavouriteItemDocument(favouriteItem));
         } else {
             LOG.warn("FavouriteItem not found for the given id: {}", event.getAggregateId());
         }

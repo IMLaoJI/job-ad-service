@@ -1,16 +1,25 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write;
 
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.join.query.HasParentQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
+import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Optional;
 
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.TYPE_DOC;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument.JOB_ADVERTISEMENT_PARENT_RELATION_NAME;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
@@ -20,8 +29,31 @@ public class CustomizedFavouriteItemElasticsearchRepositoryImpl implements Custo
 
     private final ElasticsearchTemplate elasticsearchTemplate;
 
-    public CustomizedFavouriteItemElasticsearchRepositoryImpl(ElasticsearchTemplate elasticsearchTemplate) {
+    private final ObjectMapper objectMapper;
+
+    public CustomizedFavouriteItemElasticsearchRepositoryImpl(ElasticsearchTemplate elasticsearchTemplate, ObjectMapper objectMapper) {
         this.elasticsearchTemplate = elasticsearchTemplate;
+        this.objectMapper = objectMapper;
+    }
+
+    @Override
+    public void customSave(FavouriteItemDocument document) {
+        UpdateRequest updateRequest = new UpdateRequest(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT, TYPE_DOC, document.getId());
+        updateRequest.routing(document.getJobAdvertisementRelations().getParent());
+        try {
+            String json = this.objectMapper.writeValueAsString(document);
+            updateRequest.doc(json, XContentType.JSON);
+            UpdateQuery updateQuery = new UpdateQuery();
+            updateQuery.setUpdateRequest(updateRequest);
+            updateQuery.setClazz(FavouriteItemDocument.class);
+            updateQuery.setId(document.getId());
+            updateQuery.setIndexName(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT);
+            updateQuery.setType(TYPE_DOC);
+            updateQuery.setDoUpsert(true);
+            UpdateResponse response = elasticsearchTemplate.update(updateQuery);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     @Override

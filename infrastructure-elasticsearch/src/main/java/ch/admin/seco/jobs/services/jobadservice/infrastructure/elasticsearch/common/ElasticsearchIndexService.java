@@ -9,17 +9,11 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.fav
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.elasticsearch.action.update.UpdateRequest;
-import org.elasticsearch.action.update.UpdateResponse;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.scheduling.annotation.Async;
@@ -29,9 +23,7 @@ import org.springframework.util.StopWatch;
 import reactor.core.publisher.Flux;
 
 import javax.persistence.EntityManager;
-import java.io.IOException;
 import java.io.Serializable;
-import java.io.UncheckedIOException;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -62,10 +54,6 @@ public class ElasticsearchIndexService {
     private FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository;
 
     private final ElasticsearchTemplate elasticsearchTemplate;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
 
     public ElasticsearchIndexService(
             EntityManager entityManager,
@@ -150,29 +138,4 @@ public class ElasticsearchIndexService {
         entityManager.clear();
     }
 
-    // TODO move to the ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.CustomizedFavouriteItemElasticsearchRepository
-    public void saveChildWithUpdateRequest(FavouriteItemDocument document, String parent, String indexName) {
-        UpdateRequest updateRequest = new UpdateRequest(indexName, TYPE_DOC, document.getId());
-        updateRequest.routing(parent);
-        try {
-            String json = this.objectMapper.writeValueAsString(document);
-
-            log.debug("json dump: {}", json);
-
-            updateRequest.doc(json, XContentType.JSON);
-
-            UpdateQuery updateQuery = new UpdateQuery();
-            updateQuery.setUpdateRequest(updateRequest);
-            updateQuery.setClazz(FavouriteItemDocument.class);
-            updateQuery.setId(document.getId());
-            updateQuery.setIndexName(indexName);
-            updateQuery.setType(TYPE_DOC);
-            updateQuery.setDoUpsert(true);
-
-            UpdateResponse response = elasticsearchTemplate.update(updateQuery);
-            log.info("Response {}", response);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
 }
