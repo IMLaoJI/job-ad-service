@@ -150,6 +150,7 @@ public class ElasticsearchIndexService {
         entityManager.clear();
     }
 
+    // TODO move to the ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.CustomizedFavouriteItemElasticsearchRepository
     public void saveChildWithUpdateRequest(FavouriteItemDocument document, String parent, String indexName) {
         UpdateRequest updateRequest = new UpdateRequest(indexName, TYPE_DOC, document.getId());
         updateRequest.routing(parent);
