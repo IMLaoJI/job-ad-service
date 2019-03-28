@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Optional;
-
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,14 +34,18 @@ public class FavouriteItemElasticsearchRepositoryTest {
         index(createJob(job04.id()));
 
         indexChildDocument(createFavouriteItem("child-01", job01.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-02", job01.id(), "Paul"));
+        indexChildDocument(createFavouriteItem("child-03", job01.id(), "Lisa"));
 
-        // when
-        Optional<FavouriteItemDocument> byIdAndParent = this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child-01");
+        indexChildDocument(createFavouriteItem("child-04", job02.id(), "Lisa"));
 
         // then
-        assertThat(byIdAndParent).isPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child-01")).isPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child-02")).isPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child-03")).isPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child-04")).isNotPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job02.id().getValue(), "child-04")).isPresent();
     }
-
 
     private void index(JobAdvertisement jobAdvertisement) {
         this.jobAdvertisementElasticsearchRepository.save(new JobAdvertisementDocument(jobAdvertisement));
