@@ -29,6 +29,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -141,11 +144,56 @@ public class FavouriteItemRestControllerIntTest {
 
         // when
         mockMvc.perform(
-                MockMvcRequestBuilders.delete(URL + "/" + id)
+                MockMvcRequestBuilders.get(URL)
                         .contentType(TestUtil.APPLICATION_JSON_UTF8));
 
         // then
         await().until(() -> !favouriteItemElasticsearchRepository.findById(id).isPresent());
+    }
+
+    @Test
+    @WithJobSeeker
+    public void findByJobAdIdAndUserId() throws Exception {
+        // given
+        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.save(JobAdvertisementFixture.testJobAdvertisement().build());
+
+        FavouriteItemRestController.CreateFavouriteItemResource createFavouriteItemResource = new FavouriteItemRestController.CreateFavouriteItemResource();
+        createFavouriteItemResource.jobAdvertisementId = jobAdvertisement.getId().getValue();
+        createFavouriteItemResource.userId = WithJobSeeker.USER_ID;
+        createFavouriteItemResource.note = "Test Note 1";
+        ResultActions post = post(createFavouriteItemResource, URL);
+        post.andExpect(status().isCreated());
+        String contentAsString = post.andReturn().getResponse().getContentAsString();
+        JSONArray ja = new JSONArray("[" + contentAsString + "]");
+        String id1 = ja.getJSONObject(0).getString("value");
+
+        createFavouriteItemResource = new FavouriteItemRestController.CreateFavouriteItemResource();
+        createFavouriteItemResource.jobAdvertisementId = jobAdvertisement.getId().getValue();
+        createFavouriteItemResource.userId = WithJobSeeker.USER_ID;
+        createFavouriteItemResource.note = "Test Note 2";
+        post = post(createFavouriteItemResource, URL);
+        post.andExpect(status().isCreated());
+        contentAsString = post.andReturn().getResponse().getContentAsString();
+        ja = new JSONArray("[" + contentAsString + "]");
+        String id2 = ja.getJSONObject(0).getString("value");
+
+        await().until(() -> favouriteItemElasticsearchRepository.findById(id1).isPresent());
+        await().until(() -> favouriteItemElasticsearchRepository.findById(id2).isPresent());
+
+        FavouriteItemRestController.SearchByJobAdIdAndUserIdResource searchByJobAdIdAndUserIdResource = new FavouriteItemRestController.SearchByJobAdIdAndUserIdResource();
+        searchByJobAdIdAndUserIdResource.jobAdvertisementId = jobAdvertisement.getId().getValue();
+        searchByJobAdIdAndUserIdResource.userId = WithJobSeeker.USER_ID;
+
+        // when
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(URL + "/_search/byJobAdvertisementIdAndUserId")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(searchByJobAdIdAndUserIdResource)))
+                .andExpect(header().string("X-Total-Count", "2"))
+                .andExpect(jsonPath("$.[0].id").value(equalTo(id1)))
+                .andExpect(jsonPath("$.[1].id").value(equalTo(id2)))
+                .andExpect(jsonPath("$.[0].note").value(equalTo("Test Note 1")))
+                .andExpect(jsonPath("$.[0].note").value(equalTo("Test Note 2")));
     }
 
     private String createTestFavouriteItem(JobAdvertisement jobAdvertisement) throws Exception {
