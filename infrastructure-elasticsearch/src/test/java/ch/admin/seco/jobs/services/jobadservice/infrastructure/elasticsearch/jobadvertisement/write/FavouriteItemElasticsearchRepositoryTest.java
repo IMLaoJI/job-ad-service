@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class JobAdvertisementElasticsearchRepositoryTest {
+public class FavouriteItemElasticsearchRepositoryTest {
 
     @Autowired
     private FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository;
