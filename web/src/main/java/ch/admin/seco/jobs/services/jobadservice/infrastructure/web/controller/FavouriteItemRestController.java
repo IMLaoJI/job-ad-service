@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -47,7 +48,8 @@ public class FavouriteItemRestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public FavouriteItemId createFavouriteItem(@RequestBody @Valid CreateFavouriteItemDto createFavouriteItemDto) throws AggregateNotFoundException {
+    public FavouriteItemId createFavouriteItem(@RequestBody @Valid CreateFavouriteItemResource createFavouriteItemResource) throws AggregateNotFoundException {
+        CreateFavouriteItemDto createFavouriteItemDto = new CreateFavouriteItemDto(createFavouriteItemResource.note, createFavouriteItemResource.userId, new JobAdvertisementId(createFavouriteItemResource.jobAdvertisementId));
         return favouriteItemApplicationService.create(createFavouriteItemDto);
     }
 
@@ -70,9 +72,9 @@ public class FavouriteItemRestController {
         return favouriteItemApplicationService.findById(favouriteItemId);
     }
 
-    @GetMapping("/_search/byJobAdIdAndOwnerId")
-    public FavouriteItemDto findByJobAdIdAndOwnerId(@RequestBody @Valid SearchByJobAdIdAndOwnerIdResource searchByJobAdIdAndOwnerIdResource) {
-        return favouriteItemApplicationService.findByJobAdvertisementIdAndOwnerId(new JobAdvertisementId(searchByJobAdIdAndOwnerIdResource.jobAdId), searchByJobAdIdAndOwnerIdResource.ownerId)
+    @GetMapping("/_search/byJobAdvertisementIdAndUserId")
+    public FavouriteItemDto findByJobAdIdAndUserId(@RequestBody @Valid FavouriteItemRestController.SearchByJobAdIdAndUserIdResource searchByJobAdIdAndUserIdResource) {
+        return favouriteItemApplicationService.findByJobAdvertisementIdAndUserId(new JobAdvertisementId(searchByJobAdIdAndUserIdResource.jobAdvertisementId), searchByJobAdIdAndUserIdResource.userId)
                 .orElse(null);
     }
 
@@ -83,18 +85,27 @@ public class FavouriteItemRestController {
         return new ResponseEntity<>(userFavorites.getContent(), headers, HttpStatus.OK);
     }
 
-    static class SearchByJobAdIdAndOwnerIdResource {
+    static class CreateFavouriteItemResource {
+        @Size(max = 1000)
+        public String note;
 
         @NotBlank
-        public String ownerId;
+        public String userId;
+
+        @NotNull
+        public String jobAdvertisementId;
+    }
+
+    static class SearchByJobAdIdAndUserIdResource {
+        @NotBlank
+        public String userId;
 
         @NotBlank
-        public String jobAdId;
+        public String jobAdvertisementId;
 
     }
 
     static class FavouriteItemUpdateResource {
-
         @Size(max = 1000)
         public String note;
     }

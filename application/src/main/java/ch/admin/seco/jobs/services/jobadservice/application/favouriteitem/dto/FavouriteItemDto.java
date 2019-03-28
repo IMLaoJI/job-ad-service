@@ -1,14 +1,12 @@
 package ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItem;
-import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 
 import java.time.LocalDateTime;
 
 public class FavouriteItemDto {
 
-    private FavouriteItemId id;
+    private String id;
 
     private LocalDateTime createdTime;
 
@@ -16,24 +14,24 @@ public class FavouriteItemDto {
 
     private String note;
 
-    private String ownerId;
+    private String ownerUserId;
 
-    private JobAdvertisementId jobAdvertisementId;
+    private String jobAdvertisementId;
 
-    private FavouriteItemDto(FavouriteItemId id, LocalDateTime createdTime, LocalDateTime updatedTime, String note, String ownerId, JobAdvertisementId jobAdvertisementId) {
+    private FavouriteItemDto(String id, LocalDateTime createdTime, LocalDateTime updatedTime, String note, String ownerUserId, String jobAdvertisementId) {
         this.id = id;
         this.createdTime = createdTime;
         this.updatedTime = updatedTime;
         this.note = note;
-        this.ownerId = ownerId;
+        this.ownerUserId = ownerUserId;
         this.jobAdvertisementId = jobAdvertisementId;
     }
 
-    public FavouriteItemId getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(FavouriteItemId id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -61,29 +59,29 @@ public class FavouriteItemDto {
         this.note = note;
     }
 
-    public String getOwnerId() {
-        return ownerId;
+    public String getOwnerUserId() {
+        return ownerUserId;
     }
 
-    public void setOwnerId(String ownerId) {
-        this.ownerId = ownerId;
+    public void setOwnerUserId(String ownerUserId) {
+        this.ownerUserId = ownerUserId;
     }
 
-    public JobAdvertisementId getJobAdvertisementId() {
+    public String getJobAdvertisementId() {
         return jobAdvertisementId;
     }
 
-    public void setJobAdvertisementId(JobAdvertisementId jobAdvertisementId) {
-        this.jobAdvertisementId = jobAdvertisementId;
+    public void setJobAdvertisementId(String String) {
+        this.jobAdvertisementId = String;
     }
 
     public static FavouriteItemDto toDto(FavouriteItem favouriteItem) {
         return new FavouriteItemDto(
-                favouriteItem.getId(),
+                favouriteItem.getId().getValue(),
                 favouriteItem.getCreatedTime(),
                 favouriteItem.getUpdatedTime(),
                 favouriteItem.getNote(),
                 favouriteItem.getOwnerId(),
-                favouriteItem.getJobAdvertisementId());
+                favouriteItem.getJobAdvertisementId().getValue());
     }
 }

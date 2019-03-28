@@ -1,10 +1,11 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
 import ch.admin.seco.jobs.services.jobadservice.Application;
-import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.create.CreateFavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItem;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemRepository;
+import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItem;
+import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture;
@@ -112,13 +113,13 @@ public class FavouriteItemRestControllerIntTest {
         JobAdvertisement jobAdvertisement = this.jobAdvertisementRepository.save(JobAdvertisementFixture.of(job02.id()).build());
         JobAdvertisementDocument document = this.jobAdvertisementElasticsearchRepository.index(new JobAdvertisementDocument(jobAdvertisement));
 
-        CreateFavouriteItemDto createFavouriteItemDto = new CreateFavouriteItemDto();
-        createFavouriteItemDto.setOwnerId(WithJobSeeker.USER_ID);
-        createFavouriteItemDto.setNote("hurray");
-        createFavouriteItemDto.setJobAdvertisementId(jobAdvertisement.getId());
-
         //when
-        ResultActions post = post(createFavouriteItemDto, URL);
+        FavouriteItemRestController.CreateFavouriteItemResource createFavouriteItemResource = new FavouriteItemRestController.CreateFavouriteItemResource();
+        createFavouriteItemResource.jobAdvertisementId=jobAdvertisement.getId().getValue();
+        createFavouriteItemResource.userId=WithJobSeeker.USER_ID;
+        createFavouriteItemResource.note="Test Note";
+
+        ResultActions post = post(createFavouriteItemResource, URL);
         post.andExpect(status().isCreated());
 
         String contentAsString = post.andReturn().getResponse().getContentAsString();
@@ -170,4 +171,8 @@ public class FavouriteItemRestControllerIntTest {
         );
     }
 
+    private class FavouriteItemId extends ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId {
+        public FavouriteItemId(String s) {
+        }
+    }
 }
