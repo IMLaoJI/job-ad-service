@@ -3,7 +3,6 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.fa
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elasticsearch.action.update.UpdateRequest;
-import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -50,7 +49,7 @@ public class CustomizedFavouriteItemElasticsearchRepositoryImpl implements Custo
             updateQuery.setIndexName(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT);
             updateQuery.setType(TYPE_DOC);
             updateQuery.setDoUpsert(true);
-            UpdateResponse response = elasticsearchTemplate.update(updateQuery);
+            elasticsearchTemplate.update(updateQuery);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
