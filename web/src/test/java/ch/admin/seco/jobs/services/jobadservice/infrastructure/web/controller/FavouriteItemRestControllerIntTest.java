@@ -131,6 +131,23 @@ public class FavouriteItemRestControllerIntTest {
         await().until(() -> !favouriteItemElasticsearchRepository.findById(id).isPresent());
     }
 
+    @Test
+    @WithJobSeeker
+    public void findByIdFavouriteItem() throws Exception {
+        // given
+        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.save(JobAdvertisementFixture.testJobAdvertisement().build());
+        String id = createTestFavouriteItem(jobAdvertisement);
+        await().until(() -> favouriteItemElasticsearchRepository.findById(id).isPresent());
+
+        // when
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete(URL + "/" + id)
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8));
+
+        // then
+        await().until(() -> !favouriteItemElasticsearchRepository.findById(id).isPresent());
+    }
+
     private String createTestFavouriteItem(JobAdvertisement jobAdvertisement) throws Exception {
         FavouriteItemRestController.CreateFavouriteItemResource createFavouriteItemResource = new FavouriteItemRestController.CreateFavouriteItemResource();
         createFavouriteItemResource.jobAdvertisementId = jobAdvertisement.getId().getValue();
