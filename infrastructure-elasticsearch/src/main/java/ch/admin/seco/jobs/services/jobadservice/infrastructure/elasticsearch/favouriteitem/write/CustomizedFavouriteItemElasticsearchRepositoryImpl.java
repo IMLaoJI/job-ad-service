@@ -37,16 +37,16 @@ public class CustomizedFavouriteItemElasticsearchRepositoryImpl implements Custo
     }
 
     @Override
-    public void customSave(FavouriteItemDocument document) {
-        UpdateRequest updateRequest = new UpdateRequest(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT, TYPE_DOC, document.getId());
-        updateRequest.routing(document.getJobAdvertisementRelations().getParent());
+    public void customSave(FavouriteItemDocument favouriteItemDocument) {
+        UpdateRequest updateRequest = new UpdateRequest(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT, TYPE_DOC, favouriteItemDocument.getId());
+        updateRequest.routing(favouriteItemDocument.getJobAdvertisementRelations().getParent());
         try {
-            String json = this.objectMapper.writeValueAsString(document);
+            String json = this.objectMapper.writeValueAsString(favouriteItemDocument);
             updateRequest.doc(json, XContentType.JSON);
             UpdateQuery updateQuery = new UpdateQuery();
             updateQuery.setUpdateRequest(updateRequest);
             updateQuery.setClazz(FavouriteItemDocument.class);
-            updateQuery.setId(document.getId());
+            updateQuery.setId(favouriteItemDocument.getId());
             updateQuery.setIndexName(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT);
             updateQuery.setType(TYPE_DOC);
             updateQuery.setDoUpsert(true);
