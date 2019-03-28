@@ -1,12 +1,12 @@
 package ch.admin.seco.jobs.services.jobadservice.application.complaint;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.PhoneNumber;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Locale;
 
 public class ContactInformationDto {
 
@@ -23,6 +23,9 @@ public class ContactInformationDto {
     @NotBlank
     @Size(max = 255)
     private String email;
+
+    @NotNull
+    private Locale contactLanguage;
 
     public Salutation getSalutation() {
         return salutation;
@@ -60,6 +63,15 @@ public class ContactInformationDto {
         return this;
     }
 
+    public Locale getContactLanguage() {
+        return contactLanguage;
+    }
+
+    public ContactInformationDto setContactLanguage(Locale contactLanguage) {
+        this.contactLanguage = contactLanguage;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "ContactInformationDto{" +
@@ -67,6 +79,7 @@ public class ContactInformationDto {
                 ", name='" + name + '\'' +
                 ", phone='" + phone + '\'' +
                 ", email='" + email + '\'' +
+                ", contactLanguage=" + contactLanguage +
                 '}';
     }
 }
