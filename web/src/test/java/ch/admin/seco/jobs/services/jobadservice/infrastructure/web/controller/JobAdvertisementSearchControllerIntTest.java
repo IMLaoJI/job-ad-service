@@ -1,6 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
 import ch.admin.seco.jobs.services.jobadservice.Application;
+import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.FavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.GeoPointDto;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
@@ -21,12 +22,12 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.job
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors.ExceptionTranslator;
 import org.apache.lucene.search.join.ScoreMode;
-import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.InnerHitBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.join.query.HasChildQueryBuilder;
 import org.elasticsearch.join.query.HasParentQueryBuilder;
-import org.elasticsearch.join.query.JoinQueryBuilders;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -35,7 +36,13 @@ import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.core.DefaultResultMapper;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ResultsMapper;
+import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -51,6 +58,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import reactor.util.function.Tuples;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.*;
@@ -69,12 +77,14 @@ import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.contro
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForGeoDistanceTests;
 import static java.time.LocalDate.now;
 import static java.util.Arrays.asList;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.CombinableMatcher.both;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.data.domain.Sort.Order.desc;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
@@ -139,6 +149,8 @@ public class JobAdvertisementSearchControllerIntTest {
 
     private JobAdvertisementSearchService jobAdvertisementSearchService;
 
+    private ResultsMapper resultsMapper;
+
     private CurrentUserContext mockCurrentUserContext;
 
     private MockMvc mockMvc;
@@ -156,6 +168,8 @@ public class JobAdvertisementSearchControllerIntTest {
                 this.customEntityMapper,
                 this.jobAdvertisementElasticsearchRepository
         );
+
+        this.resultsMapper = new DefaultResultMapper(elasticsearchTemplate.getElasticsearchConverter().getMappingContext(), customEntityMapper);
 
         JobAdvertisementSearchController jobAdvertisementSearchController
                 = new JobAdvertisementSearchController(jobAdvertisementSearchService);
@@ -1363,66 +1377,154 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
-    public void indexParentWithChildTest() throws Exception {
-        //given
+    public void indexParentWithChildAndFetchPARENTResultListTest() {
+
+        // given
         index(createJob(job01.id()));
         index(createJob(job02.id()));
         index(createJob(job03.id()));
-        //when
+        index(createJob(job04.id()));
+        index(createJob(job05.id()));
+
         indexChildDocument(createFavouriteItem("child-01", job01.id(), "John"));
         indexChildDocument(createFavouriteItem("child-02", job02.id(), "John"));
         indexChildDocument(createFavouriteItem("child-03", job03.id(), "John"));
         indexChildDocument(createFavouriteItem("child-04", job01.id(), "Emma"));
         indexChildDocument(createFavouriteItem("child-05", job03.id(), "Emma"));
-        indexChildDocument(createFavouriteItem("child-06", job03.id(), "Tom"));
+        indexChildDocument(createFavouriteItem("child-06", job04.id(), "John"));
         indexChildDocument(createFavouriteItem("child-07", job01.id(), "Jane"));
         indexChildDocument(createFavouriteItem("child-08", job02.id(), "Jane"));
         indexChildDocument(createFavouriteItem("child-09", job03.id(), "Jane"));
         indexChildDocument(createFavouriteItem("child-10", job03.id(), "Paul"));
-        //then
 
-        QueryBuilder query = matchAllQuery();
+        // when
+        QueryBuilder queryOwner = QueryBuilders.matchQuery("favouriteItem.ownerId", "John");
+        HasChildQueryBuilder childWithInnerHits = new HasChildQueryBuilder(FAVOURITE_ITEM, queryOwner, ScoreMode.None)
+                .innerHit(new InnerHitBuilder());
+
+        BoolQueryBuilder boolQueryJob = boolQuery()
+                .should(matchQuery("jobAdvertisement.id.value", job02.id().getValue()))
+                .should(matchQuery("jobAdvertisement.id.value", job03.id().getValue()));
+
+        BoolQueryBuilder boolQuery = boolQuery()
+                .must(boolQueryJob)
+                .must(childWithInnerHits);
+
         SearchQuery searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(query)
-                .withFilter(JoinQueryBuilders.hasChildQuery(FAVOURITE_ITEM, query, ScoreMode.None))
+                .withQuery(boolQuery)
                 .build();
 
         List<JobAdvertisementDocument> jobAdvertisementIdList = this.elasticsearchTemplate.queryForList(searchQuery, JobAdvertisementDocument.class);
+
+        //then
         assertThat(jobAdvertisementIdList, is(notNullValue()));
-        assertThat(jobAdvertisementIdList, is(hasSize(3)));
-        assertThat(jobAdvertisementIdList.get(0).getId(), is("job01"));
-//        SearchQuery searchQuery = new NativeSearchQueryBuilder()
-//                .withQuery(QueryBuilders.matchQuery("title", "cook"))
-//                .withFilter(JoinQueryBuilders.hasChildQuery(FAVOURITE_ITEM_DOCUMENT_TYPE, QueryBuilders.matchQuery("note", "interesting"), ScoreMode.None))
-//                .build();
-//
-//        List<String> jobAdvertisementIdList = this.elasticsearchTemplate.queryForIds(searchQuery);
-//        assertThat(jobAdvertisementIdList, is(notNullValue()));
-//        assertThat(jobAdvertisementIdList, is(hasSize(1)));
-//        assertThat(jobAdvertisementIdList.get(0), is("3"))
+        assertThat(jobAdvertisementIdList, is(hasSize(2)));
+        assertThat(jobAdvertisementIdList.get(0).getId(), is(job02.id().getValue()));
+        assertThat(jobAdvertisementIdList.get(1).getId(), is(job03.id().getValue()));
+    }
 
-        QueryBuilder queryChild = matchAllQuery();
-        HasChildQueryBuilder childQueryBuilder = new HasChildQueryBuilder(FAVOURITE_ITEM, queryChild, ScoreMode.None);
+    @Test
+    public void indexParentWithChildAndFetchCHILDRENResultListTest() {
 
-        SearchResponse responseChild = this.elasticsearchTemplate.getClient()
-                .prepareSearch(INDEX_NAME_JOB_ADVERTISEMENT).setQuery(childQueryBuilder).execute().actionGet();
+        // given
+        index(createJob(job01.id()));
+        index(createJob(job02.id()));
+        index(createJob(job03.id()));
+        index(createJob(job04.id()));
+        index(createJob(job05.id()));
 
-        Assert.assertNotNull(responseChild);
-        Assert.assertNotNull(responseChild.getHits());
-        Assert.assertNotNull(responseChild.getHits().getTotalHits());
-        Assert.assertEquals(3, responseChild.getHits().getTotalHits());
+        indexChildDocument(createFavouriteItem("child-01", job01.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-02", job02.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-03", job03.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-04", job01.id(), "Emma"));
+        indexChildDocument(createFavouriteItem("child-05", job03.id(), "Emma"));
+        indexChildDocument(createFavouriteItem("child-06", job04.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-07", job01.id(), "Jane"));
+        indexChildDocument(createFavouriteItem("child-08", job02.id(), "Jane"));
+        indexChildDocument(createFavouriteItem("child-09", job03.id(), "Jane"));
+        indexChildDocument(createFavouriteItem("child-10", job03.id(), "Paul"));
 
-        QueryBuilder queryParent = matchAllQuery();
-        HasParentQueryBuilder parentQueryBuilder = new HasParentQueryBuilder(JOB_ADVERTISEMENT, queryParent, true);
+        // when
+        BoolQueryBuilder boolQueryJob = boolQuery()
+                .should(matchQuery("id", job02.id().getValue()))
+                .should(matchQuery("id", job03.id().getValue()));
+        HasParentQueryBuilder parentQuery = new HasParentQueryBuilder(JOB_ADVERTISEMENT, boolQueryJob, true);
 
-        SearchResponse responseParent = this.elasticsearchTemplate.getClient()
-                .prepareSearch(INDEX_NAME_JOB_ADVERTISEMENT).setQuery(parentQueryBuilder).execute().actionGet();
 
-        Assert.assertNotNull(responseParent);
-        Assert.assertNotNull(responseParent.getHits());
-        Assert.assertNotNull(responseParent.getHits().getTotalHits());
-        Assert.assertEquals(10, responseParent.getHits().getTotalHits());
+        QueryBuilder queryOwner = QueryBuilders.matchQuery("favouriteItem.ownerId", "John");
 
+        BoolQueryBuilder boolQuery = boolQuery()
+                .must(parentQuery)
+                .must(queryOwner);
+
+        SearchQuery searchFavouriteQuery = new NativeSearchQueryBuilder()
+                .withQuery(boolQuery)
+                .build();
+
+        Pageable pageable = PageRequest.of(0, 20, Sort.by(desc("score")));
+
+        /* FIRST TRY */
+        List<FavouriteItemDocument> favouriteItemDocumentList = this.elasticsearchTemplate.queryForList(searchFavouriteQuery, FavouriteItemDocument.class);
+
+        /* SECOND TRY */
+        List<FavouriteItemDto> favouriteItemDtoList = elasticsearchTemplate.query(searchFavouriteQuery, response -> {
+            AggregatedPage<FavouriteItemDocument> searchResults = resultsMapper.mapResults(response, FavouriteItemDocument.class, pageable);
+
+            List<FavouriteItemDto> results = searchResults.getContent().stream()
+                    .map(FavouriteItemDocument::getFavouriteItem)
+                    .map(FavouriteItemDto::toDto)
+                    .collect(Collectors.toList());
+
+            return results;
+        });
+
+        // then
+        /* FIRST TRY */
+        assertThat(favouriteItemDocumentList, is(notNullValue()));
+        assertThat(favouriteItemDocumentList, is(hasSize(2)));
+        assertThat(favouriteItemDocumentList.get(0).getId(), is("child-02"));
+        assertThat(favouriteItemDocumentList.get(1).getId(), is("child-03"));
+        /* SECOND TRY */
+        assertThat(favouriteItemDtoList, is(notNullValue()));
+        assertThat(favouriteItemDtoList, is(hasSize(2)));
+        assertThat(favouriteItemDtoList.get(0).getId(), is("child-02"));
+        assertThat(favouriteItemDtoList.get(1).getId(), is("child-03"));
+    }
+
+    @Test
+    public void indexParentWithChildrenAndFetchSINGLECHILDResultTest() {
+
+        // given
+        index(createJob(job01.id()));
+        index(createJob(job02.id()));
+        index(createJob(job04.id()));
+
+        indexChildDocument(createFavouriteItem("child-01", job01.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-02", job02.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-05", job02.id(), "Emma"));
+        indexChildDocument(createFavouriteItem("child-06", job04.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-07", job01.id(), "Jane"));
+        indexChildDocument(createFavouriteItem("child-10", job04.id(), "Paul"));
+
+        // when
+        BoolQueryBuilder boolQueryJob = boolQuery().should(matchQuery("id", job04.id().getValue()));
+
+        QueryBuilder queryOwner = QueryBuilders.matchQuery("favouriteItem.ownerId", "Paul");
+        HasParentQueryBuilder parentQuery = new HasParentQueryBuilder(JOB_ADVERTISEMENT, boolQueryJob, true);
+
+        BoolQueryBuilder boolQuery = boolQuery()
+                .must(parentQuery)
+                .must(queryOwner);
+
+        SearchQuery searchFavouriteQuery = new NativeSearchQueryBuilder()
+                .withQuery(boolQuery)
+                .build();
+
+        // then
+        List<FavouriteItemDocument> favouriteItemDocumentList = this.elasticsearchTemplate.queryForList(searchFavouriteQuery, FavouriteItemDocument.class);
+        assertThat(favouriteItemDocumentList, is(notNullValue()));
+        assertThat(favouriteItemDocumentList, is(hasSize(1)));
+        assertThat(favouriteItemDocumentList.get(0).getId(), is("child-10"));
     }
 
     private void indexChildDocument(FavouriteItem favouriteItem) {

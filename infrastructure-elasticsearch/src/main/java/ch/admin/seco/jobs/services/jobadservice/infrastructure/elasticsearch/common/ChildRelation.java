@@ -6,6 +6,9 @@ public class ChildRelation extends ParentRelation {
 
     private String parent;
 
+    public ChildRelation() {
+    }
+
     private ChildRelation(Builder builder) {
         this.name = Condition.notNull(builder.name);
         this.parent = Condition.notNull(builder.parent);

@@ -154,7 +154,6 @@ public class FavouriteItemRestControllerIntTest {
                 .withFilter(JoinQueryBuilders.hasParentQuery(JOB_ADVERTISEMENT, query, true))
                 .build();
 
-        // queryForList etc. only works for the PARENT DOCUMENT !! NOT for FavouriteItemDocument! it can't map it correctly
         List<String> favouriteItemListId = this.elasticsearchTemplate.queryForIds(searchQuery);
         assertThat(favouriteItemListId, is(notNullValue()));
         assertThat(favouriteItemListId, is(hasSize(1)));
