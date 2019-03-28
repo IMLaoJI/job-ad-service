@@ -20,7 +20,8 @@
 <div th:if="${contactInformation?.name}" th:text="#{mail.complaint.body.contactinformation.name(${contactInformation?.name})}"></div>
 <div th:if="${contactInformation?.phone}" th:text="#{mail.complaint.body.contactinformation.phone(${contactInformation?.phone})}"></div>
 <div th:if="${contactInformation?.email}"th:text="#{mail.complaint.body.contactinformation.email(${contactInformation?.email})}"></div>
-<div th:text="#{mail.complaint.body.complaintmessage(${complaintMessage})}"></div>
+<div th:text="#{mail.complaint.body.complaintmessage}"></div>
+<div th:text="${complaintMessage}"></div>
 
 </body>
 </html>
