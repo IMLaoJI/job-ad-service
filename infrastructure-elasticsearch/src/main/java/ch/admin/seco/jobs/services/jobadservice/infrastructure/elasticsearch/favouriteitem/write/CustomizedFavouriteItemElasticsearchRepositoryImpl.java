@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.join.query.HasParentQueryBuilder;
 import org.elasticsearch.join.query.ParentIdQueryBuilder;
@@ -22,7 +23,6 @@ import java.util.Optional;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.TYPE_DOC;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument.JOB_ADVERTISEMENT_PARENT_RELATION_NAME;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 
 @Component
 public class CustomizedFavouriteItemElasticsearchRepositoryImpl implements CustomizedFavouriteItemElasticsearchRepository {
@@ -87,7 +87,7 @@ public class CustomizedFavouriteItemElasticsearchRepositoryImpl implements Custo
 
         BoolQueryBuilder boolQuery = boolQuery()
                 .must(new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, matchesJobAdvertisementIds(jobAdvertisementIds), true))
-                .must(QueryBuilders.matchQuery("favouriteItem.ownerId", ownerId));
+                .must(QueryBuilders.termQuery("favouriteItem.ownerId", ownerId.toLowerCase()));
 
         SearchQuery searchFavouriteQuery = new NativeSearchQueryBuilder()
                 .withQuery(boolQuery)
@@ -95,11 +95,7 @@ public class CustomizedFavouriteItemElasticsearchRepositoryImpl implements Custo
         return this.elasticsearchTemplate.queryForList(searchFavouriteQuery, FavouriteItemDocument.class);
     }
 
-    private BoolQueryBuilder matchesJobAdvertisementIds(List<String> jobAdvertisementIds) {
-        BoolQueryBuilder boolQueryJob = boolQuery();
-        for (String jobAdvertisementId : jobAdvertisementIds) {
-            boolQueryJob = boolQueryJob.should(matchQuery("id", jobAdvertisementId));
-        }
-        return boolQueryJob;
+    private QueryBuilder matchesJobAdvertisementIds(List<String> jobAdvertisementIds) {
+        return QueryBuilders.termsQuery("_id", jobAdvertisementIds.toArray(new String[0]));
     }
 }

@@ -15,7 +15,7 @@ public class FavouriteItemId implements AggregateId<FavouriteItemId> {
     }
 
     public FavouriteItemId(String value) {
-        this.value = Condition.notBlank(value);
+        this.value = Condition.notBlank(value).toLowerCase();
     }
 
     @Override
