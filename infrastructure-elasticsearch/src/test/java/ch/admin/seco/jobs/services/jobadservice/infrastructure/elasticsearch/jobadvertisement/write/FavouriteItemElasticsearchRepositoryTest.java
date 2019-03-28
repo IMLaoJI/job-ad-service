@@ -6,15 +6,12 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
-import org.elasticsearch.client.RestClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.io.IOException;
 
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
@@ -32,15 +29,11 @@ public class FavouriteItemElasticsearchRepositoryTest {
     @Autowired
     private JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository;
 
-    @Autowired
-    private RestClient restClient;
-
     @Before
-    public void setUp() throws IOException {
+    public void setUp() {
         deleteAllParentAndChildren();
     }
 
-    // Was only able to delete the parent and children by using the _delete_by_query method
     private void deleteAllParentAndChildren() {
         this.favouriteItemElasticsearchRepository.deleteAll();
         this.jobAdvertisementElasticsearchRepository.deleteAll();
