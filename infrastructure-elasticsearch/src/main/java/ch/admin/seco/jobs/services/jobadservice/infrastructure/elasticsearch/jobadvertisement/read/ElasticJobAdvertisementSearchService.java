@@ -145,13 +145,13 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
             SearchHits searchHits = response.getHits();
             Iterator<SearchHit> searchHitIterator = searchHits.iterator();
 
-            List<JobAdvertisementDto> highLigtedResults = searchResults.getContent().stream()
+            List<JobAdvertisementDto> highLightedResults = searchResults.getContent().stream()
                     .map(JobAdvertisementDocument::getJobAdvertisement)
                     .map(JobAdvertisementDto::toDto)
                     .map(jobAdvertisementDto -> highlightFields(jobAdvertisementDto, searchHitIterator.next().getHighlightFields()))
                     .collect(Collectors.toList());
 
-            return new AggregatedPageImpl<>(highLigtedResults, pageable, searchHits.totalHits, searchResults.getAggregations(), searchResults.getScrollId());
+            return new AggregatedPageImpl<>(highLightedResults, pageable, searchHits.totalHits, searchResults.getAggregations(), searchResults.getScrollId());
         });
     }
 

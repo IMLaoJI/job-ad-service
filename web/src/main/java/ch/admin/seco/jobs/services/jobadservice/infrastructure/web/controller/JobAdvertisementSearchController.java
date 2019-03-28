@@ -51,7 +51,6 @@ public class JobAdvertisementSearchController {
         return new ResponseEntity<>(resultPage.getContent(), headers, HttpStatus.OK);
     }
 
-
     @PostMapping("/_search/managed")
     @Timed
     public ResponseEntity<List<JobAdvertisementDto>> searchManagedJobAds(
