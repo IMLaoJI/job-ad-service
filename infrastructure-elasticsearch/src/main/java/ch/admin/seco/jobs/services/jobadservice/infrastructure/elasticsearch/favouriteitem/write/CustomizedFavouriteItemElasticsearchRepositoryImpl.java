@@ -7,6 +7,7 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.join.query.HasParentQueryBuilder;
+import org.elasticsearch.join.query.ParentIdQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
@@ -55,18 +56,42 @@ public class CustomizedFavouriteItemElasticsearchRepositoryImpl implements Custo
         }
     }
 
+    /**
+     * GET job-advertisements/_search
+     * {
+     * "query": {
+     * "bool": {
+     * "must": [
+     * {
+     * "parent_id": {
+     * "type": "favouriteItem",
+     * "id": "job01"
+     * }
+     * },
+     * {
+     * "match": {
+     * "id": {
+     * "query": "child-01"
+     * }
+     * }
+     * }
+     * ]
+     * }
+     * }
+     * }
+     *
+     * @param jobAdvertisementId
+     * @param favouriteItemId
+     * @return
+     */
     @Override
     public Optional<FavouriteItemDocument> findByIdAndParent(String jobAdvertisementId, String favouriteItemId) {
-        BoolQueryBuilder boolQueryJob = boolQuery().should(matchQuery("id", jobAdvertisementId));
-
-        BoolQueryBuilder boolQuery = boolQuery()
-                .must(new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, boolQueryJob, true))
-                .must(QueryBuilders.matchQuery("favouriteItem.id", favouriteItemId));
-
+        BoolQueryBuilder parentId = boolQuery()
+                .must(new ParentIdQueryBuilder("favouriteItem", jobAdvertisementId))
+                .must(QueryBuilders.matchQuery("id", favouriteItemId));
         SearchQuery searchFavouriteQuery = new NativeSearchQueryBuilder()
-                .withQuery(boolQuery)
+                .withQuery(parentId)
                 .build();
-
         List<FavouriteItemDocument> favouriteItemDocumentList = this.elasticsearchTemplate.queryForList(searchFavouriteQuery, FavouriteItemDocument.class);
         if (favouriteItemDocumentList.size() == 0) {
             return Optional.empty();
