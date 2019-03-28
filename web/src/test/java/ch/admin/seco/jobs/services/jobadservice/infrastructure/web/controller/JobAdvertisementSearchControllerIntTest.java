@@ -1415,7 +1415,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     private void indexChildDocument(FavouriteItem favouriteItem) {
-        this.favouriteItemElasticsearchRepository.customSave(new FavouriteItemDocument(favouriteItem));
+        this.favouriteItemElasticsearchRepository.save(new FavouriteItemDocument(favouriteItem));
     }
 
     private FavouriteItem createFavouriteItem(String favouriteItemId, JobAdvertisementId id, String ownerId) {

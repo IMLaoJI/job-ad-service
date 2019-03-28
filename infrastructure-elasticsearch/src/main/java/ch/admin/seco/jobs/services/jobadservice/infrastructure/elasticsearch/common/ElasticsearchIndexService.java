@@ -14,7 +14,6 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -77,18 +76,70 @@ public class ElasticsearchIndexService {
     @Async
     @Transactional(readOnly = true)
     public void reindexAll() {
-        reindexForClass(FavouriteItemDocument.class, favouriteItemRepository, favouriteItemElasticsearchRepository, FavouriteItemDocument::new, "streamAll");
-        reindexForClass(JobAdvertisementDocument.class, jobAdvertisementRepository, jobAdvertisementElasticsearchRepository, JobAdvertisementDocument::new, "streamAll");
-        reindexForClass(ApiUserDocument.class, apiUserRepository, apiUserElasticsearchRepository, ApiUserDocument::new, "streamAll");
+
+        reindexForClass(
+                JobAdvertisementDocument.class,
+                jobAdvertisementRepository,
+                new ElassticRepositoryAdapter<JobAdvertisementDocument>() {
+                    @Override
+                    public long count() {
+                        return jobAdvertisementElasticsearchRepository.count();
+                    }
+
+                    @Override
+                    public Iterable<JobAdvertisementDocument> saveAll(Iterable<JobAdvertisementDocument> entities) {
+                        return jobAdvertisementElasticsearchRepository.saveAll(entities);
+                    }
+                },
+                JobAdvertisementDocument::new,
+                "streamAll"
+        );
+
+        reindexForClass(
+                ApiUserDocument.class,
+                apiUserRepository,
+                new ElassticRepositoryAdapter<ApiUserDocument>() {
+                    @Override
+                    public long count() {
+                        return apiUserElasticsearchRepository.count();
+                    }
+
+                    @Override
+                    public Iterable<ApiUserDocument> saveAll(Iterable<ApiUserDocument> entities) {
+                        return apiUserElasticsearchRepository.saveAll(entities);
+                    }
+                },
+                ApiUserDocument::new,
+                "streamAll"
+        );
+
+        // TODO REINDEX FavouriteItemDocument
+        reindexForClass(
+                FavouriteItemDocument.class,
+                favouriteItemRepository,
+                new ElassticRepositoryAdapter<FavouriteItemDocument>() {
+                    @Override
+                    public long count() {
+                        return favouriteItemElasticsearchRepository.count();
+                    }
+
+                    @Override
+                    public Iterable<FavouriteItemDocument> saveAll(Iterable<FavouriteItemDocument> entities) {
+                        return favouriteItemElasticsearchRepository.saveAll(entities);
+                    }
+                },
+                FavouriteItemDocument::new,
+                "streamAll"
+        );
 
         log.info("Elasticsearch: Successfully performed reindexing");
     }
 
     @SuppressWarnings("unchecked")
-    <JPA, ELASTIC, ID extends Serializable, DOCUMENTID extends Serializable> void reindexForClass(
+    <JPA, ELASTIC, ID extends Serializable> void reindexForClass(
             Class<ELASTIC> documentClass,
             JpaRepository<JPA, ID> jpaRepository,
-            ElasticsearchRepository<ELASTIC, DOCUMENTID> elasticsearchRepository,
+            ElassticRepositoryAdapter<ELASTIC> elasticsearchRepository,
             Function<JPA, ELASTIC> entityToDocumentMapper,
             String methodName) {
         elasticsearchTemplate.deleteIndex(documentClass);
@@ -102,9 +153,9 @@ public class ElasticsearchIndexService {
         log.info("Elasticsearch: Indexed all rows for " + documentClass.getSimpleName());
     }
 
-    private <JPA, ELASTIC, ID extends Serializable, DOCUMENTID extends Serializable> void reindexWithStream(
+    private <JPA, ELASTIC, ID extends Serializable> void reindexWithStream(
             JpaRepository<JPA, ID> jpaRepository,
-            ElasticsearchRepository<ELASTIC, DOCUMENTID> elasticsearchRepository,
+            ElassticRepositoryAdapter<ELASTIC> elasticsearchRepository,
             Function<JPA, ELASTIC> entityToDocumentMapper, Class entityClass, String methodName) {
 
         try {
@@ -138,4 +189,12 @@ public class ElasticsearchIndexService {
         entityManager.clear();
     }
 
+
+    interface ElassticRepositoryAdapter<S> {
+
+        long count();
+
+        Iterable<S> saveAll(Iterable<S> entities);
+
+    }
 }

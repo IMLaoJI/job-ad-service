@@ -44,7 +44,7 @@ public class IndexerEventListener {
         Optional<FavouriteItem> favouriteItemOptional = this.favouriteItemRepository.findById(event.getAggregateId());
         if (favouriteItemOptional.isPresent()) {
             FavouriteItem favouriteItem = favouriteItemOptional.get();
-            this.favouriteItemElasticsearchRepository.customSave(new FavouriteItemDocument(favouriteItem));
+            this.favouriteItemElasticsearchRepository.save(new FavouriteItemDocument(favouriteItem));
         } else {
             LOG.warn("FavouriteItem not found for the given id: {}", event.getAggregateId());
         }

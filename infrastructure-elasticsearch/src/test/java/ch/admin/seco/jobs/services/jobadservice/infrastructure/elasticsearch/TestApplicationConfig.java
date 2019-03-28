@@ -30,7 +30,6 @@ public class TestApplicationConfig {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.findAndRegisterModules();
-        // TODO
         return objectMapper;
     }
 }
