@@ -1,12 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.read;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdveristementSearchResult;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchService;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ManagedJobAdSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.PeaJobAdvertisementSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCode;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.RadiusSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.*;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchResult;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
@@ -162,7 +157,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
     @Override
     // TODO Pre-authorization-checks
-    public Page<JobAdveristementSearchResult> findByUserId(String ownerId, int page, int size) {
+    public Page<JobAdvertisementSearchResult> findByUserId(String ownerId, int page, int size) {
         return Page.empty();
     }
 
