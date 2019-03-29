@@ -69,7 +69,7 @@ public class FavouriteItemElasticsearchRepositoryImpl implements FavouriteItemEl
     }
 
     @Override
-    public Optional<FavouriteItemDocument> findByIdAndParent(String jobAdvertisementId, String favouriteItemId) {
+    public Optional<FavouriteItemDocument> findById(String jobAdvertisementId, String favouriteItemId) {
         BoolQueryBuilder parentId = boolQuery()
                 .must(new ParentIdQueryBuilder(FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME, jobAdvertisementId))
                 .must(QueryBuilders.termQuery("_id", favouriteItemId));

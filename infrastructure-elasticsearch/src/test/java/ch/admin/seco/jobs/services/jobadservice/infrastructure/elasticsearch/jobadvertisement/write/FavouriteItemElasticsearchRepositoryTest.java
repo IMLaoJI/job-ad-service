@@ -55,11 +55,11 @@ public class FavouriteItemElasticsearchRepositoryTest {
         await().until(() -> favouriteItemElasticsearchRepository.count() >= 4);
 
         // then
-        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child-01")).isPresent();
-        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child-02")).isPresent();
-        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child-03")).isPresent();
-        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job01.id().getValue(), "child-04")).isNotPresent();
-        assertThat(this.favouriteItemElasticsearchRepository.findByIdAndParent(job02.id().getValue(), "child-04")).isPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findById(job01.id().getValue(), "child-01")).isPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findById(job01.id().getValue(), "child-02")).isPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findById(job01.id().getValue(), "child-03")).isPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findById(job01.id().getValue(), "child-04")).isNotPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findById(job02.id().getValue(), "child-04")).isPresent();
     }
 
     @Test

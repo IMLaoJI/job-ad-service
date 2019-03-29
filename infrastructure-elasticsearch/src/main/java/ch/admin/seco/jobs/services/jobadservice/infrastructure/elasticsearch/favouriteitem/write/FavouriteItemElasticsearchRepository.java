@@ -9,7 +9,7 @@ public interface FavouriteItemElasticsearchRepository {
 
     List<FavouriteItemDocument> findByParent(String jobAdvertisementId);
 
-    Optional<FavouriteItemDocument> findByIdAndParent(String jobAdvertisementId, String favouriteItemId);
+    Optional<FavouriteItemDocument> findById(String jobAdvertisementId, String favouriteItemId);
 
     List<FavouriteItemDocument> findByOwnerAndParentIds(List<String> jobAdvertisementId, String ownerId);
 
