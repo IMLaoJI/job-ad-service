@@ -14,5 +14,7 @@ public @interface WithMockCustomUser {
 
     String userExtId() default "junit";
 
+    String companyId() default "";
+
     Role[] roles() default {Role.USER};
 }

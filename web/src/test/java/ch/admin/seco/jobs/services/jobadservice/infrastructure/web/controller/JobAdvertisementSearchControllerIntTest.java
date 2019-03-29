@@ -1,39 +1,29 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
-import ch.admin.seco.jobs.services.jobadservice.Application;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.GeoPointDto;
-import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.read.ElasticJobAdvertisementSearchService;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
-import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import reactor.util.function.Tuples;
 
 import java.util.List;
@@ -54,14 +44,12 @@ import static java.time.LocalDate.now;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.CombinableMatcher.both;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 @ActiveProfiles("dev")
-@WithJobSeeker
 public class JobAdvertisementSearchControllerIntTest {
 
     private static final String DEFAULT_AVAM_CODE = "11111";
@@ -95,27 +83,6 @@ public class JobAdvertisementSearchControllerIntTest {
     private FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository;
 
     @Autowired
-    private ElasticsearchTemplate elasticsearchTemplate;
-
-    @Autowired
-    private ElasticsearchConfiguration.CustomEntityMapper customEntityMapper;
-
-    @Autowired
-    private FormattingConversionService formattingConversionService;
-
-    @Autowired
-    private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
-
-    @Autowired
-    private ExceptionTranslator exceptionTranslator;
-
-    @Autowired
-    private MappingJackson2HttpMessageConverter jacksonMessageConverter;
-
-    private JobAdvertisementSearchService jobAdvertisementSearchService;
-
-    private CurrentUserContext mockCurrentUserContext;
-
     private MockMvc mockMvc;
 
     @Before
@@ -123,23 +90,6 @@ public class JobAdvertisementSearchControllerIntTest {
         this.favouriteItemElasticsearchRepository.deleteAll();
         this.jobAdvertisementElasticsearchRepository.deleteAll();
         this.jobAdvertisementJpaRepository.deleteAll();
-        this.mockCurrentUserContext = mock(CurrentUserContext.class);
-
-        this.jobAdvertisementSearchService = new ElasticJobAdvertisementSearchService(mockCurrentUserContext,
-                this.elasticsearchTemplate,
-                this.customEntityMapper,
-                this.favouriteItemElasticsearchRepository
-        );
-
-        JobAdvertisementSearchController jobAdvertisementSearchController
-                = new JobAdvertisementSearchController(jobAdvertisementSearchService);
-
-        this.mockMvc = MockMvcBuilders.standaloneSetup(jobAdvertisementSearchController)
-                .setConversionService(formattingConversionService)
-                .setCustomArgumentResolvers(pageableArgumentResolver)
-                .setControllerAdvice(exceptionTranslator)
-                .setMessageConverters(jacksonMessageConverter)
-                .build();
     }
 
     @Test
@@ -602,9 +552,9 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithJobSeeker
     public void shouldFilterByDisplayRestricted() throws Exception {
         // GIVEN
-        when(this.mockCurrentUserContext.hasAnyRoles(ArgumentMatchers.any())).thenReturn(true);
         index(createJob(job01.id()));
         index(createRestrictedJob(job02.id()));
         index(createJob(job03.id()));
@@ -629,9 +579,9 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithJobSeeker
     public void shouldFilterByPublicationForJobSeeker() throws Exception {
         // GIVEN
-        when(this.mockCurrentUserContext.hasAnyRoles(ArgumentMatchers.any())).thenReturn(true);
         //-------------------------------------------------------------------------------publicDisplay  restrictedDisplay
         index(createJobWithoutPublicDisplayAndWithoutRestrictedDisplay(job01.id()));   //0 0
         index(createJobWithoutPublicDisplayAndWithRestrictedDisplay(job02.id()));      //0 1
@@ -713,10 +663,10 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithJobSeeker
     public void shouldShowRestrictedJobsForJobSeekers() throws Exception {
         // GIVEN
         //-----------------------------------------------------------------------------------publicDisplay restrictedDisplay status
-        when(this.mockCurrentUserContext.hasAnyRoles(ArgumentMatchers.any())).thenReturn(true);
         index(createJob(job01.id()));                                                           //1 0 PUBLISHED_PUBLIC
         index(createRestrictedJob(job02.id()));                                                 //1 0 PUBLISHED_RESTRICTED
         index(createRestrictedJobWithoutPublicDisplayAndWithoutRestrictedDisplay(job03.id()));  //0 0 PUBLISHED_RESTRICTED
@@ -898,6 +848,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdsReturnBadRequestIfEmptyRequest() throws Exception {
         // GIVEN
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest();
@@ -913,7 +864,7 @@ public class JobAdvertisementSearchControllerIntTest {
     public void shouldSearchManagedJobAdsReturnBadRequestIfCurrentUserIsNotMemberOfCompany() throws Exception {
         // GIVEN
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId");
+                .setCompanyId(WithCompanyUser.USER_ID);
 
         // WHEN
         post(request, API_JOB_ADVERTISEMENTS + "/_search/managed")
@@ -922,6 +873,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdsBeFilteredByPublicationStartDate() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
@@ -933,7 +885,7 @@ public class JobAdvertisementSearchControllerIntTest {
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId")
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID)
                 .setOnlineSinceDays(10);
 
         // WHEN
@@ -944,6 +896,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdsBeFilteredByOwnerUserId() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
@@ -955,7 +908,7 @@ public class JobAdvertisementSearchControllerIntTest {
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId")
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID)
                 .setOwnerUserId("OwnerUserId");
 
         // WHEN
@@ -966,18 +919,19 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdsBeFilteredByOwnerCompanyId() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
                 JobAdvertisementFixture.of(job01.id()),
                 JobAdvertisementFixture.of(job02.id())
                         .setOwner(
-                                OwnerFixture.of(job02.id()).setCompanyId("OwnerCompanyId").build()
+                                OwnerFixture.of(job02.id()).setCompanyId(WithCompanyUser.USER_COMPANY_ID).build()
                         )
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("OwnerCompanyId");
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID);
 
         // WHEN
         post(request, API_JOB_ADVERTISEMENTS + "/_search/managed")
@@ -987,6 +941,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdsBeFilteredByStatus() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
@@ -995,7 +950,7 @@ public class JobAdvertisementSearchControllerIntTest {
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId").setState(REJECTED);
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID).setState(REJECTED);
 
         // WHEN
         post(request, API_JOB_ADVERTISEMENTS + "/_search/managed")
@@ -1005,6 +960,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdBeSearchedByKeywords() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
@@ -1030,7 +986,7 @@ public class JobAdvertisementSearchControllerIntTest {
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId")
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID)
                 .setKeywordsText(String.join(" ",
                         "OwnerUserDisplayName", "Adli", "JobDescT",
                         "test", "StellennummerEgov"));
@@ -1050,6 +1006,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdBeSearchedAndSortedByDateAndCreatedTime() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
@@ -1095,7 +1052,7 @@ public class JobAdvertisementSearchControllerIntTest {
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId");
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID);
 
         // WHEN SORTED ASCENDING
         ResultActions resultActions = mockMvc.perform(
@@ -1133,6 +1090,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdBeSearchedAndSortedByTitle() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
@@ -1155,7 +1113,7 @@ public class JobAdvertisementSearchControllerIntTest {
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId")
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID)
                 .setKeywordsText("desc");
 
         // WHEN
@@ -1176,6 +1134,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdBeSearchedNotSortedDesByTitleIfMultipleDescriptions() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
@@ -1202,7 +1161,7 @@ public class JobAdvertisementSearchControllerIntTest {
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId")
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID)
                 .setKeywordsText("desc");
 
         // WHEN
@@ -1223,6 +1182,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdBeSortedDescByCity() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
@@ -1250,7 +1210,7 @@ public class JobAdvertisementSearchControllerIntTest {
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId");
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID);
 
         // WHEN
         ResultActions resultActions = mockMvc.perform(
@@ -1272,6 +1232,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdBeSearchedAndSortedDescByCity() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
@@ -1294,7 +1255,7 @@ public class JobAdvertisementSearchControllerIntTest {
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId")
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID)
                 .setKeywordsText("Zur");
 
         // WHEN
