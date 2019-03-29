@@ -185,6 +185,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
             Map<String, FavouriteItemDto> favouriteItemsLookupMap = findFavouriteItemsMappedByJobAdId(extractJobAdIds(jobAdvertisements));
             List<JobAdvertisementSearchResult> jobAdvertisementSearchResults = mapToJobAdvertisementSearchResults(jobAdvertisements, favouriteItemsLookupMap);
+
             return new AggregatedPageImpl<>(jobAdvertisementSearchResults, pageable, searchHits.totalHits, searchResults.getAggregations(), searchResults.getScrollId());
         });
     }

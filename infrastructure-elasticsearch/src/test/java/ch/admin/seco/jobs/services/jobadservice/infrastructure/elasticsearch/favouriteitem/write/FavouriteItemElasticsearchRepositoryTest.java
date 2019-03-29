@@ -170,7 +170,6 @@ public class FavouriteItemElasticsearchRepositoryTest {
         index(createJob(job04.id()));
         index(createJob(job05.id()));
 
-
         indexChildDocument(createFavouriteItem("child-01", job01.id(), "John"));
         indexChildDocument(createFavouriteItem("child-02", job01.id(), "Emma"));
         indexChildDocument(createFavouriteItem("child-03", job02.id(), "John"));
@@ -178,6 +177,7 @@ public class FavouriteItemElasticsearchRepositoryTest {
 
         await().until(() -> favouriteItemElasticsearchRepository.count() >= 4);
 
+        // then
         assertThat(this.favouriteItemElasticsearchRepository.findByOwnerId("John")).hasSize(2);
 
     }
