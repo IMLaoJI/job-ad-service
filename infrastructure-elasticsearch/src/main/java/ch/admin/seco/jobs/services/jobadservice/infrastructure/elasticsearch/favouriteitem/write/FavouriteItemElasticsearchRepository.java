@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.InnerHitBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
@@ -99,7 +100,7 @@ public class FavouriteItemElasticsearchRepository {
 
     public List<FavouriteItemDocument> findByOwnerId(String ownerId) {
         BoolQueryBuilder boolQuery = boolQuery()
-                .must(new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, matchAllQuery(), true))
+                .must(new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, matchAllQuery(), true).innerHit(new InnerHitBuilder()))
                 .must(QueryBuilders.termQuery("favouriteItem.ownerId", ownerId.toLowerCase()));
         SearchQuery searchFavouriteQuery = new NativeSearchQueryBuilder()
                 .withQuery(boolQuery)
