@@ -106,7 +106,7 @@ public class FavouriteItemElasticsearchRepository {
                         .source(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT)
                         .refresh(true)
                         .get();
-        // TODO LOG ME
+        LOG.info("{} Index(es) deleted for parent jobAdId: {}.", response.getDeleted(), jobAdvertisementId);
         System.out.println(response.getDeleted());
     }
 
@@ -118,7 +118,7 @@ public class FavouriteItemElasticsearchRepository {
                 .setIndex(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT)
                 .setType(TYPE_DOC)
                 .get();
-        // TODO LOG ME
+        LOG.info("Index deleted for id: {} and parent jobAdId: {}.", favouriteItemId, jobAdvertisementId);
         System.out.println(response);
     }
 
@@ -136,7 +136,7 @@ public class FavouriteItemElasticsearchRepository {
                         .source(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT)
                         .refresh(true)
                         .get();
-        // TODO LOG ME
+        LOG.info("{} Index(es) deleted.", response.getDeleted());
         System.out.println(response.getDeleted());
     }
 
