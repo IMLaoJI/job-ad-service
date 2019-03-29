@@ -97,6 +97,16 @@ public class FavouriteItemElasticsearchRepository {
         return this.elasticsearchTemplate.queryForList(searchFavouriteQuery, FavouriteItemDocument.class);
     }
 
+    public List<FavouriteItemDocument> findByOwnerId(String ownerId) {
+        BoolQueryBuilder boolQuery = boolQuery()
+                .must(new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, matchAllQuery(), true))
+                .must(QueryBuilders.termQuery("favouriteItem.ownerId", ownerId.toLowerCase()));
+        SearchQuery searchFavouriteQuery = new NativeSearchQueryBuilder()
+                .withQuery(boolQuery)
+                .build();
+        return this.elasticsearchTemplate.queryForList(searchFavouriteQuery, FavouriteItemDocument.class);
+    }
+
     public void deleteByParentId(String jobAdvertisementId) {
         BulkByScrollResponse response =
                 DeleteByQueryAction.INSTANCE.newRequestBuilder(this.elasticsearchTemplate.getClient())
