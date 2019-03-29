@@ -2,11 +2,10 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jo
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.*;
-
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvent;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -17,6 +16,8 @@ public class IndexerEventListener {
 	private static Logger LOG = LoggerFactory.getLogger(IndexerEventListener.class);
 
 	private JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository;
+
+	private FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository;
 
 	private JobAdvertisementRepository jobAdvertisementJpaRepository;
 

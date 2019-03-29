@@ -2,6 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.fa
 
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -24,8 +25,7 @@ import java.util.Optional;
 
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.TYPE_DOC;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument.JOB_ADVERTISEMENT_PARENT_RELATION_NAME;
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.elasticsearch.index.query.QueryBuilders.*;
 
 @Repository
 public class FavouriteItemElasticsearchRepositoryImpl implements FavouriteItemElasticsearchRepository {
@@ -99,8 +99,28 @@ public class FavouriteItemElasticsearchRepositoryImpl implements FavouriteItemEl
     }
 
     @Override
-    public void deleteById(String favouriteItemId) {
-        // TODO DELETE WITH PARENT ID
+    public void deleteByParentId(String jobAdvertisementId) {
+        BulkByScrollResponse response =
+                DeleteByQueryAction.INSTANCE.newRequestBuilder(this.elasticsearchTemplate.getClient())
+                        .filter(new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, termQuery("_id", jobAdvertisementId), false))
+                        .source(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT)
+                        .refresh(true)
+                        .get();
+        // TODO LOG ME
+        System.out.println(response.getDeleted());
+    }
+
+    @Override
+    public void deleteById(String jobAdvertisementId, String favouriteItemId) {
+        DeleteResponse response = this.elasticsearchTemplate.getClient()
+                .prepareDelete()
+                .setParent(jobAdvertisementId)
+                .setId(favouriteItemId)
+                .setIndex(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT)
+                .setType(TYPE_DOC)
+                .get();
+        // TODO LOG ME
+        System.out.println(response);
     }
 
     @Override

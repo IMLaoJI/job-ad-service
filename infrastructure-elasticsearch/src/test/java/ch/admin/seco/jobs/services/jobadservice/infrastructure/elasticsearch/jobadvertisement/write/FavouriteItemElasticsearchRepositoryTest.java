@@ -115,6 +115,48 @@ public class FavouriteItemElasticsearchRepositoryTest {
         assertThat(this.favouriteItemElasticsearchRepository.findByParent(job03.id().getValue())).hasSize(0);
     }
 
+    @Test
+    public void testDeleteById() {
+        // given
+        index(createJob(job01.id()));
+        index(createJob(job02.id()));
+
+
+        indexChildDocument(createFavouriteItem("child-01", job01.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-02", job01.id(), "Emma"));
+
+        indexChildDocument(createFavouriteItem("child-03", job02.id(), "Jane"));
+
+        await().until(() -> favouriteItemElasticsearchRepository.count() == 3);
+
+        // when
+        favouriteItemElasticsearchRepository.deleteById(job01.id().getValue(), "child-01");
+
+        // then
+        await().until(() -> favouriteItemElasticsearchRepository.count() == 2);
+    }
+
+    @Test
+    public void testDeleteByParentId() {
+        // given
+        index(createJob(job01.id()));
+        index(createJob(job02.id()));
+
+        indexChildDocument(createFavouriteItem("child-01", job01.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-02", job01.id(), "Emma"));
+
+        indexChildDocument(createFavouriteItem("child-03", job02.id(), "Jane"));
+
+        await().until(() -> favouriteItemElasticsearchRepository.count() >= 3);
+
+        // when
+        favouriteItemElasticsearchRepository.deleteByParentId(job01.id().getValue());
+
+        // then
+        await().until(() -> favouriteItemElasticsearchRepository.count() == 1);
+    }
+
+
     private void index(JobAdvertisement jobAdvertisement) {
         this.jobAdvertisementElasticsearchRepository.save(new JobAdvertisementDocument(jobAdvertisement));
     }

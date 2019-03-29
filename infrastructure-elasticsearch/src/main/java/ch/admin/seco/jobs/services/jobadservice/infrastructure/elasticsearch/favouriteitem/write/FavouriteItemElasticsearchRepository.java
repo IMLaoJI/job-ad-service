@@ -13,7 +13,9 @@ public interface FavouriteItemElasticsearchRepository {
 
     List<FavouriteItemDocument> findByOwnerAndParentIds(List<String> jobAdvertisementId, String ownerId);
 
-    void deleteById(String favouriteItemId);
+    void deleteByParentId(String jobAdvertisementId);
+
+    void deleteById(String jobAdvertisementId, String favouriteItemId);
 
     long count();
 
