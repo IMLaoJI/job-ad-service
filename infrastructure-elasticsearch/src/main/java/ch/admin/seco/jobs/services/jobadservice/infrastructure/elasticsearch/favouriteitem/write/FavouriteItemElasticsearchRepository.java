@@ -16,7 +16,6 @@ import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.data.elasticsearch.core.query.UpdateQuery;
-import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -27,7 +26,6 @@ import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsea
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument.JOB_ADVERTISEMENT_PARENT_RELATION_NAME;
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
-@Repository
 public class FavouriteItemElasticsearchRepository {
 
     private final ElasticsearchTemplate elasticsearchTemplate;

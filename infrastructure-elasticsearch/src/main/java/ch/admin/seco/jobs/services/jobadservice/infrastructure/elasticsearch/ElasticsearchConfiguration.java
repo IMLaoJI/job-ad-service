@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch;
 
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -18,19 +19,30 @@ import java.io.IOException;
 @EnableConfigurationProperties(ElasticsearchProperties.class)
 public class ElasticsearchConfiguration {
 
-    @Bean
-    public ElasticsearchTemplate elasticsearchTemplate(Client client, CustomEntityMapper customEntityMapper) {
-        return new ElasticsearchTemplate(client, customEntityMapper);
+    private final Client client;
+
+    public ElasticsearchConfiguration(Client client) {
+        this.client = client;
     }
 
     @Bean
-    public CustomEntityMapper customEntityMapper(/*ObjectMapper objectMapper*/) {
+    public ElasticsearchTemplate elasticsearchTemplate() {
+        return new ElasticsearchTemplate(client, this.customEntityMapper());
+    }
+
+    @Bean
+    public CustomEntityMapper customEntityMapper() {
         return new CustomEntityMapper(objectMapper());
+    }
+
+    @Bean
+    public FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository() {
+        return new FavouriteItemElasticsearchRepository(this.elasticsearchTemplate(), this.objectMapper());
     }
 
     //todo: Review-> The ExceptionTranslatorIntTest fails if this is a spring bean
     //@Bean
-    public ObjectMapper objectMapper() {
+    private ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
