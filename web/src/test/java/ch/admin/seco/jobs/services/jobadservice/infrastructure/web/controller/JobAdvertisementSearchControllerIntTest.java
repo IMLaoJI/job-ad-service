@@ -926,7 +926,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 JobAdvertisementFixture.of(job01.id()),
                 JobAdvertisementFixture.of(job02.id())
                         .setOwner(
-                                OwnerFixture.of(job02.id()).setCompanyId(WithCompanyUser.USER_COMPANY_ID).build()
+                                OwnerFixture.of(job02.id()).setCompanyId("XXX").build()
                         )
         );
 
