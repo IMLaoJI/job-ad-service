@@ -20,7 +20,7 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
     @Override
     public SecurityContext createSecurityContext(WithMockCustomUser customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        CurrentUser currentUser = this.getCurrentUser(customUser.userId(), customUser.userExtId());
+        CurrentUser currentUser = this.getCurrentUser(customUser.userId(), customUser.userExtId(),customUser.companyId());
         String[] roles = Arrays.stream(customUser.roles())
                 .map(Role::getValue)
                 .toArray(size -> new String[customUser.roles().length]);
@@ -37,11 +37,11 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
         return context;
     }
 
-    private CurrentUser getCurrentUser(String userId, String userExtId) {
+    private CurrentUser getCurrentUser(String userId, String userExtId, String companyId) {
         return new CurrentUser(
                 userId,
                 userExtId,
-                "companyId",
+                companyId,
                 "Junit",
                 "Junit",
                 "junit@example.com",

@@ -1,6 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
-import ch.admin.seco.jobs.services.jobadservice.Application;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItem;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemRepository;
@@ -10,23 +9,19 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors.ExceptionTranslator;
 import org.codehaus.jettison.json.JSONArray;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
-import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Optional;
 
@@ -35,26 +30,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 @ActiveProfiles("dev")
 public class FavouriteItemRestControllerIntTest {
 
     private static final String URL = "/api/favourite-items";
-
-    @Autowired
-    private FavouriteItemRestController favouriteItemRestController;
-
-    @Autowired
-    private FormattingConversionService formattingConversionService;
-
-    @Autowired
-    private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
-
-    @Autowired
-    private ExceptionTranslator exceptionTranslator;
-
-    @Autowired
-    private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
     private JobAdvertisementRepository jobAdvertisementRepository;
@@ -68,17 +49,11 @@ public class FavouriteItemRestControllerIntTest {
     @Autowired
     private FavouriteItemRepository favouriteItemRepository;
 
+    @Autowired
     private MockMvc mockMvc;
 
     @Before
     public void setUp() {
-        this.mockMvc = MockMvcBuilders.standaloneSetup(this.favouriteItemRestController)
-                .setConversionService(this.formattingConversionService)
-                .setCustomArgumentResolvers(this.pageableArgumentResolver)
-                .setControllerAdvice(this.exceptionTranslator)
-                .setMessageConverters(this.jacksonMessageConverter)
-                .build();
-
         this.favouriteItemRepository.deleteAll();
         this.jobAdvertisementRepository.deleteAll();
         this.favouriteItemElasticsearchRepository.deleteAll();
