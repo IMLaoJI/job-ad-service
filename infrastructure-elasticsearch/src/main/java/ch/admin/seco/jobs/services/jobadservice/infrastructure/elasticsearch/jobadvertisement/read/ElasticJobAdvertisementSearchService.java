@@ -12,12 +12,11 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.Ela
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
+import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.unit.DistanceUnit;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.Operator;
-import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.*;
+import org.elasticsearch.join.query.HasChildQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
@@ -47,6 +46,7 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.J
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.TYPE_DOC;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME;
 import static org.apache.commons.lang3.ArrayUtils.*;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -128,28 +128,19 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
             LOG.trace("filter: {}", searchQuery.getFilter());
         }
 
-        return elasticsearchTemplate.query(searchQuery, response -> {
-            AggregatedPage<JobAdvertisementDocument> searchResults = resultsMapper.mapResults(response, JobAdvertisementDocument.class, pageable);
-            SearchHits searchHits = response.getHits();
-            Iterator<SearchHit> searchHitIterator = searchHits.iterator();
-
-            List<JobAdvertisementDto> jobAdvertisements = searchResults.getContent().stream()
-                    .map(JobAdvertisementDocument::getJobAdvertisement)
-                    .map(JobAdvertisementDto::toDto)
-                    .map(jobAdvertisementDto -> highlightFields(jobAdvertisementDto, searchHitIterator.next().getHighlightFields()))
-                    .collect(Collectors.toList());
-
-            Map<String, FavouriteItemDto> favouriteItemsLookupMap = findFavouriteItemsMappedByJobAdId(extractJobAdIds(jobAdvertisements));
-            List<JobAdvertisementSearchResult> jobAdvertisementSearchResults = mapToJobAdvertisementSearchResults(jobAdvertisements, favouriteItemsLookupMap);
-            return new AggregatedPageImpl<>(jobAdvertisementSearchResults, pageable, searchHits.totalHits, searchResults.getAggregations(), searchResults.getScrollId());
-        });
+        return searchQueryResponse(searchQuery, pageable);
     }
 
     @Override
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.matchesCurrentUserId(#ownerId)")
     public Page<JobAdvertisementSearchResult> findFavouriteJobAds(String ownerId, int page, int size) {
-        // search all job ads that I have "favorized"
-        return Page.empty();
+        Pageable pageable = PageRequest.of(page, size);
+        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(new HasChildQueryBuilder(FAVOURITE_ITEM_RELATION_NAME,
+                        QueryBuilders.termQuery("favouriteItem.ownerId", ownerId.toLowerCase()), ScoreMode.None))
+                .build();
+
+        return searchQueryResponse(searchQuery, pageable);
     }
 
     @Override
@@ -178,6 +169,25 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
         }
 
         return elasticsearchTemplate.query(query, response -> extractHighlightedResults(updatedPageable, response));
+    }
+
+    private Page<JobAdvertisementSearchResult> searchQueryResponse(SearchQuery searchQuery, Pageable pageable) {
+        return elasticsearchTemplate.query(searchQuery, response -> {
+            AggregatedPage<JobAdvertisementDocument> searchResults = resultsMapper.mapResults(response, JobAdvertisementDocument.class, pageable);
+            SearchHits searchHits = response.getHits();
+            Iterator<SearchHit> searchHitIterator = searchHits.iterator();
+
+            List<JobAdvertisementDto> jobAdvertisements = searchResults.getContent().stream()
+                    .map(JobAdvertisementDocument::getJobAdvertisement)
+                    .map(JobAdvertisementDto::toDto)
+                    .map(jobAdvertisementDto -> highlightFields(jobAdvertisementDto, searchHitIterator.next().getHighlightFields()))
+                    .collect(Collectors.toList());
+
+            Map<String, FavouriteItemDto> favouriteItemsLookupMap = findFavouriteItemsMappedByJobAdId(extractJobAdIds(jobAdvertisements));
+            List<JobAdvertisementSearchResult> jobAdvertisementSearchResults = mapToJobAdvertisementSearchResults(jobAdvertisements, favouriteItemsLookupMap);
+
+            return new AggregatedPageImpl<>(jobAdvertisementSearchResults, pageable, searchHits.totalHits, searchResults.getAggregations(), searchResults.getScrollId());
+        });
     }
 
     private Map<String, FavouriteItemDto> findFavouriteItemsMappedByJobAdId(List<String> jobAdvertisementIds) {

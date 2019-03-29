@@ -14,7 +14,6 @@ public interface JobAdvertisementSearchService {
 
     Page<JobAdvertisementSearchResult> search(JobAdvertisementSearchRequest jobSearchRequest, int page, int size, JobAdvertisementSearchService.SearchSort sort);
 
-    // TODO implement used for the favorite item widget and the job-ad favorite item page on the logged in user dashboard
     Page<JobAdvertisementSearchResult> findFavouriteJobAds(String ownerId, int page, int size);
 
     Page<JobAdvertisementDto> searchManagedJobAds(ManagedJobAdSearchRequest searchRequest, Pageable pageable);

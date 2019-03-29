@@ -161,6 +161,27 @@ public class FavouriteItemElasticsearchRepositoryTest {
         await().until(() -> favouriteItemElasticsearchRepository.count() == 1);
     }
 
+    @Test
+    public void testFindByOwnerId() {
+        // given
+        index(createJob(job01.id()));
+        index(createJob(job02.id()));
+        index(createJob(job03.id()));
+        index(createJob(job04.id()));
+        index(createJob(job05.id()));
+
+        indexChildDocument(createFavouriteItem("child-01", job01.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-02", job01.id(), "Emma"));
+        indexChildDocument(createFavouriteItem("child-03", job02.id(), "John"));
+        indexChildDocument(createFavouriteItem("child-04", job02.id(), "Jane"));
+
+        await().until(() -> favouriteItemElasticsearchRepository.count() >= 4);
+
+        // then
+        assertThat(this.favouriteItemElasticsearchRepository.findByOwnerId("John")).hasSize(2);
+
+    }
+
 
     private void index(JobAdvertisement jobAdvertisement) {
         this.jobAdvertisementElasticsearchRepository.save(new JobAdvertisementDocument(jobAdvertisement));
