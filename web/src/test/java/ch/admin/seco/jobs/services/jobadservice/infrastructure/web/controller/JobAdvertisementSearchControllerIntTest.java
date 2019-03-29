@@ -34,9 +34,7 @@ import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.elasticsearch.core.DefaultResultMapper;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.core.ResultsMapper;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -139,8 +137,6 @@ public class JobAdvertisementSearchControllerIntTest {
 
     private JobAdvertisementSearchService jobAdvertisementSearchService;
 
-    private ResultsMapper resultsMapper;
-
     private CurrentUserContext mockCurrentUserContext;
 
     private MockMvc mockMvc;
@@ -158,8 +154,6 @@ public class JobAdvertisementSearchControllerIntTest {
                 this.customEntityMapper,
                 this.jobAdvertisementElasticsearchRepository
         );
-
-        this.resultsMapper = new DefaultResultMapper(elasticsearchTemplate.getElasticsearchConverter().getMappingContext(), customEntityMapper);
 
         JobAdvertisementSearchController jobAdvertisementSearchController
                 = new JobAdvertisementSearchController(jobAdvertisementSearchService);
