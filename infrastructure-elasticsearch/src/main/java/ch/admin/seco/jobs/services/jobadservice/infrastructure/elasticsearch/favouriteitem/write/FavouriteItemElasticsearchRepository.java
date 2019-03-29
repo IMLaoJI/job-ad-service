@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.TYPE_DOC;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument.JOB_ADVERTISEMENT_PARENT_RELATION_NAME;
@@ -67,7 +68,7 @@ public class FavouriteItemElasticsearchRepository {
     public Optional<FavouriteItemDocument> findById(String jobAdvertisementId, String favouriteItemId) {
         BoolQueryBuilder parentId = boolQuery()
                 .must(new ParentIdQueryBuilder(FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME, jobAdvertisementId))
-                .must(QueryBuilders.termQuery("_id", favouriteItemId));
+                .must(QueryBuilders.termQuery("_id", favouriteItemId.toLowerCase()));
         SearchQuery searchFavouriteQuery = new NativeSearchQueryBuilder()
                 .withQuery(parentId)
                 .build();
@@ -95,7 +96,7 @@ public class FavouriteItemElasticsearchRepository {
     public void deleteByParentId(String jobAdvertisementId) {
         BulkByScrollResponse response =
                 DeleteByQueryAction.INSTANCE.newRequestBuilder(this.elasticsearchTemplate.getClient())
-                        .filter(new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, termQuery("_id", jobAdvertisementId), false))
+                        .filter(new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, termQuery("_id", jobAdvertisementId.toLowerCase()), false))
                         .source(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT)
                         .refresh(true)
                         .get();
@@ -140,6 +141,8 @@ public class FavouriteItemElasticsearchRepository {
     }
 
     private QueryBuilder matchesJobAdvertisementIds(List<String> jobAdvertisementIds) {
-        return QueryBuilders.termsQuery("_id", jobAdvertisementIds.toArray(new String[0]));
+        return QueryBuilders.termsQuery("_id", jobAdvertisementIds.stream()
+                .map(String::toLowerCase)
+                .collect(Collectors.toList()));
     }
 }
