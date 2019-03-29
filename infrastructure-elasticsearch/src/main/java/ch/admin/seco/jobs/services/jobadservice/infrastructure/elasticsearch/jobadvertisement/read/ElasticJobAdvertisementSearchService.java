@@ -128,7 +128,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
             LOG.trace("filter: {}", searchQuery.getFilter());
         }
 
-        return searchQueryResponse(searchQuery, pageable);
+        return elasticsearchTemplate.query(searchQuery, response -> extractSearchResult(pageable, response));
     }
 
     @Override
@@ -140,7 +140,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
                         QueryBuilders.termQuery("favouriteItem.ownerId", ownerId.toLowerCase()), ScoreMode.None))
                 .build();
 
-        return searchQueryResponse(searchQuery, pageable);
+        return elasticsearchTemplate.query(searchQuery, response -> extractSearchResult(pageable, response));
     }
 
     @Override
@@ -171,23 +171,21 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
         return elasticsearchTemplate.query(query, response -> extractHighlightedResults(updatedPageable, response));
     }
 
-    private Page<JobAdvertisementSearchResult> searchQueryResponse(SearchQuery searchQuery, Pageable pageable) {
-        return elasticsearchTemplate.query(searchQuery, response -> {
-            AggregatedPage<JobAdvertisementDocument> searchResults = resultsMapper.mapResults(response, JobAdvertisementDocument.class, pageable);
-            SearchHits searchHits = response.getHits();
-            Iterator<SearchHit> searchHitIterator = searchHits.iterator();
+    private Page<JobAdvertisementSearchResult> extractSearchResult(Pageable pageable, SearchResponse response) {
+        AggregatedPage<JobAdvertisementDocument> searchResults = resultsMapper.mapResults(response, JobAdvertisementDocument.class, pageable);
+        SearchHits searchHits = response.getHits();
+        Iterator<SearchHit> searchHitIterator = searchHits.iterator();
 
-            List<JobAdvertisementDto> jobAdvertisements = searchResults.getContent().stream()
-                    .map(JobAdvertisementDocument::getJobAdvertisement)
-                    .map(JobAdvertisementDto::toDto)
-                    .map(jobAdvertisementDto -> highlightFields(jobAdvertisementDto, searchHitIterator.next().getHighlightFields()))
-                    .collect(Collectors.toList());
+        List<JobAdvertisementDto> jobAdvertisements = searchResults.getContent().stream()
+                .map(JobAdvertisementDocument::getJobAdvertisement)
+                .map(JobAdvertisementDto::toDto)
+                .map(jobAdvertisementDto -> highlightFields(jobAdvertisementDto, searchHitIterator.next().getHighlightFields()))
+                .collect(Collectors.toList());
 
-            Map<String, FavouriteItemDto> favouriteItemsLookupMap = findFavouriteItemsMappedByJobAdId(extractJobAdIds(jobAdvertisements));
-            List<JobAdvertisementSearchResult> jobAdvertisementSearchResults = mapToJobAdvertisementSearchResults(jobAdvertisements, favouriteItemsLookupMap);
+        Map<String, FavouriteItemDto> favouriteItemsLookupMap = findFavouriteItemsMappedByJobAdId(extractJobAdIds(jobAdvertisements));
+        List<JobAdvertisementSearchResult> jobAdvertisementSearchResults = mapToJobAdvertisementSearchResults(jobAdvertisements, favouriteItemsLookupMap);
 
-            return new AggregatedPageImpl<>(jobAdvertisementSearchResults, pageable, searchHits.totalHits, searchResults.getAggregations(), searchResults.getScrollId());
-        });
+        return new AggregatedPageImpl<>(jobAdvertisementSearchResults, pageable, searchHits.totalHits, searchResults.getAggregations(), searchResults.getScrollId());
     }
 
     private Map<String, FavouriteItemDto> findFavouriteItemsMappedByJobAdId(List<String> jobAdvertisementIds) {
