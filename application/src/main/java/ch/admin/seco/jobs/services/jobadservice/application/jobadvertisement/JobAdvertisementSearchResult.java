@@ -3,32 +3,25 @@ package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.FavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
 
-import java.util.List;
-
 public class JobAdvertisementSearchResult {
 
-    private JobAdvertisementDto jobAdvertisementDto;
+    private JobAdvertisementDto jobAdvertisement;
 
-    private FavouriteItemDto favouriteItemDto;
+    private FavouriteItemDto favouriteItem;
 
-    public JobAdvertisementSearchResult(JobAdvertisementDto jobAdvertisementDto, FavouriteItemDto favouriteItemDto) {
-        this.jobAdvertisementDto = jobAdvertisementDto;
-        this.favouriteItemDto = favouriteItemDto;
-    }
-    public static JobAdvertisementSearchResult mapToSearchResult(
-            JobAdvertisementDto jobAdvertisementDto, List<FavouriteItemDto> favouriteItemDtoList) {
-
-        // TODO different approach?
-        return new JobAdvertisementSearchResult(jobAdvertisementDto, favouriteItemDtoList.stream()
-                .filter(favItem -> favItem.getJobAdvertisementId().equals(jobAdvertisementDto.getId()))
-                .findFirst().orElse(null));
+    public JobAdvertisementSearchResult(JobAdvertisementDto jobAdvertisement, FavouriteItemDto favouriteItem) {
+        this.jobAdvertisement = jobAdvertisement;
+        this.favouriteItem = favouriteItem;
     }
 
-    public JobAdvertisementDto getJobAdvertisementDto() {
-        return jobAdvertisementDto;
+    private JobAdvertisementSearchResult() {
     }
 
-    public FavouriteItemDto getFavouriteItemDto() {
-        return favouriteItemDto;
+    public JobAdvertisementDto getJobAdvertisement() {
+        return jobAdvertisement;
+    }
+
+    public FavouriteItemDto getFavouriteItem() {
+        return favouriteItem;
     }
 }

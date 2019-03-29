@@ -1,12 +1,12 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchResult;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ManagedJobAdSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.read.ElasticJobAdvertisementSearchService;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchService;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ManagedJobAdSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PaginationUtil;
 import io.micrometer.core.annotation.Timed;
 import org.jsoup.Jsoup;
@@ -72,7 +72,7 @@ public class JobAdvertisementSearchController {
     }
 
     private JobAdvertisementSearchResult sanitizeJobDescription(JobAdvertisementSearchResult searchResult) {
-        for (JobDescriptionDto jobDescriptionDto : searchResult.getJobAdvertisementDto().getJobContent().getJobDescriptions()) {
+        for (JobDescriptionDto jobDescriptionDto : searchResult.getJobAdvertisement().getJobContent().getJobDescriptions()) {
             String sanitizedDescription = "";
             if (hasText(jobDescriptionDto.getDescription())) {
                 sanitizedDescription = Jsoup.clean(

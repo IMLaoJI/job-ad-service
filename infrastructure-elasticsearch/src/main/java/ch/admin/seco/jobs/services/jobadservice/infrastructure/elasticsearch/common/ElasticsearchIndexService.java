@@ -76,11 +76,10 @@ public class ElasticsearchIndexService {
     @Async
     @Transactional(readOnly = true)
     public void reindexAll() {
-
         reindexForClass(
                 JobAdvertisementDocument.class,
                 jobAdvertisementRepository,
-                new ElassticRepositoryAdapter<JobAdvertisementDocument>() {
+                new ElasticRepositoryAdapter<JobAdvertisementDocument>() {
                     @Override
                     public long count() {
                         return jobAdvertisementElasticsearchRepository.count();
@@ -98,7 +97,7 @@ public class ElasticsearchIndexService {
         reindexForClass(
                 ApiUserDocument.class,
                 apiUserRepository,
-                new ElassticRepositoryAdapter<ApiUserDocument>() {
+                new ElasticRepositoryAdapter<ApiUserDocument>() {
                     @Override
                     public long count() {
                         return apiUserElasticsearchRepository.count();
@@ -113,11 +112,10 @@ public class ElasticsearchIndexService {
                 "streamAll"
         );
 
-        // TODO REINDEX FavouriteItemDocument
         reindexForClass(
                 FavouriteItemDocument.class,
                 favouriteItemRepository,
-                new ElassticRepositoryAdapter<FavouriteItemDocument>() {
+                new ElasticRepositoryAdapter<FavouriteItemDocument>() {
                     @Override
                     public long count() {
                         return favouriteItemElasticsearchRepository.count();
@@ -139,7 +137,7 @@ public class ElasticsearchIndexService {
     <JPA, ELASTIC, ID extends Serializable> void reindexForClass(
             Class<ELASTIC> documentClass,
             JpaRepository<JPA, ID> jpaRepository,
-            ElassticRepositoryAdapter<ELASTIC> elasticsearchRepository,
+            ElasticRepositoryAdapter<ELASTIC> elasticsearchRepository,
             Function<JPA, ELASTIC> entityToDocumentMapper,
             String methodName) {
         elasticsearchTemplate.deleteIndex(documentClass);
@@ -155,7 +153,7 @@ public class ElasticsearchIndexService {
 
     private <JPA, ELASTIC, ID extends Serializable> void reindexWithStream(
             JpaRepository<JPA, ID> jpaRepository,
-            ElassticRepositoryAdapter<ELASTIC> elasticsearchRepository,
+            ElasticRepositoryAdapter<ELASTIC> elasticsearchRepository,
             Function<JPA, ELASTIC> entityToDocumentMapper, Class entityClass, String methodName) {
 
         try {
@@ -190,7 +188,7 @@ public class ElasticsearchIndexService {
     }
 
 
-    interface ElassticRepositoryAdapter<S> {
+    interface ElasticRepositoryAdapter<S> {
 
         long count();
 

@@ -12,7 +12,6 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.Ela
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.unit.DistanceUnit;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -40,10 +39,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchResult.mapToSearchResult;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
@@ -100,19 +99,17 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
     private final CurrentUserContext currentUserContext;
     private final ElasticsearchTemplate elasticsearchTemplate;
     private final ResultsMapper resultsMapper;
-    private final JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository;
+
     private final FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository;
 
 
     public ElasticJobAdvertisementSearchService(CurrentUserContext currentUserContext,
                                                 ElasticsearchTemplate elasticsearchTemplate,
                                                 ElasticsearchConfiguration.CustomEntityMapper customEntityMapper,
-                                                JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository,
                                                 FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository) {
         this.currentUserContext = currentUserContext;
         this.elasticsearchTemplate = elasticsearchTemplate;
         this.resultsMapper = new DefaultResultMapper(elasticsearchTemplate.getElasticsearchConverter().getMappingContext(), customEntityMapper);
-        this.jobAdvertisementElasticsearchRepository = jobAdvertisementElasticsearchRepository;
         this.favouriteItemElasticsearchRepository = favouriteItemElasticsearchRepository;
     }
 
@@ -136,25 +133,22 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
             SearchHits searchHits = response.getHits();
             Iterator<SearchHit> searchHitIterator = searchHits.iterator();
 
-            List<JobAdvertisementDto> highLightedResults = searchResults.getContent().stream()
+            List<JobAdvertisementDto> jobAdvertisements = searchResults.getContent().stream()
                     .map(JobAdvertisementDocument::getJobAdvertisement)
                     .map(JobAdvertisementDto::toDto)
                     .map(jobAdvertisementDto -> highlightFields(jobAdvertisementDto, searchHitIterator.next().getHighlightFields()))
                     .collect(Collectors.toList());
 
-            List<FavouriteItemDto> favouriteItemDtoList = searchFavouriteItems(highLightedResults);
-
-            List<JobAdvertisementSearchResult> jobAdvertisementSearchResultList = highLightedResults.stream()
-                    .map(jobAdvertisementDto -> mapToSearchResult(jobAdvertisementDto, favouriteItemDtoList))
-                    .collect(Collectors.toList());
-
-            return new AggregatedPageImpl<>(jobAdvertisementSearchResultList, pageable, searchHits.totalHits, searchResults.getAggregations(), searchResults.getScrollId());
+            Map<String, FavouriteItemDto> favouriteItemsLookupMap = findFavouriteItemsMappedByJobAdId(extractJobAdIds(jobAdvertisements));
+            List<JobAdvertisementSearchResult> jobAdvertisementSearchResults = mapToJobAdvertisementSearchResults(jobAdvertisements, favouriteItemsLookupMap);
+            return new AggregatedPageImpl<>(jobAdvertisementSearchResults, pageable, searchHits.totalHits, searchResults.getAggregations(), searchResults.getScrollId());
         });
     }
 
     @Override
-    // TODO Pre-authorization-checks
-    public Page<JobAdvertisementSearchResult> findByUserId(String ownerId, int page, int size) {
+    @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.matchesCurrentUserId(#ownerId)")
+    public Page<JobAdvertisementSearchResult> findFavouriteJobAds(String ownerId, int page, int size) {
+        // search all job ads that I have "favorized"
         return Page.empty();
     }
 
@@ -186,22 +180,23 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
         return elasticsearchTemplate.query(query, response -> extractHighlightedResults(updatedPageable, response));
     }
 
-    private List<FavouriteItemDto> searchFavouriteItems(List<JobAdvertisementDto> jobAdvertisementDtoList) {
-        List<String> jobAdvertisementIds = jobAdvertisementDtoList.stream()
-                .map(JobAdvertisementDto::getId)
-                .collect(Collectors.toList());
-
+    private Map<String, FavouriteItemDto> findFavouriteItemsMappedByJobAdId(List<String> jobAdvertisementIds) {
         CurrentUser currentUser = currentUserContext.getCurrentUser();
         if (currentUser == null) {
-            return Collections.emptyList();
-        } else {
-            String ownerId = currentUser.getUserId();
-            return this.favouriteItemElasticsearchRepository
-                    .findByOwnerAndParentIds(jobAdvertisementIds, ownerId).stream()
-                    .map(FavouriteItemDocument::getFavouriteItem)
-                    .map(FavouriteItemDto::toDto)
-                    .collect(Collectors.toList());
+            return Collections.emptyMap();
         }
+        String ownerId = currentUser.getUserId();
+        return this.favouriteItemElasticsearchRepository
+                .findByOwnerAndParentIds(jobAdvertisementIds, ownerId).stream()
+                .map(FavouriteItemDocument::getFavouriteItem)
+                .map(FavouriteItemDto::toDto)
+                .collect(Collectors.toMap(FavouriteItemDto::getJobAdvertisementId, Function.identity()));
+    }
+
+    private List<String> extractJobAdIds(List<JobAdvertisementDto> jobAdvertisementDtoList) {
+        return jobAdvertisementDtoList.stream()
+                .map(JobAdvertisementDto::getId)
+                .collect(Collectors.toList());
     }
 
     private Pageable appendUniqueSortingKey(Pageable pageable) {
@@ -570,5 +565,14 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
             }
         });
         return jobAdvertisementDto;
+    }
+
+    private List<JobAdvertisementSearchResult> mapToJobAdvertisementSearchResults(List<JobAdvertisementDto> jobAdvertisements, Map<String, FavouriteItemDto> favouriteItems) {
+        return jobAdvertisements.stream()
+                .map(jobAdvertisementDto -> {
+                    FavouriteItemDto favouriteItemDto = favouriteItems.get(jobAdvertisementDto.getId());
+                    return new JobAdvertisementSearchResult(jobAdvertisementDto, favouriteItemDto);
+                })
+                .collect(Collectors.toList());
     }
 }

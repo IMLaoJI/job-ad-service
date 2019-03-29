@@ -16,16 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -80,7 +71,7 @@ public class FavouriteItemRestController {
 
     @GetMapping("/_search/byUserId}")
     public ResponseEntity<List<JobAdvertisementSearchResult>> findByUserId(Pageable pageable, @RequestParam String userId) {
-        Page<JobAdvertisementSearchResult> userFavorites = jobAdvertisementSearchService.findByUserId(userId, pageable.getPageNumber(), pageable.getPageSize());
+        Page<JobAdvertisementSearchResult> userFavorites = jobAdvertisementSearchService.findFavouriteJobAds(userId, pageable.getPageNumber(), pageable.getPageSize());
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(userFavorites, "/api/favourite-items/_search/managed");
         return new ResponseEntity<>(userFavorites.getContent(), headers, HttpStatus.OK);
     }

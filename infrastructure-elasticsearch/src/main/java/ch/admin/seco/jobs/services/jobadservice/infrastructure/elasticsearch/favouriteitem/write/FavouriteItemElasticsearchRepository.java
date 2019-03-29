@@ -2,7 +2,6 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.fa
 
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -72,11 +71,10 @@ public class FavouriteItemElasticsearchRepository {
     }
 
     public Optional<FavouriteItemDocument> findById(String jobAdvertisementId, String favouriteItemId) {
-        BoolQueryBuilder parentId = boolQuery()
-                .must(new ParentIdQueryBuilder(FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME, jobAdvertisementId))
-                .must(QueryBuilders.termQuery("_id", favouriteItemId.toLowerCase()));
         SearchQuery searchFavouriteQuery = new NativeSearchQueryBuilder()
-                .withQuery(parentId)
+                .withQuery(boolQuery()
+                        .must(new ParentIdQueryBuilder(FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME, jobAdvertisementId))
+                        .must(QueryBuilders.termQuery("_id", favouriteItemId.toLowerCase())))
                 .build();
         List<FavouriteItemDocument> favouriteItemDocumentList = this.elasticsearchTemplate.queryForList(searchFavouriteQuery, FavouriteItemDocument.class);
         if (favouriteItemDocumentList.size() == 0) {
@@ -107,11 +105,10 @@ public class FavouriteItemElasticsearchRepository {
                         .refresh(true)
                         .get();
         LOG.info("{} Index(es) deleted for parent jobAdId: {}.", response.getDeleted(), jobAdvertisementId);
-        System.out.println(response.getDeleted());
     }
 
     public void deleteById(String jobAdvertisementId, String favouriteItemId) {
-        DeleteResponse response = this.elasticsearchTemplate.getClient()
+       this.elasticsearchTemplate.getClient()
                 .prepareDelete()
                 .setParent(jobAdvertisementId)
                 .setId(favouriteItemId)
@@ -119,7 +116,6 @@ public class FavouriteItemElasticsearchRepository {
                 .setType(TYPE_DOC)
                 .get();
         LOG.info("Index deleted for id: {} and parent jobAdId: {}.", favouriteItemId, jobAdvertisementId);
-        System.out.println(response);
     }
 
     public long count() {
@@ -137,7 +133,6 @@ public class FavouriteItemElasticsearchRepository {
                         .refresh(true)
                         .get();
         LOG.info("{} Index(es) deleted.", response.getDeleted());
-        System.out.println(response.getDeleted());
     }
 
     public Iterable<FavouriteItemDocument> saveAll(Iterable<FavouriteItemDocument> entities) {

@@ -15,7 +15,7 @@ import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsea
 @Setting(settingPath = "config/elasticsearch/settings/folding-analyzer.json")
 public class FavouriteItemDocument {
 
-    public static final String FAVOURITE_ITEM_RELATION_NAME = "rel_favouriteItem";
+    static final String FAVOURITE_ITEM_RELATION_NAME = "rel_favouriteItem";
 
     @Id
     private String id;

@@ -120,6 +120,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
     @Before
     public void setUp() {
+        this.favouriteItemElasticsearchRepository.deleteAll();
         this.jobAdvertisementElasticsearchRepository.deleteAll();
         this.jobAdvertisementJpaRepository.deleteAll();
         this.mockCurrentUserContext = mock(CurrentUserContext.class);
@@ -127,7 +128,6 @@ public class JobAdvertisementSearchControllerIntTest {
         this.jobAdvertisementSearchService = new ElasticJobAdvertisementSearchService(mockCurrentUserContext,
                 this.elasticsearchTemplate,
                 this.customEntityMapper,
-                this.jobAdvertisementElasticsearchRepository,
                 this.favouriteItemElasticsearchRepository
         );
 
@@ -180,12 +180,12 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[0].id").value(equalTo("job02")))
-                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Ausland")))
-                .andExpect(jsonPath("$.[1].id").value(equalTo("job03")))
-                .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("Ausland")))
-                .andExpect(jsonPath("$.[2].id").value(equalTo("job04")))
-                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("Ausland")));
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job02")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job03")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")));
 
     }
 
@@ -255,8 +255,8 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
-                .andExpect(jsonPath("$.[0].id").value(equalTo("job01")))
-                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Bern")));
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job01")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")));
     }
 
     @Test
@@ -277,8 +277,8 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
-                .andExpect(jsonPath("$.[0].id").value(equalTo("job04")))
-                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Lausanne")));
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")));
     }
 
     @Test
@@ -300,12 +300,12 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[0].id").value(equalTo("job01")))
-                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Bern")))
-                .andExpect(jsonPath("$.[1].id").value(equalTo("job03")))
-                .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("Sion")))
-                .andExpect(jsonPath("$.[2].id").value(equalTo("job04")))
-                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("Lausanne")));
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job01")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job03")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Sion")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")));
     }
 
     @Test
@@ -324,14 +324,14 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "4"))
-                .andExpect(jsonPath("$.[0].id").value(equalTo("job01")))
-                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Bern")))
-                .andExpect(jsonPath("$.[1].id").value(equalTo("job02")))
-                .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("Ausland")))
-                .andExpect(jsonPath("$.[2].id").value(equalTo("job03")))
-                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("Ausland")))
-                .andExpect(jsonPath("$.[3].id").value(equalTo("job04")))
-                .andExpect(jsonPath("$.[3].jobContent.location.city").value(equalTo("Ausland")));
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job01")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job02")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job03")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
+                .andExpect(jsonPath("$.[3].jobAdvertisement.id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[3].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")));
 
     }
 
@@ -357,13 +357,13 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
 
-                .andExpect(jsonPath("$.[0].id").value(equalTo(job01.name())))
-                .andExpect(jsonPath("$.[0].jobContent.jobDescriptions[0].title").value(equalTo("c++ developer")))
-                .andExpect(jsonPath("$.[0].jobContent.jobDescriptions[0].description").value(equalTo("c++ &amp; <em>java</em> <em>entwickler</em>")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo(job01.name())))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("c++ developer")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].description").value(equalTo("c++ &amp; <em>java</em> <em>entwickler</em>")))
 
-                .andExpect(jsonPath("$.[1].id").value(equalTo(job02.name())))
-                .andExpect(jsonPath("$.[1].jobContent.jobDescriptions[0].title").value(equalTo("<em>java</em> & <em>javascript</em> developer")))
-                .andExpect(jsonPath("$.[1].jobContent.jobDescriptions[0].description").value(equalTo("jee <em>entwickler</em>")));
+                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo(job02.name())))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("<em>java</em> & <em>javascript</em> developer")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.jobDescriptions[0].description").value(equalTo("jee <em>entwickler</em>")));
     }
 
     @Test
@@ -387,9 +387,9 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
 
-                .andExpect(jsonPath("$.[0].id").value(equalTo(job01.name())))
-                .andExpect(jsonPath("$.[0].jobContent.jobDescriptions[0].title").value(equalTo("c++ developer")))
-                .andExpect(jsonPath("$.[0].jobContent.jobDescriptions[0].description").value(equalTo("c++ &amp; java entwickler")));
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo(job01.name())))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("c++ developer")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].description").value(equalTo("c++ &amp; java entwickler")));
     }
 
     @Test
@@ -446,8 +446,8 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job01.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job04.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job01.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job04.name())))
         ;
     }
 
@@ -478,8 +478,8 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job01.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job02.name())));
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job01.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job02.name())));
     }
 
     @Test
@@ -514,8 +514,8 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job01.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job02.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job01.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job02.name())))
         ;
     }
 
@@ -542,8 +542,8 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job01.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job02.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job01.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job02.name())))
         ;
     }
 
@@ -570,9 +570,9 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job02.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job03.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job04.name())));
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job02.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job03.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job04.name())));
     }
 
     @Test
@@ -597,7 +597,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
-                .andExpect(jsonPath("$.*.id").value(job02.name()))
+                .andExpect(jsonPath("$.*.jobAdvertisement.id").value(job02.name()))
         ;
     }
 
@@ -624,7 +624,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
-                .andExpect(jsonPath("$.*.id").value(job02.name()))
+                .andExpect(jsonPath("$.*jobAdvertisement.id").value(job02.name()))
         ;
     }
 
@@ -652,9 +652,9 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job02.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job03.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job04.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job02.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job03.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job04.name())))
         ;
 
     }
@@ -682,8 +682,8 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job03.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job04.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job03.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job04.name())))
         ;
 
     }
@@ -709,7 +709,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
-                .andExpect(jsonPath("$.*.id").value(job02.name()));
+                .andExpect(jsonPath("$.*.jobAdvertisement.id").value(job02.name()));
     }
 
     @Test
@@ -738,11 +738,11 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "5"))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job01.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job02.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job03.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job04.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job06.name())));
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job01.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job02.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job03.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job04.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job06.name())));
     }
 
     @Test
@@ -764,7 +764,7 @@ public class JobAdvertisementSearchControllerIntTest {
         searchRequest.setPermanent(false);
         searchRequest.setWorkloadPercentageMin(70);
         searchRequest.setCantonCodes(new String[]{"BE"});
-        searchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.AVAM, "avamOccupationCode")});
+        searchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.AVAM, "9999")});
         searchRequest.setKeywords(new String[]{"title"});
 
         ResultActions resultActions = mockMvc.perform(
@@ -825,7 +825,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[*].id").value(
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(
                         both(containsInAnyOrder(
                                 job01.name(),
                                 job02.name(),
@@ -883,7 +883,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "4"))
-                .andExpect(jsonPath("$.[*].id").value(
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(
                         both(containsInAnyOrder(
                                 job01.name(),
                                 job03.name(),
