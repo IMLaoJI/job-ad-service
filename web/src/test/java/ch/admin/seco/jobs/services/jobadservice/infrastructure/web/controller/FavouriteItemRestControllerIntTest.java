@@ -99,12 +99,12 @@ public class FavouriteItemRestControllerIntTest {
         post.andExpect(status().isCreated());
 
         String contentAsString = post.andReturn().getResponse().getContentAsString();
-        JSONArray ja = new JSONArray("["+contentAsString+"]");
+        JSONArray ja = new JSONArray("[" + contentAsString + "]");
         String id = ja.getJSONObject(0).getString("value");
 
         // check in elasticsearch
         await().until(() -> this.jobAdvertisementElasticsearchRepository.existsById(jobAdvertisement.getId().getValue()));
-        await().until(() -> this.favouriteItemElasticsearchRepository.existsById(id));
+        await().until(() -> this.favouriteItemElasticsearchRepository.findById(jobAdvertisement.getId().getValue(), id).isPresent());
     }
 
 
