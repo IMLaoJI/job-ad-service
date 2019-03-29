@@ -78,7 +78,7 @@ public class FavouriteItemApplicationService {
         LOG.info("Favourite Item " + favouriteItem.getId().getValue() + " has been deleted for user " + favouriteItem.getOwnerId() + ".");
     }
 
-    @PreAuthorize("isAuthenticated() and favouriteItemAuthorizationService.matchesCurrentUserId(#ownerId)")
+    @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.matchesCurrentUserId(#ownerId)")
     public Optional<FavouriteItemDto> findByJobAdvertisementIdAndUserId(JobAdvertisementId jobAdvertisementId, String ownerId) {
         return this.favouriteItemRepository.findByJobAdvertisementIdAndOwnerId(jobAdvertisementId, ownerId)
                 .map(FavouriteItemDto::toDto);

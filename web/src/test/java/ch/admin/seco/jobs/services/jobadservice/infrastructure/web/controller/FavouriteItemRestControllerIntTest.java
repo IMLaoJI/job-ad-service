@@ -8,6 +8,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors.ExceptionTranslator;
 import org.codehaus.jettison.json.JSONArray;
@@ -31,10 +32,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
@@ -65,6 +63,9 @@ public class FavouriteItemRestControllerIntTest {
     private FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository;
 
     @Autowired
+    private JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository;
+
+    @Autowired
     private FavouriteItemRepository favouriteItemRepository;
 
     private MockMvc mockMvc;
@@ -77,6 +78,11 @@ public class FavouriteItemRestControllerIntTest {
                 .setControllerAdvice(exceptionTranslator)
                 .setMessageConverters(jacksonMessageConverter)
                 .build();
+
+        this.favouriteItemRepository.deleteAll();
+        this.jobAdvertisementRepository.deleteAll();
+        this.favouriteItemElasticsearchRepository.deleteAll();
+        this.jobAdvertisementElasticsearchRepository.deleteAll();
     }
 
     @Test
@@ -135,14 +141,13 @@ public class FavouriteItemRestControllerIntTest {
         // await().until(() -> favouriteItemElasticsearchRepository.findById(id).isPresent());
 
         // when
-        ResultActions resultActions = mockMvc.perform(
+        mockMvc.perform(
                 MockMvcRequestBuilders.delete(URL + "/" + id)
                         .contentType(TestUtil.APPLICATION_JSON_UTF8));
 
         // then
-        resultActions
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(header().string("X-Total-Count", "0"));
+        assertThat(this.favouriteItemRepository.findById(new FavouriteItemId(id))).isNotPresent();
+
         // await().until(() -> !favouriteItemElasticsearchRepository.findByIdAndParent(jobAdvertisement.getId().getValue(), id).isPresent());
     }
 
@@ -152,8 +157,6 @@ public class FavouriteItemRestControllerIntTest {
         // given
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.save(JobAdvertisementFixture.testJobAdvertisement().build());
         String id = createTestFavouriteItem(jobAdvertisement);
-        FavouriteItemRestController.SearchByJobAdIdAndUserIdResource searchByJobAdIdAndUserIdResource = new FavouriteItemRestController.SearchByJobAdIdAndUserIdResource();
-
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -161,12 +164,9 @@ public class FavouriteItemRestControllerIntTest {
                         .contentType(TestUtil.APPLICATION_JSON_UTF8));
 
         // then
-
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(header().string("X-Total-Count", "1"))
-                .andExpect(jsonPath("$.[0].id").value(equalTo(id)));
-        // await().until(() -> favouriteItemElasticsearchRepository.findByIdAndParent(jobAdvertisement.getId().getValue(), id).isPresent());
+                .andExpect(jsonPath("$.id").value(equalTo(id)));
     }
 
     @Test
@@ -175,28 +175,7 @@ public class FavouriteItemRestControllerIntTest {
         // given
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.save(JobAdvertisementFixture.testJobAdvertisement().build());
 
-        FavouriteItemRestController.CreateFavouriteItemResource createFavouriteItemResource = new FavouriteItemRestController.CreateFavouriteItemResource();
-        createFavouriteItemResource.jobAdvertisementId = jobAdvertisement.getId().getValue();
-        createFavouriteItemResource.userId = WithJobSeeker.USER_ID;
-        createFavouriteItemResource.note = "Test Note 1";
-        ResultActions post = post(createFavouriteItemResource, URL);
-        post.andExpect(status().isCreated());
-        String contentAsString = post.andReturn().getResponse().getContentAsString();
-        JSONArray ja = new JSONArray("[" + contentAsString + "]");
-        String id1 = ja.getJSONObject(0).getString("value");
-
-        createFavouriteItemResource = new FavouriteItemRestController.CreateFavouriteItemResource();
-        createFavouriteItemResource.jobAdvertisementId = jobAdvertisement.getId().getValue();
-        createFavouriteItemResource.userId = WithJobSeeker.USER_ID;
-        createFavouriteItemResource.note = "Test Note 2";
-        post = post(createFavouriteItemResource, URL);
-        post.andExpect(status().isCreated());
-        contentAsString = post.andReturn().getResponse().getContentAsString();
-        ja = new JSONArray("[" + contentAsString + "]");
-        String id2 = ja.getJSONObject(0).getString("value");
-
-        // await().until(() -> favouriteItemElasticsearchRepository.findById(id1).isPresent());
-        // await().until(() -> favouriteItemElasticsearchRepository.findById(id2).isPresent());
+        String favouriteItemId = createTestFavouriteItem(jobAdvertisement);
 
         FavouriteItemRestController.SearchByJobAdIdAndUserIdResource searchByJobAdIdAndUserIdResource = new FavouriteItemRestController.SearchByJobAdIdAndUserIdResource();
         searchByJobAdIdAndUserIdResource.jobAdvertisementId = jobAdvertisement.getId().getValue();
@@ -209,11 +188,9 @@ public class FavouriteItemRestControllerIntTest {
                         .content(TestUtil.convertObjectToJsonBytes(searchByJobAdIdAndUserIdResource)));
 
         // then
-        resultActions.andExpect(header().string("X-Total-Count", "2"))
-                .andExpect(jsonPath("$.[0].id").value(equalTo(id1)))
-                .andExpect(jsonPath("$.[1].id").value(equalTo(id2)))
-                .andExpect(jsonPath("$.[0].note").value(equalTo("Test Note 1")))
-                .andExpect(jsonPath("$.[0].note").value(equalTo("Test Note 2")));
+        resultActions
+                .andExpect(jsonPath("$.id").value(equalTo(favouriteItemId)))
+                .andExpect(jsonPath("$.note").value(equalTo("Test Note")));
     }
 
     private String createTestFavouriteItem(JobAdvertisement jobAdvertisement) throws Exception {
