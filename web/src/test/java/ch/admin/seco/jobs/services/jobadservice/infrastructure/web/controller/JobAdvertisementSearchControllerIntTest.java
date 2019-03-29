@@ -927,9 +927,9 @@ public class JobAdvertisementSearchControllerIntTest {
         saveJobAdvertisementDocuments(
                 JobAdvertisementFixture.of(job01.id()),
                 JobAdvertisementFixture.of(job02.id())
-                        .setPublication(testPublication().setStartDate(now().minusDays(10)).build()),
+                        .setPublication(testPublication().setStartDate(now().minusDays(20)).build()),
                 JobAdvertisementFixture.of(job03.id())
-                        .setPublication(testPublication().setStartDate(now().minusDays(11)).build())
+                        .setPublication(testPublication().setStartDate(now().minusDays(15)).build())
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
