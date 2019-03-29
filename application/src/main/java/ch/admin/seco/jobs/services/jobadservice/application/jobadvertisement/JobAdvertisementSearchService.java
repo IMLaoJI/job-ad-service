@@ -12,7 +12,6 @@ public interface JobAdvertisementSearchService {
         date_desc
     }
 
-    // TODO return the ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchResult
     Page<JobAdvertisementSearchResult> search(JobAdvertisementSearchRequest jobSearchRequest, int page, int size, JobAdvertisementSearchService.SearchSort sort);
 
     // TODO implement used for the favorite item widget and the job-ad favorite item page on the logged in user dashboard

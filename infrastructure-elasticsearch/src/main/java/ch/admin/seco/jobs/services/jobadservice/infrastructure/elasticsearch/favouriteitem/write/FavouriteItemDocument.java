@@ -47,4 +47,13 @@ public class FavouriteItemDocument {
     public ChildRelation getJobAdvertisementRelations() {
         return jobAdvertisementRelations;
     }
+
+    public String toString() {
+        return "FavouriteItemDocument{" +
+                "id=" + id +
+                ", jobAdId=" + favouriteItem.getJobAdvertisementId().getValue() +
+                ", ownerId=" + favouriteItem.getOwnerId() +
+                '}';
+
+    }
 }

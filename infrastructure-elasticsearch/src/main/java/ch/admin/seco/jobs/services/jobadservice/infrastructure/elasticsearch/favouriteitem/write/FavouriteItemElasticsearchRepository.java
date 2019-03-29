@@ -12,6 +12,8 @@ import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.DeleteByQueryAction;
 import org.elasticsearch.join.query.HasParentQueryBuilder;
 import org.elasticsearch.join.query.ParentIdQueryBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
@@ -28,6 +30,8 @@ import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsea
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
 public class FavouriteItemElasticsearchRepository {
+
+    private static Logger LOG = LoggerFactory.getLogger(FavouriteItemElasticsearchRepository.class);
 
     private final ElasticsearchTemplate elasticsearchTemplate;
 
@@ -53,8 +57,10 @@ public class FavouriteItemElasticsearchRepository {
             updateQuery.setDoUpsert(true);
             elasticsearchTemplate.update(updateQuery);
         } catch (IOException e) {
+            LOG.error("Indexing {} not successful.", favouriteItemDocument.toString());
             throw new UncheckedIOException(e);
         }
+        LOG.info("Index of {} successfully created or updated.", favouriteItemDocument.toString());
         return favouriteItemDocument;
     }
 
