@@ -13,7 +13,7 @@ public interface JobAdvertisementSearchService {
     }
 
     // TODO return the ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchResult
-    Page<JobAdvertisementDto> search(JobAdvertisementSearchRequest jobSearchRequest, int page, int size, JobAdvertisementSearchService.SearchSort sort);
+    Page<JobAdvertisementSearchResult> search(JobAdvertisementSearchRequest jobSearchRequest, int page, int size, JobAdvertisementSearchService.SearchSort sort);
 
     // TODO implement used for the favorite item widget and the job-ad favorite item page on the logged in user dashboard
     Page<JobAdvertisementSearchResult> findByUserId(String ownerId, int page, int size);

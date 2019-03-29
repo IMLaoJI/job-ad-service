@@ -84,7 +84,7 @@ public class FavouriteItemRestControllerIntTest {
 
     @Test
     @WithJobSeeker
-    public void create() throws Exception {
+    public void testCreateAndIndexParentAndChild() throws Exception {
         // given
         JobAdvertisement jobAdvertisement = this.jobAdvertisementRepository.save(JobAdvertisementFixture.of(job02.id()).build());
         this.jobAdvertisementElasticsearchRepository.index(new JobAdvertisementDocument(jobAdvertisement));

@@ -4,28 +4,17 @@ import ch.admin.seco.jobs.services.jobadservice.Application;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.GeoPointDto;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
-import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItem;
-import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
-import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.read.ElasticJobAdvertisementSearchService;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors.ExceptionTranslator;
-import org.apache.lucene.search.join.ScoreMode;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.InnerHitBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.join.query.HasChildQueryBuilder;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -35,8 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
@@ -61,16 +48,12 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobDescriptionFixture.testJobDescription;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForAbroadSearchTests;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForGeoDistanceTests;
 import static java.time.LocalDate.now;
 import static java.util.Arrays.asList;
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.CombinableMatcher.both;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -78,7 +61,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 @ActiveProfiles("dev")
-@WithJobSeeker()
+@WithJobSeeker
 public class JobAdvertisementSearchControllerIntTest {
 
     private static final String DEFAULT_AVAM_CODE = "11111";
@@ -109,9 +92,6 @@ public class JobAdvertisementSearchControllerIntTest {
     private JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository;
 
     @Autowired
-    private FavouriteItemRepository favouriteItemRepository;
-
-    @Autowired
     private FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository;
 
     @Autowired
@@ -130,9 +110,6 @@ public class JobAdvertisementSearchControllerIntTest {
     private ExceptionTranslator exceptionTranslator;
 
     @Autowired
-    private ElasticsearchIndexService elasticsearchIndexService;
-
-    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     private JobAdvertisementSearchService jobAdvertisementSearchService;
@@ -143,16 +120,15 @@ public class JobAdvertisementSearchControllerIntTest {
 
     @Before
     public void setUp() {
-        this.favouriteItemElasticsearchRepository.deleteAll();
         this.jobAdvertisementElasticsearchRepository.deleteAll();
-        this.favouriteItemRepository.deleteAll();
         this.jobAdvertisementJpaRepository.deleteAll();
         this.mockCurrentUserContext = mock(CurrentUserContext.class);
 
         this.jobAdvertisementSearchService = new ElasticJobAdvertisementSearchService(mockCurrentUserContext,
                 this.elasticsearchTemplate,
                 this.customEntityMapper,
-                this.jobAdvertisementElasticsearchRepository
+                this.jobAdvertisementElasticsearchRepository,
+                this.favouriteItemElasticsearchRepository
         );
 
         JobAdvertisementSearchController jobAdvertisementSearchController
@@ -1358,67 +1334,6 @@ public class JobAdvertisementSearchControllerIntTest {
 
     private void index(JobAdvertisement jobAdvertisement) {
         this.jobAdvertisementElasticsearchRepository.save(new JobAdvertisementDocument(jobAdvertisement));
-    }
-
-    @Test
-    // TODO REMOVE THIS TEST OR MOVE IT TO THE ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.CustomizedFavouriteItemElasticsearchRepository
-    public void indexParentWithChildAndFetchPARENTResultListTest() {
-
-        // given
-        index(createJob(job01.id()));
-        index(createJob(job02.id()));
-        index(createJob(job03.id()));
-        index(createJob(job04.id()));
-        index(createJob(job05.id()));
-
-        indexChildDocument(createFavouriteItem("child-01", job01.id(), "John"));
-        indexChildDocument(createFavouriteItem("child-02", job02.id(), "John"));
-        indexChildDocument(createFavouriteItem("child-03", job03.id(), "John"));
-        indexChildDocument(createFavouriteItem("child-04", job01.id(), "Emma"));
-        indexChildDocument(createFavouriteItem("child-05", job03.id(), "Emma"));
-        indexChildDocument(createFavouriteItem("child-06", job04.id(), "John"));
-        indexChildDocument(createFavouriteItem("child-07", job01.id(), "Jane"));
-        indexChildDocument(createFavouriteItem("child-08", job02.id(), "Jane"));
-        indexChildDocument(createFavouriteItem("child-09", job03.id(), "Jane"));
-        indexChildDocument(createFavouriteItem("child-10", job03.id(), "Paul"));
-
-        // when
-        QueryBuilder queryOwner = QueryBuilders.matchQuery("favouriteItem.ownerId", "John");
-        HasChildQueryBuilder childWithInnerHits = new HasChildQueryBuilder(FAVOURITE_ITEM_RELATION_NAME, queryOwner, ScoreMode.None)
-                .innerHit(new InnerHitBuilder());
-
-        BoolQueryBuilder boolQueryJob = boolQuery()
-                .should(matchQuery("jobAdvertisement.id.value", job02.id().getValue()))
-                .should(matchQuery("jobAdvertisement.id.value", job03.id().getValue()));
-
-        BoolQueryBuilder boolQuery = boolQuery()
-                .must(boolQueryJob)
-                .must(childWithInnerHits);
-
-        SearchQuery searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(boolQuery)
-                .build();
-
-        List<JobAdvertisementDocument> jobAdvertisementIdList = this.elasticsearchTemplate.queryForList(searchQuery, JobAdvertisementDocument.class);
-
-        //then
-        assertThat(jobAdvertisementIdList, is(notNullValue()));
-        assertThat(jobAdvertisementIdList, is(hasSize(2)));
-        assertThat(jobAdvertisementIdList.get(0).getId(), is(job02.id().getValue()));
-        assertThat(jobAdvertisementIdList.get(1).getId(), is(job03.id().getValue()));
-    }
-
-    private void indexChildDocument(FavouriteItem favouriteItem) {
-        this.favouriteItemElasticsearchRepository.save(new FavouriteItemDocument(favouriteItem));
-    }
-
-    private FavouriteItem createFavouriteItem(String favouriteItemId, JobAdvertisementId id, String ownerId) {
-        return new FavouriteItem.Builder()
-                .setId(new FavouriteItemId(favouriteItemId))
-                .setJobAdvertisementId(id)
-                .setOwnerId(ownerId)
-                .setNote("Favourite Item Note")
-                .build();
     }
 
 }

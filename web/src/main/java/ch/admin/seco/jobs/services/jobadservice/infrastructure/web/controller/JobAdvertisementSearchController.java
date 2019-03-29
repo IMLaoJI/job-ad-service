@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchResult;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.read.ElasticJobAdvertisementSearchService;
@@ -37,14 +38,14 @@ public class JobAdvertisementSearchController {
 
     @PostMapping("/_search")
     @Timed
-    public ResponseEntity<List<JobAdvertisementDto>> searchJobs(
+    public ResponseEntity<List<JobAdvertisementSearchResult>> searchJobs(
             @RequestBody @Valid JobAdvertisementSearchRequest jobAdvertisementSearchRequest,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "20") int size,
             @RequestParam(defaultValue = "score") ElasticJobAdvertisementSearchService.SearchSort sort
     ) {
 
-        Page<JobAdvertisementDto> resultPage = jobAdvertisementSearchService.search(jobAdvertisementSearchRequest, page, size, sort)
+        Page<JobAdvertisementSearchResult> resultPage = jobAdvertisementSearchService.search(jobAdvertisementSearchRequest, page, size, sort)
                 //todo: Discuss where to put the HTML cleanup. This is suboptimal concerning performance
                 .map(this::sanitizeJobDescription);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(resultPage, "/api/_search/jobs");
@@ -70,8 +71,8 @@ public class JobAdvertisementSearchController {
         return new ResponseEntity<>(Collections.singletonMap("totalCount", totalCount), HttpStatus.OK);
     }
 
-    private JobAdvertisementDto sanitizeJobDescription(JobAdvertisementDto jobAdvertisementDto) {
-        for (JobDescriptionDto jobDescriptionDto : jobAdvertisementDto.getJobContent().getJobDescriptions()) {
+    private JobAdvertisementSearchResult sanitizeJobDescription(JobAdvertisementSearchResult searchResult) {
+        for (JobDescriptionDto jobDescriptionDto : searchResult.getJobAdvertisementDto().getJobContent().getJobDescriptions()) {
             String sanitizedDescription = "";
             if (hasText(jobDescriptionDto.getDescription())) {
                 sanitizedDescription = Jsoup.clean(
@@ -83,7 +84,7 @@ public class JobAdvertisementSearchController {
             jobDescriptionDto.setDescription(sanitizedDescription);
         }
 
-        return jobAdvertisementDto;
+        return searchResult;
     }
 
 }

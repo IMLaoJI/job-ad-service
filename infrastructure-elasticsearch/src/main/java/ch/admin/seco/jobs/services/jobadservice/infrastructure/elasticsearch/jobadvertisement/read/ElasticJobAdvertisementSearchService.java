@@ -1,12 +1,16 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.read;
 
+import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.FavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
+import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUser;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
 import ch.admin.seco.jobs.services.jobadservice.application.security.Role;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
 import org.elasticsearch.action.search.SearchResponse;
@@ -39,6 +43,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchResult.mapToSearchResult;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
@@ -96,19 +101,23 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
     private final ElasticsearchTemplate elasticsearchTemplate;
     private final ResultsMapper resultsMapper;
     private final JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository;
+    private final FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository;
+
 
     public ElasticJobAdvertisementSearchService(CurrentUserContext currentUserContext,
                                                 ElasticsearchTemplate elasticsearchTemplate,
                                                 ElasticsearchConfiguration.CustomEntityMapper customEntityMapper,
-                                                JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository) {
+                                                JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository,
+                                                FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository) {
         this.currentUserContext = currentUserContext;
         this.elasticsearchTemplate = elasticsearchTemplate;
         this.resultsMapper = new DefaultResultMapper(elasticsearchTemplate.getElasticsearchConverter().getMappingContext(), customEntityMapper);
         this.jobAdvertisementElasticsearchRepository = jobAdvertisementElasticsearchRepository;
+        this.favouriteItemElasticsearchRepository = favouriteItemElasticsearchRepository;
     }
 
     @Override
-    public Page<JobAdvertisementDto> search(JobAdvertisementSearchRequest jobSearchRequest, int page, int size, SearchSort sort) {
+    public Page<JobAdvertisementSearchResult> search(JobAdvertisementSearchRequest jobSearchRequest, int page, int size, SearchSort sort) {
         Pageable pageable = PageRequest.of(page, size, createSort(sort));
         SearchQuery searchQuery = createSearchQueryBuilder(jobSearchRequest)
                 .withPageable(pageable)
@@ -133,7 +142,13 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
                     .map(jobAdvertisementDto -> highlightFields(jobAdvertisementDto, searchHitIterator.next().getHighlightFields()))
                     .collect(Collectors.toList());
 
-            return new AggregatedPageImpl<>(highLightedResults, pageable, searchHits.totalHits, searchResults.getAggregations(), searchResults.getScrollId());
+            List<FavouriteItemDto> favouriteItemDtoList = searchFavouriteItems(highLightedResults);
+
+            List<JobAdvertisementSearchResult> jobAdvertisementSearchResultList = highLightedResults.stream()
+                    .map(jobAdvertisementDto -> mapToSearchResult(jobAdvertisementDto, favouriteItemDtoList))
+                    .collect(Collectors.toList());
+
+            return new AggregatedPageImpl<>(jobAdvertisementSearchResultList, pageable, searchHits.totalHits, searchResults.getAggregations(), searchResults.getScrollId());
         });
     }
 
@@ -169,6 +184,24 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
         }
 
         return elasticsearchTemplate.query(query, response -> extractHighlightedResults(updatedPageable, response));
+    }
+
+    private List<FavouriteItemDto> searchFavouriteItems(List<JobAdvertisementDto> jobAdvertisementDtoList) {
+        List<String> jobAdvertisementIds = jobAdvertisementDtoList.stream()
+                .map(JobAdvertisementDto::getId)
+                .collect(Collectors.toList());
+
+        CurrentUser currentUser = currentUserContext.getCurrentUser();
+        if (currentUser == null) {
+            return Collections.emptyList();
+        } else {
+            String ownerId = currentUser.getUserId();
+            return this.favouriteItemElasticsearchRepository
+                    .findByOwnerAndParentIds(jobAdvertisementIds, ownerId).stream()
+                    .map(FavouriteItemDocument::getFavouriteItem)
+                    .map(FavouriteItemDto::toDto)
+                    .collect(Collectors.toList());
+        }
     }
 
     private Pageable appendUniqueSortingKey(Pageable pageable) {

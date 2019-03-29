@@ -94,6 +94,11 @@ public class FavouriteItemElasticsearchRepositoryTest {
                 "John")
         ).hasSize(3);
 
+        assertThat(this.favouriteItemElasticsearchRepository.findByOwnerAndParentIds(
+                asList(job01.id().getValue(), job04.id().getValue()),
+                "Emma")
+        ).hasSize(0);
+
     }
 
     @Test
