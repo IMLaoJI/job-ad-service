@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="20190401080000-1" author="madv">
+        <createIndex tableName="FAVOURITE_ITEM"
+                     indexName="IDX_FAVOURITE_ITEM_ID"
+                     unique="true">
+            <column name="ID" type="varchar(36)"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20190401080000-2" author="madv">
+        <createIndex tableName="FAVOURITE_ITEM"
+                     indexName="IDX_OWNER_ID">
+            <column name="OWNER_ID" type="varchar(64)"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20190401080000-3" author="madv">
+        <createIndex tableName="FAVOURITE_ITEM"
+                     indexName="IDX_JOB_ADVERTISEMENT_ID">
+            <column name="ID" type="varchar(36)"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
