@@ -4,10 +4,10 @@
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
-    <changeSet id="20190320080000" author="madv">
+    <changeSet id="20190320080000_0" author="madv">
         <createTable tableName="FAVOURITE_ITEM">
             <column name="ID" type="varchar(36)">
-                <constraints primaryKey="true" nullable="false"/>
+                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_FAVOURITE_ITEM"/>
             </column>
             <column name="CREATED_TIME" type="timestamp">
                 <constraints nullable="false"/>
@@ -24,6 +24,15 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+    </changeSet>
+
+    <changeSet id="20190320080000_1" author="madv">
+        <createIndex tableName="FAVOURITE_ITEM"
+                     unique="true"
+                     indexName="IDX_JOB_AD_OWNER_ID">
+            <column name="JOB_ADVERTISEMENT_ID"/>
+            <column name="OWNER_ID"/>
+        </createIndex>
     </changeSet>
 
 </databaseChangeLog>

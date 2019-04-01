@@ -37,5 +37,4 @@
     <include file="classpath:/liquibase/changelog/20190215080000_update_jobad_location_lon_lat.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20190226080000_update_field_lengths.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20190320080000_added_entity_FavouriteItem.xml" relativeToChangelogFile="false"/>
-    <include file="classpath:/liquibase/changelog/20190401080000_updated_entity_FavouriteItem.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
