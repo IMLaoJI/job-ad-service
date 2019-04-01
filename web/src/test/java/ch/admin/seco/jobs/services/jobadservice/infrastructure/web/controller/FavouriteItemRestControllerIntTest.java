@@ -27,19 +27,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Optional;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job02;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job03;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job04;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job05;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -121,7 +114,7 @@ public class FavouriteItemRestControllerIntTest {
         assertThat(favouriteItem.get().getNote()).isEqualTo(adjustedNote);
 
         await().until(() -> {
-            Optional<FavouriteItemDocument> favouriteItemDocumentOptional =  favouriteItemElasticsearchRepository.findById(job01.id(), fav01);
+            Optional<FavouriteItemDocument> favouriteItemDocumentOptional = favouriteItemElasticsearchRepository.findById(job01.id(), fav01);
             if (favouriteItemDocumentOptional.isPresent()) {
                 assertThat(favouriteItemDocumentOptional.get().getFavouriteItem().getNote()).isEqualTo(adjustedNote);
                 return true;
@@ -207,15 +200,15 @@ public class FavouriteItemRestControllerIntTest {
         this.index(createJob(job04.id()));
         this.index(createJob(job05.id()));
 
-        this.index(createTestFavouriteItem(new FavouriteItemId("fav-01"), job01.id(), WithJobSeeker.USER_ID, ""));
-        this.index(createTestFavouriteItem(new FavouriteItemId("fav-02"), job05.id(), WithJobSeeker.USER_ID, ""));
+        this.index(createTestFavouriteItem(new FavouriteItemId("fav-01"), job01.id(), WithJobSeeker.USER_ID, "Meine grosse Notiz"));
+        this.index(createTestFavouriteItem(new FavouriteItemId("fav-02"), job05.id(), WithJobSeeker.USER_ID, "Meine kleine Notiz"));
 
-        this.index(createTestFavouriteItem(new FavouriteItemId("fav-03"), job01.id(), "job-seeker-2", ""));
-        this.index(createTestFavouriteItem(new FavouriteItemId("fav-04"), job03.id(), "job-seeker-2", ""));
-        this.index(createTestFavouriteItem(new FavouriteItemId("fav-05"), job04.id(), "job-seeker-2", ""));
-
+        this.index(createTestFavouriteItem(new FavouriteItemId("fav-03"), job01.id(), "job-seeker-2", "Eine andere Notiz"));
+        this.index(createTestFavouriteItem(new FavouriteItemId("fav-04"), job03.id(), "job-seeker-2", "Eine weitere Notiz"));
+        this.index(createTestFavouriteItem(new FavouriteItemId("fav-05"), job04.id(), "job-seeker-2", "Eine Notiz"));
 
         await().until(() -> favouriteItemElasticsearchRepository.count() >= 5);
+
         // when
         ResultActions resultActions = this.mockMvc.perform(
                 MockMvcRequestBuilders.get(URL + "/_search/byUserId")
@@ -226,32 +219,44 @@ public class FavouriteItemRestControllerIntTest {
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(header().string("X-Total-Count", "2"))
-                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo(job01.id().getValue())))
-                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo(job05.id().getValue())))
-                .andExpect(jsonPath("$.[0].favouriteItem.id").value(equalTo("fav-01")))
-                .andExpect(jsonPath("$.[1].favouriteItem.id").value(equalTo("fav-02")));
-
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo(job05.id().getValue())))
+                .andExpect(jsonPath("$.[0].favouriteItem.id").value(equalTo("fav-02")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo(job01.id().getValue())))
+                .andExpect(jsonPath("$.[1].favouriteItem.id").value(equalTo("fav-01")));
     }
 
     @Test
-    public void testFindByOwnerId() {
+    @WithJobSeeker
+    public void testSearchByUserIdAndQuery() throws Exception {
         // given
-      /*  index(createJob(job01.id()));
-        index(createJob(job02.id()));
-        index(createJob(job03.id()));
-        index(createJob(job04.id()));
-        index(createJob(job05.id()));
+        this.index(createJob(job01.id()));
+        this.index(createJob(job02.id()));
+        this.index(createJob(job03.id()));
+        this.index(createJob(job04.id()));
+        this.index(createJob(job05.id()));
 
-        indexChildDocument(createFavouriteItem("child-01", job01.id(), "John"));
-        indexChildDocument(createFavouriteItem("child-02", job01.id(), "Emma"));
-        indexChildDocument(createFavouriteItem("child-03", job02.id(), "John"));
-        indexChildDocument(createFavouriteItem("child-04", job02.id(), "Jane"));
+        this.index(createTestFavouriteItem(new FavouriteItemId("fav-01"), job01.id(), WithJobSeeker.USER_ID, "Meine grosse Notiz"));
+        this.index(createTestFavouriteItem(new FavouriteItemId("fav-02"), job05.id(), WithJobSeeker.USER_ID, "Meine kleine Notiz"));
 
-        await().until(() -> favouriteItemElasticsearchRepository.count() >= 4);
+        this.index(createTestFavouriteItem(new FavouriteItemId("fav-03"), job01.id(), "job-seeker-2", "Eine andere Notiz"));
+        this.index(createTestFavouriteItem(new FavouriteItemId("fav-04"), job03.id(), "job-seeker-2", "Eine weitere Notiz"));
+        this.index(createTestFavouriteItem(new FavouriteItemId("fav-05"), job04.id(), "job-seeker-2", "Eine Notiz"));
 
-        // then
-        assertThat(this.favouriteItemElasticsearchRepository.findByOwnerId("John")).hasSize(2);
-*/
+        await().until(() -> favouriteItemElasticsearchRepository.count() >= 5);
+
+        // when
+        ResultActions resultActions = this.mockMvc.perform(
+                MockMvcRequestBuilders.get(URL + "/_search/byUserId")
+                        .param("userId", WithJobSeeker.USER_ID)
+                        .param("query", "kleine")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8));
+
+        //then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(header().string("X-Total-Count", "1"))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo(job05.id().getValue())))
+                .andExpect(jsonPath("$.[0].favouriteItem.id").value(equalTo("fav-02")));
     }
 
     private void index(JobAdvertisement jobAdvertisement) {

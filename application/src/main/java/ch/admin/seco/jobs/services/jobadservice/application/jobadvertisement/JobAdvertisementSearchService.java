@@ -14,7 +14,7 @@ public interface JobAdvertisementSearchService {
 
     Page<JobAdvertisementSearchResult> search(JobAdvertisementSearchRequest jobSearchRequest, int page, int size, JobAdvertisementSearchService.SearchSort sort);
 
-    Page<JobAdvertisementSearchResult> findFavouriteJobAds(String ownerId, int page, int size);
+    Page<JobAdvertisementSearchResult> findFavouriteJobAds(String ownerId, String query, int page, int size);
 
     Page<JobAdvertisementDto> searchManagedJobAds(ManagedJobAdSearchRequest searchRequest, Pageable pageable);
 
