@@ -4,15 +4,11 @@ import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteIt
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ChildRelation;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Mapping;
-import org.springframework.data.elasticsearch.annotations.Setting;
 
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.TYPE_DOC;
 
-@Document(indexName = INDEX_NAME_JOB_ADVERTISEMENT, type = TYPE_DOC, shards = 1, replicas = 0)
-@Mapping(mappingPath = "config/elasticsearch/mappings/job-advertisement.json")
-@Setting(settingPath = "config/elasticsearch/settings/folding-analyzer.json")
+@Document(indexName = INDEX_NAME_JOB_ADVERTISEMENT, type = TYPE_DOC)
 public class FavouriteItemDocument {
 
     public static final String FAVOURITE_ITEM_RELATION_NAME = "rel_favouriteItem";

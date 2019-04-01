@@ -12,11 +12,10 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.Ela
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
-import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.unit.DistanceUnit;
 import org.elasticsearch.index.query.*;
-import org.elasticsearch.join.query.HasChildQueryBuilder;
+import org.elasticsearch.join.query.HasParentQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
@@ -29,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.DefaultResultMapper;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ResultsExtractor;
 import org.springframework.data.elasticsearch.core.ResultsMapper;
 import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
@@ -37,6 +37,7 @@ import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -46,7 +47,7 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.J
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.TYPE_DOC;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument.JOB_ADVERTISEMENT_PARENT_RELATION_NAME;
 import static org.apache.commons.lang3.ArrayUtils.*;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -135,12 +136,43 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.matchesCurrentUserId(#ownerId)")
     public Page<JobAdvertisementSearchResult> findFavouriteJobAds(String ownerId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        SearchQuery searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(new HasChildQueryBuilder(FAVOURITE_ITEM_RELATION_NAME,
-                        QueryBuilders.termQuery("favouriteItem.ownerId", ownerId.toLowerCase()), ScoreMode.None))
+
+        BoolQueryBuilder boolQuery = boolQuery()
+                .must(new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, matchAllQuery(), true).innerHit(new InnerHitBuilder()))
+                .must(QueryBuilders.termQuery("favouriteItem.ownerId", ownerId.toLowerCase()));
+        SearchQuery searchFavouriteQuery = new NativeSearchQueryBuilder()
+                .withQuery(boolQuery)
+                .withPageable(pageable)
                 .build();
 
-        return elasticsearchTemplate.query(searchQuery, response -> extractSearchResult(pageable, response));
+        return this.elasticsearchTemplate.query(searchFavouriteQuery, new ResultsExtractor<Page<JobAdvertisementSearchResult>>() {
+            @Override
+            public Page<JobAdvertisementSearchResult> extract(SearchResponse response) {
+                SearchHits hits = response.getHits();
+                List<JobAdvertisementSearchResult> results = new ArrayList<>();
+                for (SearchHit hit : hits) {
+                    String favouriteAsString = hit.getSourceAsString();
+                    SearchHits jobAdsHit = hit.getInnerHits().get(JOB_ADVERTISEMENT_PARENT_RELATION_NAME);
+                    SearchHit jobAdHit = jobAdsHit.getHits()[0];
+                    String jobAdAsString = jobAdHit.getSourceAsString();
+                    try {
+                        JobAdvertisementSearchResult jobAdvertisementSearchResult = toJobAdvertisementSearchResult(favouriteAsString, jobAdAsString);
+                        results.add(jobAdvertisementSearchResult);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return new AggregatedPageImpl<>(results, pageable, hits.totalHits, response.getAggregations(), response.getScrollId());
+            }
+
+            private JobAdvertisementSearchResult toJobAdvertisementSearchResult(String favouriteAsString, String jobAdAsString) throws IOException {
+                FavouriteItemDocument favouriteItemDocument = resultsMapper.getEntityMapper().mapToObject(favouriteAsString, FavouriteItemDocument.class);
+                JobAdvertisementDocument jobAdvertisementDocument = resultsMapper.getEntityMapper().mapToObject(jobAdAsString, JobAdvertisementDocument.class);
+                JobAdvertisementDto jobAdvertisementDto = JobAdvertisementDto.toDto(jobAdvertisementDocument.getJobAdvertisement());
+                FavouriteItemDto favouriteItemDto = FavouriteItemDto.toDto(favouriteItemDocument.getFavouriteItem());
+                return new JobAdvertisementSearchResult(jobAdvertisementDto, favouriteItemDto);
+            }
+        });
     }
 
     @Override
