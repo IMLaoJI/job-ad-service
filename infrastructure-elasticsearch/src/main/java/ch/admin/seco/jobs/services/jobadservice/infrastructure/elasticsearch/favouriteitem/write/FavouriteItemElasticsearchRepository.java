@@ -30,9 +30,7 @@ import java.util.stream.Collectors;
 
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.TYPE_DOC;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument.JOB_ADVERTISEMENT_PARENT_RELATION_NAME;
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.elasticsearch.index.query.QueryBuilders.termQuery;
+import static org.elasticsearch.index.query.QueryBuilders.*;
 
 public class FavouriteItemElasticsearchRepository {
 
@@ -78,14 +76,14 @@ public class FavouriteItemElasticsearchRepository {
 
     public List<FavouriteItemDocument> findByParent(JobAdvertisementId jobAdvertisementId) {
         SearchQuery searchFavouriteQuery = new NativeSearchQueryBuilder()
-                .withQuery(new ParentIdQueryBuilder(FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME, jobAdvertisementId.getValue()))
+                .withFilter(new ParentIdQueryBuilder(FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME, jobAdvertisementId.getValue()))
                 .build();
         return this.elasticsearchTemplate.queryForList(searchFavouriteQuery, FavouriteItemDocument.class);
     }
 
     public Optional<FavouriteItemDocument> findById(JobAdvertisementId jobAdvertisementId, FavouriteItemId favouriteItemId) {
         SearchQuery searchFavouriteQuery = new NativeSearchQueryBuilder()
-                .withQuery(boolQuery()
+                .withFilter(boolQuery()
                         .must(new ParentIdQueryBuilder(FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME, jobAdvertisementId.getValue()))
                         .must(QueryBuilders.termQuery("_id", favouriteItemId.getValue().toLowerCase())))
                 .build();
@@ -105,7 +103,7 @@ public class FavouriteItemElasticsearchRepository {
                 .must(QueryBuilders.termQuery("favouriteItem.ownerId", ownerId));
 
         SearchQuery searchFavouriteQuery = new NativeSearchQueryBuilder()
-                .withQuery(boolQuery)
+                .withFilter(boolQuery)
                 .build();
         return this.elasticsearchTemplate.queryForList(searchFavouriteQuery, FavouriteItemDocument.class);
     }
@@ -134,7 +132,7 @@ public class FavouriteItemElasticsearchRepository {
 
     public long count() {
         SearchQuery query = new NativeSearchQueryBuilder()
-                .withQuery(new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, matchAllQuery(), false))
+                .withFilter(new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, matchAllQuery(), false))
                 .build();
         return this.elasticsearchTemplate.count(query, FavouriteItemDocument.class);
     }
