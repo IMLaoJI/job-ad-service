@@ -74,7 +74,7 @@ public class FavouriteItemRestController {
                                                                            @RequestParam(name = "page", defaultValue = "0") int page,
                                                                            @RequestParam(name = "size", defaultValue = "20") int size
     ) {
-        Page<JobAdvertisementSearchResult> userFavorites = jobAdvertisementSearchService.findFavouriteJobAds(userId, query, page, size);
+        Page<JobAdvertisementSearchResult> userFavorites = jobAdvertisementSearchService.searchFavouriteJobAds(userId, query, page, size);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(userFavorites, "/api/favourite-items/_search/managed");
         return new ResponseEntity<>(userFavorites.getContent(), headers, HttpStatus.OK);
     }

@@ -141,7 +141,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
     @Override
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.matchesCurrentUserId(#ownerId)")
-    public Page<JobAdvertisementSearchResult> findFavouriteJobAds(String ownerId, String query, int page, int size) {
+    public Page<JobAdvertisementSearchResult> searchFavouriteJobAds(String ownerId, String query, int page, int size) {
         Pageable pageable = PageRequest
                 .of(page, size, Sort.by(
                         desc(PATH_CREATED_TIME),
