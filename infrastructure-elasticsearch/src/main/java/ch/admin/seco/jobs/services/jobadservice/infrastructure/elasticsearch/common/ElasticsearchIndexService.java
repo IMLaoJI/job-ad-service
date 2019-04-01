@@ -142,9 +142,9 @@ public class ElasticsearchIndexService {
             JpaRepository<JPA, ID> jpaRepository,
             ElasticRepositoryAdapter<ELASTIC> elasticsearchRepository,
             Function<JPA, ELASTIC> entityToDocumentMapper,
-            String methodName, boolean dropFirst) {
+            String methodName, boolean resetIndex) {
 
-        if (dropFirst) {
+        if (resetIndex) {
             elasticsearchTemplate.deleteIndex(documentClass);
             elasticsearchTemplate.createIndex(documentClass);
             elasticsearchTemplate.putMapping(documentClass);
