@@ -696,42 +696,6 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
-    public void countJobs() throws Exception {
-        // GIVEN
-        index(createJob(job01.id()));
-        index(createJob(job02.id()));
-        index(createJobWithContractType(job03.id(), true));
-        index(createJobWithWorkload(job04.id(), 20, 50));
-        index(createJobWithDescription(job05.id(), "xxx", "yyyy"));
-        index(createJob(job06.id()));
-        index(createJob(job07.id()));
-        index(createJob(job08.id()));
-        index(createJob(job09.id()));
-        index(createJob(job10.id()));
-
-        // WHEN
-        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setPermanent(false);
-        searchRequest.setWorkloadPercentageMin(70);
-        searchRequest.setCantonCodes(new String[]{"BE"});
-        searchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.AVAM, "9999")});
-        searchRequest.setKeywords(new String[]{"title"});
-
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_count")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
-        // THEN
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.totalCount").value(7))
-        ;
-    }
-
-    @Test
     public void shouldSearchEuresJobAdvertisementsMarkedForPublication() throws Exception {
         // GIVEN
         // id, publicDisplay, restrictedDisplay, euresDisplay
