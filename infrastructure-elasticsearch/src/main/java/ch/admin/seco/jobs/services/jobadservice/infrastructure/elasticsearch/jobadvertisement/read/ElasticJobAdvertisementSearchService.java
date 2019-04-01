@@ -1,12 +1,19 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.read;
 
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.FavouriteItemDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.*;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchResult;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ManagedJobAdSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.PeaJobAdvertisementSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCode;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.RadiusSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUser;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
 import ch.admin.seco.jobs.services.jobadservice.application.security.Role;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument;
@@ -14,7 +21,12 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.fav
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.unit.DistanceUnit;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.InnerHitBuilder;
+import org.elasticsearch.index.query.MultiMatchQueryBuilder;
+import org.elasticsearch.index.query.Operator;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.join.query.HasParentQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -38,7 +50,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,10 +67,22 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.J
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.TYPE_DOC;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument.JOB_ADVERTISEMENT_PARENT_RELATION_NAME;
-import static org.apache.commons.lang3.ArrayUtils.*;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
+import static org.apache.commons.lang3.ArrayUtils.toArray;
+import static org.apache.commons.lang3.ArrayUtils.toStringArray;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
+import static org.elasticsearch.index.query.QueryBuilders.geoDistanceQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchPhrasePrefixQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static org.elasticsearch.index.query.QueryBuilders.multiMatchQuery;
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
+import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
 import static org.springframework.data.domain.Sort.Order.asc;
 import static org.springframework.data.domain.Sort.Order.desc;
 
@@ -220,7 +251,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
         return new AggregatedPageImpl<>(jobAdvertisementSearchResults, pageable, searchHits.totalHits, searchResults.getAggregations(), searchResults.getScrollId());
     }
 
-    private Map<String, FavouriteItemDto> findFavouriteItemsMappedByJobAdId(List<String> jobAdvertisementIds) {
+    private Map<String, FavouriteItemDto> findFavouriteItemsMappedByJobAdId(List<JobAdvertisementId> jobAdvertisementIds) {
         CurrentUser currentUser = currentUserContext.getCurrentUser();
         if (currentUser == null) {
             return Collections.emptyMap();
@@ -233,10 +264,12 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
                 .collect(Collectors.toMap(FavouriteItemDto::getJobAdvertisementId, Function.identity()));
     }
 
-    private List<String> extractJobAdIds(List<JobAdvertisementDto> jobAdvertisementDtoList) {
-        return jobAdvertisementDtoList.stream()
-                .map(JobAdvertisementDto::getId)
-                .collect(Collectors.toList());
+    private List<JobAdvertisementId> extractJobAdIds(List<JobAdvertisementDto> jobAdvertisementDtoList) {
+        List<JobAdvertisementId> jobAdvertisementIds = new ArrayList<>();
+        for (JobAdvertisementDto jobAdvertisementDto : jobAdvertisementDtoList) {
+            jobAdvertisementIds.add(new JobAdvertisementId(jobAdvertisementDto.getId()));
+        }
+        return jobAdvertisementIds;
     }
 
     private Pageable appendUniqueSortingKey(Pageable pageable) {

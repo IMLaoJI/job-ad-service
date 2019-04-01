@@ -34,7 +34,7 @@ public class IndexerEventListener {
     @TransactionalEventListener
     public void handle(FavouriteItemEvent event) {
         if (event.getDomainEventType() == FavouriteItemEvents.FAVOURITE_ITEM_DELETED.getDomainEventType()) {
-            this.favouriteItemElasticsearchRepository.deleteById(event.getJobAdvertisementId().getValue(), event.getAggregateId().getValue());
+            this.favouriteItemElasticsearchRepository.deleteById(event.getJobAdvertisementId(), event.getAggregateId());
         } else {
             indexFavouriteItem(event);
         }

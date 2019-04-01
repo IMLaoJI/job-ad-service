@@ -13,7 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job02;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job03;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job04;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,11 +58,11 @@ public class FavouriteItemElasticsearchRepositoryTest {
         await().until(() -> favouriteItemElasticsearchRepository.count() >= 4);
 
         // then
-        assertThat(this.favouriteItemElasticsearchRepository.findById(job01.id().getValue(), "child-01")).isPresent();
-        assertThat(this.favouriteItemElasticsearchRepository.findById(job01.id().getValue(), "child-02")).isPresent();
-        assertThat(this.favouriteItemElasticsearchRepository.findById(job01.id().getValue(), "child-03")).isPresent();
-        assertThat(this.favouriteItemElasticsearchRepository.findById(job01.id().getValue(), "child-04")).isNotPresent();
-        assertThat(this.favouriteItemElasticsearchRepository.findById(job02.id().getValue(), "child-04")).isPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findById(job01.id(), new FavouriteItemId("child-01"))).isPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findById(job01.id(), new FavouriteItemId("child-02"))).isPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findById(job01.id(), new FavouriteItemId("child-03"))).isPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findById(job01.id(), new FavouriteItemId("child-04"))).isNotPresent();
+        assertThat(this.favouriteItemElasticsearchRepository.findById(job02.id(), new FavouriteItemId("child-04"))).isPresent();
     }
 
     @Test
@@ -80,22 +83,22 @@ public class FavouriteItemElasticsearchRepositoryTest {
 
         // then
         assertThat(this.favouriteItemElasticsearchRepository.findByOwnerAndParentIds(
-                asList(job04.id().getValue(), job02.id().getValue()),
+                asList(job04.id(), job02.id()),
                 "Paul")
         ).hasSize(1);
 
         assertThat(this.favouriteItemElasticsearchRepository.findByOwnerAndParentIds(
-                asList(job01.id().getValue(), job02.id().getValue()),
+                asList(job01.id(), job02.id()),
                 "John")
         ).hasSize(2);
 
         assertThat(this.favouriteItemElasticsearchRepository.findByOwnerAndParentIds(
-                asList(job01.id().getValue(), job02.id().getValue(), job04.id().getValue()),
+                asList(job01.id(), job02.id(), job04.id()),
                 "John")
         ).hasSize(3);
 
         assertThat(this.favouriteItemElasticsearchRepository.findByOwnerAndParentIds(
-                asList(job01.id().getValue(), job04.id().getValue()),
+                asList(job01.id(), job04.id()),
                 "Emma")
         ).hasSize(0);
 
@@ -115,9 +118,9 @@ public class FavouriteItemElasticsearchRepositoryTest {
         await().until(() -> favouriteItemElasticsearchRepository.count() >= 3);
 
         // then
-        assertThat(this.favouriteItemElasticsearchRepository.findByParent(job01.id().getValue())).hasSize(3);
-        assertThat(this.favouriteItemElasticsearchRepository.findByParent(job02.id().getValue())).hasSize(0);
-        assertThat(this.favouriteItemElasticsearchRepository.findByParent(job03.id().getValue())).hasSize(0);
+        assertThat(this.favouriteItemElasticsearchRepository.findByParent(job01.id())).hasSize(3);
+        assertThat(this.favouriteItemElasticsearchRepository.findByParent(job02.id())).hasSize(0);
+        assertThat(this.favouriteItemElasticsearchRepository.findByParent(job03.id())).hasSize(0);
     }
 
     @Test
@@ -135,7 +138,7 @@ public class FavouriteItemElasticsearchRepositoryTest {
         await().until(() -> favouriteItemElasticsearchRepository.count() == 3);
 
         // when
-        favouriteItemElasticsearchRepository.deleteById(job01.id().getValue(), "child-01");
+        favouriteItemElasticsearchRepository.deleteById(job01.id(), new FavouriteItemId("child-01"));
 
         // then
         await().until(() -> favouriteItemElasticsearchRepository.count() == 2);
@@ -155,7 +158,7 @@ public class FavouriteItemElasticsearchRepositoryTest {
         await().until(() -> favouriteItemElasticsearchRepository.count() >= 3);
 
         // when
-        favouriteItemElasticsearchRepository.deleteByParentId(job01.id().getValue());
+        favouriteItemElasticsearchRepository.deleteByParentId(job01.id());
 
         // then
         await().until(() -> favouriteItemElasticsearchRepository.count() == 1);
