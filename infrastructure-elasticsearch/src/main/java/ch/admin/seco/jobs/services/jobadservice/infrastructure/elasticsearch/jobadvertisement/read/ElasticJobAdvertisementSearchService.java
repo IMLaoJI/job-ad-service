@@ -288,12 +288,6 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
         return query;
     }
 
-    @Override
-    public long count(JobAdvertisementSearchRequest jobSearchRequest) {
-        SearchQuery countQuery = createSearchQueryBuilder(jobSearchRequest).build();
-        return elasticsearchTemplate.count(countQuery, JobAdvertisementDocument.class);
-    }
-
     private Sort createSort(SearchSort sort) {
         switch (sort) {
             case date_asc:

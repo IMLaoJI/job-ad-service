@@ -18,5 +18,4 @@ public interface JobAdvertisementSearchService {
 
     Page<JobAdvertisementDto> searchManagedJobAds(ManagedJobAdSearchRequest searchRequest, Pageable pageable);
 
-    long count(JobAdvertisementSearchRequest jobSearchRequest);
 }

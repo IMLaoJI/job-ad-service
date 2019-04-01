@@ -20,9 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.springframework.util.StringUtils.hasText;
 
@@ -60,15 +58,6 @@ public class JobAdvertisementSearchController {
         Page<JobAdvertisementDto> resultPage = jobAdvertisementSearchService.searchManagedJobAds(searchRequest, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(resultPage, "/api/jobAdvertisements/_search/managed");
         return new ResponseEntity<>(resultPage.getContent(), headers, HttpStatus.OK);
-    }
-
-    @PostMapping("/_count")
-    @Timed
-    public ResponseEntity<Map<String, Long>> countJobs(
-            @RequestBody @Valid JobAdvertisementSearchRequest jobAdvertisementSearchRequest) {
-
-        long totalCount = jobAdvertisementSearchService.count(jobAdvertisementSearchRequest);
-        return new ResponseEntity<>(Collections.singletonMap("totalCount", totalCount), HttpStatus.OK);
     }
 
     private JobAdvertisementSearchResult sanitizeJobDescription(JobAdvertisementSearchResult searchResult) {
