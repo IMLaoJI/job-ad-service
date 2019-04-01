@@ -71,6 +71,7 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -151,7 +152,7 @@ public class JobAdvertisementApplicationService {
         return jobAdvertisement.getId();
     }
 
-    public JobAdvertisementId createFromAvam(CreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
+    public JobAdvertisementId createFromAvam(@Valid CreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
         LOG.debug("Start creating new job ad from AVAM");
 
         Condition.notNull(createJobAdvertisementFromAvamDto, "CreateJobAdvertisementFromAvamDto can't be null");

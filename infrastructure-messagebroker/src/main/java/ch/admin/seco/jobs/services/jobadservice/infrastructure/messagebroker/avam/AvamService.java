@@ -98,7 +98,7 @@ public class AvamService {
     }
 
     @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CREATE_FROM_AVAM_CONDITION)
-    public void handleCreateAction(@Valid AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
+    public void handleCreateAction(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
         try {
             CreateJobAdvertisementDto createJobAdvertisementDto = AvamCreateJobAdvertisementDto.toDto(createJobAdvertisementFromAvamDto);
             jobAdvertisementApplicationService.createFromAvam(createJobAdvertisementDto);
