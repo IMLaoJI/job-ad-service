@@ -10,6 +10,36 @@
           }
         }
       },
+      "favouriteItem": {
+        "properties": {
+          "createdTime": {
+            "type": "date"
+          },
+          "id": {
+            "properties": {
+              "value": {
+                "type": "keyword"
+              }
+            }
+          },
+          "jobAdvertisementId": {
+            "properties": {
+              "value": {
+                "type": "keyword"
+              }
+            }
+          },
+          "note": {
+            "type": "text"
+          },
+          "ownerId": {
+            "type": "keyword"
+          },
+          "updatedTime": {
+            "type": "date"
+          }
+        }
+      },
       "jobAdvertisement": {
         "properties": {
           "id": {
