@@ -14,9 +14,11 @@ import org.elasticsearch.join.query.ParentIdQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.data.elasticsearch.core.query.UpdateQuery;
+import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -42,17 +44,23 @@ public class FavouriteItemElasticsearchRepository {
     }
 
     public FavouriteItemDocument save(FavouriteItemDocument favouriteItemDocument) {
-        UpdateRequest updateRequest = new UpdateRequest(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT, TYPE_DOC, favouriteItemDocument.getId());
+        final ElasticsearchPersistentEntity persistentEntity = this.elasticsearchTemplate.getPersistentEntityFor(favouriteItemDocument.getClass());
+        final String identifier = (String) persistentEntity.getIdentifierAccessor(favouriteItemDocument).getIdentifier();
+
+        Assert.notNull(identifier, "No id for document");
+
+        final UpdateRequest updateRequest = new UpdateRequest(persistentEntity.getIndexName(), persistentEntity.getIndexType(), identifier);
         updateRequest.routing(favouriteItemDocument.getJobAdvertisementRelations().getParent());
+
         try {
             String json = this.objectMapper.writeValueAsString(favouriteItemDocument);
             updateRequest.doc(json, XContentType.JSON);
             UpdateQuery updateQuery = new UpdateQuery();
             updateQuery.setUpdateRequest(updateRequest);
-            updateQuery.setClazz(FavouriteItemDocument.class);
-            updateQuery.setId(favouriteItemDocument.getId());
-            updateQuery.setIndexName(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT);
-            updateQuery.setType(TYPE_DOC);
+            updateQuery.setClazz(persistentEntity.getType());
+            updateQuery.setId(identifier);
+            updateQuery.setIndexName(persistentEntity.getIndexName());
+            updateQuery.setType(persistentEntity.getIndexType());
             updateQuery.setDoUpsert(true);
             elasticsearchTemplate.update(updateQuery);
         } catch (IOException e) {
@@ -60,6 +68,7 @@ public class FavouriteItemElasticsearchRepository {
             throw new UncheckedIOException(e);
         }
         LOG.info("Index of {} successfully created or updated.", favouriteItemDocument.toString());
+
         return favouriteItemDocument;
     }
 

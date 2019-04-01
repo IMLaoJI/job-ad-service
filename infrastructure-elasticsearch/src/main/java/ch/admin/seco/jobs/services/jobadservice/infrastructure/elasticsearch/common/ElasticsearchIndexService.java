@@ -91,7 +91,8 @@ public class ElasticsearchIndexService {
                     }
                 },
                 JobAdvertisementDocument::new,
-                "streamAll"
+                "streamAll",
+                true
         );
 
         reindexForClass(
@@ -109,7 +110,8 @@ public class ElasticsearchIndexService {
                     }
                 },
                 ApiUserDocument::new,
-                "streamAll"
+                "streamAll",
+                true
         );
 
         reindexForClass(
@@ -127,7 +129,8 @@ public class ElasticsearchIndexService {
                     }
                 },
                 FavouriteItemDocument::new,
-                "streamAll"
+                "streamAll",
+                false
         );
 
         log.info("Elasticsearch: Successfully performed reindexing");
@@ -139,10 +142,13 @@ public class ElasticsearchIndexService {
             JpaRepository<JPA, ID> jpaRepository,
             ElasticRepositoryAdapter<ELASTIC> elasticsearchRepository,
             Function<JPA, ELASTIC> entityToDocumentMapper,
-            String methodName) {
-        elasticsearchTemplate.deleteIndex(documentClass);
-        elasticsearchTemplate.createIndex(documentClass);
-        elasticsearchTemplate.putMapping(documentClass);
+            String methodName, boolean dropFirst) {
+
+        if (dropFirst) {
+            elasticsearchTemplate.deleteIndex(documentClass);
+            elasticsearchTemplate.createIndex(documentClass);
+            elasticsearchTemplate.putMapping(documentClass);
+        }
 
         if (jpaRepository.count() > 0) {
             reindexWithStream(jpaRepository, elasticsearchRepository,
