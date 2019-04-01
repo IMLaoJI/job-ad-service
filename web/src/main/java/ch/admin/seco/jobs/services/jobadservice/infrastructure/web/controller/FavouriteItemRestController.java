@@ -12,7 +12,6 @@ import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteIt
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PaginationUtil;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,9 +68,11 @@ public class FavouriteItemRestController {
                 .orElse(null);
     }
 
-    @GetMapping("/_search/byUserId}")
-    public ResponseEntity<List<JobAdvertisementSearchResult>> findByUserId(Pageable pageable, @RequestParam String userId) {
-        Page<JobAdvertisementSearchResult> userFavorites = jobAdvertisementSearchService.findFavouriteJobAds(userId, pageable.getPageNumber(), pageable.getPageSize());
+    @GetMapping("/_search/byUserId")
+    public ResponseEntity<List<JobAdvertisementSearchResult>> findByUserId(@RequestParam String userId,
+                                                                           @RequestParam(name = "page", defaultValue = "0") int page,
+                                                                           @RequestParam(name = "size", defaultValue = "20") int size) {
+        Page<JobAdvertisementSearchResult> userFavorites = jobAdvertisementSearchService.findFavouriteJobAds(userId, page, size);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(userFavorites, "/api/favourite-items/_search/managed");
         return new ResponseEntity<>(userFavorites.getContent(), headers, HttpStatus.OK);
     }
