@@ -214,7 +214,8 @@ public class FavouriteItemRestControllerIntTest {
         this.index(createTestFavouriteItem(new FavouriteItemId("fav-04"), job03.id(), "job-seeker-2", ""));
         this.index(createTestFavouriteItem(new FavouriteItemId("fav-05"), job04.id(), "job-seeker-2", ""));
 
-        Thread.sleep(10000);
+
+        await().until(() -> favouriteItemElasticsearchRepository.count() >= 5);
         // when
         ResultActions resultActions = this.mockMvc.perform(
                 MockMvcRequestBuilders.get(URL + "/_search/byUserId")

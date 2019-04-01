@@ -102,7 +102,7 @@ public class FavouriteItemElasticsearchRepository {
     public List<FavouriteItemDocument> findByOwnerAndParentIds(List<JobAdvertisementId> jobAdvertisementIds, String ownerId) {
         BoolQueryBuilder boolQuery = boolQuery()
                 .must(new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, matchesJobAdvertisementIds(jobAdvertisementIds), true))
-                .must(QueryBuilders.termQuery("favouriteItem.ownerId", ownerId.toLowerCase()));
+                .must(QueryBuilders.termQuery("favouriteItem.ownerId", ownerId));
 
         SearchQuery searchFavouriteQuery = new NativeSearchQueryBuilder()
                 .withQuery(boolQuery)

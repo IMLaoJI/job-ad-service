@@ -66,7 +66,7 @@ public class FavouriteItemElasticsearchRepositoryTest {
     }
 
     @Test
-    public void testFindByOwnerAndParentIds() {
+    public void testFindByOwnerAndParentIds() throws InterruptedException {
         // given
         index(createJob(job01.id()));
         index(createJob(job02.id()));
@@ -85,7 +85,7 @@ public class FavouriteItemElasticsearchRepositoryTest {
         assertThat(this.favouriteItemElasticsearchRepository.findByOwnerAndParentIds(
                 asList(job04.id(), job02.id()),
                 "Paul")
-        ).hasSize(1);
+            ).hasSize(1);
 
         assertThat(this.favouriteItemElasticsearchRepository.findByOwnerAndParentIds(
                 asList(job01.id(), job02.id()),
