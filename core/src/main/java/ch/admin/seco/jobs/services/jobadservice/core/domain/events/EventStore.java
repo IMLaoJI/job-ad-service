@@ -6,6 +6,5 @@ public interface EventStore {
 
     Page<EventData> findByAggregateId(String aggregateId, String aggregateType, int page, int pageSize);
 
-    EventData findLatestByType(String aggregateId, String aggregateType, DomainEventType domainEventType);
 
 }

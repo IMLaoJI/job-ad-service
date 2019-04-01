@@ -1,8 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
@@ -10,9 +9,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.cloud.stream.test.binder.MessageCollector;
@@ -21,26 +21,25 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.ws.test.server.MockWebServiceClient;
 import org.springframework.ws.test.server.ResponseMatchers;
 
 import java.io.IOException;
-import java.time.LocalDate;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.APPROVE;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.CANCEL;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.CREATE_FROM_AVAM;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.REJECT;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCreateJobAdvertisementDto.toDto;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.*;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.ACTION;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.ws.test.server.RequestCreators.withPayload;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = AvamSourceApplication.class)
+@SpringBootTest
 @DirtiesContext
+@AutoConfigureMockMvc
 public class AvamEndpointTest {
 
     private MockWebServiceClient mockWebServiceClient;
@@ -57,9 +56,6 @@ public class AvamEndpointTest {
     private MessageCollector messageCollector;
 
     @Autowired
-    private JobAdvertisementFromAvamAssembler assembler;
-
-    @Autowired
     private Source source;
 
     @Autowired
@@ -68,11 +64,21 @@ public class AvamEndpointTest {
     @Value("classpath:/schema/AVAMToEgov.xsd")
     private Resource secoEgovServiceXsdResource;
 
+    @Autowired
+    private MockMvc mockMvc;
+
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
         this.mockWebServiceClient = MockWebServiceClient.createClient(applicationContext);
         JacksonTester.initFields(this, objectMapper);
+    }
+
+    @Test
+    public void testRedirectToWsdl() throws Exception {
+        // useful test to check that no spring-security is configured
+        this.mockMvc.perform(get("/"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("services/SecoEgovService.wsdl"));
     }
 
     @Test

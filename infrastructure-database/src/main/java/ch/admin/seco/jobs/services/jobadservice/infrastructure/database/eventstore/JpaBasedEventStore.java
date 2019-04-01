@@ -1,6 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.database.eventstore;
 
-import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventType;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.EventData;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.EventStore;
 import org.springframework.data.domain.Page;
@@ -48,12 +47,4 @@ public class JpaBasedEventStore implements EventStore {
         return new PageImpl<>(toEventDtos(storedEvents.getContent()), pageable, storedEvents.getTotalElements());
     }
 
-    @Override
-    public EventData findLatestByType(String aggregateId, String aggregateType, DomainEventType domainEventType) {
-        StoredEvent storedEvent = storedEventRepository.findLatest(aggregateId, aggregateType, domainEventType);
-        if (storedEvent == null) {
-            return null;
-        }
-        return toEventDto(storedEvent);
-    }
 }

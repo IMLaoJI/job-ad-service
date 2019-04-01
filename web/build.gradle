@@ -13,7 +13,6 @@ dependencies {
     compile project(":infrastructure-database")
     compile project(":infrastructure-elasticsearch")
     compile project(":infrastructure-messagebroker")
-    compile project(":infrastructure-messagebroker-dlq")
     compile project(":infrastructure-service-reference")
     compile project(":infrastructure-elasticsearch")
 
@@ -23,6 +22,7 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-security"
     compile "org.springframework.boot:spring-boot-starter-web"
     compile "org.springframework.boot:spring-boot-starter-undertow"
+    compile "org.springframework.boot:spring-boot-starter-actuator"
 
     compile "org.springframework.cloud:spring-cloud-starter"
     compile "org.springframework.cloud:spring-cloud-starter-netflix-ribbon"
@@ -33,9 +33,7 @@ dependencies {
     compile "org.springframework.cloud:spring-cloud-starter-openfeign"
 
     compile "org.springframework.security:spring-security-web"
-    compile "org.springframework.security.oauth:spring-security-oauth2"
     compile "org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure"
-    compile "org.springframework.security:spring-security-jwt"
 
     compile "io.jsonwebtoken:jjwt"
     compile "io.springfox:springfox-swagger2"
@@ -46,13 +44,7 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-databind"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
     compile "com.fasterxml.jackson.module:jackson-module-afterburner"
-
-    compile "io.dropwizard.metrics:metrics-core"
-    compile "io.dropwizard.metrics:metrics-json"
-    compile "io.dropwizard.metrics:metrics-jvm"
-    compile "io.dropwizard.metrics:metrics-servlet"
-    compile "io.dropwizard.metrics:metrics-servlets"
-    compile "com.ryantenney.metrics:metrics-spring"
+    
     compile "net.logstash.logback:logstash-logback-encoder"
     compile "org.zalando:problem-spring-web"
     compile "org.jsoup:jsoup:1.11.3"
