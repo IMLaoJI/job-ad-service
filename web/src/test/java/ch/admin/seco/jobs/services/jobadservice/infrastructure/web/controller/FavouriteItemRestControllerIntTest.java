@@ -121,7 +121,7 @@ public class FavouriteItemRestControllerIntTest {
         assertThat(favouriteItem.get().getNote()).isEqualTo(adjustedNote);
 
         await().until(() -> {
-            Optional<FavouriteItemDocument> favouriteItemDocumentOptional = favouriteItemElasticsearchRepository.findById(job01.id(), fav01);
+            Optional<FavouriteItemDocument> favouriteItemDocumentOptional =  favouriteItemElasticsearchRepository.findById(job01.id(), fav01);
             if (favouriteItemDocumentOptional.isPresent()) {
                 assertThat(favouriteItemDocumentOptional.get().getFavouriteItem().getNote()).isEqualTo(adjustedNote);
                 return true;
@@ -214,6 +214,7 @@ public class FavouriteItemRestControllerIntTest {
         this.index(createTestFavouriteItem(new FavouriteItemId("fav-04"), job03.id(), "job-seeker-2", ""));
         this.index(createTestFavouriteItem(new FavouriteItemId("fav-05"), job04.id(), "job-seeker-2", ""));
 
+        Thread.sleep(10000);
         // when
         ResultActions resultActions = this.mockMvc.perform(
                 MockMvcRequestBuilders.get(URL + "/_search/byUserId")
