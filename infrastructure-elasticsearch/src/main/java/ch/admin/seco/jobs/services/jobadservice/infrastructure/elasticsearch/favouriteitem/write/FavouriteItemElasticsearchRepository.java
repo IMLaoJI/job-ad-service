@@ -85,7 +85,7 @@ public class FavouriteItemElasticsearchRepository {
         SearchQuery searchFavouriteQuery = new NativeSearchQueryBuilder()
                 .withFilter(boolQuery()
                         .must(new ParentIdQueryBuilder(FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME, jobAdvertisementId.getValue()))
-                        .must(QueryBuilders.termQuery("_id", favouriteItemId.getValue().toLowerCase())))
+                        .must(QueryBuilders.termQuery("_id", favouriteItemId.getValue())))
                 .build();
         List<FavouriteItemDocument> favouriteItemDocumentList = this.elasticsearchTemplate.queryForList(searchFavouriteQuery, FavouriteItemDocument.class);
         if (favouriteItemDocumentList.size() == 0) {
@@ -112,7 +112,7 @@ public class FavouriteItemElasticsearchRepository {
     public void deleteByParentId(JobAdvertisementId jobAdvertisementId) {
         BulkByScrollResponse response =
                 DeleteByQueryAction.INSTANCE.newRequestBuilder(this.elasticsearchTemplate.getClient())
-                        .filter(new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, termQuery("_id", jobAdvertisementId.getValue().toLowerCase()), false))
+                        .filter(new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, termQuery("_id", jobAdvertisementId.getValue()), false))
                         .source(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT)
                         .refresh(true)
                         .get();
