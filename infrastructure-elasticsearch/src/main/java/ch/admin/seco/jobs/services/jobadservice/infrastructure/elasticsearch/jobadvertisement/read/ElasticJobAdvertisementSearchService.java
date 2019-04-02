@@ -11,7 +11,6 @@ import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteIt
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.join.ScoreMode;
@@ -63,7 +62,8 @@ import static org.springframework.data.domain.Sort.Order.desc;
 public class ElasticJobAdvertisementSearchService implements JobAdvertisementSearchService {
 
 
-    public static final String PATH_CREATED_TIME = "jobAdvertisement.createdTime";
+    private static final String PATH_CREATED_TIME = "jobAdvertisement.createdTime";
+
     private static Logger LOG = LoggerFactory.getLogger(ElasticJobAdvertisementSearchService.class);
 
     private static final String PATH_CTX = "jobAdvertisement.";
@@ -113,7 +113,6 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
     public ElasticJobAdvertisementSearchService(CurrentUserContext currentUserContext,
                                                 ElasticsearchTemplate elasticsearchTemplate,
                                                 ElasticsearchConfiguration.CustomEntityMapper customEntityMapper,
-                                                FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository,
                                                 FavouriteItemRepository favouriteItemRepository) {
         this.currentUserContext = currentUserContext;
         this.elasticsearchTemplate = elasticsearchTemplate;
@@ -268,7 +267,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
                 ))
                 .forEach(keywordQuery::should);
 
-        String allKeywords = Stream.of(keywords).collect(Collectors.joining(" "));
+        String allKeywords = String.join(" ", keywords);
         if (isNotBlank(allKeywords)) {
             keywordQuery.should(multiMatchQuery(allKeywords, PATH_OWNER_USER_DISPLAY_NAME, PATH_LOCATION_CITY, PATH_TITLE)
                     .boost(2f)
@@ -276,16 +275,6 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
         }
 
         return mustAll(keywordQuery);
-    }
-
-    private BoolQueryBuilder titleFilter(PeaJobAdvertisementSearchRequest searchRequest) {
-        BoolQueryBuilder query = boolQuery();
-
-        if (isNotBlank(searchRequest.getJobTitle())) {
-            query.must(matchQuery(PATH_TITLE, searchRequest.getJobTitle()));
-        }
-
-        return query;
     }
 
     private Sort createSort(SearchSort sort) {
@@ -328,7 +317,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
 
     private BoolQueryBuilder createOccupationCodeQuery(ProfessionCode code) {
-        final String path;
+        String path = null;
         switch (code.getType()) {
             case AVAM:
                 path = PATH_OCCUPATIONS_AVAM_OCCUPATION_CODE;
@@ -345,17 +334,10 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
             case X28:
                 path = PATH_X28_CODE;
                 break;
-            default:
-                path = null;
-                break;
         }
-
-        return Objects.nonNull(path)
-                ? boolQuery().must(termQuery(path, code.getValue()))
-                : boolQuery();
+        return boolQuery().must(termQuery(path, code.getValue()));
     }
 
-    @SuppressWarnings("unchecked")
     private BoolQueryBuilder createKeywordQuery(JobAdvertisementSearchRequest jobSearchRequest) {
         BoolQueryBuilder keywordQuery = boolQuery();
 

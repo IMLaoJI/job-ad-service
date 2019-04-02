@@ -45,7 +45,7 @@ public class FavouriteItemElasticsearchRepository {
         this.objectMapper = objectMapper;
     }
 
-    public FavouriteItemDocument save(FavouriteItemDocument favouriteItemDocument) {
+    public void save(FavouriteItemDocument favouriteItemDocument) {
         final ElasticsearchPersistentEntity persistentEntity = this.elasticsearchTemplate.getPersistentEntityFor(favouriteItemDocument.getClass());
         final String identifier = (String) persistentEntity.getIdentifierAccessor(favouriteItemDocument).getIdentifier();
 
@@ -71,7 +71,6 @@ public class FavouriteItemElasticsearchRepository {
         }
         LOG.info("Index of {} successfully created or updated.", favouriteItemDocument.toString());
 
-        return favouriteItemDocument;
     }
 
     public List<FavouriteItemDocument> findByParent(JobAdvertisementId jobAdvertisementId) {

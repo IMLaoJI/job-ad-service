@@ -20,7 +20,7 @@ public class FavouriteItemDocument {
 
     private ChildRelation jobAdvertisementRelations;
 
-    protected FavouriteItemDocument() {
+    private FavouriteItemDocument() {
     }
 
     public FavouriteItemDocument(FavouriteItem favouriteItem) {
