@@ -42,6 +42,7 @@ import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.contro
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForGeoDistanceTests;
 import static java.time.LocalDate.now;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.CombinableMatcher.both;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -696,42 +697,6 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
-    public void countJobs() throws Exception {
-        // GIVEN
-        index(createJob(job01.id()));
-        index(createJob(job02.id()));
-        index(createJobWithContractType(job03.id(), true));
-        index(createJobWithWorkload(job04.id(), 20, 50));
-        index(createJobWithDescription(job05.id(), "xxx", "yyyy"));
-        index(createJob(job06.id()));
-        index(createJob(job07.id()));
-        index(createJob(job08.id()));
-        index(createJob(job09.id()));
-        index(createJob(job10.id()));
-
-        // WHEN
-        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setPermanent(false);
-        searchRequest.setWorkloadPercentageMin(70);
-        searchRequest.setCantonCodes(new String[]{"BE"});
-        searchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.AVAM, "9999")});
-        searchRequest.setKeywords(new String[]{"title"});
-
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_count")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
-        // THEN
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.totalCount").value(7))
-        ;
-    }
-
-    @Test
     public void shouldSearchEuresJobAdvertisementsMarkedForPublication() throws Exception {
         // GIVEN
         // id, publicDisplay, restrictedDisplay, euresDisplay
@@ -978,7 +943,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 JobAdvertisementFixture.of(job04.id())
                         .setJobContent(
                                 JobContentFixture.of(job04.id())
-                                        .setJobDescriptions(asList(testJobDescription().setTitle("JobDescTitle").build()))
+                                        .setJobDescriptions(singletonList(testJobDescription().setTitle("JobDescTitle").build()))
                                         .build()),
                 JobAdvertisementFixture.of(job05.id()).setStellennummerAvam("test"),
                 JobAdvertisementFixture.of(job06.id())
@@ -1013,7 +978,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
                 JobAdvertisementFixture.of(job01.id())
                         .setJobContent(JobContentFixture.of(job01.id())
-                                .setJobDescriptions(asList(
+                                .setJobDescriptions(singletonList(
                                         testJobDescription().setTitle("desc1").build()
                                 ))
                                 .build())
@@ -1021,7 +986,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
                 JobAdvertisementFixture.of(job02.id())
                         .setJobContent(JobContentFixture.of(job02.id())
-                                .setJobDescriptions(asList(
+                                .setJobDescriptions(singletonList(
                                         testJobDescription().setTitle("desc2").build()
                                 ))
                                 .build())
@@ -1029,14 +994,14 @@ public class JobAdvertisementSearchControllerIntTest {
 
                 JobAdvertisementFixture.of(job03.id())
                         .setJobContent(JobContentFixture.of(job03.id())
-                                .setJobDescriptions(asList(
+                                .setJobDescriptions(singletonList(
                                         testJobDescription().setTitle("desc3").build()
                                 ))
                                 .build())
                         .setPublication(testPublication().setStartDate(now().minusDays(10)).build()),
                 JobAdvertisementFixture.of(job04.id())
                         .setJobContent(JobContentFixture.of(job04.id())
-                                .setJobDescriptions(asList(
+                                .setJobDescriptions(singletonList(
                                         testJobDescription().setTitle("desc4").build()
                                 ))
                                 .build())
@@ -1044,7 +1009,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
                 JobAdvertisementFixture.of(job05.id())
                         .setJobContent(JobContentFixture.of(job05.id())
-                                .setJobDescriptions(asList(
+                                .setJobDescriptions(singletonList(
                                         testJobDescription().setTitle("desc5").build()
                                 ))
                                 .build())
@@ -1098,17 +1063,17 @@ public class JobAdvertisementSearchControllerIntTest {
                 JobAdvertisementFixture.of(job02.id())
                         .setJobContent(
                                 JobContentFixture.of(job02.id())
-                                        .setJobDescriptions(asList(testJobDescription().setTitle("desc1").build()))
+                                        .setJobDescriptions(singletonList(testJobDescription().setTitle("desc1").build()))
                                         .build()),
                 JobAdvertisementFixture.of(job03.id())
                         .setJobContent(
                                 JobContentFixture.of(job03.id())
-                                        .setJobDescriptions(asList(testJobDescription().setTitle("desc3").build()))
+                                        .setJobDescriptions(singletonList(testJobDescription().setTitle("desc3").build()))
                                         .build()),
                 JobAdvertisementFixture.of(job04.id())
                         .setJobContent(
                                 JobContentFixture.of(job04.id())
-                                        .setJobDescriptions(asList(testJobDescription().setTitle("desc2").build()))
+                                        .setJobDescriptions(singletonList(testJobDescription().setTitle("desc2").build()))
                                         .build())
         );
 
@@ -1151,12 +1116,12 @@ public class JobAdvertisementSearchControllerIntTest {
                 JobAdvertisementFixture.of(job03.id())
                         .setJobContent(
                                 JobContentFixture.of(job03.id())
-                                        .setJobDescriptions(asList(testJobDescription().setTitle("desc3").build()))
+                                        .setJobDescriptions(singletonList(testJobDescription().setTitle("desc3").build()))
                                         .build()),
                 JobAdvertisementFixture.of(job04.id())
                         .setJobContent(
                                 JobContentFixture.of(job04.id())
-                                        .setJobDescriptions(asList(testJobDescription().setTitle("desc2").build()))
+                                        .setJobDescriptions(singletonList(testJobDescription().setTitle("desc2").build()))
                                         .build())
         );
 

@@ -45,7 +45,7 @@ public class FavouriteItemElasticsearchRepository {
         this.objectMapper = objectMapper;
     }
 
-    public FavouriteItemDocument save(FavouriteItemDocument favouriteItemDocument) {
+    public void save(FavouriteItemDocument favouriteItemDocument) {
         final ElasticsearchPersistentEntity persistentEntity = this.elasticsearchTemplate.getPersistentEntityFor(favouriteItemDocument.getClass());
         final String identifier = (String) persistentEntity.getIdentifierAccessor(favouriteItemDocument).getIdentifier();
 
@@ -71,7 +71,6 @@ public class FavouriteItemElasticsearchRepository {
         }
         LOG.info("Index of {} successfully created or updated.", favouriteItemDocument.toString());
 
-        return favouriteItemDocument;
     }
 
     public List<FavouriteItemDocument> findByParent(JobAdvertisementId jobAdvertisementId) {
@@ -85,7 +84,7 @@ public class FavouriteItemElasticsearchRepository {
         SearchQuery searchFavouriteQuery = new NativeSearchQueryBuilder()
                 .withFilter(boolQuery()
                         .must(new ParentIdQueryBuilder(FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME, jobAdvertisementId.getValue()))
-                        .must(QueryBuilders.termQuery("_id", favouriteItemId.getValue().toLowerCase())))
+                        .must(QueryBuilders.termQuery("_id", favouriteItemId.getValue())))
                 .build();
         List<FavouriteItemDocument> favouriteItemDocumentList = this.elasticsearchTemplate.queryForList(searchFavouriteQuery, FavouriteItemDocument.class);
         if (favouriteItemDocumentList.size() == 0) {
@@ -112,7 +111,7 @@ public class FavouriteItemElasticsearchRepository {
     public void deleteByParentId(JobAdvertisementId jobAdvertisementId) {
         BulkByScrollResponse response =
                 DeleteByQueryAction.INSTANCE.newRequestBuilder(this.elasticsearchTemplate.getClient())
-                        .filter(new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, termQuery("_id", jobAdvertisementId.getValue().toLowerCase()), false))
+                        .filter(new HasParentQueryBuilder(JOB_ADVERTISEMENT_PARENT_RELATION_NAME, termQuery("_id", jobAdvertisementId.getValue()), false))
                         .source(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT)
                         .refresh(true)
                         .get();

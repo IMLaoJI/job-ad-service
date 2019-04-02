@@ -86,8 +86,8 @@ public class ElasticsearchIndexService {
                     }
 
                     @Override
-                    public Iterable<JobAdvertisementDocument> saveAll(Iterable<JobAdvertisementDocument> entities) {
-                        return jobAdvertisementElasticsearchRepository.saveAll(entities);
+                    public void saveAll(Iterable<JobAdvertisementDocument> entities) {
+                        jobAdvertisementElasticsearchRepository.saveAll(entities);
                     }
                 },
                 JobAdvertisementDocument::new,
@@ -105,8 +105,8 @@ public class ElasticsearchIndexService {
                     }
 
                     @Override
-                    public Iterable<ApiUserDocument> saveAll(Iterable<ApiUserDocument> entities) {
-                        return apiUserElasticsearchRepository.saveAll(entities);
+                    public void saveAll(Iterable<ApiUserDocument> entities) {
+                        apiUserElasticsearchRepository.saveAll(entities);
                     }
                 },
                 ApiUserDocument::new,
@@ -124,8 +124,8 @@ public class ElasticsearchIndexService {
                     }
 
                     @Override
-                    public Iterable<FavouriteItemDocument> saveAll(Iterable<FavouriteItemDocument> entities) {
-                        return favouriteItemElasticsearchRepository.saveAll(entities);
+                    public void saveAll(Iterable<FavouriteItemDocument> entities) {
+                        favouriteItemElasticsearchRepository.saveAll(entities);
                     }
                 },
                 FavouriteItemDocument::new,
@@ -151,8 +151,13 @@ public class ElasticsearchIndexService {
         }
 
         if (jpaRepository.count() > 0) {
-            reindexWithStream(jpaRepository, elasticsearchRepository,
-                    entityToDocumentMapper, documentClass, methodName);
+            reindexWithStream(
+                    jpaRepository,
+                    elasticsearchRepository,
+                    entityToDocumentMapper,
+                    documentClass,
+                    methodName
+            );
         }
         log.info("Elasticsearch: Indexed all rows for " + documentClass.getSimpleName());
     }
@@ -160,8 +165,9 @@ public class ElasticsearchIndexService {
     private <JPA, ELASTIC, ID extends Serializable> void reindexWithStream(
             JpaRepository<JPA, ID> jpaRepository,
             ElasticRepositoryAdapter<ELASTIC> elasticsearchRepository,
-            Function<JPA, ELASTIC> entityToDocumentMapper, Class entityClass, String methodName) {
-
+            Function<JPA, ELASTIC> entityToDocumentMapper,
+            Class entityClass,
+            String methodName) {
         try {
             disableHibernateSecondaryCache();
             Method m = jpaRepository.getClass().getMethod(methodName);
@@ -193,12 +199,12 @@ public class ElasticsearchIndexService {
         entityManager.clear();
     }
 
-
     interface ElasticRepositoryAdapter<S> {
 
         long count();
 
-        Iterable<S> saveAll(Iterable<S> entities);
+        void saveAll(Iterable<S> entities);
 
     }
+
 }

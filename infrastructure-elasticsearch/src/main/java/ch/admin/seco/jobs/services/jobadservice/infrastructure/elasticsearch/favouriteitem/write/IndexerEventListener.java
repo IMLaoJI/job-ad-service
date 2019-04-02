@@ -4,7 +4,6 @@ import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteIt
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.events.FavouriteItemEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.events.FavouriteItemEvents;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -21,14 +20,10 @@ public class IndexerEventListener {
 
     private FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository;
 
-    private ElasticsearchIndexService elasticsearchIndexService;
-
     public IndexerEventListener(FavouriteItemRepository favouriteItemRepository,
-                                FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository,
-                                ElasticsearchIndexService elasticsearchIndexService) {
+                                FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository) {
         this.favouriteItemRepository = favouriteItemRepository;
         this.favouriteItemElasticsearchRepository = favouriteItemElasticsearchRepository;
-        this.elasticsearchIndexService = elasticsearchIndexService;
     }
 
     @TransactionalEventListener

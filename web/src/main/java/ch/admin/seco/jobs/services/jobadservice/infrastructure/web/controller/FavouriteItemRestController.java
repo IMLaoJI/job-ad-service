@@ -70,9 +70,11 @@ public class FavouriteItemRestController {
 
     @GetMapping("/_search/byUserId")
     public ResponseEntity<List<JobAdvertisementSearchResult>> findByUserId(@RequestParam String userId,
+                                                                           @RequestParam(name = "query", defaultValue = "") String query,
                                                                            @RequestParam(name = "page", defaultValue = "0") int page,
-                                                                           @RequestParam(name = "size", defaultValue = "20") int size) {
-        Page<JobAdvertisementSearchResult> userFavorites = jobAdvertisementSearchService.findFavouriteJobAds(userId, page, size);
+                                                                           @RequestParam(name = "size", defaultValue = "20") int size
+    ) {
+        Page<JobAdvertisementSearchResult> userFavorites = jobAdvertisementSearchService.searchFavouriteJobAds(userId, query, page, size);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(userFavorites, "/api/favourite-items/_search/managed");
         return new ResponseEntity<>(userFavorites.getContent(), headers, HttpStatus.OK);
     }
