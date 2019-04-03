@@ -56,7 +56,7 @@ public class FavouriteItemApplicationService {
                 .setJobAdvertisementId(createFavouriteItemDto.getJobAdvertisementId()).build();
 
         FavouriteItem newFavouriteItem = this.favouriteItemRepository.save(favouriteItem);
-        LOG.info("Favourite Item " + newFavouriteItem.getId().getValue() + " has been created for user " + newFavouriteItem.getOwnerId() + ".");
+        LOG.debug("Favourite Item {} has been created for user {}.", newFavouriteItem.getId().getValue(), newFavouriteItem.getOwnerId());
         DomainEventPublisher.publish(new FavouriteItemCreatedEvent(newFavouriteItem));
         return newFavouriteItem.getId();
     }
@@ -66,7 +66,7 @@ public class FavouriteItemApplicationService {
         Condition.notNull(updateFavouriteItemDto, "UpdateFavouriteItemDto can't be null");
         FavouriteItem favouriteItem = getFavouriteItem(updateFavouriteItemDto.getId());
         favouriteItem.update(updateFavouriteItemDto.getNote());
-        LOG.info("Favourite Item " + favouriteItem.getId().getValue() + " has been updated for user " + favouriteItem.getOwnerId() + " with note " + favouriteItem.getNote() + ".");
+        LOG.debug("{} has been updated.", favouriteItem.toString());
     }
 
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.isCurrentUserOwner(#favouriteItemId)")
@@ -75,7 +75,7 @@ public class FavouriteItemApplicationService {
         FavouriteItem favouriteItem = getFavouriteItem(favouriteItemId);
         DomainEventPublisher.publish(new FavouriteItemDeletedEvent(favouriteItem));
         this.favouriteItemRepository.delete(favouriteItem);
-        LOG.info("Favourite Item " + favouriteItem.getId().getValue() + " has been deleted for user " + favouriteItem.getOwnerId() + ".");
+        LOG.debug("Favourite Item {} has been deleted for user {}.", favouriteItem.getId().getValue(), favouriteItem.getOwnerId());
     }
 
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.matchesCurrentUserId(#ownerId)")

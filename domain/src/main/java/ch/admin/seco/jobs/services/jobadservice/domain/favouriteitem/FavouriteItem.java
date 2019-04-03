@@ -130,4 +130,14 @@ public class FavouriteItem implements Aggregate<FavouriteItem, FavouriteItemId> 
             return this;
         }
     }
+
+    @Override
+    public String toString() {
+        return "FavouriteItem{" +
+                "id=" + id.getValue() + '\'' +
+                ", jobAdvertisementId='" + jobAdvertisementId.getValue() + '\'' +
+                ", ownerId='" + ownerId + '\'' +
+                ", note='" + note + '\'' +
+                '}';
+    }
 }

@@ -69,7 +69,7 @@ public class FavouriteItemElasticsearchRepository {
             LOG.error("Indexing {} not successful.", favouriteItemDocument.toString());
             throw new UncheckedIOException(e);
         }
-        LOG.info("Index of {} successfully created or updated.", favouriteItemDocument.toString());
+        LOG.debug("Index of {} successfully created or updated.", favouriteItemDocument.toString());
 
     }
 
@@ -88,10 +88,12 @@ public class FavouriteItemElasticsearchRepository {
                 .build();
         List<FavouriteItemDocument> favouriteItemDocumentList = this.elasticsearchTemplate.queryForList(searchFavouriteQuery, FavouriteItemDocument.class);
         if (favouriteItemDocumentList.size() == 0) {
+            LOG.error("No results found for JobAdvertisement {} and FavouriteItem {}, but should be one.", jobAdvertisementId.getValue(), favouriteItemId.getValue());
             return Optional.empty();
         } else if (favouriteItemDocumentList.size() == 1) {
             return Optional.of(favouriteItemDocumentList.get(0));
         } else {
+            LOG.error("Multiple results found for JobAdvertisement {} and FavouriteItem {}, but should be only one.", jobAdvertisementId.getValue(), favouriteItemId.getValue());
             throw new NonUniqueResultException();
         }
     }
@@ -115,7 +117,7 @@ public class FavouriteItemElasticsearchRepository {
                         .source(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT)
                         .refresh(true)
                         .get();
-        LOG.info("{} Index(es) deleted for parent jobAdId: {}.", response.getDeleted(), jobAdvertisementId);
+        LOG.debug("{} Index(es) deleted for parent jobAdId: {}.", response.getDeleted(), jobAdvertisementId);
     }
 
     public void deleteById(JobAdvertisementId jobAdvertisementId, FavouriteItemId favouriteItemId) {
@@ -126,7 +128,7 @@ public class FavouriteItemElasticsearchRepository {
                 .setIndex(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT)
                 .setType(TYPE_DOC)
                 .get();
-        LOG.info("Index deleted for id: {} and parent jobAdId: {}.", favouriteItemId, jobAdvertisementId);
+        LOG.debug("Index deleted for id: {} and parent jobAdId: {}.", favouriteItemId, jobAdvertisementId);
     }
 
     public long count() {
@@ -143,7 +145,7 @@ public class FavouriteItemElasticsearchRepository {
                         .source(ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT)
                         .refresh(true)
                         .get();
-        LOG.info("{} Index(es) deleted.", response.getDeleted());
+        LOG.debug("{} Index(es) deleted.", response.getDeleted());
     }
 
     public Iterable<FavouriteItemDocument> saveAll(Iterable<FavouriteItemDocument> entities) {
