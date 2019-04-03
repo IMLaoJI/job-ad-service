@@ -17,7 +17,7 @@
             </column>
             <column name="NOTE" type="varchar(1000)">
             </column>
-            <column name="OWNER_ID" type="varchar(64)">
+            <column name="OWNER_USER_ID" type="varchar(64)">
                 <constraints nullable="false"/>
             </column>
             <column name="JOB_ADVERTISEMENT_ID" type="VARCHAR(36)">
@@ -29,9 +29,9 @@
     <changeSet id="20190320080000_1" author="madv">
         <createIndex tableName="FAVOURITE_ITEM"
                      unique="true"
-                     indexName="IDX_JOB_AD_OWNER_ID">
+                     indexName="IDX_JOB_AD_OWNER_USER_ID">
             <column name="JOB_ADVERTISEMENT_ID"/>
-            <column name="OWNER_ID"/>
+            <column name="OWNER_USER_ID"/>
         </createIndex>
     </changeSet>
 

@@ -30,9 +30,10 @@
             }
           },
           "note": {
-            "type": "text"
+            "type": "text",
+            "analyzer": "ascii_folding"
           },
-          "ownerId": {
+          "ownerUserId": {
             "type": "keyword"
           },
           "updatedTime": {

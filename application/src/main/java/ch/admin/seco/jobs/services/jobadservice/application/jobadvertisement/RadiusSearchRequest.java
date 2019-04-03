@@ -1,6 +1,8 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.GeoPointDto;
+
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
@@ -11,6 +13,7 @@ public class RadiusSearchRequest {
 
     //default distance unit: kilometers
     @Min(10)
+    @Max(150)
     @NotNull
     private Integer distance;
 

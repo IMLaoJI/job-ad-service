@@ -5,7 +5,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 
 class FavouriteItemAlreadyExists extends RuntimeException {
 
-    FavouriteItemAlreadyExists(FavouriteItemId favouriteItemId, JobAdvertisementId jobAdvertisementId, String ownerid) {
-        super("FavouriteItem couldn't be created. User: '" + ownerid + "' already has a FavouriteItem: '" + favouriteItemId.getValue() + "' for JobAdvertismentId: '" + jobAdvertisementId.getValue() + "'");
+    FavouriteItemAlreadyExists(FavouriteItemId favouriteItemId, JobAdvertisementId jobAdvertisementId, String userId) {
+        super("FavouriteItem couldn't be created. User: '" + userId + "' already has a FavouriteItem: '" + favouriteItemId.getValue() + "' for JobAdvertismentId: '" + jobAdvertisementId.getValue() + "'");
     }
 }

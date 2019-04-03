@@ -46,10 +46,7 @@ public class IndexerEventListener {
         if (API_USER_UPDATED_DETAILS.getDomainEventType().equals(event.getDomainEventType())) {
             return true;
         }
-        if (API_USER_UPDATED_STATUS.getDomainEventType().equals(event.getDomainEventType())) {
-            return true;
-        }
-        return false;
+        return API_USER_UPDATED_STATUS.getDomainEventType().equals(event.getDomainEventType());
     }
 
 }

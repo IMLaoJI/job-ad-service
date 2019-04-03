@@ -15,11 +15,11 @@ import java.util.Set;
 public interface FavouriteItemRepository extends JpaRepository<FavouriteItem, FavouriteItemId> {
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    @Query("select i from FavouriteItem i where i.jobAdvertisementId = :jobAdvertisementId and i.ownerId = :ownerId")
-    Optional<FavouriteItem> findByJobAdvertisementIdAndOwnerId(@Param("jobAdvertisementId") JobAdvertisementId jobAdvertisementId, @Param("ownerId") String ownerId);
+    @Query("select i from FavouriteItem i where i.jobAdvertisementId = :jobAdvertisementId and i.ownerUserId = :ownerUserId")
+    Optional<FavouriteItem> findByJobAdvertisementIdAndOwnerId(@Param("jobAdvertisementId") JobAdvertisementId jobAdvertisementId, @Param("ownerUserId") String ownerUserId);
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    @Query("select i from FavouriteItem i where i.jobAdvertisementId in :jobAdvertisementIds and i.ownerId = :ownerId")
-    List<FavouriteItem> findByJobAdvertisementIdsAndOwnerId(@Param("jobAdvertisementIds") Set<JobAdvertisementId> jobAdvertisementIds, @Param("ownerId") String ownerId);
+    @Query("select i from FavouriteItem i where i.jobAdvertisementId in :jobAdvertisementIds and i.ownerUserId = :ownerUserId")
+    List<FavouriteItem> findByJobAdvertisementIdsAndOwnerId(@Param("jobAdvertisementIds") Set<JobAdvertisementId> jobAdvertisementIds, @Param("ownerUserId") String ownerUserId);
 
 }

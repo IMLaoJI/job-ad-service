@@ -49,7 +49,7 @@ public class FavouriteItem implements Aggregate<FavouriteItem, FavouriteItemId> 
         this.updatedTime = this.createdTime;
         this.note = builder.note;
         this.ownerUserId = Condition.notBlank(builder.ownerUserId);
-        this.jobAdvertisementId = Condition.notNull(builder.jobAdvertismentId);
+        this.jobAdvertisementId = Condition.notNull(builder.jobAdvertisementId);
     }
 
     private FavouriteItem() {
@@ -91,7 +91,7 @@ public class FavouriteItem implements Aggregate<FavouriteItem, FavouriteItemId> 
         private LocalDateTime updatedTime;
         private String note;
         private String ownerUserId;
-        private JobAdvertisementId jobAdvertismentId;
+        private JobAdvertisementId jobAdvertisementId;
 
         public Builder() {
         }
@@ -126,8 +126,18 @@ public class FavouriteItem implements Aggregate<FavouriteItem, FavouriteItemId> 
         }
 
         public Builder setJobAdvertisementId(JobAdvertisementId jobAdvertisementId) {
-            this.jobAdvertismentId = jobAdvertisementId;
+            this.jobAdvertisementId = jobAdvertisementId;
             return this;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "FavouriteItem{" +
+                "id=" + id.getValue() + '\'' +
+                ", jobAdvertisementId='" + jobAdvertisementId.getValue() + '\'' +
+                ", ownerUserId='" + ownerUserId + '\'' +
+                ", note='" + note + '\'' +
+                '}';
     }
 }

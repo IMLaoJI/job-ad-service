@@ -20,7 +20,7 @@ public class FavouriteItemDocument {
 
     private ChildRelation jobAdvertisementRelations;
 
-    protected FavouriteItemDocument() {
+    private FavouriteItemDocument() {
     }
 
     public FavouriteItemDocument(FavouriteItem favouriteItem) {
@@ -48,7 +48,7 @@ public class FavouriteItemDocument {
         return "FavouriteItemDocument{" +
                 "id=" + id +
                 ", jobAdId=" + favouriteItem.getJobAdvertisementId().getValue() +
-                ", ownerId=" + favouriteItem.getOwnerUserId() +
+                ", ownerUserId=" + favouriteItem.getOwnerUserId() +
                 '}';
 
     }
