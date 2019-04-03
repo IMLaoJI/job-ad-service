@@ -37,6 +37,6 @@ public class FavouriteItemAuthorizationService {
             return true;
         }
         FavouriteItem favouriteItem = favouriteItemById.get();
-        return favouriteItem.getOwnerId().equals(this.currentUserContext.getCurrentUser().getUserId());
+        return favouriteItem.getOwnerUserId().equals(this.currentUserContext.getCurrentUser().getUserId());
     }
 }

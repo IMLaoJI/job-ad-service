@@ -48,7 +48,7 @@ public class FavouriteItemDocument {
         return "FavouriteItemDocument{" +
                 "id=" + id +
                 ", jobAdId=" + favouriteItem.getJobAdvertisementId().getValue() +
-                ", ownerId=" + favouriteItem.getOwnerId() +
+                ", ownerId=" + favouriteItem.getOwnerUserId() +
                 '}';
 
     }

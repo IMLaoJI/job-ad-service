@@ -188,12 +188,12 @@ public class FavouriteItemApplicationServiceTest {
         assertThat(optionalFavouriteItemDto).isPresent();
     }
 
-    private void createAndSaveToDBFavouriteItem(FavouriteItemId favouriteItemId, JobAdvertisementId jobAdvertisementId, String note, String ownerId) {
+    private void createAndSaveToDBFavouriteItem(FavouriteItemId favouriteItemId, JobAdvertisementId jobAdvertisementId, String note, String ownerUserId) {
         FavouriteItem favouriteItem = new FavouriteItem.Builder()
                 .setId(favouriteItemId)
                 .setJobAdvertisementId(jobAdvertisementId)
                 .setNote(note)
-                .setOwnerId(ownerId)
+                .setOwnerUserId(ownerUserId)
                 .build();
         this.favouriteItemRepository.save(favouriteItem);
     }

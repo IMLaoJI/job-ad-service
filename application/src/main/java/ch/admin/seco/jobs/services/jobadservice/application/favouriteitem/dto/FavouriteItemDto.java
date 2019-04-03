@@ -81,7 +81,7 @@ public class FavouriteItemDto {
                 favouriteItem.getCreatedTime(),
                 favouriteItem.getUpdatedTime(),
                 favouriteItem.getNote(),
-                favouriteItem.getOwnerId(),
+                favouriteItem.getOwnerUserId(),
                 favouriteItem.getJobAdvertisementId().getValue());
     }
 }

@@ -36,7 +36,7 @@ public class FavouriteItem implements Aggregate<FavouriteItem, FavouriteItemId> 
     private String note;
 
     @NotBlank
-    private String ownerId;
+    private String ownerUserId;
 
     @NotNull
     @Embedded
@@ -48,7 +48,7 @@ public class FavouriteItem implements Aggregate<FavouriteItem, FavouriteItemId> 
         this.createdTime = TimeMachine.now();
         this.updatedTime = this.createdTime;
         this.note = builder.note;
-        this.ownerId = Condition.notBlank(builder.ownerId);
+        this.ownerUserId = Condition.notBlank(builder.ownerUserId);
         this.jobAdvertisementId = Condition.notNull(builder.jobAdvertismentId);
     }
 
@@ -72,8 +72,8 @@ public class FavouriteItem implements Aggregate<FavouriteItem, FavouriteItemId> 
         return note;
     }
 
-    public String getOwnerId() {
-        return ownerId;
+    public String getOwnerUserId() {
+        return ownerUserId;
     }
 
     public JobAdvertisementId getJobAdvertisementId() {
@@ -90,7 +90,7 @@ public class FavouriteItem implements Aggregate<FavouriteItem, FavouriteItemId> 
         private FavouriteItemId id;
         private LocalDateTime updatedTime;
         private String note;
-        private String ownerId;
+        private String ownerUserId;
         private JobAdvertisementId jobAdvertismentId;
 
         public Builder() {
@@ -120,8 +120,8 @@ public class FavouriteItem implements Aggregate<FavouriteItem, FavouriteItemId> 
             return this;
         }
 
-        public Builder setOwnerId(String ownerId) {
-            this.ownerId = ownerId;
+        public Builder setOwnerUserId(String ownerUserId) {
+            this.ownerUserId = ownerUserId;
             return this;
         }
 
