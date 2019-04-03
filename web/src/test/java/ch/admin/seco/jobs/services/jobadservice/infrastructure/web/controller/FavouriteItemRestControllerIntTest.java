@@ -113,15 +113,12 @@ public class FavouriteItemRestControllerIntTest {
         assertThat(favouriteItem).isPresent();
         assertThat(favouriteItem.get().getNote()).isEqualTo(adjustedNote);
 
-        await().until(() -> {
-            Optional<FavouriteItemDocument> favouriteItemDocumentOptional = favouriteItemElasticsearchRepository.findById(job01.id(), fav01);
-            if (favouriteItemDocumentOptional.isPresent()) {
-                assertThat(favouriteItemDocumentOptional.get().getFavouriteItem().getNote()).isEqualTo(adjustedNote);
-                return true;
-            } else {
-                return false;
-            }
-        });
+        await().until(() -> favouriteItemElasticsearchRepository.count() >= 1);
+
+        Optional<FavouriteItemDocument> favouriteItemDocumentOptional = favouriteItemElasticsearchRepository.findById(job01.id(), fav01);
+        assertThat(favouriteItemDocumentOptional).isPresent();
+        FavouriteItem updatedFavouriteItem = favouriteItemDocumentOptional.get().getFavouriteItem();
+        assertThat(updatedFavouriteItem.getNote().equals(adjustedNote)).isTrue();
     }
 
     @Test
