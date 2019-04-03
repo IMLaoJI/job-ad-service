@@ -147,7 +147,6 @@ public class FavouriteItemElasticsearchRepository {
     }
 
     public Iterable<FavouriteItemDocument> saveAll(Iterable<FavouriteItemDocument> entities) {
-        // TODO use bulk?
         entities.forEach(this::save);
         return entities;
     }

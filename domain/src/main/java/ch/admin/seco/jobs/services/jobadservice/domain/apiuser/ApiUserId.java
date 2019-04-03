@@ -21,7 +21,7 @@ public class ApiUserId implements AggregateId<ApiUserId> {
 	}
 
 	public ApiUserId(String value) {
-		this.value = Condition.notBlank(value);;
+		this.value = Condition.notBlank(value);
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package ch.admin.seco.jobs.services.jobadservice.application.favouriteitem;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.FavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.create.CreateFavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.update.UpdateFavouriteItemDto;
+import ch.admin.seco.jobs.services.jobadservice.core.domain.AggregateNotFoundException;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItem;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
@@ -77,7 +78,21 @@ public class FavouriteItemApplicationServiceTest {
 
     @Test
     public void testCanNotCreateFavouriteWithNonExistingJobAdId() {
+        // given
+        JobAdvertisementId jobAdvertisementId = new JobAdvertisementId("JOB_AD_ID_1");
 
+        CreateFavouriteItemDto createFavouriteItemDto = new CreateFavouriteItemDto();
+        createFavouriteItemDto.setJobAdvertisementId(jobAdvertisementId);
+        createFavouriteItemDto.setNote("Note");
+        createFavouriteItemDto.setOwnerUserId("USER-1");
+
+        // when
+        when(jobAdvertisementRepository.existsById(jobAdvertisementId)).thenReturn(false);
+
+        // then
+        assertThatThrownBy(() -> this.sut.create(createFavouriteItemDto))
+                .isInstanceOf(AggregateNotFoundException.class)
+                .hasMessageContaining("Aggregate was not found");
     }
 
     @Test

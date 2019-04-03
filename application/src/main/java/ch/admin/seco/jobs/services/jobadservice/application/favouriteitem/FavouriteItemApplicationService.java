@@ -95,17 +95,5 @@ public class FavouriteItemApplicationService {
         return this.favouriteItemRepository.findById(id)
                 .orElseThrow(() -> new FavoriteItemNotExitsException(id));
     }
-/*
-    @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.matchesCurrentUserId(#ownerId)")
-    public Page<FavouriteItemDto> findByOwnerId(Pageable pageable, String ownerId) {
-        CurrentUser currentUser = currentUserContext.getCurrentUser();
-        Condition.notNull(currentUser, "CurrentUser can't be null");
-        Page<FavouriteItem> jobAdvertisements = favouriteItemRepository.findByIdOwnerId(pageable, ownerId);
-        return new PageImpl<>(
-                jobAdvertisements.getContent().stream().map(FavouriteItemDto::toDto).collect(toList()),
-                jobAdvertisements.getPageable(),
-                jobAdvertisements.getTotalElements()
-        );
-    }*/
 
 }

@@ -66,7 +66,7 @@ public class FavouriteItemElasticsearchRepositoryTest {
     }
 
     @Test
-    public void testFindByOwnerAndParentIds() throws InterruptedException {
+    public void testFindByOwnerAndParentIds() {
         // given
         index(createJob(job01.id()));
         index(createJob(job02.id()));
