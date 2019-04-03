@@ -139,8 +139,8 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
     }
 
     @Override
-    @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.matchesCurrentUserId(#ownerId)")
-    public Page<JobAdvertisementSearchResult> searchFavouriteJobAds(String ownerId, String query, int page, int size) {
+    @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.matchesCurrentUserId(#ownerUserId)")
+    public Page<JobAdvertisementSearchResult> searchFavouriteJobAds(String ownerUserId, String query, int page, int size) {
         Pageable pageable = PageRequest
                 .of(page, size, Sort.by(
                         desc(PATH_CREATED_TIME),
@@ -149,7 +149,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
         NativeSearchQueryBuilder searchQueryBuilder = new NativeSearchQueryBuilder()
                 .withFilter(hasChildQuery(
                         FAVOURITE_ITEM_RELATION_NAME,
-                        termQuery("favouriteItem.ownerId", ownerId),
+                        termQuery("favouriteItem.ownerUserId", ownerUserId),
                         ScoreMode.None
                 ))
                 .withPageable(pageable);
@@ -212,12 +212,12 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
     private Map<String, FavouriteItemDto> findFavouriteItemsMappedByJobAdId(Set<JobAdvertisementId> jobAdvertisementIds) {
         CurrentUser currentUser = currentUserContext.getCurrentUser();
-        if (currentUser == null) {
+        if (currentUser == null || jobAdvertisementIds.isEmpty()) {
             return Collections.emptyMap();
         }
-        String ownerId = currentUser.getUserId();
+        String ownerUserId = currentUser.getUserId();
         return this.favouriteItemRepository
-                .findByJobAdvertisementIdsAndOwnerId(jobAdvertisementIds, ownerId).stream()
+                .findByJobAdvertisementIdsAndOwnerId(jobAdvertisementIds, ownerUserId).stream()
                 .map(FavouriteItemDto::toDto)
                 .collect(Collectors.toMap(FavouriteItemDto::getJobAdvertisementId, Function.identity()));
     }
