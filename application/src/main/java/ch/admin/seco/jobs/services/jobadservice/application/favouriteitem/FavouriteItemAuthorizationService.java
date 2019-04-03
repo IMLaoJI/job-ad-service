@@ -22,9 +22,9 @@ public class FavouriteItemAuthorizationService {
         this.favouriteItemRepository = favouriteItemRepository;
     }
 
-    public boolean matchesCurrentUserId(String ownerId) {
-        String userId = this.currentUserContext.getCurrentUser().getUserId();
-        return (userId != null) && userId.equals(ownerId);
+    public boolean matchesCurrentUserId(String userId) {
+        String currentUserId = this.currentUserContext.getCurrentUser().getUserId();
+        return (currentUserId != null) && currentUserId.equals(userId);
     }
 
     public boolean isCurrentUserOwner(FavouriteItemId favouriteItemId) {
