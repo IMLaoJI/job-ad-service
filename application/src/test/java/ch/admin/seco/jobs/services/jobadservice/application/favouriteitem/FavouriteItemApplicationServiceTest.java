@@ -186,7 +186,7 @@ public class FavouriteItemApplicationServiceTest {
                 .setId(favouriteItemId)
                 .setJobAdvertisementId(jobAdvertisementId)
                 .setNote(note)
-                .setOwnerId(ownerId)
+                .setOwnerUserId(ownerId)
                 .build();
         this.favouriteItemRepository.save(favouriteItem);
     }

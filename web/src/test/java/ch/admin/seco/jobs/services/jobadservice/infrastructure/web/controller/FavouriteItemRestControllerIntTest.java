@@ -264,10 +264,10 @@ public class FavouriteItemRestControllerIntTest {
         this.favouriteItemElasticsearchRepository.save(new FavouriteItemDocument(favouriteItem));
     }
 
-    private FavouriteItem createTestFavouriteItem(FavouriteItemId favouriteItemId, JobAdvertisementId jobAdvertisementId, String ownerId, String note) {
+    private FavouriteItem createTestFavouriteItem(FavouriteItemId favouriteItemId, JobAdvertisementId jobAdvertisementId, String ownerUserId, String note) {
         return new FavouriteItem.Builder()
                 .setId(favouriteItemId)
-                .setOwnerId(ownerId)
+                .setOwnerUserId(ownerUserId)
                 .setJobAdvertisementId(jobAdvertisementId)
                 .setNote(note)
                 .build();

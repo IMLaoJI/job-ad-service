@@ -46,17 +46,17 @@ public class FavouriteItemApplicationService {
 
         this.favouriteItemRepository.findByJobAdvertisementIdAndOwnerId(createFavouriteItemDto.getJobAdvertisementId(), createFavouriteItemDto.getOwnerUserId())
                 .ifPresent(favouriteItem -> {
-                    throw new FavouriteItemAlreadyExists(favouriteItem.getId(), favouriteItem.getJobAdvertisementId(), favouriteItem.getOwnerId());
+                    throw new FavouriteItemAlreadyExists(favouriteItem.getId(), favouriteItem.getJobAdvertisementId(), favouriteItem.getOwnerUserId());
                 });
 
         FavouriteItem favouriteItem = new FavouriteItem.Builder()
                 .setId(new FavouriteItemId())
                 .setNote(createFavouriteItemDto.getNote())
-                .setOwnerId(createFavouriteItemDto.getOwnerUserId())
+                .setOwnerUserId(createFavouriteItemDto.getOwnerUserId())
                 .setJobAdvertisementId(createFavouriteItemDto.getJobAdvertisementId()).build();
 
         FavouriteItem newFavouriteItem = this.favouriteItemRepository.save(favouriteItem);
-        LOG.debug("Favourite Item {} has been created for user {}.", newFavouriteItem.getId().getValue(), newFavouriteItem.getOwnerId());
+        LOG.debug("Favourite Item {} has been created for user {}.", newFavouriteItem.getId().getValue(), newFavouriteItem.getOwnerUserId());
         DomainEventPublisher.publish(new FavouriteItemCreatedEvent(newFavouriteItem));
         return newFavouriteItem.getId();
     }
@@ -75,7 +75,7 @@ public class FavouriteItemApplicationService {
         FavouriteItem favouriteItem = getFavouriteItem(favouriteItemId);
         DomainEventPublisher.publish(new FavouriteItemDeletedEvent(favouriteItem));
         this.favouriteItemRepository.delete(favouriteItem);
-        LOG.debug("Favourite Item {} has been deleted for user {}.", favouriteItem.getId().getValue(), favouriteItem.getOwnerId());
+        LOG.debug("Favourite Item {} has been deleted for user {}.", favouriteItem.getId().getValue(), favouriteItem.getOwnerUserId());
     }
 
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.matchesCurrentUserId(#ownerId)")

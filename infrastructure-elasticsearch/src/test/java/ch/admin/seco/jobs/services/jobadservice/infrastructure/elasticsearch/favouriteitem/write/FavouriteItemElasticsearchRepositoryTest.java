@@ -175,11 +175,11 @@ public class FavouriteItemElasticsearchRepositoryTest {
         this.favouriteItemElasticsearchRepository.save(new FavouriteItemDocument(favouriteItem));
     }
 
-    private FavouriteItem createFavouriteItem(String favouriteItemId, JobAdvertisementId id, String ownerId) {
+    private FavouriteItem createFavouriteItem(String favouriteItemId, JobAdvertisementId id, String ownerUserId) {
         return new FavouriteItem.Builder()
                 .setId(new FavouriteItemId(favouriteItemId))
                 .setJobAdvertisementId(id)
-                .setOwnerId(ownerId)
+                .setOwnerUserId(ownerUserId)
                 .setNote("Favourite Item Note")
                 .build();
     }
