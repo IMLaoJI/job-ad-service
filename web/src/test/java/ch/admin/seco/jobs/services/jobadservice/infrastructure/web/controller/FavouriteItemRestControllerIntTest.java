@@ -183,7 +183,6 @@ public class FavouriteItemRestControllerIntTest {
         resultActions
                 .andExpect(jsonPath("$.id").value(equalTo(fav01.getValue())))
                 .andExpect(jsonPath("$.note").value(equalTo("Test Note")));
-        // await().until(() -> favouriteItemElasticsearchRepository.findByOwnerAndParentIds(  ,  WithJobSeeker.USER_ID).isPresent());
     }
 
     @Test
