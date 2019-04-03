@@ -30,7 +30,8 @@
             }
           },
           "note": {
-            "type": "text"
+            "type": "text",
+            "analyzer": "ascii_folding"
           },
           "ownerId": {
             "type": "keyword"
