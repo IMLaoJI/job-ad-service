@@ -23,8 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -33,6 +32,14 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 @Transactional
 public class FavouriteItemApplicationServiceTest {
+
+    private final JobAdvertisementId jobAdvertisementId = new JobAdvertisementId("JOB_AD_ID_1");
+
+    private final FavouriteItemId favouriteItemId = new FavouriteItemId("FAV_ID_1");
+
+    private final String userId = "USER-1";
+
+    private final String note = "My note";
 
     @Autowired
     private FavouriteItemApplicationService sut;
@@ -60,9 +67,9 @@ public class FavouriteItemApplicationServiceTest {
     public void testCreate() {
         // given
         CreateFavouriteItemDto createFavouriteItemDto = new CreateFavouriteItemDto();
-        createFavouriteItemDto.setJobAdvertisementId(new JobAdvertisementId("JOB_AD_ID_1"));
-        createFavouriteItemDto.setNote("My Note");
-        createFavouriteItemDto.setOwnerUserId("USER-1");
+        createFavouriteItemDto.setJobAdvertisementId(jobAdvertisementId);
+        createFavouriteItemDto.setNote(note);
+        createFavouriteItemDto.setOwnerUserId(userId);
 
         when(jobAdvertisementRepository.existsById(any())).thenReturn(true);
 
@@ -79,12 +86,10 @@ public class FavouriteItemApplicationServiceTest {
     @Test
     public void testCanNotCreateFavouriteWithNonExistingJobAdId() {
         // given
-        JobAdvertisementId jobAdvertisementId = new JobAdvertisementId("JOB_AD_ID_1");
-
         CreateFavouriteItemDto createFavouriteItemDto = new CreateFavouriteItemDto();
         createFavouriteItemDto.setJobAdvertisementId(jobAdvertisementId);
-        createFavouriteItemDto.setNote("Note");
-        createFavouriteItemDto.setOwnerUserId("USER-1");
+        createFavouriteItemDto.setNote(note);
+        createFavouriteItemDto.setOwnerUserId(userId);
 
         // when
         when(jobAdvertisementRepository.existsById(jobAdvertisementId)).thenReturn(false);
@@ -98,19 +103,14 @@ public class FavouriteItemApplicationServiceTest {
     @Test
     public void testCanNotCreateFavouriteThatAlreadyExists() {
         // given
-        FavouriteItemId favouriteItemId = new FavouriteItemId("FAV_ID_1");
-        JobAdvertisementId jobAdvertisementId = new JobAdvertisementId("JOB_AD_ID_1");
-        String ownerId = "USER-1";
-        String note = "My note";
-
         when(jobAdvertisementRepository.existsById(any())).thenReturn(true);
 
-        createAndSaveToDBFavouriteItem(favouriteItemId, jobAdvertisementId, note, ownerId);
+        createAndSaveToDBFavouriteItem(favouriteItemId, jobAdvertisementId, note, userId);
 
         CreateFavouriteItemDto createFavouriteItemDto = new CreateFavouriteItemDto();
         createFavouriteItemDto.setJobAdvertisementId(jobAdvertisementId);
         createFavouriteItemDto.setNote("My other note");
-        createFavouriteItemDto.setOwnerUserId(ownerId);
+        createFavouriteItemDto.setOwnerUserId(userId);
 
         // then
         assertThatThrownBy(() -> this.sut.create(createFavouriteItemDto))
@@ -121,12 +121,7 @@ public class FavouriteItemApplicationServiceTest {
     @Test
     public void testFindExistingFavouriteItemFindById() {
         // given
-        FavouriteItemId favouriteItemId = new FavouriteItemId("FAV_ID_1");
-        JobAdvertisementId jobAdvertisementId = new JobAdvertisementId("JOB_AD_ID_1");
-        String ownerId = "USER-1";
-        String note = "My note";
-
-        createAndSaveToDBFavouriteItem(favouriteItemId, jobAdvertisementId, note, ownerId);
+        createAndSaveToDBFavouriteItem(favouriteItemId, jobAdvertisementId, note, userId);
 
         // when
         FavouriteItemDto favouriteItem = this.sut.findById(favouriteItemId);
@@ -137,9 +132,6 @@ public class FavouriteItemApplicationServiceTest {
 
     @Test
     public void testFindNonExistingFavouriteItemFindById() {
-        // given
-        FavouriteItemId favouriteItemId = new FavouriteItemId("FAV_ID_1");
-
         // then
         assertThatThrownBy(() -> this.sut.findById(favouriteItemId))
                 .isInstanceOf(FavoriteItemNotExitsException.class)
@@ -149,14 +141,10 @@ public class FavouriteItemApplicationServiceTest {
     @Test
     public void testUpdateExistingFavouriteItem() {
         // given
-        FavouriteItemId favouriteItemId = new FavouriteItemId("FAV_ID_1");
-        JobAdvertisementId jobAdvertisementId = new JobAdvertisementId("JOB_AD_ID_1");
-        String ownerId = "USER-1";
-        String originalNote = "My note";
         String adjustedNote = "My new note";
 
 
-        createAndSaveToDBFavouriteItem(favouriteItemId, jobAdvertisementId, originalNote, ownerId);
+        createAndSaveToDBFavouriteItem(favouriteItemId, jobAdvertisementId, note, userId);
         UpdateFavouriteItemDto updateFavouriteItemDto = new UpdateFavouriteItemDto(favouriteItemId, adjustedNote);
 
         // when
@@ -170,12 +158,7 @@ public class FavouriteItemApplicationServiceTest {
     @Test
     public void testDeleteExistingFavouriteItem() {
         // given
-        FavouriteItemId favouriteItemId = new FavouriteItemId("FAV_ID_1");
-        JobAdvertisementId jobAdvertisementId = new JobAdvertisementId("JOB_AD_ID_1");
-        String ownerId = "USER-1";
-        String note = "My note";
-
-        createAndSaveToDBFavouriteItem(favouriteItemId, jobAdvertisementId, note, ownerId);
+        createAndSaveToDBFavouriteItem(favouriteItemId, jobAdvertisementId, note, userId);
 
         // when
         assertThat(this.sut.findById(favouriteItemId).getJobAdvertisementId()).isEqualTo(jobAdvertisementId.getValue());
@@ -189,15 +172,10 @@ public class FavouriteItemApplicationServiceTest {
     @Test
     public void testFindByJobAdvertisementIdAndOwnerId() {
         // given
-        FavouriteItemId favouriteItemId = new FavouriteItemId("FAV_ID_1");
-        JobAdvertisementId jobAdvertisementId = new JobAdvertisementId("JOB_AD_ID_1");
-        String ownerId = "USER-1";
-        String originalNote = "My note";
-
-        createAndSaveToDBFavouriteItem(favouriteItemId, jobAdvertisementId, originalNote, ownerId);
+        createAndSaveToDBFavouriteItem(favouriteItemId, jobAdvertisementId, note, userId);
 
         // when
-        Optional<FavouriteItemDto> optionalFavouriteItemDto = this.sut.findByJobAdvertisementIdAndUserId(jobAdvertisementId, ownerId);
+        Optional<FavouriteItemDto> optionalFavouriteItemDto = this.sut.findByJobAdvertisementIdAndUserId(jobAdvertisementId, userId);
 
         // then
         assertThat(optionalFavouriteItemDto).isPresent();
