@@ -27,12 +27,19 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Optional;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job02;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job03;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job04;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job05;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -168,18 +175,12 @@ public class FavouriteItemRestControllerIntTest {
         final FavouriteItemId fav01 = new FavouriteItemId("fav-01");
         this.index(createTestFavouriteItem(fav01, job01.id(), WithJobSeeker.USER_ID, "Test Note"));
 
-
-        FavouriteItemRestController.SearchByJobAdIdAndUserIdResource searchByJobAdIdAndUserIdResource = new FavouriteItemRestController.SearchByJobAdIdAndUserIdResource();
-        searchByJobAdIdAndUserIdResource.jobAdvertisementId = job01.id().getValue();
-        searchByJobAdIdAndUserIdResource.userId = WithJobSeeker.USER_ID;
-
         // when
         ResultActions resultActions = this.mockMvc.perform(
-                MockMvcRequestBuilders.get(URL + "/_search/byJobAdvertisementIdAndUserId")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchByJobAdIdAndUserIdResource)));
+                MockMvcRequestBuilders.get(URL + "/_search/byJobAdvertisementIdAndUserId?userId="+WithJobSeeker.USER_ID+"&jobAdvertisementId="+job01.id().getValue())
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8));
 
-        // then
+        // thendatabasechangelog
         resultActions
                 .andExpect(jsonPath("$.id").value(equalTo(fav01.getValue())))
                 .andExpect(jsonPath("$.note").value(equalTo("Test Note")));

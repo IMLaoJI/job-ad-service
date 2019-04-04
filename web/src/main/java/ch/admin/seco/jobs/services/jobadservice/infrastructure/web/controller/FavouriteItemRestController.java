@@ -45,25 +45,23 @@ public class FavouriteItemRestController {
 
     @PutMapping("/{id}/note")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateFavouriteItem(@PathVariable String id, @RequestBody FavouriteItemUpdateResource favouriteItemUpdateResource) throws FavoriteItemNotExitsException {
-        favouriteItemApplicationService.update(new UpdateFavouriteItemDto(new FavouriteItemId(id), favouriteItemUpdateResource.note));
+    public void updateFavouriteItem(@PathVariable FavouriteItemId id, @RequestBody FavouriteItemUpdateResource favouriteItemUpdateResource) throws FavoriteItemNotExitsException {
+        favouriteItemApplicationService.update(new UpdateFavouriteItemDto(id, favouriteItemUpdateResource.note));
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteFavouriteItem(@PathVariable String id) throws FavoriteItemNotExitsException {
-        FavouriteItemId favouriteItemId = new FavouriteItemId(id);
-        favouriteItemApplicationService.delete(favouriteItemId);
+    public void deleteFavouriteItem(@PathVariable FavouriteItemId id) throws FavoriteItemNotExitsException {
+        favouriteItemApplicationService.delete(id);
     }
 
     @GetMapping("/{id}")
-    public FavouriteItemDto findById(@PathVariable String id) {
-        FavouriteItemId favouriteItemId = new FavouriteItemId(id);
-        return favouriteItemApplicationService.findById(favouriteItemId);
+    public FavouriteItemDto findById(@PathVariable FavouriteItemId id) {
+        return favouriteItemApplicationService.findById(id);
     }
 
     @GetMapping("/_search/byJobAdvertisementIdAndUserId")
-    public FavouriteItemDto findByJobAdIdAndUserId(@RequestBody @Valid FavouriteItemRestController.SearchByJobAdIdAndUserIdResource searchByJobAdIdAndUserIdResource) {
+    public FavouriteItemDto findByJobAdIdAndUserId(@Valid FavouriteItemRestController.SearchByJobAdIdAndUserIdResource searchByJobAdIdAndUserIdResource) {
         return favouriteItemApplicationService.findByJobAdvertisementIdAndUserId(new JobAdvertisementId(searchByJobAdIdAndUserIdResource.jobAdvertisementId), searchByJobAdIdAndUserIdResource.userId)
                 .orElse(null);
     }
@@ -97,6 +95,21 @@ public class FavouriteItemRestController {
         @NotBlank
         public String jobAdvertisementId;
 
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
+
+        public String getJobAdvertisementId() {
+            return jobAdvertisementId;
+        }
+
+        public void setJobAdvertisementId(String jobAdvertisementId) {
+            this.jobAdvertisementId = jobAdvertisementId;
+        }
     }
 
     static class FavouriteItemUpdateResource {
