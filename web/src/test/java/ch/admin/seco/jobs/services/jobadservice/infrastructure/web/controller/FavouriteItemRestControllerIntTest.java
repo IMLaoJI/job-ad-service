@@ -80,7 +80,7 @@ public class FavouriteItemRestControllerIntTest {
 
         //when
         FavouriteItemRestController.CreateFavouriteItemResource createFavouriteItemResource = new FavouriteItemRestController.CreateFavouriteItemResource();
-        createFavouriteItemResource.jobAdvertisementId = job01.id().getValue();
+        createFavouriteItemResource.jobAdvertisementId = job01.id();
         createFavouriteItemResource.userId = WithJobSeeker.USER_ID;
         createFavouriteItemResource.note = "Test Note";
 
@@ -91,7 +91,7 @@ public class FavouriteItemRestControllerIntTest {
         JSONArray ja = new JSONArray("[" + contentAsString + "]");
         String id = ja.getJSONObject(0).getString("value");
 
-        // then check that the document is now in the repository & elasticsearch
+        // then
         assertThat(this.favouriteItemRepository.findById(new FavouriteItemId(id))).isPresent();
         await().until(() -> favouriteItemElasticsearchRepository.findById(job01.id(), new FavouriteItemId(id)).isPresent());
     }
@@ -115,7 +115,7 @@ public class FavouriteItemRestControllerIntTest {
                         .content(TestUtil.convertObjectToJsonBytes(favouriteItemUpdateResource)));
         put.andExpect(status().isNoContent());
 
-        // then check that the updated document is now in repository & elasticsearch
+        // then
         Optional<FavouriteItem> favouriteItem = this.favouriteItemRepository.findById(fav01);
         assertThat(favouriteItem).isPresent();
         assertThat(favouriteItem.get().getNote()).isEqualTo(adjustedNote);
@@ -180,7 +180,7 @@ public class FavouriteItemRestControllerIntTest {
                 MockMvcRequestBuilders.get(URL + "/_search/byJobAdvertisementIdAndUserId?userId="+WithJobSeeker.USER_ID+"&jobAdvertisementId="+job01.id().getValue())
                         .contentType(TestUtil.APPLICATION_JSON_UTF8));
 
-        // thendatabasechangelog
+        // then
         resultActions
                 .andExpect(jsonPath("$.id").value(equalTo(fav01.getValue())))
                 .andExpect(jsonPath("$.note").value(equalTo("Test Note")));

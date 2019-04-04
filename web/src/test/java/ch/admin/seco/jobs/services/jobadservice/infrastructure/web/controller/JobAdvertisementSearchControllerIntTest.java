@@ -1300,11 +1300,8 @@ public class JobAdvertisementSearchControllerIntTest {
         FavouriteItemId favouriteItemId = this.favouriteItemApplicationService.create(createFavouriteItemDto);
         await().until(() -> favouriteItemElasticsearchRepository.findById(job01.id(), favouriteItemId).isPresent());
 
-//        ManagedJobAdSearchRequest searchRequest = new ManagedJobAdSearchRequest();
-//        searchRequest.setCompanyId(WithCompanyUser.USER_COMPANY_ID);
 
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        //searchRequest.setCompanyId(WithCompanyUser.USER_COMPANY_ID);
 
         // when
         ResultActions resultActions = mockMvc.perform(
