@@ -39,7 +39,7 @@ public class FavouriteItemRestController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public FavouriteItemId createFavouriteItem(@RequestBody @Valid CreateFavouriteItemResource createFavouriteItemResource) throws AggregateNotFoundException {
-        CreateFavouriteItemDto createFavouriteItemDto = new CreateFavouriteItemDto(createFavouriteItemResource.note, createFavouriteItemResource.userId, new JobAdvertisementId(createFavouriteItemResource.jobAdvertisementId));
+        CreateFavouriteItemDto createFavouriteItemDto = new CreateFavouriteItemDto(createFavouriteItemResource.note, createFavouriteItemResource.userId, createFavouriteItemResource.jobAdvertisementId);
         return favouriteItemApplicationService.create(createFavouriteItemDto);
     }
 
@@ -85,7 +85,7 @@ public class FavouriteItemRestController {
         public String userId;
 
         @NotNull
-        public String jobAdvertisementId;
+        public JobAdvertisementId jobAdvertisementId;
     }
 
     static class SearchByJobAdIdAndUserIdResource {
