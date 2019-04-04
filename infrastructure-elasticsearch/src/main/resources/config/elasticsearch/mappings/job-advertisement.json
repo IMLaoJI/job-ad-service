@@ -1,5 +1,5 @@
 {
-  "job-advertisement": {
+  "doc": {
     "properties": {
       "id": {
         "type": "text",
@@ -7,6 +7,37 @@
           "keyword": {
             "type": "keyword",
             "ignore_above": 256
+          }
+        }
+      },
+      "favouriteItem": {
+        "properties": {
+          "createdTime": {
+            "type": "date"
+          },
+          "id": {
+            "properties": {
+              "value": {
+                "type": "keyword"
+              }
+            }
+          },
+          "jobAdvertisementId": {
+            "properties": {
+              "value": {
+                "type": "keyword"
+              }
+            }
+          },
+          "note": {
+            "type": "text",
+            "analyzer": "ascii_folding"
+          },
+          "ownerUserId": {
+            "type": "keyword"
+          },
+          "updatedTime": {
+            "type": "date"
           }
         }
       },
@@ -311,6 +342,12 @@
           "stellennummerAvam": {
             "type": "keyword"
           }
+        }
+      },
+      "jobAdvertisementRelations": {
+        "type": "join",
+        "relations": {
+          "rel_jobAdvertisement": "rel_favouriteItem"
         }
       }
     }

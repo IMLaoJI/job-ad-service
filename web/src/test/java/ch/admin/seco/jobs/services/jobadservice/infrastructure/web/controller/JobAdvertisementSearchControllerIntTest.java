@@ -1,5 +1,46 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
+import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.FavouriteItemApplicationService;
+import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.create.CreateFavouriteItemDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ManagedJobAdSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCode;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCodeType;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.RadiusSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.GeoPointDto;
+import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageSkill;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Location;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import reactor.util.function.Tuples;
+
+import java.util.List;
+import java.util.stream.Stream;
+
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REJECTED;
@@ -14,18 +55,13 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job06;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job07;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job08;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job09;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job10;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createArchivedJob;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithCompanyName;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithContractType;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithDescription;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithDescriptionAndOwnerCompanyId;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithLanguageSkills;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithLocation;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithOccupation;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithOwnerAndPublicationStartDate;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithPublicDisplayAndWithRestrictedDisplay;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithPublicDisplayAndWithoutRestrictedDisplay;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithWorkload;
@@ -38,65 +74,25 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobDescriptionFixture.testJobDescription;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForAbroadSearchTests;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForGeoDistanceTests;
 import static java.time.LocalDate.now;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.CombinableMatcher.both;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.time.LocalDate;
-import java.util.stream.Stream;
-
-import ch.admin.seco.jobs.services.jobadservice.Application;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.GeoPointDto;
-import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.*;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.read.jobadvertisement.RadiusSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementDocument;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.write.jobadvertisement.JobAdvertisementElasticsearchRepository;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors.ExceptionTranslator;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
-import reactor.util.function.Tuples;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
-import org.springframework.format.support.FormattingConversionService;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.util.List;
-
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForAbroadSearchTests;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForGeoDistanceTests;
-
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 @ActiveProfiles("dev")
 public class JobAdvertisementSearchControllerIntTest {
 
@@ -118,8 +114,9 @@ public class JobAdvertisementSearchControllerIntTest {
 
     private static final GeoPointDto LAUSANNE_GEO_POINT = new GeoPointDto().setLat(46.552043).setLon(6.6523078);
 
-    private static final GeoPointDto SION_GEO_POINT =  new GeoPointDto().setLat(46.234).setLon(7.359);
+    private static final GeoPointDto SION_GEO_POINT = new GeoPointDto().setLat(46.234).setLon(7.359);
 
+    @Qualifier("jobAdvertisementRepository")
     @Autowired
     private JobAdvertisementRepository jobAdvertisementJpaRepository;
 
@@ -127,50 +124,19 @@ public class JobAdvertisementSearchControllerIntTest {
     private JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository;
 
     @Autowired
-    private ElasticsearchTemplate elasticsearchTemplate;
+    private FavouriteItemElasticsearchRepository favouriteItemElasticsearchRepository;
 
     @Autowired
-    private ElasticsearchConfiguration.CustomEntityMapper customEntityMapper;
+    private FavouriteItemApplicationService favouriteItemApplicationService;
 
     @Autowired
-    private FormattingConversionService formattingConversionService;
-
-    @Autowired
-    private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
-
-    @Autowired
-    private ExceptionTranslator exceptionTranslator;
-
-    @Autowired
-    private MappingJackson2HttpMessageConverter jacksonMessageConverter;
-
-    private JobAdvertisementSearchService jobAdvertisementSearchService;
-
-    private CurrentUserContext mockCurrentUserContext;
-
     private MockMvc mockMvc;
 
     @Before
     public void setUp() {
+        this.favouriteItemElasticsearchRepository.deleteAll();
         this.jobAdvertisementElasticsearchRepository.deleteAll();
         this.jobAdvertisementJpaRepository.deleteAll();
-        this.mockCurrentUserContext = mock(CurrentUserContext.class);
-
-        this.jobAdvertisementSearchService = new JobAdvertisementSearchService(mockCurrentUserContext,
-                this.elasticsearchTemplate,
-                this.customEntityMapper,
-                this.jobAdvertisementElasticsearchRepository
-        );
-
-        JobAdvertisementSearchController jobAdvertisementSearchController
-                = new JobAdvertisementSearchController(jobAdvertisementSearchService);
-
-        this.mockMvc = MockMvcBuilders.standaloneSetup(jobAdvertisementSearchController)
-                .setConversionService(formattingConversionService)
-                .setCustomArgumentResolvers(pageableArgumentResolver)
-                .setControllerAdvice(exceptionTranslator)
-                .setMessageConverters(jacksonMessageConverter)
-                .build();
     }
 
     @Test
@@ -211,12 +177,12 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[0].id").value(equalTo("job02")))
-                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Ausland")))
-                .andExpect(jsonPath("$.[1].id").value(equalTo("job03")))
-                .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("Ausland")))
-                .andExpect(jsonPath("$.[2].id").value(equalTo("job04")))
-                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("Ausland")));
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job02")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job03")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")));
 
     }
 
@@ -286,8 +252,8 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
-                .andExpect(jsonPath("$.[0].id").value(equalTo("job01")))
-                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Bern")));
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job01")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")));
     }
 
     @Test
@@ -308,8 +274,8 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
-                .andExpect(jsonPath("$.[0].id").value(equalTo("job04")))
-                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Lausanne")));
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")));
     }
 
     @Test
@@ -331,12 +297,12 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[0].id").value(equalTo("job01")))
-                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Bern")))
-                .andExpect(jsonPath("$.[1].id").value(equalTo("job03")))
-                .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("Sion")))
-                .andExpect(jsonPath("$.[2].id").value(equalTo("job04")))
-                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("Lausanne")));
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job01")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job03")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Sion")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")));
     }
 
     @Test
@@ -355,108 +321,15 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "4"))
-                .andExpect(jsonPath("$.[0].id").value(equalTo("job01")))
-                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("Bern")))
-                .andExpect(jsonPath("$.[1].id").value(equalTo("job02")))
-                .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("Ausland")))
-                .andExpect(jsonPath("$.[2].id").value(equalTo("job03")))
-                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("Ausland")))
-                .andExpect(jsonPath("$.[3].id").value(equalTo("job04")))
-                .andExpect(jsonPath("$.[3].jobContent.location.city").value(equalTo("Ausland")));
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job01")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job02")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job03")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
+                .andExpect(jsonPath("$.[3].jobAdvertisement.id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[3].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")));
 
-    }
-
-    @Test
-    public void shouldNotSearchPeaJobsWithoutQuery() throws Exception {
-        // GIVEN
-        index(createJob(job01.id()));
-        index(createJob(job02.id()));
-        index(createJob(job03.id()));
-
-        // WHEN
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search/pea")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(new PeaJobAdvertisementSearchRequest()))
-        );
-
-        // THEN
-        resultActions
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void shouldSearchPeaJobsWithoutJobTitleInRequest() throws Exception {
-        // GIVEN
-        index(createJobWithDescriptionAndOwnerCompanyId(job01.id(), "c++ developer", "c++ & java entwickler", "company-1"));
-        index(createJobWithDescriptionAndOwnerCompanyId(job02.id(), "java & javascript developer", "jee entwickler", "company-1"));
-        index(createJobWithDescriptionAndOwnerCompanyId(job03.id(), "php programmierer", "php programierer", "company-2"));
-        PeaJobAdvertisementSearchRequest request = new PeaJobAdvertisementSearchRequest();
-        request.setCompanyId("company-1");
-
-        // WHEN
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search/pea")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(request))
-        );
-
-        // THEN
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(header().string("X-Total-Count", "2"));
-    }
-
-    @Test
-    public void shouldSearchPeaJobsByPublicationDate() throws Exception {
-        // GIVEN
-        index(createJobWithOwnerAndPublicationStartDate(job01.id(), "company-1", now().minusDays(30)));
-        index(createJobWithOwnerAndPublicationStartDate(job02.id(), "company-1", now().minusDays(7)));
-        index(createJobWithOwnerAndPublicationStartDate(job03.id(), "company-1", now()));
-        index(createJob(job04.id()));
-        PeaJobAdvertisementSearchRequest request = new PeaJobAdvertisementSearchRequest();
-        request.setCompanyId("company-1");
-        request.setOnlineSinceDays(7);
-
-        // WHEN
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search/pea")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(request))
-        );
-
-        // THEN
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(header().string("X-Total-Count", "2"));
-    }
-
-    @Test
-    public void shouldSearchPeaJobsByJobTitle() throws Exception {
-        // GIVEN
-        index(createJobWithDescriptionAndOwnerCompanyId(job01.id(), "c++ developer", "c++ & java entwickler", "company-1"));
-        index(createJobWithDescriptionAndOwnerCompanyId(job02.id(), "java & javascript developer", "jee entwickler", "company-1"));
-        index(createJobWithDescriptionAndOwnerCompanyId(job03.id(), "php programmierer", "php programierer", "company-2"));
-        index(createJobWithDescriptionAndOwnerCompanyId(job04.id(), "javascript developer", "javascript developer", "company-3"));
-        index(createArchivedJob(job05.id(), "scala developer", "scala developer", "company-1"));
-        PeaJobAdvertisementSearchRequest request = new PeaJobAdvertisementSearchRequest();
-        request.setCompanyId("company-1");
-        request.setJobTitle("developer");
-
-        // WHEN
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search/pea")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(request))
-        );
-
-        // THEN
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(header().string("X-Total-Count", "3"));
     }
 
     @Test
@@ -481,13 +354,13 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
 
-                .andExpect(jsonPath("$.[0].id").value(equalTo(job01.name())))
-                .andExpect(jsonPath("$.[0].jobContent.jobDescriptions[0].title").value(equalTo("c++ developer")))
-                .andExpect(jsonPath("$.[0].jobContent.jobDescriptions[0].description").value(equalTo("c++ &amp; <em>java</em> <em>entwickler</em>")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo(job01.name())))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("c++ developer")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].description").value(equalTo("c++ &amp; <em>java</em> <em>entwickler</em>")))
 
-                .andExpect(jsonPath("$.[1].id").value(equalTo(job02.name())))
-                .andExpect(jsonPath("$.[1].jobContent.jobDescriptions[0].title").value(equalTo("<em>java</em> & <em>javascript</em> developer")))
-                .andExpect(jsonPath("$.[1].jobContent.jobDescriptions[0].description").value(equalTo("jee <em>entwickler</em>")));
+                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo(job02.name())))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("<em>java</em> & <em>javascript</em> developer")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.jobDescriptions[0].description").value(equalTo("jee <em>entwickler</em>")));
     }
 
     @Test
@@ -511,9 +384,9 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
 
-                .andExpect(jsonPath("$.[0].id").value(equalTo(job01.name())))
-                .andExpect(jsonPath("$.[0].jobContent.jobDescriptions[0].title").value(equalTo("c++ developer")))
-                .andExpect(jsonPath("$.[0].jobContent.jobDescriptions[0].description").value(equalTo("c++ &amp; java entwickler")));
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo(job01.name())))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("c++ developer")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].description").value(equalTo("c++ &amp; java entwickler")));
     }
 
     @Test
@@ -570,8 +443,8 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job01.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job04.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job01.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job04.name())))
         ;
     }
 
@@ -602,8 +475,8 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job01.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job02.name())));
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job01.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job02.name())));
     }
 
     @Test
@@ -638,8 +511,8 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job01.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job02.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job01.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job02.name())))
         ;
     }
 
@@ -666,8 +539,8 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job01.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job02.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job01.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job02.name())))
         ;
     }
 
@@ -694,9 +567,9 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job02.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job03.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job04.name())));
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job02.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job03.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job04.name())));
     }
 
     @Test
@@ -721,14 +594,14 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
-                .andExpect(jsonPath("$.*.id").value(job02.name()))
+                .andExpect(jsonPath("$.*.jobAdvertisement.id").value(job02.name()))
         ;
     }
 
     @Test
+    @WithJobSeeker
     public void shouldFilterByDisplayRestricted() throws Exception {
         // GIVEN
-        when(this.mockCurrentUserContext.hasAnyRoles(ArgumentMatchers.any())).thenReturn(true);
         index(createJob(job01.id()));
         index(createRestrictedJob(job02.id()));
         index(createJob(job03.id()));
@@ -748,14 +621,14 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
-                .andExpect(jsonPath("$.*.id").value(job02.name()))
+                .andExpect(jsonPath("$.*jobAdvertisement.id").value(job02.name()))
         ;
     }
 
     @Test
+    @WithJobSeeker
     public void shouldFilterByPublicationForJobSeeker() throws Exception {
         // GIVEN
-        when(this.mockCurrentUserContext.hasAnyRoles(ArgumentMatchers.any())).thenReturn(true);
         //-------------------------------------------------------------------------------publicDisplay  restrictedDisplay
         index(createJobWithoutPublicDisplayAndWithoutRestrictedDisplay(job01.id()));   //0 0
         index(createJobWithoutPublicDisplayAndWithRestrictedDisplay(job02.id()));      //0 1
@@ -776,9 +649,9 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job02.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job03.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job04.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job02.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job03.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job04.name())))
         ;
 
     }
@@ -806,8 +679,8 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job03.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job04.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job03.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job04.name())))
         ;
 
     }
@@ -833,14 +706,14 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
-                .andExpect(jsonPath("$.*.id").value(job02.name()));
+                .andExpect(jsonPath("$.*.jobAdvertisement.id").value(job02.name()));
     }
 
     @Test
+    @WithJobSeeker
     public void shouldShowRestrictedJobsForJobSeekers() throws Exception {
         // GIVEN
         //-----------------------------------------------------------------------------------publicDisplay restrictedDisplay status
-        when(this.mockCurrentUserContext.hasAnyRoles(ArgumentMatchers.any())).thenReturn(true);
         index(createJob(job01.id()));                                                           //1 0 PUBLISHED_PUBLIC
         index(createRestrictedJob(job02.id()));                                                 //1 0 PUBLISHED_RESTRICTED
         index(createRestrictedJobWithoutPublicDisplayAndWithoutRestrictedDisplay(job03.id()));  //0 0 PUBLISHED_RESTRICTED
@@ -862,47 +735,11 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "5"))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job01.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job02.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job03.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job04.name())))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(job06.name())));
-    }
-
-    @Test
-    public void countJobs() throws Exception {
-        // GIVEN
-        index(createJob(job01.id()));
-        index(createJob(job02.id()));
-        index(createJobWithContractType(job03.id(), true));
-        index(createJobWithWorkload(job04.id(), 20, 50));
-        index(createJobWithDescription(job05.id(), "xxx", "yyyy"));
-        index(createJob(job06.id()));
-        index(createJob(job07.id()));
-        index(createJob(job08.id()));
-        index(createJob(job09.id()));
-        index(createJob(job10.id()));
-
-        // WHEN
-        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setPermanent(false);
-        searchRequest.setWorkloadPercentageMin(70);
-        searchRequest.setCantonCodes(new String[]{"BE"});
-        searchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.AVAM, "avamOccupationCode")});
-        searchRequest.setKeywords(new String[]{"title"});
-
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_count")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
-        // THEN
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.totalCount").value(7))
-        ;
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job01.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job02.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job03.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job04.name())))
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(hasItem(job06.name())));
     }
 
     @Test
@@ -949,7 +786,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[*].id").value(
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(
                         both(containsInAnyOrder(
                                 job01.name(),
                                 job02.name(),
@@ -1007,7 +844,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "4"))
-                .andExpect(jsonPath("$.[*].id").value(
+                .andExpect(jsonPath("$.[*].jobAdvertisement.id").value(
                         both(containsInAnyOrder(
                                 job01.name(),
                                 job03.name(),
@@ -1022,6 +859,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdsReturnBadRequestIfEmptyRequest() throws Exception {
         // GIVEN
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest();
@@ -1037,7 +875,7 @@ public class JobAdvertisementSearchControllerIntTest {
     public void shouldSearchManagedJobAdsReturnBadRequestIfCurrentUserIsNotMemberOfCompany() throws Exception {
         // GIVEN
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId");
+                .setCompanyId(WithCompanyUser.USER_ID);
 
         // WHEN
         post(request, API_JOB_ADVERTISEMENTS + "/_search/managed")
@@ -1046,18 +884,19 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdsBeFilteredByPublicationStartDate() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
                 JobAdvertisementFixture.of(job01.id()),
                 JobAdvertisementFixture.of(job02.id())
-                        .setPublication(testPublication().setStartDate(LocalDate.now().minusDays(10)).build()),
+                        .setPublication(testPublication().setStartDate(now().minusDays(20)).build()),
                 JobAdvertisementFixture.of(job03.id())
-                        .setPublication(testPublication().setStartDate(LocalDate.now().minusDays(11)).build())
+                        .setPublication(testPublication().setStartDate(now().minusDays(15)).build())
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId")
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID)
                 .setOnlineSinceDays(10);
 
         // WHEN
@@ -1068,6 +907,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdsBeFilteredByOwnerUserId() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
@@ -1079,7 +919,7 @@ public class JobAdvertisementSearchControllerIntTest {
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId")
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID)
                 .setOwnerUserId("OwnerUserId");
 
         // WHEN
@@ -1090,18 +930,19 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdsBeFilteredByOwnerCompanyId() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
                 JobAdvertisementFixture.of(job01.id()),
                 JobAdvertisementFixture.of(job02.id())
                         .setOwner(
-                                OwnerFixture.of(job02.id()).setCompanyId("OwnerCompanyId").build()
+                                OwnerFixture.of(job02.id()).setCompanyId("XXX").build()
                         )
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("OwnerCompanyId");
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID);
 
         // WHEN
         post(request, API_JOB_ADVERTISEMENTS + "/_search/managed")
@@ -1111,6 +952,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdsBeFilteredByStatus() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
@@ -1119,7 +961,7 @@ public class JobAdvertisementSearchControllerIntTest {
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId").setState(REJECTED);
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID).setState(REJECTED);
 
         // WHEN
         post(request, API_JOB_ADVERTISEMENTS + "/_search/managed")
@@ -1129,6 +971,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdBeSearchedByKeywords() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
@@ -1146,7 +989,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 JobAdvertisementFixture.of(job04.id())
                         .setJobContent(
                                 JobContentFixture.of(job04.id())
-                                        .setJobDescriptions(asList(testJobDescription().setTitle("JobDescTitle").build()))
+                                        .setJobDescriptions(singletonList(testJobDescription().setTitle("JobDescTitle").build()))
                                         .build()),
                 JobAdvertisementFixture.of(job05.id()).setStellennummerAvam("test"),
                 JobAdvertisementFixture.of(job06.id())
@@ -1154,7 +997,7 @@ public class JobAdvertisementSearchControllerIntTest {
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId")
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID)
                 .setKeywordsText(String.join(" ",
                         "OwnerUserDisplayName", "Adli", "JobDescT",
                         "test", "StellennummerEgov"));
@@ -1174,52 +1017,53 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdBeSearchedAndSortedByDateAndCreatedTime() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
 
                 JobAdvertisementFixture.of(job01.id())
                         .setJobContent(JobContentFixture.of(job01.id())
-                                .setJobDescriptions(asList(
+                                .setJobDescriptions(singletonList(
                                         testJobDescription().setTitle("desc1").build()
                                 ))
                                 .build())
-                        .setPublication(testPublication().setStartDate(LocalDate.now()).build()),
+                        .setPublication(testPublication().setStartDate(now()).build()),
 
                 JobAdvertisementFixture.of(job02.id())
                         .setJobContent(JobContentFixture.of(job02.id())
-                                .setJobDescriptions(asList(
+                                .setJobDescriptions(singletonList(
                                         testJobDescription().setTitle("desc2").build()
                                 ))
                                 .build())
-                        .setPublication(testPublication().setStartDate(LocalDate.now()).build()),
+                        .setPublication(testPublication().setStartDate(now()).build()),
 
                 JobAdvertisementFixture.of(job03.id())
                         .setJobContent(JobContentFixture.of(job03.id())
-                                .setJobDescriptions(asList(
+                                .setJobDescriptions(singletonList(
                                         testJobDescription().setTitle("desc3").build()
                                 ))
                                 .build())
-                        .setPublication(testPublication().setStartDate(LocalDate.now().minusDays(10)).build()),
+                        .setPublication(testPublication().setStartDate(now().minusDays(10)).build()),
                 JobAdvertisementFixture.of(job04.id())
                         .setJobContent(JobContentFixture.of(job04.id())
-                                .setJobDescriptions(asList(
+                                .setJobDescriptions(singletonList(
                                         testJobDescription().setTitle("desc4").build()
                                 ))
                                 .build())
-                        .setPublication(testPublication().setStartDate(LocalDate.now()).build()),
+                        .setPublication(testPublication().setStartDate(now()).build()),
 
                 JobAdvertisementFixture.of(job05.id())
                         .setJobContent(JobContentFixture.of(job05.id())
-                                .setJobDescriptions(asList(
+                                .setJobDescriptions(singletonList(
                                         testJobDescription().setTitle("desc5").build()
                                 ))
                                 .build())
-                        .setPublication(testPublication().setStartDate(LocalDate.now()).build())
+                        .setPublication(testPublication().setStartDate(now()).build())
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId");
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID);
 
         // WHEN SORTED ASCENDING
         ResultActions resultActions = mockMvc.perform(
@@ -1257,6 +1101,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdBeSearchedAndSortedByTitle() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
@@ -1264,22 +1109,22 @@ public class JobAdvertisementSearchControllerIntTest {
                 JobAdvertisementFixture.of(job02.id())
                         .setJobContent(
                                 JobContentFixture.of(job02.id())
-                                        .setJobDescriptions(asList(testJobDescription().setTitle("desc1").build()))
+                                        .setJobDescriptions(singletonList(testJobDescription().setTitle("desc1").build()))
                                         .build()),
                 JobAdvertisementFixture.of(job03.id())
                         .setJobContent(
                                 JobContentFixture.of(job03.id())
-                                        .setJobDescriptions(asList(testJobDescription().setTitle("desc3").build()))
+                                        .setJobDescriptions(singletonList(testJobDescription().setTitle("desc3").build()))
                                         .build()),
                 JobAdvertisementFixture.of(job04.id())
                         .setJobContent(
                                 JobContentFixture.of(job04.id())
-                                        .setJobDescriptions(asList(testJobDescription().setTitle("desc2").build()))
+                                        .setJobDescriptions(singletonList(testJobDescription().setTitle("desc2").build()))
                                         .build())
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId")
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID)
                 .setKeywordsText("desc");
 
         // WHEN
@@ -1300,6 +1145,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdBeSearchedNotSortedDesByTitleIfMultipleDescriptions() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
@@ -1316,17 +1162,17 @@ public class JobAdvertisementSearchControllerIntTest {
                 JobAdvertisementFixture.of(job03.id())
                         .setJobContent(
                                 JobContentFixture.of(job03.id())
-                                        .setJobDescriptions(asList(testJobDescription().setTitle("desc3").build()))
+                                        .setJobDescriptions(singletonList(testJobDescription().setTitle("desc3").build()))
                                         .build()),
                 JobAdvertisementFixture.of(job04.id())
                         .setJobContent(
                                 JobContentFixture.of(job04.id())
-                                        .setJobDescriptions(asList(testJobDescription().setTitle("desc2").build()))
+                                        .setJobDescriptions(singletonList(testJobDescription().setTitle("desc2").build()))
                                         .build())
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId")
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID)
                 .setKeywordsText("desc");
 
         // WHEN
@@ -1347,6 +1193,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdBeSortedDescByCity() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
@@ -1374,7 +1221,7 @@ public class JobAdvertisementSearchControllerIntTest {
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId");
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID);
 
         // WHEN
         ResultActions resultActions = mockMvc.perform(
@@ -1396,6 +1243,7 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
+    @WithCompanyUser
     public void shouldSearchManagedJobAdBeSearchedAndSortedDescByCity() throws Exception {
         // GIVEN
         saveJobAdvertisementDocuments(
@@ -1418,7 +1266,7 @@ public class JobAdvertisementSearchControllerIntTest {
         );
 
         ManagedJobAdSearchRequest request = new ManagedJobAdSearchRequest()
-                .setCompanyId("companyId")
+                .setCompanyId(WithCompanyUser.USER_COMPANY_ID)
                 .setKeywordsText("Zur");
 
         // WHEN
@@ -1436,6 +1284,38 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("<em>ZurichZ</em>")))
                 .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("<em>ZurichB</em>")))
                 .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("<em>ZurichA</em>")));
+    }
+
+    @Test
+    @WithCompanyUser
+    public void searchJobAdvertisementWithFavouriteItem() throws Exception {
+        JobAdvertisement jobAdvertisement = createJob(job01.id());
+        jobAdvertisementJpaRepository.save(jobAdvertisement);
+        this.index(jobAdvertisement);
+        await().until(() -> jobAdvertisementElasticsearchRepository.findById(job01.id().getValue()).isPresent());
+
+        CreateFavouriteItemDto createFavouriteItemDto = new CreateFavouriteItemDto();
+        createFavouriteItemDto.setJobAdvertisementId(job01.id());
+        createFavouriteItemDto.setOwnerUserId(WithCompanyUser.USER_ID);
+        FavouriteItemId favouriteItemId = this.favouriteItemApplicationService.create(createFavouriteItemDto);
+        await().until(() -> favouriteItemElasticsearchRepository.findById(job01.id(), favouriteItemId).isPresent());
+
+
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
+        )
+                .andExpect(status().isOk());
+
+        // then
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "1"))
+                .andExpect(jsonPath("$.[0].favouriteItem.id").value(equalTo(favouriteItemId.getValue())));
     }
 
     private void saveJobAdvertisementDocuments(JobAdvertisement.Builder... jobAdvertisementBuilders) {
@@ -1459,4 +1339,5 @@ public class JobAdvertisementSearchControllerIntTest {
     private void index(JobAdvertisement jobAdvertisement) {
         this.jobAdvertisementElasticsearchRepository.save(new JobAdvertisementDocument(jobAdvertisement));
     }
+
 }

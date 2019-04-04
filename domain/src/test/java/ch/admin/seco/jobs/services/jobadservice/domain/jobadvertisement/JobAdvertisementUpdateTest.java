@@ -42,7 +42,7 @@ public class JobAdvertisementUpdateTest {
                                 .setStreet("new-street")
                                 .setPostalCode("postalCode")
                                 .setCity("city")
-                                .setCountryIsoCode("countryIsoCode")
+                                .setCountryIsoCode("CH")
                         .build()
                 )
                 .build();
@@ -59,7 +59,7 @@ public class JobAdvertisementUpdateTest {
         assertThat(company.getHouseNumber()).isNull();
         assertThat(company.getPostalCode()).isEqualTo("postalCode");
         assertThat(company.getCity()).isEqualTo("city");
-        assertThat(company.getCountryIsoCode()).isEqualTo("countryIsoCode");
+        assertThat(company.getCountryIsoCode()).isEqualTo("CH");
         assertThat(company.getPostOfficeBoxNumber()).isNull();
         assertThat(company.getPostOfficeBoxPostalCode()).isNull();
         assertThat(company.getPostOfficeBoxCity()).isNull();

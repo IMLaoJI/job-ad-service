@@ -8,8 +8,8 @@ public class JobCenterAddressFixture {
                 "jobCenter-name",
                 "jobCenter-city",
                 "jobCenter-street",
-                "jobCenter-houseNumber",
-                "jobCenter-postalCode"
+                "100",
+                "3000"
         );
     }
 }

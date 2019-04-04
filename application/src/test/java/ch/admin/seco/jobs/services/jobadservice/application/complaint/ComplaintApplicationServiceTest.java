@@ -30,23 +30,13 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-@ActiveProfiles("test")
 public class ComplaintApplicationServiceTest {
-
 
     @Autowired
     ComplaintProperties complaintProperties;
 
     @Autowired
-    private MailSenderService mailSenderService;
-
-    @MockBean
-    JobAdvertisementRepository jobAdvertisementRepository;
-
-    @MockBean
-    MailSenderData mailSenderData;
-
-    private ComplaintApplicationService complaintApplicationService;
+    MailSenderService mailSenderService;
 
     @MockBean
     JobAdvertisementApplicationService jobAdvertisementApplicationService;
@@ -59,6 +49,14 @@ public class ComplaintApplicationServiceTest {
 
     @MockBean
     JobAdvertisementFactory jobAdvertisementFactory;
+
+    @MockBean
+    JobAdvertisementRepository jobAdvertisementRepository;
+
+    @MockBean
+    MailSenderData mailSenderData;
+
+    private ComplaintApplicationService complaintApplicationService;
 
     @Before
     public void setUp() {
