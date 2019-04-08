@@ -62,11 +62,12 @@ public class FavouriteItemApplicationService {
     }
 
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.isCurrentUserOwner(#updateFavouriteItemDto.id)")
-    public void update(UpdateFavouriteItemDto updateFavouriteItemDto) {
+    public FavouriteItemId update(UpdateFavouriteItemDto updateFavouriteItemDto) {
         Condition.notNull(updateFavouriteItemDto, "UpdateFavouriteItemDto can't be null");
         FavouriteItem favouriteItem = getFavouriteItem(updateFavouriteItemDto.getId());
         favouriteItem.update(updateFavouriteItemDto.getNote());
         LOG.debug("{} has been updated.", favouriteItem.toString());
+        return favouriteItem.getId();
     }
 
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.isCurrentUserOwner(#favouriteItemId)")

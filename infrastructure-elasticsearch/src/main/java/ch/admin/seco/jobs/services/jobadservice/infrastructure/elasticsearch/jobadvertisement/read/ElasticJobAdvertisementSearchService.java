@@ -140,7 +140,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
     @Override
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.matchesCurrentUserId(#ownerUserId)")
-    public Page<JobAdvertisementSearchResult> searchFavouriteJobAds(String ownerUserId, String query, int page, int size) {
+    public Page<JobAdvertisementSearchResult> searchFavouriteJobAds(String ownerUserId, String keyword, int page, int size) {
         Pageable pageable = PageRequest
                 .of(page, size, Sort.by(
                         desc(PATH_CREATED_TIME),
@@ -153,11 +153,11 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
                         ScoreMode.None
                 ))
                 .withPageable(pageable);
-        if (StringUtils.isNotBlank(query)) {
+        if (StringUtils.isNotBlank(keyword)) {
             searchQueryBuilder
                     .withQuery(boolQuery()
-                            .should(multiMatchQuery(query, PATH_TITLE, PATH_DESCRIPTION))
-                            .should(hasChildQuery(FAVOURITE_ITEM_RELATION_NAME, matchQuery("favouriteItem.note", query), ScoreMode.None))
+                            .should(multiMatchQuery(keyword, PATH_TITLE, PATH_DESCRIPTION).type(MultiMatchQueryBuilder.Type.PHRASE_PREFIX))
+                            .should(hasChildQuery(FAVOURITE_ITEM_RELATION_NAME, matchPhrasePrefixQuery("favouriteItem.note", keyword), ScoreMode.None))
                     )
             ;
         }
@@ -223,11 +223,9 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
     }
 
     private Set<JobAdvertisementId> extractJobAdIds(List<JobAdvertisementDto> jobAdvertisementDtoList) {
-        Set<JobAdvertisementId> jobAdvertisementIds = new HashSet<>();
-        for (JobAdvertisementDto jobAdvertisementDto : jobAdvertisementDtoList) {
-            jobAdvertisementIds.add(new JobAdvertisementId(jobAdvertisementDto.getId()));
-        }
-        return jobAdvertisementIds;
+        return jobAdvertisementDtoList.stream()
+                .map(jobAdvertisementDto -> new JobAdvertisementId(jobAdvertisementDto.getId()))
+                .collect(Collectors.toSet());
     }
 
     private Pageable appendUniqueSortingKey(Pageable pageable) {

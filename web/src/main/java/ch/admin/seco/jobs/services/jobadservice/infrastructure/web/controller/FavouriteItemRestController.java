@@ -38,15 +38,17 @@ public class FavouriteItemRestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public FavouriteItemId createFavouriteItem(@RequestBody @Valid CreateFavouriteItemResource createFavouriteItemResource) throws AggregateNotFoundException {
+    public FavouriteItemDto createFavouriteItem(@RequestBody @Valid CreateFavouriteItemResource createFavouriteItemResource) throws AggregateNotFoundException {
         CreateFavouriteItemDto createFavouriteItemDto = new CreateFavouriteItemDto(createFavouriteItemResource.note, createFavouriteItemResource.userId, createFavouriteItemResource.jobAdvertisementId);
-        return favouriteItemApplicationService.create(createFavouriteItemDto);
+        FavouriteItemId favouriteItemId = favouriteItemApplicationService.create(createFavouriteItemDto);
+        return favouriteItemApplicationService.findById(favouriteItemId);
     }
 
     @PutMapping("/{id}/note")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateFavouriteItem(@PathVariable FavouriteItemId id, @RequestBody FavouriteItemUpdateResource favouriteItemUpdateResource) throws FavoriteItemNotExitsException {
-        favouriteItemApplicationService.update(new UpdateFavouriteItemDto(id, favouriteItemUpdateResource.note));
+    public FavouriteItemDto updateFavouriteItem(@PathVariable FavouriteItemId id, @RequestBody FavouriteItemUpdateResource favouriteItemUpdateResource) throws FavoriteItemNotExitsException {
+        FavouriteItemId favouriteItemId = favouriteItemApplicationService.update(new UpdateFavouriteItemDto(id, favouriteItemUpdateResource.note));
+        return favouriteItemApplicationService.findById(favouriteItemId);
     }
 
     @DeleteMapping("/{id}")
