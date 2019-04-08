@@ -1,6 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.FavouriteItemApplicationService;
+import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.FavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.create.CreateFavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ManagedJobAdSearchRequest;
@@ -1297,7 +1298,8 @@ public class JobAdvertisementSearchControllerIntTest {
         CreateFavouriteItemDto createFavouriteItemDto = new CreateFavouriteItemDto();
         createFavouriteItemDto.setJobAdvertisementId(job01.id());
         createFavouriteItemDto.setOwnerUserId(WithCompanyUser.USER_ID);
-        FavouriteItemId favouriteItemId = this.favouriteItemApplicationService.create(createFavouriteItemDto);
+        FavouriteItemDto favouriteItemDto = this.favouriteItemApplicationService.create(createFavouriteItemDto);
+        FavouriteItemId favouriteItemId = new FavouriteItemId(favouriteItemDto.getId());
         await().until(() -> favouriteItemElasticsearchRepository.findById(job01.id(), favouriteItemId).isPresent());
 
 
