@@ -38,7 +38,7 @@ public class FavouriteItemApplicationService {
     }
 
     @PreAuthorize("isAuthenticated() and @favouriteItemAuthorizationService.matchesCurrentUserId(#createFavouriteItemDto.ownerUserId)")
-    public FavouriteItemId create(CreateFavouriteItemDto createFavouriteItemDto) {
+    public FavouriteItemDto create(CreateFavouriteItemDto createFavouriteItemDto) {
         Condition.notNull(createFavouriteItemDto, "CreateFavouriteItemDto can't be null");
         if (!this.jobAdvertisementRepository.existsById(createFavouriteItemDto.getJobAdvertisementId())) {
             throw new AggregateNotFoundException(JobAdvertisement.class, createFavouriteItemDto.getJobAdvertisementId().getValue());
@@ -58,17 +58,17 @@ public class FavouriteItemApplicationService {
         FavouriteItem newFavouriteItem = this.favouriteItemRepository.save(favouriteItem);
         LOG.debug("Favourite Item {} has been created for user {}.", newFavouriteItem.getId().getValue(), newFavouriteItem.getOwnerUserId());
         DomainEventPublisher.publish(new FavouriteItemCreatedEvent(newFavouriteItem));
-        return newFavouriteItem.getId();
+        return FavouriteItemDto.toDto(newFavouriteItem);
     }
 
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.isCurrentUserOwner(#updateFavouriteItemDto.id)")
-    public FavouriteItemId update(UpdateFavouriteItemDto updateFavouriteItemDto) {
+    public FavouriteItemDto update(UpdateFavouriteItemDto updateFavouriteItemDto) {
         Condition.notNull(updateFavouriteItemDto, "UpdateFavouriteItemDto can't be null");
         FavouriteItem favouriteItem = getFavouriteItem(updateFavouriteItemDto.getId());
         favouriteItem.update(updateFavouriteItemDto.getNote());
         LOG.debug("{} has been updated.", favouriteItem.toString());
-        return favouriteItem.getId();
-    }
+        return FavouriteItemDto.toDto(favouriteItem);
+}
 
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.isCurrentUserOwner(#favouriteItemId)")
     public void delete(FavouriteItemId favouriteItemId) {
