@@ -74,10 +74,10 @@ public class FavouriteItemApplicationServiceTest {
         when(jobAdvertisementRepository.existsById(any())).thenReturn(true);
 
         //when
-        FavouriteItemId favouriteItemId = this.sut.create(createFavouriteItemDto);
+        FavouriteItemDto favouriteItemDto = this.sut.create(createFavouriteItemDto);
 
         //then
-        Optional<FavouriteItem> createdFavouriteItem = favouriteItemRepository.findById(favouriteItemId);
+        Optional<FavouriteItem> createdFavouriteItem = favouriteItemRepository.findById(new FavouriteItemId(favouriteItemDto.getId()));
         assertThat(createdFavouriteItem).isPresent();
         assertThat(createdFavouriteItem.get().getNote()).isEqualTo(createFavouriteItemDto.getNote());
         domainEventMockUtils.assertSingleDomainEventPublished(FavouriteItemEvents.FAVOURITE_ITEM_CREATED.getDomainEventType());
@@ -148,8 +148,7 @@ public class FavouriteItemApplicationServiceTest {
         UpdateFavouriteItemDto updateFavouriteItemDto = new UpdateFavouriteItemDto(favouriteItemId, adjustedNote);
 
         // when
-        this.sut.update(updateFavouriteItemDto);
-        FavouriteItemDto favouriteItemDto = this.sut.findById(favouriteItemId);
+        FavouriteItemDto favouriteItemDto = this.sut.update(updateFavouriteItemDto);
 
         // then
         assertThat(favouriteItemDto.getNote()).isEqualTo(adjustedNote);
