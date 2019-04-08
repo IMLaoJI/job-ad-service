@@ -107,7 +107,7 @@ public class FavouriteItemRestControllerIntTest {
                 MockMvcRequestBuilders.put(URL + "/" + favItem01.id().getValue() + "/note")
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
                         .content(TestUtil.convertObjectToJsonBytes(favouriteItemUpdateResource)));
-        put.andExpect(status().isNoContent());
+        put.andExpect(status().isOk());
 
         // then
         Optional<FavouriteItem> favouriteItem = this.favouriteItemRepository.findById(favItem01.id());
