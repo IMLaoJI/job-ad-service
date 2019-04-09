@@ -380,7 +380,8 @@ public class JobAdvertisementApplicationService {
         JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerEgov(approvalDto.getStellennummerEgov());
         if (jobAdvertisement.getStatus().equals(INSPECTING)) {
             LOG.debug("Starting approve for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
-            jobAdvertisement.approve(approvalDto.getStellennummerAvam(), approvalDto.getDate(), approvalDto.isReportingObligation(), approvalDto.getReportingObligationEndDate());
+            jobAdvertisement.approve(approvalDto.getStellennummerAvam(), approvalDto.getDate(), approvalDto.isReportingObligation(),
+                    approvalDto.getReportingObligationEndDate(), approvalDto.getJobCenterCode());
         }
         // FIXME This is a workaround when updating after approval, until AVAM add an actionType on there message.
         LOG.debug("Starting UPDATE for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
