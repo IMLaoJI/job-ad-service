@@ -352,6 +352,14 @@ public class JobAdvertisementTestFixture {
         );
     }
 
+    public static JobAdvertisement createJobWithLocationAndPublicationStartDate(JobAdvertisementId jobAdvertisementId, LocalDate startDate, Location location) {
+        return testJobAdvertisementWithContentAndPublication(jobAdvertisementId, startDate,
+                JobContentFixture.of(jobAdvertisementId)
+                        .setLocation(location)
+                        .build()
+        );
+    }
+
     private static JobAdvertisement testJobAdvertisementWithContent(JobAdvertisementId jobAdvertisementId, JobContent jobContent) {
         return new JobAdvertisement.Builder()
                 .setId(jobAdvertisementId)
@@ -359,6 +367,21 @@ public class JobAdvertisementTestFixture {
                 .setStatus(PUBLISHED_PUBLIC)
                 .setOwner(OwnerFixture.of(jobAdvertisementId).build())
                 .setPublication(testPublication().setPublicDisplay(true).build())
+                .setJobContent(jobContent)
+                .build();
+    }
+
+    private static JobAdvertisement testJobAdvertisementWithContentAndPublication(JobAdvertisementId jobAdvertisementId, LocalDate startDate, JobContent jobContent) {
+        return new JobAdvertisement.Builder()
+                .setId(jobAdvertisementId)
+                .setSourceSystem(JOBROOM)
+                .setStatus(PUBLISHED_PUBLIC)
+                .setOwner(OwnerFixture.of(jobAdvertisementId).build())
+                .setPublication(testPublication()
+                        .setPublicDisplay(true)
+                        .setStartDate(startDate)
+                        .setEndDate(startDate.plusMonths(1))
+                        .build())
                 .setJobContent(jobContent)
                 .build();
     }
