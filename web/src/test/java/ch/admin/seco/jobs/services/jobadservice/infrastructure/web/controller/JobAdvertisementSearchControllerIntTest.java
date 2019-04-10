@@ -178,11 +178,11 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job02")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job04")))
                 .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
                 .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job03")))
                 .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
-                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job02")))
                 .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")));
 
     }
@@ -298,12 +298,12 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job01")))
-                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")))
                 .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job03")))
                 .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Sion")))
-                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job04")))
-                .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")));
+                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job01")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")));
     }
 
     @Test
@@ -322,14 +322,14 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "4"))
-                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job01")))
-                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
-                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job02")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job03")))
                 .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
-                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job03")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job02")))
                 .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
-                .andExpect(jsonPath("$.[3].jobAdvertisement.id").value(equalTo("job04")))
-                .andExpect(jsonPath("$.[3].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")));
+                .andExpect(jsonPath("$.[3].jobAdvertisement.id").value(equalTo("job01")))
+                .andExpect(jsonPath("$.[3].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")));
 
     }
 
