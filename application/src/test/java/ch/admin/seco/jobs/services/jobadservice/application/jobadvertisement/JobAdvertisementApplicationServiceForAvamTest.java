@@ -53,8 +53,6 @@ public class JobAdvertisementApplicationServiceForAvamTest {
 
     public static final String STELLENNUMMER_AVAM = "avam";
 
-    public static final String JOB_CENTER_ID = "jobcenterid";
-
     @Autowired
     private DataFieldMaxValueIncrementer egovNumberGenerator;
 

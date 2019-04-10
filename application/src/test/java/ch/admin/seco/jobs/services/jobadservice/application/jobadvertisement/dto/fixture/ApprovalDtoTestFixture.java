@@ -6,7 +6,6 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 
 import java.time.LocalDate;
 
-import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationServiceForAvamTest.JOB_CENTER_ID;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationServiceForAvamTest.STELLENNUMMER_AVAM;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.UpdateJobAdvertisementFromAvamDtoTestFixture.testUpdateJobAdvertisementFromAvamDto;
 
@@ -20,7 +19,7 @@ public class ApprovalDtoTestFixture {
         updateJobAdAvamDto.setReportingObligation(true);
         updateJobAdAvamDto.setReportingObligationEndDate(LocalDate.of(2018, 10, 1));
         updateJobAdAvamDto.setStellennummerAvam(STELLENNUMMER_AVAM);
-        updateJobAdAvamDto.setJobCenterCode(JOB_CENTER_ID);
+        updateJobAdAvamDto.setJobCenterCode("job-center-id");
 
         return new ApprovalDto(
                 jobAdvertisement.getId().getValue(),
