@@ -306,16 +306,17 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
     }
 
     public void approve(String stellennummerAvam, LocalDate date, boolean reportingObligation, LocalDate reportingObligationEndDate, String jobCenterCode) {
+
         if (reportingObligation) {
             Condition.notNull(reportingObligationEndDate, "Reporting obligation end date is missing");
         }
-
-        ChangeLog changeLog = applyApprove(reportingObligation, reportingObligationEndDate, jobCenterCode);
-
         this.stellennummerAvam = Condition.notBlank(stellennummerAvam);
         this.approvalDate = Condition.notNull(date);
+
+        ChangeLog changeLog = applyApprove(reportingObligation, reportingObligationEndDate, jobCenterCode);
         this.status = status.validateTransitionTo(JobAdvertisementStatus.APPROVED);
         this.updatedTime = TimeMachine.now();
+
         DomainEventPublisher.publish(new JobAdvertisementApprovedEvent(this, changeLog));
     }
 
