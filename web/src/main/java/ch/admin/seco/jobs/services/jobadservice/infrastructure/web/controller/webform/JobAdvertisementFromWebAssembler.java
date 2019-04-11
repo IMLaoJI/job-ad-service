@@ -3,8 +3,10 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.w
 import ch.admin.seco.jobs.services.jobadservice.application.HtmlToMarkdownConverter;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.AddressDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
+import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.CancellationResource;
@@ -28,7 +30,7 @@ public class JobAdvertisementFromWebAssembler {
         return new CreateJobAdvertisementDto()
                 .setReportToAvam(true)
                 .setApplyChannel(convertApplyChannel(createJobAdvertisementFromWebDto.getApplyChannel()))
-                .setCompany(createJobAdvertisementFromWebDto.getCompany())
+                .setCompany(convertCompany(createJobAdvertisementFromWebDto.getCompany()))
                 .setContact(createJobAdvertisementFromWebDto.getContact())
                 .setEmployer(createJobAdvertisementFromWebDto.getEmployer())
                 .setExternalReference(createJobAdvertisementFromWebDto.getExternalReference())
@@ -51,12 +53,14 @@ public class JobAdvertisementFromWebAssembler {
                 .setCancelledBy(SourceSystem.JOBROOM);
     }
 
-    private ApplyChannelDto convertApplyChannel(ApplyChannelDto createApplyChannelDto) {
+    ApplyChannelDto convertApplyChannel(WebformCreateApplyChannelDto createApplyChannelDto) {
         if (createApplyChannelDto == null) {
             return null;
         }
+
+        validateApplyChannelIsNotEmpty(createApplyChannelDto);
+
         return new ApplyChannelDto()
-                .setRawPostAddress(trimOrNull(createApplyChannelDto.getRawPostAddress()))
                 .setPostAddress(convertPostAddress(createApplyChannelDto.getPostAddress()))
                 .setEmailAddress(trimOrNull(createApplyChannelDto.getEmailAddress()))
                 .setPhoneNumber(trimOrNull(createApplyChannelDto.getPhoneNumber()))
@@ -64,26 +68,76 @@ public class JobAdvertisementFromWebAssembler {
                 .setAdditionalInfo(trimOrNull(createApplyChannelDto.getAdditionalInfo()));
     }
 
-    private AddressDto convertPostAddress(AddressDto createPostAddressDto) {
-        if (createPostAddressDto == null) {
+    CompanyDto convertCompany(WebformCreateCompanyDto createCompanyDto) {
+        if (createCompanyDto == null) {
             return null;
         }
-        if (!hasText(createPostAddressDto.getName())) {
+
+        validateAddressNormalOrPOBox(createCompanyDto.getStreet(), createCompanyDto.getPostOfficeBoxNumber());
+
+        CompanyDto companyDto = new CompanyDto();
+        if (hasText(createCompanyDto.getPostOfficeBoxNumber())) {
+            companyDto
+                    .setPostOfficeBoxNumber(trimOrNull(createCompanyDto.getPostOfficeBoxNumber()))
+                    .setPostOfficeBoxPostalCode(trimOrNull(createCompanyDto.getPostalCode()))
+                    .setPostOfficeBoxCity(trimOrNull(createCompanyDto.getCity()));
+        }
+        if (hasText(createCompanyDto.getStreet())) {
+            companyDto
+                    .setStreet(trimOrNull(createCompanyDto.getStreet()))
+                    .setHouseNumber(trimOrNull(createCompanyDto.getHouseNumber()))
+                    .setPostalCode(trimOrNull(createCompanyDto.getPostalCode()))
+                    .setCity(trimOrNull(createCompanyDto.getCity()));
+        }
+
+        return companyDto
+                .setName(trimOrNull(createCompanyDto.getName()))
+                .setCountryIsoCode(trimOrNull(createCompanyDto.getCountryIsoCode()))
+                .setSurrogate(createCompanyDto.isSurrogate());
+    }
+
+    AddressDto convertPostAddress(WebformCreateAddressDto createAddressDto) {
+        if (createAddressDto == null) {
             return null;
         }
-        return new AddressDto()
-                .setName(trimOrNull(createPostAddressDto.getName()))
-                .setStreet(trimOrNull(createPostAddressDto.getStreet()))
-                .setHouseNumber(trimOrNull(createPostAddressDto.getHouseNumber()))
-                .setPostalCode(trimOrNull(createPostAddressDto.getPostalCode()))
-                .setCity(trimOrNull(createPostAddressDto.getCity()))
-                .setPostOfficeBoxNumber(trimOrNull(createPostAddressDto.getPostOfficeBoxNumber()))
-                .setPostOfficeBoxPostalCode(trimOrNull(createPostAddressDto.getPostOfficeBoxPostalCode()))
-                .setPostOfficeBoxCity(trimOrNull(createPostAddressDto.getPostOfficeBoxCity()))
-                .setCountryIsoCode(trimOrNull(createPostAddressDto.getCountryIsoCode()));
+
+        validateAddressNormalOrPOBox(createAddressDto.getStreet(), createAddressDto.getPostOfficeBoxNumber());
+
+        AddressDto addressDto = new AddressDto();
+
+        if (hasText(createAddressDto.getPostOfficeBoxNumber())) {
+            addressDto
+                    .setPostOfficeBoxNumber(trimOrNull(createAddressDto.getPostOfficeBoxNumber()))
+                    .setPostOfficeBoxPostalCode(trimOrNull(createAddressDto.getPostalCode()))
+                    .setPostOfficeBoxCity(trimOrNull(createAddressDto.getCity()));
+        } else {
+            addressDto
+                    .setStreet(trimOrNull(createAddressDto.getStreet()))
+                    .setHouseNumber(trimOrNull(createAddressDto.getHouseNumber()))
+                    .setPostalCode(trimOrNull(createAddressDto.getPostalCode()))
+                    .setCity(trimOrNull(createAddressDto.getCity()));
+        }
+
+        return addressDto
+                .setName(trimOrNull(createAddressDto.getName()))
+                .setCountryIsoCode(trimOrNull(createAddressDto.getCountryIsoCode()));
+    }
+
+    private void validateApplyChannelIsNotEmpty(WebformCreateApplyChannelDto createApplyChannelDto) {
+        boolean isNotEmpty = (createApplyChannelDto.getPostAddress() != null)
+                || hasText(createApplyChannelDto.getEmailAddress())
+                || hasText(createApplyChannelDto.getPhoneNumber())
+                || hasText(createApplyChannelDto.getFormUrl());
+
+        Condition.isTrue(isNotEmpty, "One of the apply channel must be set");
+    }
+
+    private void validateAddressNormalOrPOBox(String street, String postOfficeBoxNumber) {
+        Condition.isTrue(hasText(street) || hasText(postOfficeBoxNumber), "Street or post office box number must be set");
     }
 
     private String trimOrNull(String value) {
         return hasText(value) ? trimWhitespace(value) : null;
     }
+
 }
