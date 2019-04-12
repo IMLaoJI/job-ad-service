@@ -51,7 +51,7 @@ public class AvamEndpoint {
             } else if (isCancelled(avamJobAdvertisement)) {
                 avamSource.cancel(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
             } else if (isApproved(avamJobAdvertisement)) {
-                avamSource.approve(jobAdvertisementFromAvamAssembler.createApprovaldDto(avamJobAdvertisement));
+                avamSource.approve(jobAdvertisementFromAvamAssembler.createApprovalDto(avamJobAdvertisement));
             } else if (isCreatedFromAvam(avamJobAdvertisement)) {
                 avamSource.create(jobAdvertisementFromAvamAssembler.createCreateJobAdvertisementAvamDto(avamJobAdvertisement));
             } else {

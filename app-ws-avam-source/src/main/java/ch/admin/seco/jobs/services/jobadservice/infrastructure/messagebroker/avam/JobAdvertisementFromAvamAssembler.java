@@ -90,13 +90,14 @@ public class JobAdvertisementFromAvamAssembler {
         );
     }
 
-    ApprovalDto createApprovaldDto(WSOsteEgov avamJobAdvertisement) {
+    ApprovalDto createApprovalDto(WSOsteEgov avamJobAdvertisement) {
         return new ApprovalDto(
                 safeTrimOrNull(avamJobAdvertisement.getStellennummerEgov()),
                 safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()),
                 parseToLocalDate(avamJobAdvertisement.getAnmeldeDatum()),
                 avamJobAdvertisement.isMeldepflicht(),
                 parseToLocalDate(avamJobAdvertisement.getSperrfrist()),
+                safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()),
                 new UpdateJobAdvertisementFromAvamDto(
                         safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()),
                         safeTrimOrNull(avamJobAdvertisement.getBezeichnung()),

@@ -220,19 +220,19 @@ public class JobAdvertisementApplicationServiceForAvamTest {
                         .setJobContent(JobContentFixture.of(job01.id()).build())
                         .build()
         );
-        UpdateJobAdvertisementFromAvamDto updateJobAdvertisementFromAvamDto = testUpdateJobAdvertisementFromAvamDto(inspectingJobAd);
-        ApprovalDto approvalDto = testApprovalDto(updateJobAdvertisementFromAvamDto);
+        ApprovalDto approvalDto = testApprovalDto(inspectingJobAd);
 
         // when
         sut.approve(approvalDto);
 
         // then
-        JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
-        assertThat(repoJobAd.getStellennummerAvam()).isEqualTo(STELLENNUMMER_AVAM);
-        assertThat(repoJobAd.getApprovalDate()).isEqualTo(approvalDto.getDate());
-        assertThat(repoJobAd.isReportingObligation()).isTrue();
-        assertThat(repoJobAd.getReportingObligationEndDate()).isEqualTo(approvalDto.getReportingObligationEndDate());
-        assertThat(repoJobAd.getStatus()).isEqualTo(APPROVED);
+        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(job01.id());
+        assertThat(jobAdvertisement.getStellennummerAvam()).isEqualTo(approvalDto.getStellennummerAvam());
+        assertThat(jobAdvertisement.getApprovalDate()).isEqualTo(approvalDto.getDate());
+        assertThat(jobAdvertisement.isReportingObligation()).isEqualTo(approvalDto.isReportingObligation());
+        assertThat(jobAdvertisement.getReportingObligationEndDate()).isEqualTo(approvalDto.getReportingObligationEndDate());
+        assertThat(jobAdvertisement.getJobCenterCode()).isEqualTo(approvalDto.getJobCenterCode());
+        assertThat(jobAdvertisement.getStatus()).isEqualTo(APPROVED);
         domainEventMockUtils.assertSingleDomainEventPublished(JOB_ADVERTISEMENT_APPROVED.getDomainEventType());
     }
 
@@ -240,24 +240,24 @@ public class JobAdvertisementApplicationServiceForAvamTest {
     @Test
     public void shouldApproveWithUpdate() {
         // given
-        JobAdvertisement jobAdvertisementWithInspectingStatus = jobAdvertisementRepository.save(
+        JobAdvertisement inspectingJobAd = jobAdvertisementRepository.save(
                 testJobAdvertisement()
                         .setStatus(INSPECTING)
                         .setJobContent(JobContentFixture.of(job01.id()).build())
                         .build());
-        UpdateJobAdvertisementFromAvamDto updateJobAdvertisementFromAvamDto = testUpdateJobAdvertisementFromAvamDto(jobAdvertisementWithInspectingStatus);
-        updateJobAdvertisementFromAvamDto.setDescription("OTHER VALUE");
-        ApprovalDto approvalDto = testApprovalDto(updateJobAdvertisementFromAvamDto);
+        ApprovalDto approvalDto = testApprovalDto(inspectingJobAd);
+        approvalDto.getUpdateJobAdvertisement().setDescription("OTHER VALUE");
 
         // when
         sut.approve(approvalDto);
 
         // then
-        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(jobAdvertisementWithInspectingStatus.getId());
-        assertThat(jobAdvertisement.getStellennummerAvam()).isEqualTo(STELLENNUMMER_AVAM);
+        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(inspectingJobAd.getId());
+        assertThat(jobAdvertisement.getStellennummerAvam()).isEqualTo(approvalDto.getStellennummerAvam());
         assertThat(jobAdvertisement.getApprovalDate()).isEqualTo(approvalDto.getDate());
-        assertThat(jobAdvertisement.isReportingObligation()).isTrue();
+        assertThat(jobAdvertisement.isReportingObligation()).isEqualTo(approvalDto.isReportingObligation());
         assertThat(jobAdvertisement.getReportingObligationEndDate()).isEqualTo(approvalDto.getReportingObligationEndDate());
+        assertThat(jobAdvertisement.getJobCenterCode()).isEqualTo(approvalDto.getJobCenterCode());
         assertThat(jobAdvertisement.getStatus()).isEqualTo(APPROVED);
         assertThat(jobAdvertisement.getJobContent().getJobDescriptions().get(0).getDescription()).isEqualTo("OTHER VALUE");
         domainEventMockUtils.assertMultipleDomainEventPublished(2, JOB_ADVERTISEMENT_UPDATED.getDomainEventType());
