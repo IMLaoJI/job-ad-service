@@ -1,6 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.mail;
 
-import org.apache.commons.mail.util.IDNEmailAddressConverter;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -21,8 +20,6 @@ class MailSenderConfig {
 
 	private final SpringTemplateEngine templateEngine;
 
-	private final IDNEmailAddressConverter idnEmailAddressConverter;
-
 	private final MailSendingService mailSendingService;
 
 	public MailSenderConfig(
@@ -34,7 +31,6 @@ class MailSenderConfig {
 		this.messageSource = messageSource;
 		this.templateEngine = templateEngine;
 		this.mailSendingService = mailSendingService;
-		this.idnEmailAddressConverter = new IDNEmailAddressConverter();
 	}
 
 	@Bean
@@ -43,7 +39,6 @@ class MailSenderConfig {
 				templateEngine,
 				mailSenderProperties,
 				messageSource,
-				idnEmailAddressConverter,
 				mailSendingService
 		);
 	}

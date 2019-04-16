@@ -2,12 +2,10 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.mail;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.mail.util.IDNEmailAddressConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.Context;
@@ -31,15 +29,12 @@ class DefaultMailSenderService implements MailSenderService {
 
 	private final MessageSource messageSource;
 
-	private final IDNEmailAddressConverter idnEmailAddressConverter;
-
 	private final MailSendingService mailSendingService;
 
-	DefaultMailSenderService(SpringTemplateEngine templateEngine, MailSenderProperties mailSenderProperties, MessageSource messageSource, IDNEmailAddressConverter idnEmailAddressConverter, MailSendingService mailSendingService) {
+	DefaultMailSenderService(SpringTemplateEngine templateEngine, MailSenderProperties mailSenderProperties, MessageSource messageSource, MailSendingService mailSendingService) {
 		this.templateEngine = templateEngine;
 		this.mailSenderProperties = mailSenderProperties;
 		this.messageSource = messageSource;
-		this.idnEmailAddressConverter = idnEmailAddressConverter;
 		this.mailSendingService = mailSendingService;
 	}
 
@@ -57,11 +52,11 @@ class DefaultMailSenderService implements MailSenderService {
 		Set<String> bcc = extractAllBccAddresses(mailSenderData);
 		return new ch.admin.seco.alv.shared.mail.MailSenderData.Builder()
 				.setBcc(bcc.toArray(new String[0]))
-				.setCc(encodeEmailAddresses(mailSenderData.getCc().toArray(new String[0])))
+				.setCc(mailSenderData.getCc().toArray(new String[0]))
 				.setContent(content)
 				.setFrom(mailSenderProperties.getFromAddress())
 				.setSubject(subject)
-				.setTo(encodeEmailAddresses(mailSenderData.getTo().toArray(new String[0])))
+				.setTo(mailSenderData.getTo().toArray(new String[0]))
 				.build();
 	}
 
@@ -83,13 +78,5 @@ class DefaultMailSenderService implements MailSenderService {
 		context.setVariables(mailSenderData.getTemplateVariables());
 		context.setLocale(mailSenderData.getLocale());
 		return context;
-	}
-
-	private String[] encodeEmailAddresses(String[] addresses) {
-		return addresses != null
-				? Stream.of(addresses)
-				.map(idnEmailAddressConverter::toASCII)
-				.toArray(String[]::new)
-				: null;
 	}
 }
