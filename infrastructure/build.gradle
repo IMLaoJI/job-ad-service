@@ -10,7 +10,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-integration'
     compile 'org.springframework.integration:spring-integration-jpa'
 
-    compile 'ch.admin.seco.alv:alv-logger:0.0.1-SNAPSHOT'
+    compile 'ch.admin.seco.alv:alv-logger-starter:0.0.1-SNAPSHOT'
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.hibernate.validator:hibernate-validator'
