@@ -58,10 +58,11 @@ public class AvamIntegrationFlowConfig {
 	public IntegrationFlow avamOutputGatewayFlow() {
 		return IntegrationFlows
 				.from(this.inputChannel)
+				.enrichHeaders(h -> h.headerFunction(EVENT, AvamIntegrationFlowConfig::extractEventHeader))
 				.transform(this::toJobAdvertisement, c -> c
 						.role(IntegrationBasisConfig.DEFAULT_INTEGRATION_ROLE_NAME)
 						.poller(integrationBasisConfig.pollerFactory().builder().retryAware(true).build()))
-				.enrichHeaders(h -> h.headerFunction(EVENT, AvamIntegrationFlowConfig::extractEventHeader))
+
 				.enrichHeaders(AvamIntegrationFlowConfig::applyMessageBrokerHeader)
 				.handle(this::send)
 				.get();
@@ -85,12 +86,8 @@ public class AvamIntegrationFlowConfig {
 		h.header(SOURCE_SYSTEM, JOB_AD_SERVICE.name())
 				.header(TARGET_SYSTEM, AVAM.name())
 				.header(PAYLOAD_TYPE, JobAdvertisement.class.getSimpleName())
-				.<JobAdvertisement>headerFunction(PARTITION_KEY, jobAdvertisementMessage -> {
-					return jobAdvertisementMessage.getPayload().getId().getValue();
-				})
-				.<JobAdvertisement>headerFunction(RELEVANT_ID, jobAdvertisementMessage -> {
-					return jobAdvertisementMessage.getPayload().getId().getValue();
-				});
+				.<JobAdvertisement>headerFunction(PARTITION_KEY, message -> message.getPayload().getId().getValue())
+				.<JobAdvertisement>headerFunction(RELEVANT_ID, message -> message.getPayload().getId().getValue());
 	}
 
 	private static String extractEventHeader(Message<AvamTaskData> message) {
