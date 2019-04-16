@@ -1,23 +1,13 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.mail;
 
-import java.util.Collections;
-import java.util.Set;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotNull;
 
 @Validated
 @ConfigurationProperties(prefix = "mail.sender")
 public class MailSenderProperties {
-
-    @NotEmpty
-    private String fromAddress;
-
-    @NotEmpty
-    private Set<String> bccAddress = Collections.emptySet();
 
     private String baseUrl;
 
@@ -25,22 +15,6 @@ public class MailSenderProperties {
 
     @NotNull
     private String templatesPath;
-
-    public String getFromAddress() {
-        return fromAddress;
-    }
-
-    public void setFromAddress(String fromAddress) {
-        this.fromAddress = fromAddress;
-    }
-
-    public Set<String> getBccAddress() {
-        return bccAddress;
-    }
-
-    public void setBccAddress(Set<String> bccAddress) {
-        this.bccAddress = bccAddress;
-    }
 
     public String getBaseUrl() {
         return baseUrl;

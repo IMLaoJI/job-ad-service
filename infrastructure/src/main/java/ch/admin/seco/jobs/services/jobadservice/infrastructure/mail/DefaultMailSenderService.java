@@ -1,22 +1,17 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.mail;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.validation.Valid;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring5.SpringTemplateEngine;
-
-import org.springframework.context.MessageSource;
-import org.springframework.validation.annotation.Validated;
-
 import ch.admin.seco.alv.shared.mail.MailSendingService;
 import ch.admin.seco.jobs.services.jobadservice.application.MailSenderData;
 import ch.admin.seco.jobs.services.jobadservice.application.MailSenderService;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.validation.annotation.Validated;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
+
+import javax.validation.Valid;
 
 @Validated
 class DefaultMailSenderService implements MailSenderService {
@@ -49,21 +44,13 @@ class DefaultMailSenderService implements MailSenderService {
 	private ch.admin.seco.alv.shared.mail.MailSenderData toMailData(MailSenderData mailSenderData) {
 		String subject = messageSource.getMessage(mailSenderData.getSubject(), null, mailSenderData.getSubject(), mailSenderData.getLocale());
 		String content = createContent(mailSenderData);
-		Set<String> bcc = extractAllBccAddresses(mailSenderData);
 		return new ch.admin.seco.alv.shared.mail.MailSenderData.Builder()
-				.setBcc(bcc.toArray(new String[0]))
+				.setBcc(mailSenderData.getBcc().toArray(new String[0]))
 				.setCc(mailSenderData.getCc().toArray(new String[0]))
 				.setContent(content)
-				.setFrom(mailSenderProperties.getFromAddress())
 				.setSubject(subject)
 				.setTo(mailSenderData.getTo().toArray(new String[0]))
 				.build();
-	}
-
-	private Set<String> extractAllBccAddresses(MailSenderData mailSenderData) {
-		Set<String> allBcc = new HashSet<>(mailSenderData.getBcc());
-		allBcc.addAll(this.mailSenderProperties.getBccAddress());
-		return allBcc;
 	}
 
 	private String createContent(MailSenderData mailSenderData) {
