@@ -10,6 +10,9 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-integration'
     compile 'org.springframework.integration:spring-integration-jpa'
 
+
+    compile 'ch.admin.seco.alv:alv-mail-sending-starter:0.0.1-SNAPSHOT'
+
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.hibernate.validator:hibernate-validator'
     testCompile 'org.glassfish:javax.el'
