@@ -55,6 +55,7 @@ subprojects {
         maven { url 'https://repository.jboss.org/nexus/content/repositories/releases' }
         maven { url 'https://oss.sonatype.org/content/repositories/releases' }
         maven { url 'http://repo.maven.apache.org/maven2' }
+        mavenLocal()
     }
 
     dependencyManagement {
