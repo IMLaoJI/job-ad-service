@@ -22,6 +22,7 @@ import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.dsl.HeaderEnricherSpec;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.handler.advice.RequestHandlerRetryAdvice;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 
@@ -57,15 +58,16 @@ public class AvamIntegrationFlowConfig {
 	@Bean
 	public IntegrationFlow avamOutputGatewayFlow() {
 		return IntegrationFlows
-				.from(this.inputChannel)
-				.enrichHeaders(h -> h.headerFunction(EVENT, AvamIntegrationFlowConfig::extractEventHeader))
-				.transform(this::toJobAdvertisement, c -> c
-						.role(IntegrationBasisConfig.DEFAULT_INTEGRATION_ROLE_NAME)
-						.poller(integrationBasisConfig.pollerFactory().builder().retryAware(true).build()))
-
-				.enrichHeaders(AvamIntegrationFlowConfig::applyMessageBrokerHeader)
-				.handle(this::send)
-				.get();
+                .from(this.inputChannel)
+                .enrichHeaders(h -> h
+                        .headerFunction(EVENT, AvamIntegrationFlowConfig::extractEventHeader)
+                        .role(IntegrationBasisConfig.DEFAULT_INTEGRATION_ROLE_NAME)
+                        .poller(integrationBasisConfig.pollerFactory().builder().retryAware(true).build())
+                )
+                .transform(this::toJobAdvertisement)
+                .enrichHeaders(AvamIntegrationFlowConfig::applyMessageBrokerHeader)
+                .handle(this::send, c->c.advice(new RequestHandlerRetryAdvice()))
+                .get();
 	}
 
 	private void send(Message<?> message) {
