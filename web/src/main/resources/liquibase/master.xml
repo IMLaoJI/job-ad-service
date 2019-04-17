@@ -39,4 +39,6 @@
     <include file="classpath:/liquibase/changelog/20190320080000_added_entity_FavouriteItem.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20190403080000_update_entity_FavouriteItem.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20190409080000_drop_dlq_item_table.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/liquibase/changelog/20190417080000_spring_integration.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/liquibase/changelog/20190417090000_delete_task_tables.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
