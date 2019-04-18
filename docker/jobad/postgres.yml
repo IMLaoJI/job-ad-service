@@ -1,0 +1,11 @@
+version: '3'
+services:
+    jobadservice-postgresql:
+        image: postgres:9.6.5
+        # volumes:
+        #     - ~/volumes/jhipster/jobadservice/postgresql/:/var/lib/postgresql/data/
+        environment:
+        - POSTGRES_USER=jobadservice
+        - POSTGRES_PASSWORD=
+        ports:
+        - 5433:5432

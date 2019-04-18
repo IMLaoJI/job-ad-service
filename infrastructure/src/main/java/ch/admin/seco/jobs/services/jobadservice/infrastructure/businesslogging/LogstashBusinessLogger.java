@@ -2,8 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.businesslogging;
 
 import org.springframework.stereotype.Component;
 
-import ch.admin.seco.alv.shared.logger.business.BusinessLogEvent;
-import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogData;
+import ch.admin.seco.alv.shared.logger.business.BusinessLogData;
 import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogger;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUser;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
@@ -22,7 +21,7 @@ public class LogstashBusinessLogger implements BusinessLogger {
 
 	@Override
 	public void log(BusinessLogData businessLogData) {
-		BusinessLogEvent businessLogEvent = new BusinessLogEvent(businessLogData.getEventType())
+		BusinessLogData businessLogEvent = new BusinessLogData(businessLogData.getEventType())
 				.withObjectId(businessLogData.getObjectId())
 				.withAuthorities(extractAuthorities(currentUserContext.getCurrentUser()))
 				.withObjectType(businessLogData.getObjectType())

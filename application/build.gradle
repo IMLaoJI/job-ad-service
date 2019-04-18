@@ -5,6 +5,7 @@ dependencies {
     compile 'com.google.guava:guava'
     compile 'org.hibernate.validator:hibernate-validator'
     compile 'com.fasterxml.jackson.core:jackson-annotations'
+    compile 'ch.admin.seco.alv:alv-logger-starter:0.0.1-SNAPSHOT'
 
     testCompile files(this.project(':domain').sourceSets.test.output)
     testCompile files(this.project(':core').sourceSets.test.output)

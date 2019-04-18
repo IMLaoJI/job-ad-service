@@ -1,6 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
-import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogData;
+import ch.admin.seco.alv.shared.logger.business.BusinessLogData;
 import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogger;
 import ch.admin.seco.jobs.services.jobadservice.application.IsSysAdmin;
 import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
@@ -316,9 +316,11 @@ public class JobAdvertisementApplicationService {
     @PreAuthorize("@jobAdvertisementAuthorizationService.canViewJob(#jobAdvertisementId)")
     public JobAdvertisementDto getById(JobAdvertisementId jobAdvertisementId) throws AggregateNotFoundException {
         JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
-
-        this.businessLogger.log(new BusinessLogData("JOB_ADVERTISEMENT_ACCESS", "JobAdvertisement",
-                jobAdvertisementId.getValue(), Collections.singletonMap("objectTypeStatus", jobAdvertisement.getStatus())));
+        BusinessLogData logData = new BusinessLogData("JOB_ADVERTISEMENT_ACCESS")
+                .withObjectType("JobAdvertisement")
+                .withObjectId(jobAdvertisementId.getValue())
+                .withAdditionalData("objectTypeStatus", jobAdvertisement.getStatus());
+        this.businessLogger.log(logData);
 
         return JobAdvertisementDto.toDto(jobAdvertisement);
     }
