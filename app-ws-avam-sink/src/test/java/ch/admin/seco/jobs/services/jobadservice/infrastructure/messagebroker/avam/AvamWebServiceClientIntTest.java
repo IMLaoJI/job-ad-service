@@ -31,10 +31,6 @@ import static org.springframework.ws.test.client.ResponseCreators.withPayload;
         "jobroom.ws.avam.sink.endPointUrl=test",
         "jobroom.ws.avam.sink.password=test",
         "jobroom.ws.avam.sink.username=test",
-        "alv.logstash.enabled=false",
-       /* "alv.logstash.basis-information.version=test",
-        "alv.logstash.basis-information.app-name=test",
-        "alv.logstash.basis-information.server-port=test"*/
 })
 public class AvamWebServiceClientIntTest {
     private MockWebServiceServer mockServer;
