@@ -1,5 +1,5 @@
 dependencies {
-    compile project(':infrastructure')
+    compile project(':application')
 
     compile 'org.hibernate.validator:hibernate-validator'
     compile 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -8,6 +8,7 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-annotations'
     compile 'com.fasterxml.jackson.core:jackson-databind'
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     compile 'com.fasterxml.jackson.module:jackson-module-afterburner'
 
     runtime 'org.postgresql:postgresql'

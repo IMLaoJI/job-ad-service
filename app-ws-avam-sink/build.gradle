@@ -5,6 +5,7 @@ apply from: "${rootProject.rootDir}/gradle/maven-publish.gradle"
 
 dependencies {
     compile project(':infrastructure-messagebroker-shared')
+    
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile 'org.springframework.boot:spring-boot-starter-undertow'
