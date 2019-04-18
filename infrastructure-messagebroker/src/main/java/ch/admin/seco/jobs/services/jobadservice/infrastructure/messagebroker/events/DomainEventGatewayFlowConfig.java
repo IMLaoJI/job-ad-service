@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 
 import ch.admin.seco.alv.shared.spring.integration.IntegrationBasisConfig;
@@ -41,12 +40,8 @@ class DomainEventGatewayFlowConfig {
 						.<JobAdvertisementEventDto>headerFunction(MessageHeaders.RELEVANT_ID, message -> message.getPayload().getId())
 						.<JobAdvertisementEventDto>headerFunction(MessageHeaders.EVENT, message -> message.getPayload().getEventType())
 				)
-				.handle(this::send)
+				.channel(this.outputChannel)
 				.get();
-	}
-
-	private void send(Message<?> message) {
-		outputChannel.send(message);
 	}
 
 }

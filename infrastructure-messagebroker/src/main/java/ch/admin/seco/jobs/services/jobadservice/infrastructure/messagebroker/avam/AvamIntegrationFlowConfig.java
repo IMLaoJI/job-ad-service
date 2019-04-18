@@ -22,7 +22,6 @@ import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.dsl.HeaderEnricherSpec;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.handler.advice.RequestHandlerRetryAdvice;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 
@@ -66,12 +65,8 @@ public class AvamIntegrationFlowConfig {
                 )
                 .transform(this::toJobAdvertisement)
                 .enrichHeaders(AvamIntegrationFlowConfig::applyMessageBrokerHeader)
-                .handle(this::send, c->c.advice(new RequestHandlerRetryAdvice()))
+                .channel(this.outputChannel)
                 .get();
-	}
-
-	private void send(Message<?> message) {
-		outputChannel.send(message);
 	}
 
 	private JobAdvertisement toJobAdvertisement(AvamTaskData avamTaskData) {
