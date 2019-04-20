@@ -1,15 +1,16 @@
 dependencies {
     compile project(':application')
-    compile 'org.springframework.boot:spring-boot-starter-mail'
+
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
     compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    compile 'org.springframework.cloud:spring-cloud-context'
+    compile 'ch.admin.seco.alv:alv-mail-sending-starter'
+    compile "ch.admin.seco.alv:alv-spring-integration-leader-starter"
+
+//  compile 'org.springframework.cloud:spring-cloud-zookeeper-core'
+//  compile 'org.springframework.integration:spring-integration-zookeeper'
+
     compile 'net.logstash.logback:logstash-logback-encoder'
     compile 'com.overzealous:remark:1.0.0'
-    compile 'org.springframework.boot:spring-boot-starter-actuator'
-    compile 'org.springframework.boot:spring-boot-starter-integration'
-    compile 'org.springframework.integration:spring-integration-jpa'
-
-    compile 'ch.admin.seco.alv:alv-mail-sending-starter'
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.hibernate.validator:hibernate-validator'
