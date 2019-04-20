@@ -1,15 +1,21 @@
-package ch.admin.seco.jobs.services.jobadservice.infrastructure.database.eventstore;
+package ch.admin.seco.jobs.services.jobadservice.infrastructure.events.store;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEvent;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventType;
-
-import javax.persistence.*;
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Entity
 class StoredEvent {

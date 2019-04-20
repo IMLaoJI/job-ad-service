@@ -1,15 +1,16 @@
-package ch.admin.seco.jobs.services.jobadservice.infrastructure.database.eventstore;
+package ch.admin.seco.jobs.services.jobadservice.infrastructure.events.store;
 
-import ch.admin.seco.jobs.services.jobadservice.core.domain.events.EventData;
-import ch.admin.seco.jobs.services.jobadservice.core.domain.events.EventStore;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import ch.admin.seco.jobs.services.jobadservice.core.domain.events.EventData;
+import ch.admin.seco.jobs.services.jobadservice.core.domain.events.EventStore;
 
 @Transactional(readOnly = true)
 public class JpaBasedEventStore implements EventStore {

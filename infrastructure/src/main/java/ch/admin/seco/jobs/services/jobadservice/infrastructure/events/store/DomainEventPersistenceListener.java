@@ -1,4 +1,4 @@
-package ch.admin.seco.jobs.services.jobadservice.infrastructure.database.eventstore;
+package ch.admin.seco.jobs.services.jobadservice.infrastructure.events.store;
 
 import java.util.Collections;
 import java.util.HashMap;
