@@ -10,7 +10,6 @@ project.ext {
 apply from: "${rootProject.rootDir}/gradle/docker.gradle"
 
 dependencies {
-    compile project(":infrastructure-database")
     compile project(":infrastructure-elasticsearch")
     compile project(":infrastructure-messagebroker")
     compile project(":infrastructure-service-reference")
@@ -48,6 +47,7 @@ dependencies {
     compile "net.logstash.logback:logstash-logback-encoder"
     compile "org.zalando:problem-spring-web"
     compile "org.jsoup:jsoup:1.11.3"
+    compile 'org.postgresql:postgresql'
 
     runtime "org.liquibase:liquibase-core"
     runtime "com.mattbertolini:liquibase-slf4j"
