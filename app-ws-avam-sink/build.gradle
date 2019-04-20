@@ -4,6 +4,7 @@ apply from: "${rootProject.rootDir}/gradle/docker-compose.gradle"
 apply from: "${rootProject.rootDir}/gradle/maven-publish.gradle"
 
 dependencies {
+    compile project(':application')
     compile project(':infrastructure-messagebroker-shared')
     
     compile 'org.springframework.boot:spring-boot-starter-web'
