@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.QueueChannel;
 
-import ch.admin.seco.alv.shared.spring.integration.actuator.QueueChannelHealthHolder;
+import ch.admin.seco.alv.shared.spring.integration.actuator.QueueChannelHealthProvider;
 
 @Configuration
 @EnableConfigurationProperties(DomainEventGatewayProperties.class)
@@ -26,8 +26,8 @@ class DomainEventGatewayConfig {
 	}
 
 	@Bean
-	QueueChannelHealthHolder eventGatewayQueueChannelHealth() {
-		return new QueueChannelHealthHolder() {
+	QueueChannelHealthProvider eventQueueChannelHealthProvider() {
+		return new QueueChannelHealthProvider() {
 			@Override
 			public QueueChannel queueChannel() {
 				return domainEventIntegrationChannels.eventGatewayInputChannel();
