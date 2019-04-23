@@ -3,9 +3,6 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.database;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,11 +11,12 @@ import org.springframework.jdbc.support.incrementer.H2SequenceMaxValueIncremente
 import org.springframework.jdbc.support.incrementer.PostgresSequenceMaxValueIncrementer;
 
 @Configuration
-@ConditionalOnClass({DataSource.class})
-@AutoConfigureAfter(DataSourceAutoConfiguration.class)
 public class SequenceGeneratorConfiguration {
+
 	private final DataSource dataSource;
+
 	private final DataSourceProperties dataSourceProperties;
+
 	private final String stellennummerEgovGeneratorSequenceName;
 
 	public SequenceGeneratorConfiguration(DataSource dataSource,
