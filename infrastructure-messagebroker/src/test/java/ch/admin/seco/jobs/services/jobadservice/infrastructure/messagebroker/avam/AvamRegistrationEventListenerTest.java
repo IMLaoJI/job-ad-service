@@ -2,14 +2,15 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.av
 
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+
+import org.springframework.integration.channel.QueueChannel;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
@@ -19,52 +20,59 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.J
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
 
-@RunWith(MockitoJUnitRunner.class)
+
 public class AvamRegistrationEventListenerTest {
 
-    private static JobAdvertisementId ID = new JobAdvertisementId("id");
-    private JobAdvertisement JOBADVERTISEMENT = new JobAdvertisement.Builder()
-            .setId(ID)
-            .setStatus(JobAdvertisementStatus.CREATED)
-            .setSourceSystem(SourceSystem.JOBROOM)
-            .setJobContent(JobContentFixture.of(ID).build())
-            .setOwner(OwnerFixture.of(ID)
-                    .build())
-            .setPublication(testPublication()
-                    .setPublicDisplay(true)
-                    .build())
-            .setReportToAvam(true)
-            .setReportingObligation(true)
-            .build();
+	private static JobAdvertisementId ID = new JobAdvertisementId("id");
 
-    @Mock
-    private AvamTaskRepository avamTaskRepository;
+	private JobAdvertisement JOBADVERTISEMENT = new JobAdvertisement.Builder()
+			.setId(ID)
+			.setStatus(JobAdvertisementStatus.CREATED)
+			.setSourceSystem(SourceSystem.JOBROOM)
+			.setJobContent(JobContentFixture.of(ID).build())
+			.setOwner(OwnerFixture.of(ID)
+					.build())
+			.setPublication(testPublication()
+					.setPublicDisplay(true)
+					.build())
+			.setReportToAvam(true)
+			.setReportingObligation(true)
+			.build();
 
-    @InjectMocks
-    private AvamRegistrationEventListener sut; //System Under Test
+	private AvamDomainEventSenderGateway sut; //System Under Test
 
-    @Test
-    public void shouldHandleCancel() {
-        // GIVEN
-        JobAdvertisementCancelledEvent event = new JobAdvertisementCancelledEvent(JOBADVERTISEMENT, SourceSystem.JOBROOM);
+	private QueueChannel queueChannel;
 
-        // WHEN
-        sut.handle(event);
+	@Before
+	public void setUp() {
+		AvamIntegrationChannels avamIntegrationChannels = mock(AvamIntegrationChannels.class);
+		queueChannel = mock(QueueChannel.class);
+		when(avamIntegrationChannels.avamInputChannel()).thenReturn(queueChannel);
+		sut = new AvamDomainEventSenderGateway(avamIntegrationChannels);
+	}
 
-        // THEN
-        verify(avamTaskRepository).save(any());
-    }
+	@Test
+	public void shouldHandleCancel() {
+		// GIVEN
+		JobAdvertisementCancelledEvent event = new JobAdvertisementCancelledEvent(JOBADVERTISEMENT, SourceSystem.JOBROOM);
 
-    @Test
-    public void shouldNotHandleCancel() {
-        // GIVEN
-        JobAdvertisementCancelledEvent event = new JobAdvertisementCancelledEvent(JOBADVERTISEMENT, SourceSystem.RAV);
+		// WHEN
+		sut.handle(event);
 
-        // WHEN
-        sut.handle(event);
+		// THEN
+		verify(queueChannel).send(any());
+	}
 
-        // THEN
-        verify(avamTaskRepository, never()).save(any());
-    }
+	@Test
+	public void shouldNotHandleCancel() {
+		// GIVEN
+		JobAdvertisementCancelledEvent event = new JobAdvertisementCancelledEvent(JOBADVERTISEMENT, SourceSystem.RAV);
+
+		// WHEN
+		sut.handle(event);
+
+		// THEN
+		verify(queueChannel, never()).send(any());
+	}
 
 }

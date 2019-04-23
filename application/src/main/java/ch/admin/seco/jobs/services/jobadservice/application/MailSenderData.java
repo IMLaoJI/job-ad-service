@@ -5,30 +5,19 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-
-import org.springframework.validation.annotation.Validated;
 
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 
-@Validated
 public class MailSenderData {
 
-    @NotBlank
     private final String subject;
 
-    @NotEmpty
-    private final Set<@Email String> to = new HashSet<>();
+    private final Set<String> to = new HashSet<>();
 
-    private final Set<@Email String> cc = new HashSet<>();
+    private final Set<String> cc = new HashSet<>();
 
-    private final Set<@Email String> bcc = new HashSet<>();
+    private final Set<String> bcc = new HashSet<>();
 
     private final String templateName;
 
@@ -49,29 +38,6 @@ public class MailSenderData {
         }
         this.locale = Condition.notNull(builder.locale, "E-Mail must contain a locale.");
         Condition.notEmpty(builder.to, "E-Mail must contain at least one receiver.");
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        MailSenderData that = (MailSenderData) o;
-        return Objects.equals(subject, that.subject) &&
-                Objects.equals(to, that.to) &&
-                Objects.equals(cc, that.cc) &&
-                Objects.equals(bcc, that.bcc) &&
-                Objects.equals(templateName, that.templateName) &&
-                Objects.equals(templateVariables, that.templateVariables) &&
-                Objects.equals(locale, that.locale);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(subject, to, cc, bcc, templateName, templateVariables, locale);
     }
 
     public String getSubject() {
@@ -157,18 +123,5 @@ public class MailSenderData {
             return new MailSenderData(this);
         }
 
-    }
-
-    @Override
-    public String toString() {
-        return "MailSenderData{" +
-                "subject='" + subject + '\'' +
-                ", to=" + to +
-                ", cc=" + cc +
-                ", bcc=" + bcc +
-                ", templateName='" + templateName + '\'' +
-                ", templateVariables=" + templateVariables +
-                ", locale=" + locale +
-                '}';
     }
 }
