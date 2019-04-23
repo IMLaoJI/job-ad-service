@@ -83,6 +83,7 @@ subprojects {
             dependency "ch.admin.seco.alv:alv-mail-sending-starter:${alv_shared_library_version}"
             dependency "ch.admin.seco.alv:alv-spring-integration-starter:${alv_shared_library_version}"
             dependency "ch.admin.seco.alv:alv-spring-integration-leader-starter:${alv_shared_library_version}"
+            dependency "ch.admin.seco.alv:alv-logger-starter:${alv_shared_library_version}"
         }
         imports {
             mavenBom "org.springframework.boot:spring-boot-dependencies:${spring_boot_version}"

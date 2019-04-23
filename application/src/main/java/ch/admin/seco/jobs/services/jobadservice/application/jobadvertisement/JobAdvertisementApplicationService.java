@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogData;
+import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEvent;
 import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogger;
 import ch.admin.seco.jobs.services.jobadservice.application.IsSysAdmin;
 import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
@@ -315,12 +315,14 @@ public class JobAdvertisementApplicationService {
 		);
 	}
 
-	@PreAuthorize("@jobAdvertisementAuthorizationService.canViewJob(#jobAdvertisementId)")
-	public JobAdvertisementDto getById(JobAdvertisementId jobAdvertisementId) throws AggregateNotFoundException {
-		JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
-
-		this.businessLogger.log(new BusinessLogData("JOB_ADVERTISEMENT_ACCESS", "JobAdvertisement",
-				jobAdvertisementId.getValue(), Collections.singletonMap("objectTypeStatus", jobAdvertisement.getStatus())));
+    @PreAuthorize("@jobAdvertisementAuthorizationService.canViewJob(#jobAdvertisementId)")
+    public JobAdvertisementDto getById(JobAdvertisementId jobAdvertisementId) throws AggregateNotFoundException {
+        JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
+        BusinessLogEvent logData = new BusinessLogEvent("JOB_ADVERTISEMENT_ACCESS")
+                .withObjectType("JobAdvertisement")
+				.withObjectId(jobAdvertisementId.getValue())
+                .withAdditionalData("objectTypeStatus", jobAdvertisement.getStatus());
+        this.businessLogger.log(logData);
 
 		return JobAdvertisementDto.toDto(jobAdvertisement);
 	}
