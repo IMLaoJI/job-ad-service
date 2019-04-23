@@ -30,7 +30,7 @@ import static org.springframework.ws.test.client.ResponseCreators.withPayload;
 @TestPropertySource(properties = {
         "jobroom.ws.avam.sink.endPointUrl=test",
         "jobroom.ws.avam.sink.password=test",
-        "jobroom.ws.avam.sink.username=test",
+        "jobroom.ws.avam.sink.username=test"
 })
 public class AvamWebServiceClientIntTest {
     private MockWebServiceServer mockServer;
