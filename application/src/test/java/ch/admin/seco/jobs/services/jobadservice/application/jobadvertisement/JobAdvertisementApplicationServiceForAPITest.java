@@ -76,10 +76,10 @@ public class JobAdvertisementApplicationServiceForAPITest {
          CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(company);
 
         //when
-        JobAdvertisementId jobAdvertisementId = service.createFromApi(createJobAdvertisementDto);
+        JobAdvertisement tempJobAdvertisement = service.createFromApi(createJobAdvertisementDto);
 
         //then
-        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(jobAdvertisementId);
+        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(tempJobAdvertisement.getId());
 
         assertThat(jobAdvertisement).isNotNull();
         assertThat(jobAdvertisement.getStatus()).isEqualTo(JobAdvertisementStatus.CREATED);
