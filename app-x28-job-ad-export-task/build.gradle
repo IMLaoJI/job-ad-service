@@ -3,18 +3,21 @@ apply from: 'jaxb.gradle'
 apply from: "${rootProject.rootDir}/gradle/maven-publish.gradle"
 
 dependencies {
-    compile project(':infrastructure-database')
+    compile project(':domain')
+
     compile 'org.springframework.boot:spring-boot-starter-batch'
     compile 'org.springframework.cloud:spring-cloud-starter-task'
     compile 'org.springframework.cloud:spring-cloud-starter-config'
     compile 'org.springframework.integration:spring-integration-sftp'
     compile 'org.springframework:spring-oxm'
 
-    compile 'com.h2database:h2'
     compile 'org.postgresql:postgresql'
 
     compile 'org.zeroturnaround:zt-zip:1.12'
 
+    compile 'org.hibernate.validator:hibernate-validator'
+
+    testCompile 'com.h2database:h2'
     testCompile 'org.springframework.batch:spring-batch-test'
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.springframework.integration:spring-integration-test'
@@ -29,6 +32,7 @@ compileJava.dependsOn(processResources)
 
 apply plugin: 'io.github.http-builder-ng.http-plugin'
 import io.github.httpbuilderng.http.HttpTask
+
 task registerApps(type: HttpTask) {
     group 'spring data flow'
     mustRunAfter 'publish'

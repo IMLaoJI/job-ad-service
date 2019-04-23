@@ -1,10 +1,17 @@
 dependencies {
+    compile project(':application')
     compile project(':infrastructure-messagebroker-shared')
-    compile project(':infrastructure')
+
     compile 'org.springframework.boot:spring-boot-starter-integration'
     compile 'org.springframework.integration:spring-integration-jpa'
     compile 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
     optional 'org.springframework.boot:spring-boot-configuration-processor'
+
+    compile 'ch.admin.seco.alv:alv-spring-integration-starter'
+    compile "ch.admin.seco.alv:alv-spring-integration-leader-starter"
+
+    // is defined as test compile because we only need to fetch the messages.properties
+    testCompile project(':infrastructure')
 
     testCompile files(this.project(':domain').sourceSets.test.output)
     testCompile files(this.project(':core').sourceSets.test.output)

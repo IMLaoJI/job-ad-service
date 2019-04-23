@@ -1,0 +1,20 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="pado" id="20190417090000_0">
+        <preConditions onFail="HALT">
+            <tableIsEmpty tableName="mail_sending_task"/>
+        </preConditions>
+        <dropTable tableName="mail_sending_task"/>
+    </changeSet>
+
+    <changeSet author="pado" id="20190417090000_1">
+        <preConditions onFail="HALT">
+            <tableIsEmpty tableName="avam_task"/>
+        </preConditions>
+        <dropTable tableName="avam_task"/>
+    </changeSet>
+
+</databaseChangeLog>
