@@ -50,55 +50,92 @@
               }
             }
           },
+          "createdTime": {
+            "type": "date"
+          },
+          "updatedTime": {
+            "type": "date"
+          },
+          "status": {
+            "type": "keyword"
+          },
+          "sourceSystem": {
+            "type": "keyword"
+          },
+          "externalReference": {
+            "type": "keyword"
+          },
+          "stellennummerEgov": {
+            "type": "keyword"
+          },
+          "stellennummerAvam": {
+            "type": "keyword"
+          },
+          "fingerprint": {
+            "type": "keyword"
+          },
+          "reportingObligation": {
+            "type": "boolean"
+          },
+          "reportingObligationEndDate": {
+            "type": "date"
+          },
+          "reportToAvam": {
+            "type": "boolean"
+          },
+          "jobCenterCode": {
+            "type": "keyword"
+          },
+          "approvalDate": {
+            "type": "date"
+          },
+          "rejectionDate": {
+            "type": "date"
+          },
+          "rejectionCode": {
+            "type": "keyword"
+          },
+          "rejectionReason": {
+            "type": "keyword"
+          },
+          "cancellationDate": {
+            "type": "date"
+          },
+          "cancellationCode": {
+            "type": "keyword"
+          },
           "jobContent": {
             "properties": {
-              "applyChannel": {
+              "externalUrl": {
+                "type": "keyword"
+              },
+              "x28OccupationCodes": {
+                "type": "text",
+                "analyzer": "simple_csv_analyzer"
+              },
+              "numberOfJobs": {
+                "type": "keyword"
+              },
+              "jobDescriptions": {
                 "properties": {
-                  "additionalInfo": {
-                    "type": "text"
+                  "language": {
+                    "type": "text",
+                    "analyzer": "language_iso_code_synonym_analyzer"
                   },
-                  "emailAddress": {
-                    "type": "text"
-                  },
-                  "formUrl": {
-                    "type": "text"
-                  },
-                  "rawPostAddress": {
-                    "type": "text"
-                  },
-                  "postAddress": {
-                    "properties": {
-                      "name": {
-                        "type": "text"
-                      },
-                      "street": {
-                        "type": "text"
-                      },
-                      "houseNumber": {
-                        "type": "keyword"
-                      },
-                      "postalCode": {
-                        "type": "keyword"
-                      },
-                      "city": {
-                        "type": "text"
-                      },
-                      "countryIsoCode": {
-                        "type": "keyword"
-                      },
-                      "postOfficeBoxNumber": {
-                        "type": "keyword"
-                      },
-                      "postOfficeBoxPostalCode": {
-                        "type": "keyword"
-                      },
-                      "postOfficeBoxCity": {
-                        "type": "keyword"
+                  "title": {
+                    "type": "text",
+                    "analyzer": "ascii_folding",
+                    "fields": {
+                      "keyword": {
+                        "type": "keyword",
+                        "normalizer": "lowercase_sort_normalizer",
+                        "ignore_above": 256
                       }
                     }
                   },
-                  "phoneNumber": {
-                    "type": "keyword"
+                  "description": {
+                    "type": "text",
+                    "analyzer": "ascii_folding"
                   }
                 }
               },
@@ -146,10 +183,76 @@
                   }
                 }
               },
+              "company": {
+                "properties": {
+                  "name": {
+                    "type": "text",
+                    "analyzer": "ascii_folding"
+                  },
+                  "street": {
+                    "type": "text"
+                  },
+                  "houseNumber": {
+                    "type": "keyword"
+                  },
+                  "postalCode": {
+                    "type": "keyword"
+                  },
+                  "city": {
+                    "type": "text"
+                  },
+                  "countryIsoCode": {
+                    "type": "keyword"
+                  },
+                  "postOfficeBoxNumber": {
+                    "type": "keyword"
+                  },
+                  "postOfficeBoxPostalCode": {
+                    "type": "keyword"
+                  },
+                  "postOfficeBoxCity": {
+                    "type": "keyword"
+                  },
+                  "phone": {
+                    "type": "keyword"
+                  },
+                  "email": {
+                    "type": "text"
+                  },
+                  "website": {
+                    "type": "text"
+                  },
+                  "surrogate": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "employer": {
+                "properties": {
+                  "name": {
+                    "type": "text"
+                  },
+                  "postalCode": {
+                    "type": "keyword"
+                  },
+                  "city": {
+                    "type": "text"
+                  },
+                  "countryIsoCode": {
+                    "type": "keyword"
+                  }
+                }
+              },
               "employment": {
                 "properties": {
+                  "startDate": {
+                    "type": "date"
+                  },
                   "endDate": {
                     "type": "date"
+                  },
+                  "shortEmployment": {
+                    "type": "boolean"
                   },
                   "immediately": {
                     "type": "boolean"
@@ -157,32 +260,24 @@
                   "permanent": {
                     "type": "boolean"
                   },
-                  "shortEmployment": {
-                    "type": "boolean"
-                  },
-                  "startDate": {
-                    "type": "date"
+                  "workloadPercentageMin": {
+                    "type": "long"
                   },
                   "workloadPercentageMax": {
                     "type": "long"
                   },
-                  "workloadPercentageMin": {
-                    "type": "long"
+                  "workForms": {
+                    "type": "keyword"
                   }
                 }
               },
-              "jobDescriptions": {
+              "location": {
                 "properties": {
-                  "description": {
-                    "type": "text",
-                    "analyzer": "ascii_folding"
-                  },
-                  "language": {
+                  "remarks": {
                     "type": "text"
                   },
-                  "title": {
+                  "city": {
                     "type": "text",
-                    "analyzer": "ascii_folding",
                     "fields": {
                       "keyword": {
                         "type": "keyword",
@@ -190,6 +285,52 @@
                         "ignore_above": 256
                       }
                     }
+                  },
+                  "postalCode": {
+                    "type": "keyword"
+                  },
+                  "communalCode": {
+                    "type": "keyword"
+                  },
+                  "regionCode": {
+                    "type": "keyword"
+                  },
+                  "cantonCode": {
+                    "type": "keyword"
+                  },
+                  "countryIsoCode": {
+                    "type": "keyword"
+                  },
+                  "coordinates": {
+                    "type": "geo_point"
+                  }
+                }
+              },
+              "occupations": {
+                "properties": {
+                  "avamOccupationCode": {
+                    "type": "keyword"
+                  },
+                  "sbn3Code": {
+                    "type": "keyword"
+                  },
+                  "sbn5Code": {
+                    "type": "keyword"
+                  },
+                  "bfsCode": {
+                    "type": "keyword"
+                  },
+                  "label": {
+                    "type": "keyword"
+                  },
+                  "workExperience": {
+                    "type": "keyword"
+                  },
+                  "educationCode": {
+                    "type": "keyword"
+                  },
+                  "qualificationCode": {
+                    "type": "keyword"
                   }
                 }
               },
@@ -207,61 +348,110 @@
                   }
                 }
               },
-              "location": {
+              "applyChannel": {
                 "properties": {
-                  "cantonCode": {
-                    "type": "keyword"
+                  "rawPostAddress": {
+                    "type": "text"
                   },
-                  "city": {
-                    "type": "text",
-                    "fields": {
-                      "keyword": {
-                        "type": "keyword",
-                        "normalizer": "lowercase_sort_normalizer",
-                        "ignore_above": 256
+                  "postAddress": {
+                    "properties": {
+                      "name": {
+                        "type": "text"
+                      },
+                      "street": {
+                        "type": "text"
+                      },
+                      "houseNumber": {
+                        "type": "keyword"
+                      },
+                      "postalCode": {
+                        "type": "keyword"
+                      },
+                      "city": {
+                        "type": "text"
+                      },
+                      "postOfficeBoxNumber": {
+                        "type": "keyword"
+                      },
+                      "postOfficeBoxPostalCode": {
+                        "type": "keyword"
+                      },
+                      "postOfficeBoxCity": {
+                        "type": "keyword"
+                      },
+                      "countryIsoCode": {
+                        "type": "keyword"
                       }
                     }
                   },
-                  "communalCode": {
-                    "type": "keyword"
-                  },
-                  "countryIsoCode": {
-                    "type": "keyword"
-                  },
-                  "postalCode": {
-                    "type": "keyword"
-                  },
-                  "regionCode": {
-                    "type": "keyword"
-                  },
-                  "remarks": {
+                  "emailAddress": {
                     "type": "text"
                   },
-                  "coordinates": {
-                    "type": "geo_point"
+                  "phoneNumber": {
+                    "type": "keyword"
+                  },
+                  "formUrl": {
+                    "type": "text"
+                  },
+                  "additionalInfo": {
+                    "type": "text"
                   }
                 }
               },
-              "occupations": {
+              "displayApplyChannel": {
                 "properties": {
-                  "avamOccupationCode": {
+                  "rawPostAddress": {
+                    "type": "text"
+                  },
+                  "postAddress": {
+                    "properties": {
+                      "name": {
+                        "type": "text"
+                      },
+                      "street": {
+                        "type": "text"
+                      },
+                      "houseNumber": {
+                        "type": "keyword"
+                      },
+                      "postalCode": {
+                        "type": "keyword"
+                      },
+                      "city": {
+                        "type": "text"
+                      },
+                      "postOfficeBoxNumber": {
+                        "type": "keyword"
+                      },
+                      "postOfficeBoxPostalCode": {
+                        "type": "keyword"
+                      },
+                      "postOfficeBoxCity": {
+                        "type": "keyword"
+                      },
+                      "countryIsoCode": {
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "emailAddress": {
+                    "type": "text"
+                  },
+                  "phoneNumber": {
                     "type": "keyword"
                   },
-                  "bfsCode": {
-                    "type": "keyword"
+                  "formUrl": {
+                    "type": "text"
                   },
-                  "sbn3Code": {
-                    "type": "keyword"
-                  },
-                  "sbn5Code": {
-                    "type": "keyword"
+                  "additionalInfo": {
+                    "type": "text"
                   }
                 }
               },
               "publicContact": {
                 "properties": {
-                  "email": {
-                    "type": "text"
+                  "salutation": {
+                    "type": "keyword"
                   },
                   "firstName": {
                     "type": "text"
@@ -272,42 +462,64 @@
                   "phone": {
                     "type": "keyword"
                   },
-                  "salutation": {
-                    "type": "keyword"
+                  "email": {
+                    "type": "text"
                   }
                 }
-              },
-              "x28OccupationCodes": {
-                "type": "text",
-                "analyzer": "simple_csv_analyzer"
               }
             }
           },
           "owner": {
             "properties": {
-              "accessToken": {
-                "type": "keyword"
-              },
-              "companyId": {
-                "type": "keyword"
-              },
               "userId": {
                 "type": "keyword"
               },
               "userDisplayName": {
                 "type": "keyword"
+              },
+              "companyId": {
+                "type": "keyword"
+              },
+              "accessToken": {
+                "type": "keyword"
+              }
+            }
+          },
+          "contact": {
+            "properties": {
+              "salutation": {
+                "type": "keyword"
+              },
+              "firstName": {
+                "type": "text"
+              },
+              "lastName": {
+                "type": "text"
+              },
+              "phone": {
+                "type": "text"
+              },
+              "email": {
+                "type": "text"
+              },
+              "language": {
+                "type": "text",
+                "analyzer": "language_iso_code_synonym_analyzer"
               }
             }
           },
           "publication": {
             "properties": {
+              "startDate": {
+                "type": "date"
+              },
               "endDate": {
                 "type": "date"
               },
-              "euresAnonymous": {
+              "euresDisplay": {
                 "type": "boolean"
               },
-              "euresDisplay": {
+              "euresAnonymous": {
                 "type": "boolean"
               },
               "publicDisplay": {
@@ -318,29 +530,8 @@
               },
               "companyAnonymous": {
                 "type": "boolean"
-              },
-              "startDate": {
-                "type": "date"
               }
             }
-          },
-          "reportToAvam": {
-            "type": "boolean"
-          },
-          "reportingObligation": {
-            "type": "boolean"
-          },
-          "sourceSystem": {
-            "type": "keyword"
-          },
-          "status": {
-            "type": "keyword"
-          },
-          "stellennummerEgov": {
-            "type": "keyword"
-          },
-          "stellennummerAvam": {
-            "type": "keyword"
           }
         }
       },
