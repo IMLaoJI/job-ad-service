@@ -6,8 +6,10 @@ dependencies {
     compile 'ch.admin.seco.alv:alv-mail-sending-starter'
     compile "ch.admin.seco.alv:alv-spring-integration-leader-starter"
 
-//  compile 'org.springframework.cloud:spring-cloud-zookeeper-core'
-//  compile 'org.springframework.integration:spring-integration-zookeeper'
+
+    // these two libraries might be used if we decide to base our leader election on zookeeper
+    // compile 'org.springframework.cloud:spring-cloud-zookeeper-core'
+    // compile 'org.springframework.integration:spring-integration-zookeeper'
 
     compile 'net.logstash.logback:logstash-logback-encoder'
     compile 'com.overzealous:remark:1.0.0'
