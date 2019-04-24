@@ -97,7 +97,7 @@ public class FavouriteItemApplicationServiceTest {
         // then
         assertThatThrownBy(() -> this.sut.create(createFavouriteItemDto))
                 .isInstanceOf(AggregateNotFoundException.class)
-                .hasMessageContaining("Aggregate was not found");
+                .hasMessageContaining("Aggregate with ID " + jobAdvertisementId.getValue() +" not found");
     }
 
     @Test
@@ -135,7 +135,7 @@ public class FavouriteItemApplicationServiceTest {
         // then
         assertThatThrownBy(() -> this.sut.findById(favouriteItemId))
                 .isInstanceOf(FavoriteItemNotExitsException.class)
-                .hasMessageContaining("Aggregate was not found");
+                .hasMessageContaining("Aggregate with ID " + favouriteItemId.getValue() +" not found");
     }
 
     @Test
@@ -165,7 +165,7 @@ public class FavouriteItemApplicationServiceTest {
         // then
         assertThatThrownBy(() -> this.sut.findById(favouriteItemId))
                 .isInstanceOf(FavoriteItemNotExitsException.class)
-                .hasMessageContaining("Aggregate was not found");
+                .hasMessageContaining("Aggregate with ID " + favouriteItemId.getValue() + " not found");
     }
 
     @Test
