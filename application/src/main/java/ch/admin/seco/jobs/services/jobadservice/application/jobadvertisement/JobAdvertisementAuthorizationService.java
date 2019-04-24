@@ -61,14 +61,14 @@ public class JobAdvertisementAuthorizationService {
 
     public boolean canViewJob(JobAdvertisementId jobAdvertisementId) {
         return this.jobAdvertisementRepository.findById(jobAdvertisementId)
-                .map(this::canViewJob)
-                .orElse(false);
+                .map(this::internalCanViewJob)
+                .orElse(true);
     }
 
     public boolean canViewJob(String stellennummer) {
         return this.jobAdvertisementRepository.findByStellennummerAvamOrStellennummerEgov(stellennummer)
-                .map(this::canViewJob)
-                .orElse(false);
+                .map(this::internalCanViewJob)
+                .orElse(true);
     }
 
     public boolean isCurrentUserMemberOfCompany(String companyId) {
@@ -86,7 +86,7 @@ public class JobAdvertisementAuthorizationService {
         return jobAdvertisement.getOwner().getAccessToken().equals(token);
     }
 
-    private boolean canViewJob(JobAdvertisement jobAdvertisement) {
+    private boolean internalCanViewJob(JobAdvertisement jobAdvertisement) {
         if (this.currentUserContext.hasRole(Role.SYSADMIN)) {
             return true;
         }
