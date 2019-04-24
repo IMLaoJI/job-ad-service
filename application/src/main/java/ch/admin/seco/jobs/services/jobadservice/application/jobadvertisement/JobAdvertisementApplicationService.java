@@ -39,6 +39,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CreatedJobAdvertisementIdWithTokenDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmployerDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
@@ -144,15 +145,16 @@ public class JobAdvertisementApplicationService {
 		return jobAdvertisement.getId();
 	}
 
-	public JobAdvertisementDto createFromApi(CreateJobAdvertisementDto createJobAdvertisementDto) {
+	public CreatedJobAdvertisementIdWithTokenDto createFromApi(CreateJobAdvertisementDto createJobAdvertisementDto) {
 		LOG.debug("Start creating new job ad from API");
 		Condition.notNull(createJobAdvertisementDto, "CreateJobAdvertisementDto can't be null");
 		LOG.debug("Create '{}'", createJobAdvertisementDto.getJobDescriptions().get(0).getTitle());
 
 		final JobAdvertisementCreator creator = getJobAdvertisementCreatorFromInternal(createJobAdvertisementDto);
-		JobAdvertisement jobAdvertisement = jobAdvertisementFactory.createFromApi(creator);
-        JobAdvertisementDto jobAdvertisementDto = JobAdvertisementDto.toDto(jobAdvertisement);
-		return jobAdvertisementDto;
+		JobAdvertisement newJobAdvertisement = jobAdvertisementFactory.createFromApi(creator);
+		return new CreatedJobAdvertisementIdWithTokenDto()
+				.setJobAdvertisementId(newJobAdvertisement.getId().getValue())
+				.setToken(newJobAdvertisement.getOwner().getAccessToken());
 	}
 
 	public JobAdvertisementId createFromAvam(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
