@@ -144,14 +144,15 @@ public class JobAdvertisementApplicationService {
 		return jobAdvertisement.getId();
 	}
 
-	public JobAdvertisement createFromApi(CreateJobAdvertisementDto createJobAdvertisementDto) {
+	public JobAdvertisementDto createFromApi(CreateJobAdvertisementDto createJobAdvertisementDto) {
 		LOG.debug("Start creating new job ad from API");
 		Condition.notNull(createJobAdvertisementDto, "CreateJobAdvertisementDto can't be null");
 		LOG.debug("Create '{}'", createJobAdvertisementDto.getJobDescriptions().get(0).getTitle());
 
 		final JobAdvertisementCreator creator = getJobAdvertisementCreatorFromInternal(createJobAdvertisementDto);
 		JobAdvertisement jobAdvertisement = jobAdvertisementFactory.createFromApi(creator);
-		return jobAdvertisement;
+        JobAdvertisementDto jobAdvertisementDto = JobAdvertisementDto.toDto(jobAdvertisement);
+		return jobAdvertisementDto;
 	}
 
 	public JobAdvertisementId createFromAvam(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
