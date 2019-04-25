@@ -10,6 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 
 public class SupportedEducationCodeValidator implements ConstraintValidator<SupportedEducationCode, String> {
 
+    static final String PRIMARSTUFE = "120";
+    static final String SEKUNDARSTUFE = "121";
     static final String SEK_II_WEITERFUEHRENDE_SCHULE = "130";
     static final String SEK_II_GRUNDBILDUNG_EBA = "131";
     static final String SEK_II_GRUNDBILDUNG_EFZ = "132";
@@ -28,6 +30,8 @@ public class SupportedEducationCodeValidator implements ConstraintValidator<Supp
     private static final Set<String> SUPPORTED_EDUCATION_CODES = new HashSet<>();
 
     static {
+        SUPPORTED_EDUCATION_CODES.add(PRIMARSTUFE);
+        SUPPORTED_EDUCATION_CODES.add(SEKUNDARSTUFE);
         SUPPORTED_EDUCATION_CODES.add(SEK_II_WEITERFUEHRENDE_SCHULE);
         SUPPORTED_EDUCATION_CODES.add(SEK_II_GRUNDBILDUNG_EBA);
         SUPPORTED_EDUCATION_CODES.add(SEK_II_GRUNDBILDUNG_EFZ);
