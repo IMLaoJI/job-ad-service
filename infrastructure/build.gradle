@@ -5,15 +5,14 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
     compile 'ch.admin.seco.alv:alv-mail-sending-starter'
     compile "ch.admin.seco.alv:alv-spring-integration-leader-starter"
+    compile 'ch.admin.seco.alv:alv-logger-starter'
 
+    compile 'com.overzealous:remark:1.0.0'
 
     // these two libraries might be used if we decide to base our leader election on zookeeper
     // compile 'org.springframework.cloud:spring-cloud-zookeeper-core'
     // compile 'org.springframework.integration:spring-integration-zookeeper'
     
-    compile 'com.overzealous:remark:1.0.0'
-    compile 'ch.admin.seco.alv:alv-logger-starter'
-
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.hibernate.validator:hibernate-validator'
     testCompile 'org.glassfish:javax.el'
