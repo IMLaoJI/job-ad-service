@@ -53,15 +53,6 @@ public class SupportedEducationCodeValidatorTest {
         assertThat(constraintViolations).hasSize(1);
     }
 
-    @Test
-    public void testValid() {
-        DummyClass validCode = new DummyClass("120");
-
-        Set<ConstraintViolation<DummyClass>> constraintViolations = validator.validate(validCode);
-
-        assertThat(constraintViolations).isEmpty();
-    }
-
     private static class DummyClass {
 
         @SupportedEducationCode
