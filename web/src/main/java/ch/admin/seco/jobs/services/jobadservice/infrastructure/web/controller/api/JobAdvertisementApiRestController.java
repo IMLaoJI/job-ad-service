@@ -1,7 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.api;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CreatedJobAdvertisementIdWithTokenDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.AggregateNotFoundException;
@@ -53,10 +53,11 @@ public class JobAdvertisementApiRestController {
     @PostMapping
     public ResponseEntity<ApiJobAdvertisementDto> createFromApi(@RequestBody @Valid ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto) throws AggregateNotFoundException {
         CreateJobAdvertisementDto createJobAdvertisementDto = jobAdvertisementFromApiAssembler.convert(apiCreateJobAdvertisementDto);
-        JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.createFromApi(createJobAdvertisementDto);
+        CreatedJobAdvertisementIdWithTokenDto createdJobAdvertisementIdWithTokenDto = jobAdvertisementApplicationService.createFromApi(createJobAdvertisementDto);
+        ApiJobAdvertisementDto apiJobAdvertisementDto = jobAdvertisementToApiAssembler.convert(jobAdvertisementApplicationService.getById(new JobAdvertisementId(createdJobAdvertisementIdWithTokenDto.getJobAdvertisementId())));
         HttpHeaders headers = new HttpHeaders();
-        headers.add("token", jobAdvertisementDto.getOwner().getAccessToken());
-        return new ResponseEntity<>(jobAdvertisementToApiAssembler.convert(jobAdvertisementApplicationService.getById(new JobAdvertisementId(jobAdvertisementDto.getId()))), headers, HttpStatus.CREATED);
+        headers.add("token", createdJobAdvertisementIdWithTokenDto.getToken());
+        return new ResponseEntity<>(apiJobAdvertisementDto, headers, HttpStatus.CREATED);
     }
 
     /**

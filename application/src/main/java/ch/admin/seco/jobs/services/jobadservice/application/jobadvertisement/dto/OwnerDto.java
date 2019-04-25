@@ -10,8 +10,6 @@ public class OwnerDto {
 
     private String companyId;
 
-    private String accessToken;
-
     public OwnerDto() {
         // For reflection libs
     }
@@ -43,15 +41,6 @@ public class OwnerDto {
         return this;
     }
 
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public OwnerDto setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-        return this;
-    }
-
     public static OwnerDto toDto(Owner owner) {
         if (owner == null) {
             return null;
@@ -59,7 +48,6 @@ public class OwnerDto {
         return new OwnerDto()
                 .setUserId(owner.getUserId())
                 .setUserDisplayName(owner.getUserDisplayName())
-                .setCompanyId(owner.getCompanyId())
-                .setAccessToken(owner.getAccessToken());
+                .setCompanyId(owner.getCompanyId());
     }
 }
