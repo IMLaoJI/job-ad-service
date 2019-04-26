@@ -30,7 +30,7 @@ dependencies {
     compile "org.springframework.retry:spring-retry"
     compile "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client"
     compile "org.springframework.cloud:spring-cloud-starter-config"
-    compile "org.springframework.cloud:spring-cloud-starter-openfeign"
+    compile 'ch.admin.seco.alv:alv-feign-starter'
 
     compile "org.springframework.security:spring-security-web"
     compile "org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure"
