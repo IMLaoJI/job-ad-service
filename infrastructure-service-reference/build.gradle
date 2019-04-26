@@ -1,6 +1,5 @@
 dependencies {
     compile project(':application')
-    compile 'ch.admin.seco.alv:alv-feign-starter'
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
