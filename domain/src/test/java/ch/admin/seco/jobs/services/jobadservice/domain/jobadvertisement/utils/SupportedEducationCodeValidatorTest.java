@@ -1,19 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCodeValidator.SEK_II_BERUFSMATURITAET;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCodeValidator.SEK_II_FACHMATURITAET;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCodeValidator.SEK_II_FACHMITTELSCHULE;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCodeValidator.SEK_II_GRUNDBILDUNG_EBA;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCodeValidator.SEK_II_GRUNDBILDUNG_EFZ;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCodeValidator.SEK_II_GYMNASIALE_MATURITAET;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCodeValidator.SEK_II_WEITERFUEHRENDE_SCHULE;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCodeValidator.TER_BACHELOR_FACHHOCHSCHULE;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCodeValidator.TER_BACHELOR_UNIVERSITAET;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCodeValidator.TER_BERUFSBILDUNG_DIPL;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCodeValidator.TER_BERUFSBILDUNG_FA;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCodeValidator.TER_DOKTORAT_UNIVERSITAET;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCodeValidator.TER_MASTER_FACHHOCHSCHULE;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCodeValidator.TER_MASTER_UNIVERSITAET;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCodeValidator.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
@@ -38,6 +25,8 @@ public class SupportedEducationCodeValidatorTest {
 
     @Test
     public void testNoViolation() {
+        assertThat(validator.validate(new DummyClass(PRIMARSTUFE))).isEmpty();
+        assertThat(validator.validate(new DummyClass(SEKUNDARSTUFE))).isEmpty();
         assertThat(validator.validate(new DummyClass(SEK_II_WEITERFUEHRENDE_SCHULE))).isEmpty();
         assertThat(validator.validate(new DummyClass(SEK_II_GRUNDBILDUNG_EBA))).isEmpty();
         assertThat(validator.validate(new DummyClass(SEK_II_GRUNDBILDUNG_EFZ))).isEmpty();
