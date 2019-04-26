@@ -45,7 +45,6 @@ dependencies {
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
     compile "com.fasterxml.jackson.module:jackson-module-afterburner"
     
-    compile "net.logstash.logback:logstash-logback-encoder"
     compile "org.zalando:problem-spring-web"
     compile "org.jsoup:jsoup:1.11.3"
     compile 'org.postgresql:postgresql'
