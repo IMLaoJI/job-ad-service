@@ -1,5 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.api;
 
+import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.GeoPoint;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
@@ -14,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,6 +29,9 @@ import java.util.List;
 
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -44,8 +50,23 @@ public class JobAdvertisementApiRestControllerIntTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @MockBean
+    private LocationService locationService;
+
     @Before
     public void setUp() {
+        when(locationService.isLocationValid(any())).thenReturn(true);
+        when(locationService.enrichCodes(any())).thenReturn(testLocation()
+                .setCity("Bern")
+                .setCommunalCode("351")
+                .setRegionCode("BE01")
+                .setCantonCode("BE")
+                .setPostalCode("3012")
+                .setCountryIsoCode("CH")
+                .setCoordinates(new GeoPoint(7.441, 46.948))
+                .build()
+        );
+
         this.jobAdvertisementRepository.deleteAll();
         this.jobAdvertisementElasticsearchRepository.deleteAll();
     }
