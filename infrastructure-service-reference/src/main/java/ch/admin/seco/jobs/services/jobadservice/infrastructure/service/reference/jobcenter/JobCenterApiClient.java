@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@AlvUnauthorizedFeignClient(name = "referenceservice", contextId = "job-center-api", url = "${feign.referenceservice.url:}",
+@AlvUnauthorizedFeignClient(name = "referenceservice", contextId = "jobcenter-api", url = "${feign.referenceservice.url:}",
         fallback = JobCenterApiClientFallback.class, path = "/api/job-centers")
 interface JobCenterApiClient {
 

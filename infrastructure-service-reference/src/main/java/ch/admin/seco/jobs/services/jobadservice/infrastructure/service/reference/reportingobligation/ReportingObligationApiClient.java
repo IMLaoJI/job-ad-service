@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@AlvUnauthorizedFeignClient(name = "referenceservice", contextId = "reporting-obligations-api", url = "${feign.referenceservice.url:}",
+@AlvUnauthorizedFeignClient(name = "referenceservice", contextId = "reportingobligation-api", url = "${feign.referenceservice.url:}",
         fallback = ReportingObligationApiClientFallback.class, path = "/api/reporting-obligations")
 public interface ReportingObligationApiClient {
 
