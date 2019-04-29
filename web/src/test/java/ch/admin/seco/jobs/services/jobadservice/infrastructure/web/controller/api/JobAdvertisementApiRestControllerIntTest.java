@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.api;
 
+import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
@@ -7,13 +8,14 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.job
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.WithApiUser;
-import org.codehaus.jettison.json.JSONArray;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,6 +28,9 @@ import java.util.List;
 
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -43,6 +48,9 @@ public class JobAdvertisementApiRestControllerIntTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private LocationService locationService;
 
     @Before
     public void setUp() {
@@ -105,14 +113,14 @@ public class JobAdvertisementApiRestControllerIntTest {
 
         apiCreateJobAdvertisementDto.setApplyChannel(new ApiApplyChannelDto());
 
-        ResultActions post = post(apiCreateJobAdvertisementDto, URL);
-        post.andExpect(status().isCreated());
+        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
+        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
 
-        String contentAsString = post.andReturn().getResponse().getContentAsString();
-        JSONArray ja = new JSONArray("[" + contentAsString + "]");
+        ResultActions post = post(apiCreateJobAdvertisementDto, URL);
 
         // then
-        // TODO
+        post.andExpect(status().isCreated());
+        assertThat(post.andReturn().getResponse().getHeader("token")).isNotBlank();
     }
 
     private void index(JobAdvertisement jobAdvertisement) {
