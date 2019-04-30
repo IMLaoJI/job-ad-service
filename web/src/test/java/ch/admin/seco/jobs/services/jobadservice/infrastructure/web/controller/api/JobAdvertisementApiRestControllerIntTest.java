@@ -3,7 +3,6 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.a
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
@@ -22,12 +21,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.ApiCreateJobAdvertisementFixture.createJobAdvertismentDto01;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.Mockito.when;
@@ -63,56 +59,9 @@ public class JobAdvertisementApiRestControllerIntTest {
     public void testCreateFavouriteItem() throws Exception {
         // given
         this.index(createJob(job01.id()));
+        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertismentDto01();
 
         //when
-        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = new ApiCreateJobAdvertisementDto();
-
-        ApiContactDto apiContactDto = new ApiContactDto();
-        apiContactDto.setSalutation(Salutation.MR);
-        apiContactDto.setFirstName("Test First Name");
-        apiContactDto.setLastName("Test Last Name");
-        apiContactDto.setPhone("+41123123123");
-        apiContactDto.setEmail("Test@mail.com");
-        apiContactDto.setLanguageIsoCode("en");
-        apiCreateJobAdvertisementDto.setContact(apiContactDto);
-
-        ApiPublicationDto apiPublicationDto = new ApiPublicationDto();
-        apiPublicationDto.setStartDate(LocalDate.now());
-        apiCreateJobAdvertisementDto.setPublication(apiPublicationDto);
-
-        ApiJobDescriptionDto apiJobDescriptionDto = new ApiJobDescriptionDto();
-        apiJobDescriptionDto.setLanguageIsoCode("en");
-        apiJobDescriptionDto.setDescription("Test Description");
-        apiJobDescriptionDto.setTitle("Test Description");
-        List<ApiJobDescriptionDto> apiJobDescriptionDtos = new ArrayList<>();
-        apiJobDescriptionDtos.add(apiJobDescriptionDto);
-        apiCreateJobAdvertisementDto.setJobDescriptions(apiJobDescriptionDtos);
-
-
-        ApiCompanyDto apiCompanyDto = new ApiCompanyDto();
-        apiCompanyDto.setName("Test company name");
-        apiCompanyDto.setPostalCode("3001");
-        apiCompanyDto.setCity("Bern");
-        apiCompanyDto.setCountryIsoCode("CH");
-        apiCreateJobAdvertisementDto.setCompany(apiCompanyDto);
-
-        ApiEmploymentDto apiEmploymentDto = new ApiEmploymentDto();
-        apiEmploymentDto.setWorkloadPercentageMin(11);
-        apiEmploymentDto.setWorkloadPercentageMax(11);
-        apiCreateJobAdvertisementDto.setEmployment(apiEmploymentDto);
-
-        ApiCreateLocationDto apiCreateLocationDto = new ApiCreateLocationDto();
-        apiCreateLocationDto.setCity("Bern");
-        apiCreateLocationDto.setPostalCode("3012");
-        apiCreateLocationDto.setCountryIsoCode("CH");
-        apiCreateJobAdvertisementDto.setLocation(apiCreateLocationDto);
-
-        ApiOccupationDto apiOccupationDto = new ApiOccupationDto();
-        apiOccupationDto.setAvamOccupationCode("123456789");
-        apiCreateJobAdvertisementDto.setOccupation(apiOccupationDto);
-
-        apiCreateJobAdvertisementDto.setApplyChannel(new ApiApplyChannelDto());
-
         when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
         when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
 
