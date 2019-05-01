@@ -4,8 +4,7 @@ import ch.admin.seco.alv.shared.feign.AlvUnauthorizedFeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@AlvUnauthorizedFeignClient(name = "referenceservice", contextId = "occupation-api", url = "${feign.referenceservice.url:}",
-        fallback = OccupationLabelApiClientFallback.class, path = "/api/occupations")
+@AlvUnauthorizedFeignClient(name = "referenceservice", contextId = "occupation-api", url = "${feign.referenceservice.url:}", path = "/api/occupations")
 public interface OccupationLabelApiClient {
 
     @GetMapping("/label/mapping/{type}/{code}")
