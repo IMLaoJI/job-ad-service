@@ -8,6 +8,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.Sear
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.validation.Valid;
@@ -30,15 +31,17 @@ public class SearchProfile implements Aggregate<SearchProfile, SearchProfileId> 
     @NotNull
     private LocalDateTime updatedTime;
 
+    @NotBlank
     @Size(max = 100)
     private String name;
 
     @NotBlank
     private String ownerUserId;
 
-    // TODO
-    @NotBlank
-    private String searchFilter;
+    @Embedded
+    @Valid
+    @NotNull
+    private SearchFilter searchFilter;
 
     private SearchProfile() {
         // FOR REFLECTION
@@ -73,22 +76,26 @@ public class SearchProfile implements Aggregate<SearchProfile, SearchProfileId> 
         return ownerUserId;
     }
 
-    public String getSearchFilter() {
+    public SearchFilter getSearchFilter() {
         return searchFilter;
     }
 
-    public void update(String searchFilter) {
+    public void update(SearchFilter searchFilter) {
         this.searchFilter = searchFilter;
         this.updatedTime = TimeMachine.now();
         DomainEventPublisher.publish(new SearchProfileUpdatedEvent(this));
     }
 
     public static final class Builder {
+
         private SearchProfileId id;
-        private LocalDateTime updatedTime;
+
+
         private String name;
+
         private String ownerUserId;
-        private String searchFilter;
+
+        private SearchFilter searchFilter;
 
         public Builder() { }
 
@@ -96,11 +103,6 @@ public class SearchProfile implements Aggregate<SearchProfile, SearchProfileId> 
 
         public  Builder setId(SearchProfileId id) {
             this.id = id;
-            return this;
-        }
-
-        public Builder setUpdatedTime(LocalDateTime updatedTime) {
-            this.updatedTime = updatedTime;
             return this;
         }
 
@@ -114,7 +116,7 @@ public class SearchProfile implements Aggregate<SearchProfile, SearchProfileId> 
             return this;
         }
 
-        public Builder setSearchFilter(String searchFilter) {
+        public Builder setSearchFilter(SearchFilter searchFilter) {
             this.searchFilter = searchFilter;
             return this;
         }
