@@ -1,4 +1,4 @@
-package ch.admin.seco.jobs.services.jobadservice.domain.searchprofile;
+package ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.GeoPoint;
 

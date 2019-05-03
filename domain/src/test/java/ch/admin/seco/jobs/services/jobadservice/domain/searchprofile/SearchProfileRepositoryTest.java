@@ -1,6 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.searchprofile;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.GeoPointFixture;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.*;
 import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 import org.junit.runner.RunWith;

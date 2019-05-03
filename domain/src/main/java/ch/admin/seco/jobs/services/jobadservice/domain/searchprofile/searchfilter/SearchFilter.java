@@ -1,4 +1,4 @@
-package ch.admin.seco.jobs.services.jobadservice.domain.searchprofile;
+package ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -88,6 +88,18 @@ public class SearchFilter {
 
     public List<OccupationFilter> getOccupationFilters() {
         return Collections.unmodifiableList(this.occupationFilters);
+    }
+
+    public List<LocalityFilter> getLocalityFilters() {
+        return Collections.unmodifiableList(this.localityFilters);
+    }
+
+    public List<CantonFilter> getCantonFilters() {
+        return Collections.unmodifiableList(this.cantonFilters);
+    }
+
+    public List<RadiusSearchFilter> getRadiusSearchFilters() {
+        return Collections.unmodifiableList(this.radiusSearchFilters);
     }
 
     public ContractType getContractType() {

@@ -5,6 +5,7 @@ import ch.admin.seco.jobs.services.jobadservice.core.domain.Aggregate;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPublisher;
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileUpdatedEvent;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.SearchFilter;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
@@ -32,7 +33,7 @@ public class SearchProfile implements Aggregate<SearchProfile, SearchProfileId> 
     private LocalDateTime updatedTime;
 
     @NotBlank
-    @Size(max = 100)
+    @Size(max = 100) // TODO is there a limitation in size?
     private String name;
 
     @NotBlank
@@ -80,7 +81,8 @@ public class SearchProfile implements Aggregate<SearchProfile, SearchProfileId> 
         return searchFilter;
     }
 
-    public void update(SearchFilter searchFilter) {
+    public void update(String name, SearchFilter searchFilter) {
+        this.name = name;
         this.searchFilter = searchFilter;
         this.updatedTime = TimeMachine.now();
         DomainEventPublisher.publish(new SearchProfileUpdatedEvent(this));
