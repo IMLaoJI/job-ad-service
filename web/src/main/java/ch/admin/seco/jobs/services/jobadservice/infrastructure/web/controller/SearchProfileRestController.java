@@ -1,10 +1,95 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.SearchProfileApplicationService;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.SearchProfileNotExitsException;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.SearchProfileDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.SearchProfileResultDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.create.CreateSearchProfileDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.SearchFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.update.UpdateSearchProfileDto;
+import ch.admin.seco.jobs.services.jobadservice.core.domain.AggregateNotFoundException;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileId;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.SearchFilter;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/searchProfiles")
 public class SearchProfileRestController {
-    // TBD
+
+    private final SearchProfileApplicationService searchProfileApplicationService;
+
+    public SearchProfileRestController(SearchProfileApplicationService searchProfileApplicationService) {
+        this.searchProfileApplicationService = searchProfileApplicationService;
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public SearchProfileDto createSearchProfile(@RequestBody @Valid CreateSearchProfileResource createSearchProfileResource)
+            throws AggregateNotFoundException {
+
+        CreateSearchProfileDto createSearchProfileDto = new CreateSearchProfileDto(
+                createSearchProfileResource.name, createSearchProfileResource.userOwnerId, SearchFilterDto.toDto(createSearchProfileResource.searchFilter)
+        );
+        return this.searchProfileApplicationService.createSearchProfile(createSearchProfileDto);
+    }
+
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public SearchProfileDto updateSearchProfile(@PathVariable SearchProfileId id, @RequestBody UpdateSearchProfileResouce updateSearchProfileResouce)
+            throws SearchProfileNotExitsException {
+
+        UpdateSearchProfileDto updateSearchProfileDto = new UpdateSearchProfileDto(
+                id, updateSearchProfileResouce.name, SearchFilterDto.toDto(updateSearchProfileResouce.searchFilter)
+        );
+        return this.searchProfileApplicationService.updateSearchProfile(updateSearchProfileDto);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteSearchProfile(@PathVariable SearchProfileId id) throws SearchProfileNotExitsException {
+        this.searchProfileApplicationService.deleteSearchProfile(id);
+    }
+
+    @GetMapping("/{id}")
+    public SearchProfileDto findById(@PathVariable SearchProfileId id) {
+        return this.searchProfileApplicationService.getSearchProfile(id);
+    }
+
+    @GetMapping("/_search")
+    public ResponseEntity<List<SearchProfileResultDto>> findByOwnerUserId(@RequestParam String ownerUserId,
+                                                                          @RequestParam(name = "page", defaultValue = "0") int page,
+                                                                          @RequestParam(name = "size", defaultValue = "20") int size
+    ) {
+        // TODO
+        return null;
+    }
+
+    static class CreateSearchProfileResource {
+        @NotBlank
+        @Size(max = 100)
+        public String name;
+
+        @NotBlank
+        public String userOwnerId;
+
+        @NotNull
+        public SearchFilter searchFilter;
+    }
+
+    static class UpdateSearchProfileResouce {
+        @NotBlank
+        @Size(max = 100)
+        public String name;
+
+        @NotNull
+        public SearchFilter searchFilter;
+    }
 }
