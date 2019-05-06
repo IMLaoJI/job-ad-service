@@ -1,6 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
@@ -51,19 +52,27 @@ public class SearchFilter {
     private Boolean euresDisplay;
 
     @OrderColumn(name = "occupation_order")
+    @ElementCollection
     @CollectionTable(name = "SEARCH_PROFILE_OCCUPATION_FILTER", joinColumns = @JoinColumn(name = "SEARCH_PROFILE_ID"))
+    @Valid
     private List<OccupationFilter> occupationFilters = new ArrayList<>();
 
     @OrderColumn(name = "locality_order")
+    @ElementCollection
     @CollectionTable(name = "SEARCH_PROFILE_LOCALITY_FILTER", joinColumns = @JoinColumn(name = "SEARCH_PROFILE_ID"))
+    @Valid
     private List<LocalityFilter> localityFilters = new ArrayList<>();
 
     @OrderColumn(name = "canton_order")
+    @ElementCollection
     @CollectionTable(name = "SEARCH_PROFILE_CANTON_FILTER", joinColumns = @JoinColumn(name = "SEARCH_PROFILE_ID"))
+    @Valid
     private List<CantonFilter> cantonFilters = new ArrayList<>();
 
     @OrderColumn(name = "radio_order")
+    @ElementCollection
     @CollectionTable(name = "SEARCH_PROFILE_RADIUS_FILTER", joinColumns = @JoinColumn(name = "SEARCH_PROFILE_ID"))
+    @Valid
     private List<RadiusSearchFilter> radiusSearchFilters = new ArrayList<>();
 
     private SearchFilter(Builder builder) {

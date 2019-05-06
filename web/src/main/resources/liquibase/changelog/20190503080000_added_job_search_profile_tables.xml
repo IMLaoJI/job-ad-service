@@ -43,7 +43,7 @@
             <column name="SEARCH_PROFILE_ID" type="VARCHAR(36)">
                 <constraints nullable="false"/>
             </column>
-            <column name="LABEL_ID" type="VARCHAR(128)">
+            <column name="LABEL_ID" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="TYPE" type="VARCHAR(36)">
@@ -56,7 +56,7 @@
             <column name="SEARCH_PROFILE_ID" type="VARCHAR(36)">
                 <constraints nullable="false"/>
             </column>
-            <column name="LOCALITY_ID" type="VARCHAR(128)">
+            <column name="LOCALITY_ID" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -66,10 +66,10 @@
             <column name="SEARCH_PROFILE_ID" type="VARCHAR(36)">
                 <constraints nullable="false"/>
             </column>
-            <column name="NAME" type="VARCHAR(128)">
+            <column name="NAME" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="CODE" type="VARCHAR(128)">
+            <column name="CODE" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
