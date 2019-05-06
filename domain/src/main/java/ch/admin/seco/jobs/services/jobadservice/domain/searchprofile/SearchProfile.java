@@ -48,6 +48,10 @@ public class SearchProfile implements Aggregate<SearchProfile, SearchProfileId> 
         // FOR REFLECTION
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     private SearchProfile(Builder builder) {
         this.id = Condition.notNull(builder.id);
         this.createdTime = TimeMachine.now();

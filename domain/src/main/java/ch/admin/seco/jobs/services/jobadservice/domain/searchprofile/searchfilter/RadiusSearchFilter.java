@@ -2,10 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilt
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.GeoPoint;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Embeddable
@@ -13,6 +10,10 @@ import java.util.Objects;
 public class RadiusSearchFilter {
 
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "geoPoint.lon", column = @Column(name = "GEO_POINT_LON")),
+            @AttributeOverride(name = "geoPoint.lat", column = @Column(name = "GEO_POINT_LAT"))
+    })
     private GeoPoint geoPoint;
 
     private Integer distance;

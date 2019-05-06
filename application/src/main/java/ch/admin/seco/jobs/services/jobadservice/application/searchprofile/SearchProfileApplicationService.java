@@ -24,6 +24,8 @@ import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilte
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.SearchFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +52,7 @@ public class SearchProfileApplicationService {
     public SearchProfileDto getSearchProfile(SearchProfileId searchProfileId) throws SearchProfileNotExitsException {
         Condition.notNull(searchProfileId, "SearchProfileId can't be null");
         SearchProfile searchProfile = getById(searchProfileId);
-        // TODO throw SearchProfileNotExitsException
+
         return SearchProfileDto.toDto(searchProfile);
     }
 
@@ -103,7 +105,7 @@ public class SearchProfileApplicationService {
     }
 
     @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(ownerUserId)")
-    public List<SearchProfileResultDto> getSearchProfiles(String ownerUserId) {
+    public Page<SearchProfileResultDto> getSearchProfiles(String ownerUserId, int page, int size) {
         Condition.notNull(ownerUserId, "OwnerUserId can't be null");
         List<SearchProfile> searchProfileList = this.searchProfileRepository.findAllByOwnerUserId(ownerUserId);
         List<SearchProfileResultDto> searchProfileResultDtos = new ArrayList<>();
@@ -116,9 +118,8 @@ public class SearchProfileApplicationService {
             );
             searchProfileResultDtos.add(SearchProfileResultDto.toDto(searchProfileResult));
         }
-        return searchProfileResultDtos;
+        return  new PageImpl<>(searchProfileResultDtos);
     }
-
 
     private SearchProfile getById(SearchProfileId id) {
         return this.searchProfileRepository.findById(id).orElseThrow(() -> new SearchProfileNotExitsException(id));

@@ -10,6 +10,9 @@ import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.up
 import ch.admin.seco.jobs.services.jobadservice.core.domain.AggregateNotFoundException;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileId;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.SearchFilter;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PaginationUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -68,8 +71,9 @@ public class SearchProfileRestController {
                                                                           @RequestParam(name = "page", defaultValue = "0") int page,
                                                                           @RequestParam(name = "size", defaultValue = "20") int size
     ) {
-        // TODO
-        return null;
+        Page<SearchProfileResultDto> resultPage = this.searchProfileApplicationService.getSearchProfiles(ownerUserId, page, size);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(resultPage, "/api/searchProfiles/_search");
+        return new ResponseEntity<>(resultPage.getContent(), headers, HttpStatus.OK);
     }
 
     static class CreateSearchProfileResource {

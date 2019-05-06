@@ -1,13 +1,10 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Convert;
-import javax.persistence.ElementCollection;
-import javax.persistence.Embeddable;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.OrderColumn;
+import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,40 +15,64 @@ import java.util.Set;
 public class SearchFilter {
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "SEARCH_FILTER_SORT")
     private Sort sort;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "SEARCH_FILTER_CONTRACT_TYPE")
     private ContractType contractType;
 
     @Convert(converter = StringSetConverter.class)
+    @Column(name = "SEARCH_FILTER_KEYWORDS")
+    @Size(max = 1000)
     private Set<String> keywords;
 
+    @Column(name = "SEARCH_FILTER_WORKLOAD_PERCENTAGE_MIN")
+    @Min(10)
+    @Max(100)
     private Integer workloadPercentageMin;
 
+    @Column(name = "SEARCH_FILTER_WORKLOAD_PERCENTAGE_MAX")
+    @Min(10)
+    @Max(100)
     private Integer workloadPercentageMax;
 
+    @Column(name = "SEARCH_FILTER_COMPANY_NAME")
     private String companyName;
 
+    @Column(name = "SEARCH_FILTER_ONLINE_SINCE")
+    @Min(0)
+    @Max(60)
     private Integer onlineSince;
 
+    @Column(name = "SEARCH_FILTER_DISPLAY_RESTRICTED")
     private Boolean displayRestricted;
 
+    @Column(name = "SEARCH_FILTER_EURES_DISPLAY")
     private Boolean euresDisplay;
 
     @OrderColumn(name = "occupation_order")
     @ElementCollection
+    @CollectionTable(name = "SEARCH_PROFILE_OCCUPATION_FILTER", joinColumns = @JoinColumn(name = "SEARCH_PROFILE_ID"))
+    @Valid
     private List<OccupationFilter> occupationFilters = new ArrayList<>();
 
     @OrderColumn(name = "locality_order")
     @ElementCollection
+    @CollectionTable(name = "SEARCH_PROFILE_LOCALITY_FILTER", joinColumns = @JoinColumn(name = "SEARCH_PROFILE_ID"))
+    @Valid
     private List<LocalityFilter> localityFilters = new ArrayList<>();
 
     @OrderColumn(name = "canton_order")
     @ElementCollection
+    @CollectionTable(name = "SEARCH_PROFILE_CANTON_FILTER", joinColumns = @JoinColumn(name = "SEARCH_PROFILE_ID"))
+    @Valid
     private List<CantonFilter> cantonFilters = new ArrayList<>();
 
     @OrderColumn(name = "radio_order")
     @ElementCollection
+    @CollectionTable(name = "SEARCH_PROFILE_RADIUS_FILTER", joinColumns = @JoinColumn(name = "SEARCH_PROFILE_ID"))
+    @Valid
     private List<RadiusSearchFilter> radiusSearchFilters = new ArrayList<>();
 
     private SearchFilter(Builder builder) {

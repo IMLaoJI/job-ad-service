@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -101,11 +102,11 @@ public class SearchProfileApplicationServiceTest {
 
         // then
         domainEventMockUtils.assertMultipleDomainEventPublished(3,SearchProfileEvents.SEARCH_PROFILE_CREATED.getDomainEventType());
-        List<SearchProfileResultDto> searchProfileResultDtos = searchProfileApplicationService.getSearchProfiles(ownerUserId);
+        Page<SearchProfileResultDto> searchProfileResultDtos = searchProfileApplicationService.getSearchProfiles(ownerUserId,0,100);
         assertThat(searchProfileResultDtos).hasSize(3);
-        assertThat(searchProfileResultDtos.get(0).getId().equals(createdSearchProfileDto1.getId()));
-        assertThat(searchProfileResultDtos.get(1).getId().equals(createdSearchProfileDto2.getId()));
-        assertThat(searchProfileResultDtos.get(2).getId().equals(createdSearchProfileDto3.getId()));
+        assertThat(searchProfileResultDtos.getContent().get(0).getId().equals(createdSearchProfileDto1.getId()));
+        assertThat(searchProfileResultDtos.getContent().get(1).getId().equals(createdSearchProfileDto2.getId()));
+        assertThat(searchProfileResultDtos.getContent().get(2).getId().equals(createdSearchProfileDto3.getId()));
     }
 
     @Test
@@ -226,6 +227,4 @@ public class SearchProfileApplicationServiceTest {
                 ))
                 .build();
     }
-
-
 }

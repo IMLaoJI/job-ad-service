@@ -3,6 +3,156 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-    <!-- TODO set tables, indexes and rest -->
+    <changeSet id="20190503080000_00" author="emst">
+        <createSequence sequenceName="search_profile_seq"/>
+    </changeSet>
 
+    <!-- TABLES -->
+    <changeSet id="20190503080000_01" author="emst">
+        <createTable tableName="SEARCH_PROFILE">
+            <column name="ID" type="VARCHAR(36)">
+                <constraints primaryKey="true"
+                             nullable="false"
+                             primaryKeyName="PK_SEARCH_PROFILE"/>
+            </column>
+            <column name="CREATED_TIME" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UPDATED_TIME" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="OWNER_USER_ID" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SEARCH_FILTER_SORT" type="VARCHAR(36)"/>
+            <column name="SEARCH_FILTER_CONTRACT_TYPE" type="VARCHAR(36)"/>
+            <column name="SEARCH_FILTER_KEYWORDS" type="VARCHAR(1000)"/>
+            <column name="SEARCH_FILTER_WORKLOAD_PERCENTAGE_MIN" type="INT"/>
+            <column name="SEARCH_FILTER_WORKLOAD_PERCENTAGE_MAX" type="INT"/>
+            <column name="SEARCH_FILTER_COMPANY_NAME" type="VARCHAR(64)"/>
+            <column name="SEARCH_FILTER_ONLINE_SINCE" type="INT"/>
+            <column name="SEARCH_FILTER_DISPLAY_RESTRICTED" type="BOOLEAN"/>
+            <column name="SEARCH_FILTER_EURES_DISPLAY" type="BOOLEAN"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="20190503080000_02" author="emst">
+        <createTable tableName="SEARCH_PROFILE_OCCUPATION_FILTER">
+            <column name="SEARCH_PROFILE_ID" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="LABEL_ID" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TYPE" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="20190503080000_03" author="emst">
+        <createTable tableName="SEARCH_PROFILE_LOCALITY_FILTER">
+            <column name="SEARCH_PROFILE_ID" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="LOCALITY_ID" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="20190503080000_04" author="emst">
+        <createTable tableName="SEARCH_PROFILE_CANTON_FILTER">
+            <column name="SEARCH_PROFILE_ID" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CODE" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="20190503080000_05" author="emst">
+        <createTable tableName="SEARCH_PROFILE_RADIUS_FILTER">
+            <column name="SEARCH_PROFILE_ID" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="GEO_POINT_LON" type="DOUBLE"/>
+            <column name="GEO_POINT_LAT" type="DOUBLE"/>
+            <column name="DISTANCE" type="INT"/>
+        </createTable>
+    </changeSet>
+
+    <!-- PRIMARY KEY INDEX -->
+    <changeSet id="20190503080000_06" author="emst">
+        <addPrimaryKey tableName="SEARCH_PROFILE"
+                       columnNames="ID"
+                       constraintName="PK_SEARCH_PROFILE_ID"/>
+    </changeSet>
+
+    <!-- INDEXES -->
+    <changeSet id="20190503080000_07" author="emst">
+        <createIndex tableName="SEARCH_PROFILE_OCCUPATION_FILTER"
+                     indexName="IDX_SEARCH_PROFILE_OCCUPATION_FILTER">
+            <column name="SEARCH_PROFILE_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="20190503080000_08" author="emst">
+        <createIndex tableName="SEARCH_PROFILE_LOCALITY_FILTER"
+                     indexName="IDX_SEARCH_PROFILE_LOCALITY_FILTER">
+            <column name="SEARCH_PROFILE_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="20190503080000_09" author="emst">
+        <createIndex tableName="SEARCH_PROFILE_CANTON_FILTER"
+                     indexName="IDX_SEARCH_PROFILE_CANTON_FILTER">
+            <column name="SEARCH_PROFILE_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="20190503080000_10" author="emst">
+        <createIndex tableName="SEARCH_PROFILE_RADIUS_FILTER"
+                     indexName="IDX_SEARCH_PROFILE_RADIUS_FILTER">
+            <column name="SEARCH_PROFILE_ID"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- FOREIGN KEY INDEXES -->
+    <changeSet id="20190503080000_11" author="emst">
+        <addForeignKeyConstraint baseColumnNames="SEARCH_PROFILE_ID"
+                                 baseTableName="SEARCH_PROFILE_OCCUPATION_FILTER"
+                                 constraintName="FK_SEARCH_PROFILE_OCCUPATION_FILTER"
+                                 deferrable="false" initiallyDeferred="false"
+                                 onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="ID"
+                                 referencedTableName="SEARCH_PROFILE"/>
+    </changeSet>
+    <changeSet id="20190503080000_12" author="emst">
+        <addForeignKeyConstraint baseColumnNames="SEARCH_PROFILE_ID"
+                                 baseTableName="SEARCH_PROFILE_LOCALITY_FILTER"
+                                 constraintName="FK_SEARCH_PROFILE_LOCALITY_FILTER"
+                                 deferrable="false" initiallyDeferred="false"
+                                 onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="ID"
+                                 referencedTableName="SEARCH_PROFILE"/>
+    </changeSet>
+    <changeSet id="20190503080000_13" author="emst">
+        <addForeignKeyConstraint baseColumnNames="SEARCH_PROFILE_ID"
+                                 baseTableName="SEARCH_PROFILE_CANTON_FILTER"
+                                 constraintName="FK_SEARCH_PROFILE_CANTON_FILTER"
+                                 deferrable="false" initiallyDeferred="false"
+                                 onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="ID"
+                                 referencedTableName="SEARCH_PROFILE"/>
+    </changeSet>
+    <changeSet id="20190503080000_14" author="emst">
+        <addForeignKeyConstraint baseColumnNames="SEARCH_PROFILE_ID"
+                                 baseTableName="SEARCH_PROFILE_RADIUS_FILTER"
+                                 constraintName="FK_SEARCH_PROFILE_RADIUS_FILTER"
+                                 deferrable="false" initiallyDeferred="false"
+                                 onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="ID"
+                                 referencedTableName="SEARCH_PROFILE"/>
+    </changeSet>
 </databaseChangeLog>
