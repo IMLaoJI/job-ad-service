@@ -16,6 +16,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.Sear
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -93,11 +94,11 @@ public class SearchProfileApplicationService {
     }
 
     @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(ownerUserId)")
-    public List<SearchProfileResultDto> getSearchProfiles(String ownerUserId) {
+    public Page<SearchProfileResultDto> getSearchProfiles(String ownerUserId, int page, int size) {
         Condition.notNull(ownerUserId, "OwnerUserId can't be null");
         List<SearchProfileResult> searchProfileList = this.searchProfileRepository.findAllByOwnerUserId(ownerUserId);
-
-        return SearchProfileResultDto.toDto(searchProfileList);
+        return null;
+        //return SearchProfileResultDto.toDto(searchProfileList);
     }
 
     private SearchProfile getById(SearchProfileId id) {
