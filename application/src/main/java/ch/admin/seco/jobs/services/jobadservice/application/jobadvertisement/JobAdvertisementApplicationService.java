@@ -39,6 +39,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CreatedJobAdvertisementIdWithTokenDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmployerDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
@@ -117,13 +118,13 @@ public class JobAdvertisementApplicationService {
 
 	@Autowired
 	public JobAdvertisementApplicationService(CurrentUserContext currentUserContext,
-			JobAdvertisementRepository jobAdvertisementRepository,
-			JobAdvertisementFactory jobAdvertisementFactory,
-			ReportingObligationService reportingObligationService,
-			LocationService locationService,
-			ProfessionService professionService,
-			JobCenterService jobCenterService, TransactionTemplate transactionTemplate,
-			BusinessLogger businessLogger) {
+											  JobAdvertisementRepository jobAdvertisementRepository,
+											  JobAdvertisementFactory jobAdvertisementFactory,
+											  ReportingObligationService reportingObligationService,
+											  LocationService locationService,
+											  ProfessionService professionService,
+											  JobCenterService jobCenterService, TransactionTemplate transactionTemplate,
+											  BusinessLogger businessLogger) {
 		this.currentUserContext = currentUserContext;
 		this.jobAdvertisementRepository = jobAdvertisementRepository;
 		this.jobAdvertisementFactory = jobAdvertisementFactory;
@@ -144,14 +145,16 @@ public class JobAdvertisementApplicationService {
 		return jobAdvertisement.getId();
 	}
 
-	public JobAdvertisementId createFromApi(CreateJobAdvertisementDto createJobAdvertisementDto) {
+	public CreatedJobAdvertisementIdWithTokenDto createFromApi(CreateJobAdvertisementDto createJobAdvertisementDto) {
 		LOG.debug("Start creating new job ad from API");
 		Condition.notNull(createJobAdvertisementDto, "CreateJobAdvertisementDto can't be null");
 		LOG.debug("Create '{}'", createJobAdvertisementDto.getJobDescriptions().get(0).getTitle());
 
 		final JobAdvertisementCreator creator = getJobAdvertisementCreatorFromInternal(createJobAdvertisementDto);
-		JobAdvertisement jobAdvertisement = jobAdvertisementFactory.createFromApi(creator);
-		return jobAdvertisement.getId();
+		JobAdvertisement newJobAdvertisement = jobAdvertisementFactory.createFromApi(creator);
+		return new CreatedJobAdvertisementIdWithTokenDto()
+				.setJobAdvertisementId(newJobAdvertisement.getId().getValue())
+				.setToken(newJobAdvertisement.getOwner().getAccessToken());
 	}
 
 	public JobAdvertisementId createFromAvam(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
@@ -315,14 +318,14 @@ public class JobAdvertisementApplicationService {
 		);
 	}
 
-    @PreAuthorize("@jobAdvertisementAuthorizationService.canViewJob(#jobAdvertisementId)")
-    public JobAdvertisementDto getById(JobAdvertisementId jobAdvertisementId) throws AggregateNotFoundException {
-        JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
-        BusinessLogEvent logData = new BusinessLogEvent("JOB_ADVERTISEMENT_ACCESS")
-                .withObjectType("JobAdvertisement")
+	@PreAuthorize("@jobAdvertisementAuthorizationService.canViewJob(#jobAdvertisementId)")
+	public JobAdvertisementDto getById(JobAdvertisementId jobAdvertisementId) throws AggregateNotFoundException {
+		JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
+		BusinessLogEvent logData = new BusinessLogEvent("JOB_ADVERTISEMENT_ACCESS")
+				.withObjectType("JobAdvertisement")
 				.withObjectId(jobAdvertisementId.getValue())
-                .withAdditionalData("objectTypeStatus", jobAdvertisement.getStatus());
-        this.businessLogger.log(logData);
+				.withAdditionalData("objectTypeStatus", jobAdvertisement.getStatus());
+		this.businessLogger.log(logData);
 
 		return JobAdvertisementDto.toDto(jobAdvertisement);
 	}
@@ -652,7 +655,7 @@ public class JobAdvertisementApplicationService {
 	private Location convertCreateLocationToEnrichedLocation(CreateLocationDto createLocationDto) {
 		Condition.notNull(createLocationDto, "Location can't be null");
 		Location location = toLocation(createLocationDto);
-        Condition.isTrue(locationService.isLocationValid(location), String.format("Invalid location: %s %s %s", location.getCountryIsoCode(), location.getPostalCode(), location.getCity()));
+		Condition.isTrue(locationService.isLocationValid(location), String.format("Invalid location: %s %s %s", location.getCountryIsoCode(), location.getPostalCode(), location.getCity()));
 
 		return locationService.enrichCodes(location);
 	}

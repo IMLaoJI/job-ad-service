@@ -5,6 +5,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CreatedJobAdvertisementIdWithTokenDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
@@ -76,11 +77,12 @@ public class JobAdvertisementApplicationServiceForAPITest {
          CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(company);
 
         //when
-        JobAdvertisementId jobAdvertisementId = service.createFromApi(createJobAdvertisementDto);
+        CreatedJobAdvertisementIdWithTokenDto result = service.createFromApi(createJobAdvertisementDto);
 
         //then
-        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(jobAdvertisementId);
+        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(new JobAdvertisementId(result.getJobAdvertisementId()));
 
+        assertThat(result.getToken()).isNotBlank();
         assertThat(jobAdvertisement).isNotNull();
         assertThat(jobAdvertisement.getStatus()).isEqualTo(JobAdvertisementStatus.CREATED);
         assertThat(jobAdvertisement.getSourceSystem()).isEqualTo(SourceSystem.API);
