@@ -11,5 +11,7 @@ dependencies {
     testCompile 'org.assertj:assertj-core'
     testCompile 'junit:junit'
     testCompile 'org.hibernate.validator:hibernate-validator'
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.glassfish:javax.el'
+    testCompile 'com.google.guava:guava'
 }

@@ -1,8 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.searchprofile;
 
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.GeoPointFixture;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.*;
-import com.google.common.collect.ImmutableSet;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileFixture;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Arrays;
-
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_01;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -25,12 +22,7 @@ public class SearchProfileRepositoryTest {
     @Test
     public void testSaveSearchProfile() {
         // given
-        SearchProfile searchProfile = new SearchProfile.Builder()
-                .setId(new SearchProfileId("SP-1"))
-                .setName("My-Name")
-                .setOwnerUserId("User-01")
-                .setSearchFilter(prepareSearchFilter())
-                .build();
+        SearchProfile searchProfile = SearchProfileFixture.testSearchProfile(search_profile_01.id());
 
         //when
         SearchProfile savedSearchProfile = this.searchProfileRepository.save(searchProfile);
@@ -41,31 +33,6 @@ public class SearchProfileRepositoryTest {
 
         assertThat(savedSearchProfile.getSearchFilter().getOccupationFilters())
                 .containsExactlyElementsOf(searchProfile.getSearchFilter().getOccupationFilters());
-    }
-
-    private SearchFilter prepareSearchFilter() {
-        return SearchFilter.builder()
-                .setSort(Sort.SCORE)
-                .setKeywords(ImmutableSet.of("Keyword-1", "Keyword-2", "Keyword-3", "Keyword-4"))
-                .setOccupationFilters(Arrays.asList(
-                        new OccupationFilter("Label-1", OccupationFilterType.OCCUPATION),
-                        new OccupationFilter("Label-2", OccupationFilterType.OCCUPATION),
-                        new OccupationFilter("Label-3", OccupationFilterType.OCCUPATION),
-                        new OccupationFilter("Label-4", OccupationFilterType.OCCUPATION),
-                        new OccupationFilter("Label-5", OccupationFilterType.CLASSIFICATION)
-                ))
-                .setLocalityFilters(Arrays.asList(
-                        new LocalityFilter("Label-1"),
-                        new LocalityFilter("Label-2"),
-                        new LocalityFilter("Label-3")
-                ))
-                .setCantonFilters(Arrays.asList(
-                        new CantonFilter("Bern", "BE")
-                ))
-                .setRadiusSearchFilters(Arrays.asList(
-                        new RadiusSearchFilter(GeoPointFixture.testGeoPoint(),20)
-                ))
-                .build();
     }
 
     @SpringBootApplication
