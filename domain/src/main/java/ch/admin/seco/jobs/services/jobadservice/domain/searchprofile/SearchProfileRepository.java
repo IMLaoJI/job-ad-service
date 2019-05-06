@@ -16,7 +16,8 @@ public interface SearchProfileRepository  extends JpaRepository<SearchProfile, S
     @Query("select sp from SearchProfile sp where sp.name = :name and sp.ownerUserId = :ownerUserId")
     Optional<SearchProfile> findByNameAndOwnerUserId(@Param("name") String name, @Param("ownerUserId") String ownerUserId);
 
+    // TODO Exclude SearchFilter
     @Transactional(propagation = Propagation.SUPPORTS)
-    @Query("select sp.id, sp.updatedTime, sp.name, sp.ownerUserId from SearchProfile sp where sp.ownerUserId = :ownerUserId")
-    List<SearchProfileResult> findAllByOwnerUserId(@Param("ownerUserId") String ownerUserId);
+    @Query("select sp from SearchProfile sp where sp.ownerUserId = :ownerUserId")
+    List<SearchProfile> findAllByOwnerUserId(@Param("ownerUserId") String ownerUserId);
 }

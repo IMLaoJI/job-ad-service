@@ -3,7 +3,11 @@ package ch.admin.seco.jobs.services.jobadservice.application.searchprofile;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.SearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.SearchProfileResultDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.create.CreateSearchProfileDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.*;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.CantonFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.LocalityFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.OccupationFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.RadiusSearchFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.SearchFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.update.UpdateSearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPublisher;
@@ -13,7 +17,11 @@ import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfi
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileResult;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileCreatedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileDeletedEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.*;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.CantonFilter;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.LocalityFilter;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.OccupationFilter;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.RadiusSearchFilter;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.SearchFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,8 +29,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,20 +50,19 @@ public class SearchProfileApplicationService {
     public SearchProfileDto getSearchProfile(SearchProfileId searchProfileId) throws SearchProfileNotExitsException {
         Condition.notNull(searchProfileId, "SearchProfileId can't be null");
         SearchProfile searchProfile = getById(searchProfileId);
-
+        // TODO throw SearchProfileNotExitsException
         return SearchProfileDto.toDto(searchProfile);
     }
 
     @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.matchesCurrentUserId(#createSearchProfileDto.ownerUserId)")
     public SearchProfileDto createSearchProfile(CreateSearchProfileDto createSearchProfileDto) {
         Condition.notNull(createSearchProfileDto, "CreateSearchProfileDto can't be null");
-        SearchProfile searchProfile = getByNameAndOwnerUserId(createSearchProfileDto.getName(), createSearchProfileDto.getOwnerUserId());
-        if (Objects.nonNull(searchProfile)) {
-            throw new SearchProfileNameAlreadyExistsException(
-                    searchProfile.getId(), searchProfile.getName(), searchProfile.getOwnerUserId());
+        Optional<SearchProfile> tmpSearchProfile = searchProfileRepository.findByNameAndOwnerUserId(createSearchProfileDto.getName(), createSearchProfileDto.getOwnerUserId());
+        if (tmpSearchProfile.isPresent()) {
+            throw new SearchProfileNameAlreadyExistsException(tmpSearchProfile.get().getName(), tmpSearchProfile.get().getOwnerUserId());
         }
 
-        searchProfile = new SearchProfile.Builder()
+        SearchProfile searchProfile = new SearchProfile.Builder()
                 .setId(new SearchProfileId())
                 .setName(createSearchProfileDto.getName())
                 .setOwnerUserId(createSearchProfileDto.getOwnerUserId())
@@ -72,10 +80,12 @@ public class SearchProfileApplicationService {
     public SearchProfileDto updateSearchProfile(UpdateSearchProfileDto updateSearchProfileDto) {
         Condition.notNull(updateSearchProfileDto, "UpdateSearchProfileDto can't be null");
         SearchProfile searchProfile = getById(updateSearchProfileDto.getId());
-        SearchProfile existingNameOfSearchProfile = getByNameAndOwnerUserId(updateSearchProfileDto.getName(), searchProfile.getOwnerUserId());
-        if (!searchProfile.getId().equals(existingNameOfSearchProfile.getId())) {
-            throw new SearchProfileNameAlreadyExistsException(
-                    searchProfile.getId(), searchProfile.getName(), searchProfile.getOwnerUserId());
+
+        Optional<SearchProfile> existingNameOfSearchProfile = searchProfileRepository.findByNameAndOwnerUserId(updateSearchProfileDto.getName(), searchProfile.getOwnerUserId());
+        if (existingNameOfSearchProfile.isPresent()) {
+            if (!searchProfile.getId().equals(existingNameOfSearchProfile.get().getId())) {
+                throw new SearchProfileNameAlreadyExistsException(searchProfile.getName(), searchProfile.getOwnerUserId());
+            }
         }
         searchProfile.update(updateSearchProfileDto.getName(), convertFromDto(updateSearchProfileDto.getSearchFilter()));
         LOG.debug("{} has been updated.", searchProfile.toString());
@@ -95,17 +105,23 @@ public class SearchProfileApplicationService {
     @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(ownerUserId)")
     public List<SearchProfileResultDto> getSearchProfiles(String ownerUserId) {
         Condition.notNull(ownerUserId, "OwnerUserId can't be null");
-        List<SearchProfileResult> searchProfileList = this.searchProfileRepository.findAllByOwnerUserId(ownerUserId);
-
-        return SearchProfileResultDto.toDto(searchProfileList);
+        List<SearchProfile> searchProfileList = this.searchProfileRepository.findAllByOwnerUserId(ownerUserId);
+        List<SearchProfileResultDto> searchProfileResultDtos = new ArrayList<>();
+        for (SearchProfile searchProfile : searchProfileList) {
+            SearchProfileResult searchProfileResult = new SearchProfileResult(
+                    searchProfile.getId().getValue()
+                    , searchProfile.getUpdatedTime()
+                    , searchProfile.getName()
+                    , searchProfile.getOwnerUserId()
+            );
+            searchProfileResultDtos.add(SearchProfileResultDto.toDto(searchProfileResult));
+        }
+        return searchProfileResultDtos;
     }
+
 
     private SearchProfile getById(SearchProfileId id) {
         return this.searchProfileRepository.findById(id).orElseThrow(() -> new SearchProfileNotExitsException(id));
-    }
-
-    private SearchProfile getByNameAndOwnerUserId(String name, String ownerUserId) {
-        return this.searchProfileRepository.findByNameAndOwnerUserId(name, ownerUserId).orElse(null);
     }
 
     private SearchFilter convertFromDto(SearchFilterDto searchFilterDto) {
