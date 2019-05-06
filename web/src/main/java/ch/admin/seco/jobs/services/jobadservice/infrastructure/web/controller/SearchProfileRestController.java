@@ -15,7 +15,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -46,11 +55,11 @@ public class SearchProfileRestController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public SearchProfileDto updateSearchProfile(@PathVariable SearchProfileId id, @RequestBody UpdateSearchProfileResouce updateSearchProfileResouce)
+    public SearchProfileDto updateSearchProfile(@PathVariable SearchProfileId id, @RequestBody UpdateSearchProfileResource updateSearchProfileResource)
             throws SearchProfileNotExitsException {
 
         UpdateSearchProfileDto updateSearchProfileDto = new UpdateSearchProfileDto(
-                id, updateSearchProfileResouce.name, SearchFilterDto.toDto(updateSearchProfileResouce.searchFilter)
+                id, updateSearchProfileResource.name, SearchFilterDto.toDto(updateSearchProfileResource.searchFilter)
         );
         return this.searchProfileApplicationService.updateSearchProfile(updateSearchProfileDto);
     }
@@ -88,7 +97,7 @@ public class SearchProfileRestController {
         public SearchFilter searchFilter;
     }
 
-    static class UpdateSearchProfileResouce {
+    static class UpdateSearchProfileResource {
         @NotBlank
         @Size(max = 100)
         public String name;
