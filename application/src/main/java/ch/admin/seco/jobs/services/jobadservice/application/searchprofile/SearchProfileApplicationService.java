@@ -89,7 +89,7 @@ public class SearchProfileApplicationService {
         SearchProfile searchProfile = getById(searchProfileId);
         DomainEventPublisher.publish(new SearchProfileDeletedEvent(searchProfile));
         this.searchProfileRepository.delete(searchProfile);
-        LOG.debug("SearchProfile {} has been deleted for user {}.", searchProfile.getId().getValue(), searchProfile.getOwnerUserId());
+        LOG.debug("{} has been deleted.", searchProfile.toString());
     }
 
     @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(ownerUserId)")
