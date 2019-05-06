@@ -51,25 +51,25 @@ public class SearchFilter {
     @Column(name = "SEARCH_FILTER_EURES_DISPLAY")
     private Boolean euresDisplay;
 
-    @OrderColumn(name = "occupation_order")
+    @OrderColumn(name = "OCCUPATION_ORDER")
     @ElementCollection
     @CollectionTable(name = "SEARCH_PROFILE_OCCUPATION_FILTER", joinColumns = @JoinColumn(name = "SEARCH_PROFILE_ID"))
     @Valid
     private List<OccupationFilter> occupationFilters = new ArrayList<>();
 
-    @OrderColumn(name = "locality_order")
+    @OrderColumn(name = "LOCALITY_ORDER")
     @ElementCollection
     @CollectionTable(name = "SEARCH_PROFILE_LOCALITY_FILTER", joinColumns = @JoinColumn(name = "SEARCH_PROFILE_ID"))
     @Valid
     private List<LocalityFilter> localityFilters = new ArrayList<>();
 
-    @OrderColumn(name = "canton_order")
+    @OrderColumn(name = "CANTON_ORDER")
     @ElementCollection
     @CollectionTable(name = "SEARCH_PROFILE_CANTON_FILTER", joinColumns = @JoinColumn(name = "SEARCH_PROFILE_ID"))
     @Valid
     private List<CantonFilter> cantonFilters = new ArrayList<>();
 
-    @OrderColumn(name = "radio_order")
+    @OrderColumn(name = "RADIUS_ORDER")
     @ElementCollection
     @CollectionTable(name = "SEARCH_PROFILE_RADIUS_FILTER", joinColumns = @JoinColumn(name = "SEARCH_PROFILE_ID"))
     @Valid

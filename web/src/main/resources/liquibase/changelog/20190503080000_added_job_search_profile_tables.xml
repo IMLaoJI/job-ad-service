@@ -47,6 +47,7 @@
             <column name="TYPE" type="VARCHAR(36)">
                 <constraints nullable="false"/>
             </column>
+            <column name="OCCUPATION_ORDER" type="INT"/>
         </createTable>
     </changeSet>
     <changeSet id="20190503080000_03" author="emst">
@@ -57,6 +58,7 @@
             <column name="LOCALITY_ID" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="LOCALITY_ORDER" type="INT"/>
         </createTable>
     </changeSet>
     <changeSet id="20190503080000_04" author="emst">
@@ -70,6 +72,7 @@
             <column name="CODE" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="CANTON_ORDER" type="INT"/>
         </createTable>
     </changeSet>
     <changeSet id="20190503080000_05" author="emst">
@@ -80,6 +83,7 @@
             <column name="GEO_POINT_LON" type="DOUBLE"/>
             <column name="GEO_POINT_LAT" type="DOUBLE"/>
             <column name="DISTANCE" type="INT"/>
+            <column name="RADIUS_ORDER" type="INT"/>
         </createTable>
     </changeSet>
 
