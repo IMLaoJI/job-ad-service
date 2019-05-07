@@ -6,6 +6,7 @@ dependencies {
     compile 'ch.admin.seco.alv:alv-mail-sending-starter'
     compile "ch.admin.seco.alv:alv-spring-integration-leader-starter"
     compile 'ch.admin.seco.alv:alv-logger-starter'
+    compile 'ch.admin.seco.alv:alv-feign-starter'
 
     compile 'com.overzealous:remark:1.0.0'
 
