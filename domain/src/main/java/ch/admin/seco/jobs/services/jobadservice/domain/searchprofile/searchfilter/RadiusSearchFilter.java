@@ -11,8 +11,8 @@ public class RadiusSearchFilter {
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "geoPoint.lon", column = @Column(name = "GEO_POINT_LON")),
-            @AttributeOverride(name = "geoPoint.lat", column = @Column(name = "GEO_POINT_LAT"))
+            @AttributeOverride(name = "lon", column = @Column(name = "GEO_POINT_LON")),
+            @AttributeOverride(name = "lat", column = @Column(name = "GEO_POINT_LAT"))
     })
     private GeoPoint geoPoint;
 
