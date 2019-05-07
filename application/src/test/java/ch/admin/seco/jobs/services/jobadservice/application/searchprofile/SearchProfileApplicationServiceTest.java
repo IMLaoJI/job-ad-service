@@ -7,19 +7,11 @@ import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.se
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.SearchFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.update.UpdateSearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.GeoPointFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileId;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileEvents;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.CantonFilter;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.LocalityFilter;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.OccupationFilter;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.OccupationFilterType;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.RadiusSearchFilter;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.SearchFilter;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.Sort;
-import com.google.common.collect.ImmutableSet;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileFixture;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +26,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_01;
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_02;
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_03;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -41,9 +36,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @RunWith(SpringRunner.class)
 @Transactional
 public class SearchProfileApplicationServiceTest {
-
-    // TODO
-    // Use fixtures
 
     private DomainEventMockUtils domainEventMockUtils;
 
@@ -67,7 +59,7 @@ public class SearchProfileApplicationServiceTest {
     @Test
     public void testGetSearchProfile() {
         // given
-        SearchProfileDto createdSearchProfileDto = createSearchProfileDto();
+        SearchProfileDto createdSearchProfileDto = searchProfileApplicationService.createSearchProfile(getCreateSearchProfileDto(search_profile_01.id()));
 
         // when
         SearchProfileId searchProfileId = new SearchProfileId(createdSearchProfileDto.getId());
@@ -80,32 +72,18 @@ public class SearchProfileApplicationServiceTest {
     @Test
     public void testGetSearchProfiles() {
         // given
-        final String ownerUserId="User 1";
-
-        CreateSearchProfileDto createSearchProfileDto1 = new CreateSearchProfileDto();
-        createSearchProfileDto1.setName("SearchProfile 1");
-        createSearchProfileDto1.setOwnerUserId(ownerUserId);
-        createSearchProfileDto1.setSearchFilter(SearchFilterDto.toDto(prepareSearchFilter()));
-
-        CreateSearchProfileDto createSearchProfileDto2 = new CreateSearchProfileDto();
-        createSearchProfileDto2.setName("SearchProfile 2");
-        createSearchProfileDto2.setOwnerUserId(ownerUserId);
-        createSearchProfileDto2.setSearchFilter(SearchFilterDto.toDto(prepareSearchFilter()));
-
-        CreateSearchProfileDto createSearchProfileDto3 = new CreateSearchProfileDto();
-        createSearchProfileDto3.setName("SearchProfile 3");
-        createSearchProfileDto3.setOwnerUserId(ownerUserId);
-        createSearchProfileDto3.setSearchFilter(SearchFilterDto.toDto(prepareSearchFilter()));
+        CreateSearchProfileDto createSearchProfileDto1 = getCreateSearchProfileDto(search_profile_01.id());
+        CreateSearchProfileDto createSearchProfileDto2 = getCreateSearchProfileDto(search_profile_02.id());
+        CreateSearchProfileDto createSearchProfileDto3 = getCreateSearchProfileDto(search_profile_03.id());
 
         // when
         SearchProfileDto createdSearchProfileDto1 = searchProfileApplicationService.createSearchProfile(createSearchProfileDto1);
         SearchProfileDto createdSearchProfileDto2 = searchProfileApplicationService.createSearchProfile(createSearchProfileDto2);
         SearchProfileDto createdSearchProfileDto3 = searchProfileApplicationService.createSearchProfile(createSearchProfileDto3);
 
-
         // then
         domainEventMockUtils.assertMultipleDomainEventPublished(3,SearchProfileEvents.SEARCH_PROFILE_CREATED.getDomainEventType());
-        Page<SearchProfileResultDto> searchProfileResultDtos = searchProfileApplicationService.getSearchProfiles(ownerUserId,0,100);
+        Page<SearchProfileResultDto> searchProfileResultDtos = searchProfileApplicationService.getSearchProfiles(createSearchProfileDto1.getOwnerUserId(), 0, 100);
         assertThat(searchProfileResultDtos).hasSize(3);
         assertThat(searchProfileResultDtos.getContent().get(0).getId().equals(createdSearchProfileDto1.getId()));
         assertThat(searchProfileResultDtos.getContent().get(1).getId().equals(createdSearchProfileDto2.getId()));
@@ -115,10 +93,7 @@ public class SearchProfileApplicationServiceTest {
     @Test
     public void testCreate() {
         // given
-        CreateSearchProfileDto createSearchProfileDto = new CreateSearchProfileDto();
-        createSearchProfileDto.setName("SearchProfile 1");
-        createSearchProfileDto.setOwnerUserId("User 1");
-        createSearchProfileDto.setSearchFilter(SearchFilterDto.toDto(prepareSearchFilter()));
+        CreateSearchProfileDto createSearchProfileDto = getCreateSearchProfileDto(search_profile_01.id());
 
         // when
         SearchProfileDto createdSearchProfileDto = searchProfileApplicationService.createSearchProfile(createSearchProfileDto);
@@ -133,15 +108,8 @@ public class SearchProfileApplicationServiceTest {
     @Test
     public void testCreateWithExistingName() {
         // given
-        CreateSearchProfileDto createSearchProfileDto1 = new CreateSearchProfileDto();
-        createSearchProfileDto1.setName("SearchProfile 1");
-        createSearchProfileDto1.setOwnerUserId("User 1");
-        createSearchProfileDto1.setSearchFilter(SearchFilterDto.toDto(prepareSearchFilter()));
-
-        CreateSearchProfileDto createSearchProfileDto2 = new CreateSearchProfileDto();
-        createSearchProfileDto2.setName("SearchProfile 1");
-        createSearchProfileDto2.setOwnerUserId("User 1");
-        createSearchProfileDto2.setSearchFilter(SearchFilterDto.toDto(prepareSearchFilter()));
+        CreateSearchProfileDto createSearchProfileDto1 = getCreateSearchProfileDto(search_profile_01.id());
+        CreateSearchProfileDto createSearchProfileDto2 = getCreateSearchProfileDto(search_profile_01.id());
 
         // when
         searchProfileApplicationService.createSearchProfile(createSearchProfileDto1);
@@ -149,24 +117,20 @@ public class SearchProfileApplicationServiceTest {
         // then
         assertThatThrownBy(() -> this.searchProfileApplicationService.createSearchProfile(createSearchProfileDto2))
                 .isInstanceOf(SearchProfileNameAlreadyExistsException.class)
-                .hasMessageContaining("SearchProfile with name " + "SearchProfile 1" + "already exists. " +
-                        "Please give rename your new SearchProfile for ownerUserId=" + "User 1" + ".");
+                .hasMessageContaining("SearchProfile with name " + createSearchProfileDto2.getName() + "already exists. " +
+                        "Please give rename your new SearchProfile for ownerUserId=" + createSearchProfileDto2.getOwnerUserId() + ".");
     }
 
 
     @Test
     public void testUpdateSearchProfile() {
         // given
-        CreateSearchProfileDto createSearchProfileDto = new CreateSearchProfileDto();
-        createSearchProfileDto.setName("SearchProfile 1");
-        createSearchProfileDto.setOwnerUserId("User 1");
-        SearchFilterDto searchFilterDto = SearchFilterDto.toDto(prepareSearchFilter());
-        createSearchProfileDto.setSearchFilter(searchFilterDto);
+        CreateSearchProfileDto createSearchProfileDto = getCreateSearchProfileDto(search_profile_01.id());
         SearchProfileDto createdSearchProfileDto = searchProfileApplicationService.createSearchProfile(createSearchProfileDto);
         domainEventMockUtils.assertSingleDomainEventPublished(SearchProfileEvents.SEARCH_PROFILE_CREATED.getDomainEventType());
 
         // when
-        searchFilterDto.getCantonFilters().clear();
+        SearchFilterDto searchFilterDto = createdSearchProfileDto.getSearchFilter();
         List<CantonFilterDto> cantonFilterList = Arrays.asList(
                 new CantonFilterDto().setCode("ZH").setName("Zürich"));
         searchFilterDto.setCantonFilters(cantonFilterList);
@@ -183,10 +147,10 @@ public class SearchProfileApplicationServiceTest {
     @Test
     public void testDeleteSearchProfile() {
         // given
-        SearchProfileDto createdSearchProfileDto = createSearchProfileDto();
+        SearchProfileDto createdSearchProfileDto = searchProfileApplicationService.createSearchProfile(getCreateSearchProfileDto(search_profile_01.id()));
+        SearchProfileId searchProfileId = new SearchProfileId(createdSearchProfileDto.getId());
 
         // when
-        SearchProfileId searchProfileId = new SearchProfileId(createdSearchProfileDto.getId());
         assertThat(this.searchProfileApplicationService.getSearchProfile(searchProfileId).getName()).isEqualTo(createdSearchProfileDto.getName());
         searchProfileApplicationService.deleteSearchProfile(searchProfileId);
 
@@ -196,38 +160,12 @@ public class SearchProfileApplicationServiceTest {
                 .hasMessageContaining("Aggregate with ID " + searchProfileId.getValue() + " not found");
     }
 
-    private SearchProfileDto createSearchProfileDto() {
-        CreateSearchProfileDto createSearchProfileDto = new CreateSearchProfileDto();
-        createSearchProfileDto.setName("SearchProfile 1");
-        createSearchProfileDto.setOwnerUserId("User 1");
-        SearchFilterDto searchFilterDto = SearchFilterDto.toDto(prepareSearchFilter());
-        createSearchProfileDto.setSearchFilter(searchFilterDto);
-        SearchProfileDto createdSearchProfileDto = searchProfileApplicationService.createSearchProfile(createSearchProfileDto);
-        return createdSearchProfileDto;
-    }
+    private CreateSearchProfileDto getCreateSearchProfileDto(SearchProfileId searchProfileId) {
+        SearchProfile searchProfile = SearchProfileFixture.testSearchProfile(searchProfileId);
+        return new CreateSearchProfileDto(
+                searchProfile.getName()
+                , searchProfile.getOwnerUserId()
+                , SearchFilterDto.toDto(searchProfile.getSearchFilter()));
 
-    private SearchFilter prepareSearchFilter() {
-        return SearchFilter.builder()
-                .setSort(Sort.SCORE)
-                .setKeywords(ImmutableSet.of("Keyword-1", "Keyword-2", "Keyword-3", "Keyword-4"))
-                .setOccupationFilters(Arrays.asList(
-                        new OccupationFilter("Label-1", OccupationFilterType.OCCUPATION),
-                        new OccupationFilter("Label-2", OccupationFilterType.OCCUPATION),
-                        new OccupationFilter("Label-3", OccupationFilterType.OCCUPATION),
-                        new OccupationFilter("Label-4", OccupationFilterType.OCCUPATION),
-                        new OccupationFilter("Label-5", OccupationFilterType.CLASSIFICATION)
-                ))
-                .setLocalityFilters(Arrays.asList(
-                        new LocalityFilter("Label-1"),
-                        new LocalityFilter("Label-2"),
-                        new LocalityFilter("Label-3")
-                ))
-                .setCantonFilters(Arrays.asList(
-                        new CantonFilter("Bern", "BE")
-                ))
-                .setRadiusSearchFilters(Arrays.asList(
-                        new RadiusSearchFilter(GeoPointFixture.testGeoPoint(), 20)
-                ))
-                .build();
     }
 }
