@@ -17,7 +17,7 @@ public class SearchProfileFixture {
         return SearchProfile.builder()
                 .setId(id)
                 .setName(format("name-%s", id))
-                .setOwnerUserId(format("user-%s", id))
+                .setOwnerUserId(format("job-seeker-1", id))
                 .setSearchFilter(prepareSearchFilter())
                 .build();
     }
