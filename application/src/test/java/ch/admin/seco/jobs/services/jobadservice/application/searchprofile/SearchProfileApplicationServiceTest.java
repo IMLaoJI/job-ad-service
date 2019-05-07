@@ -42,6 +42,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Transactional
 public class SearchProfileApplicationServiceTest {
 
+    // TODO
+    // Use fixtures
+
     private DomainEventMockUtils domainEventMockUtils;
 
     @Autowired
