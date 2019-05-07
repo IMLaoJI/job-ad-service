@@ -41,9 +41,9 @@ public class SearchProfileFixture {
                 .setCantonFilters(Collections.singletonList(
                         new CantonFilter("Bern", "BE")
                 ))
-                .setRadiusSearchFilters(Collections.singletonList(
+                .setRadiusSearchFilter(
                         new RadiusSearchFilter(GeoPointFixture.testGeoPoint(),20)
-                ))
+                )
                 .build();
     }
 }

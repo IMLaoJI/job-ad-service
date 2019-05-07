@@ -23,6 +23,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,9 +86,9 @@ public class SearchProfileApplicationServiceTest {
         domainEventMockUtils.assertMultipleDomainEventPublished(3,SearchProfileEvents.SEARCH_PROFILE_CREATED.getDomainEventType());
         Page<SearchProfileResultDto> searchProfileResultDtos = searchProfileApplicationService.getSearchProfiles(createSearchProfileDto1.getOwnerUserId(), 0, 100);
         assertThat(searchProfileResultDtos).hasSize(3);
-        assertThat(searchProfileResultDtos.getContent().get(0).getId().equals(createdSearchProfileDto1.getId()));
-        assertThat(searchProfileResultDtos.getContent().get(1).getId().equals(createdSearchProfileDto2.getId()));
-        assertThat(searchProfileResultDtos.getContent().get(2).getId().equals(createdSearchProfileDto3.getId()));
+        assertThat(searchProfileResultDtos.getContent().get(0).getId()).isEqualTo(createdSearchProfileDto1.getId());
+        assertThat(searchProfileResultDtos.getContent().get(1).getId()).isEqualTo(createdSearchProfileDto2.getId());
+        assertThat(searchProfileResultDtos.getContent().get(2).getId()).isEqualTo(createdSearchProfileDto3.getId());
     }
 
     @Test
@@ -141,7 +142,7 @@ public class SearchProfileApplicationServiceTest {
         Optional<SearchProfile> updatedSearchProfile = searchProfileRepository.findById(new SearchProfileId(createdSearchProfileDto.getId()));
         assertThat(updatedSearchProfile).isPresent();
         assertThat(updatedSearchProfile.get().getName()).isEqualTo(updateSearchProfileDto.getName());
-        assertThat(updatedSearchProfile.get().getSearchFilter().getCantonFilters().contains(new CantonFilterDto().setCode("ZH").setName("Zürich")));
+        assertThat(updatedSearchProfile.get().getSearchFilter().getCantonFilters()).contains(new CantonFilter("Zürich", "ZH"));
     }
 
     @Test

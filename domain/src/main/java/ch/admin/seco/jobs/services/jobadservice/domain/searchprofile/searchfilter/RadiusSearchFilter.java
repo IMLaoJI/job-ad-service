@@ -9,11 +9,6 @@ import java.util.Objects;
 @Access(AccessType.FIELD)
 public class RadiusSearchFilter {
 
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "lon", column = @Column(name = "GEO_POINT_LON")),
-            @AttributeOverride(name = "lat", column = @Column(name = "GEO_POINT_LAT"))
-    })
     private GeoPoint geoPoint;
 
     private Integer distance;

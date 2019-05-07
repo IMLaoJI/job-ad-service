@@ -69,11 +69,15 @@ public class SearchFilter {
     @Valid
     private List<CantonFilter> cantonFilters = new ArrayList<>();
 
-    @OrderColumn(name = "RADIUS_ORDER")
-    @ElementCollection
-    @CollectionTable(name = "SEARCH_PROFILE_RADIUS_FILTER", joinColumns = @JoinColumn(name = "SEARCH_PROFILE_ID"))
+    @OrderColumn(name = "SEARCH_FILTER_RADIUS_ORDER")
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "geoPoint.lon", column = @Column(name = "SEARCH_FILTER_RADIUS_GEO_POINT_LON")),
+            @AttributeOverride(name = "geoPoint.lat", column = @Column(name = "SEARCH_FILTER_RADIUS_GEO_POINT_LAT")),
+            @AttributeOverride(name = "distance", column = @Column(name = "SEARCH_FILTER_RADIUS_DISTANCE"))
+    })
     @Valid
-    private List<RadiusSearchFilter> radiusSearchFilters = new ArrayList<>();
+    private RadiusSearchFilter radiusSearchFilter;
 
     private SearchFilter(Builder builder) {
         this.sort = builder.sort;
@@ -88,7 +92,7 @@ public class SearchFilter {
         this.occupationFilters.addAll(builder.occupationFilters);
         this.localityFilters.addAll(builder.localityFilters);
         this.cantonFilters.addAll(builder.cantonFilters);
-        this.radiusSearchFilters.addAll(builder.radiusSearchFilters);
+        this.radiusSearchFilter = builder.radiusSearchFilter;
     }
 
     private SearchFilter() {
@@ -119,8 +123,8 @@ public class SearchFilter {
         return Collections.unmodifiableList(this.cantonFilters);
     }
 
-    public List<RadiusSearchFilter> getRadiusSearchFilters() {
-        return Collections.unmodifiableList(this.radiusSearchFilters);
+    public RadiusSearchFilter getRadiusSearchFilter() {
+        return radiusSearchFilter;
     }
 
     public ContractType getContractType() {
@@ -177,7 +181,7 @@ public class SearchFilter {
 
         private List<LocalityFilter> localityFilters;
 
-        private List<RadiusSearchFilter> radiusSearchFilters;
+        private RadiusSearchFilter radiusSearchFilter;
 
         public Builder setSort(Sort sort) {
             this.sort = sort;
@@ -239,8 +243,8 @@ public class SearchFilter {
             return this;
         }
 
-        public Builder setRadiusSearchFilters(List<RadiusSearchFilter> radiusSearchFilters) {
-            this.radiusSearchFilters = radiusSearchFilters;
+        public Builder setRadiusSearchFilter(RadiusSearchFilter radiusSearchFilter) {
+            this.radiusSearchFilter = radiusSearchFilter;
             return this;
         }
 
