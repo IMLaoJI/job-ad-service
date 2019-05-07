@@ -31,6 +31,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -107,9 +108,9 @@ public class SearchProfileApplicationServiceTest {
         domainEventMockUtils.assertMultipleDomainEventPublished(3,SearchProfileEvents.SEARCH_PROFILE_CREATED.getDomainEventType());
         Page<SearchProfileResultDto> searchProfileResultDtos = searchProfileApplicationService.getSearchProfiles(ownerUserId,0,100);
         assertThat(searchProfileResultDtos).hasSize(3);
-        assertThat(searchProfileResultDtos.getContent().get(0).getId().equals(createdSearchProfileDto1.getId()));
-        assertThat(searchProfileResultDtos.getContent().get(1).getId().equals(createdSearchProfileDto2.getId()));
-        assertThat(searchProfileResultDtos.getContent().get(2).getId().equals(createdSearchProfileDto3.getId()));
+        assertThat(searchProfileResultDtos.getContent().get(0).getId()).isEqualTo(createdSearchProfileDto1.getId());
+        assertThat(searchProfileResultDtos.getContent().get(1).getId()).isEqualTo(createdSearchProfileDto2.getId());
+        assertThat(searchProfileResultDtos.getContent().get(2).getId()).isEqualTo(createdSearchProfileDto3.getId());
     }
 
     @Test
@@ -167,7 +168,7 @@ public class SearchProfileApplicationServiceTest {
 
         // when
         searchFilterDto.getCantonFilters().clear();
-        List<CantonFilterDto> cantonFilterList = Arrays.asList(
+        List<CantonFilterDto> cantonFilterList = Collections.singletonList(
                 new CantonFilterDto().setCode("ZH").setName("Zürich"));
         searchFilterDto.setCantonFilters(cantonFilterList);
         UpdateSearchProfileDto updateSearchProfileDto = new UpdateSearchProfileDto(new SearchProfileId(createdSearchProfileDto.getId()), "Another Name", searchFilterDto);
@@ -177,7 +178,7 @@ public class SearchProfileApplicationServiceTest {
         Optional<SearchProfile> updatedSearchProfile = searchProfileRepository.findById(new SearchProfileId(createdSearchProfileDto.getId()));
         assertThat(updatedSearchProfile).isPresent();
         assertThat(updatedSearchProfile.get().getName()).isEqualTo(updateSearchProfileDto.getName());
-        assertThat(updatedSearchProfile.get().getSearchFilter().getCantonFilters().contains(new CantonFilterDto().setCode("ZH").setName("Zürich")));
+        assertThat(updatedSearchProfile.get().getSearchFilter().getCantonFilters()).contains(new CantonFilter("Zürich", "ZH"));
     }
 
     @Test
@@ -202,8 +203,7 @@ public class SearchProfileApplicationServiceTest {
         createSearchProfileDto.setOwnerUserId("User 1");
         SearchFilterDto searchFilterDto = SearchFilterDto.toDto(prepareSearchFilter());
         createSearchProfileDto.setSearchFilter(searchFilterDto);
-        SearchProfileDto createdSearchProfileDto = searchProfileApplicationService.createSearchProfile(createSearchProfileDto);
-        return createdSearchProfileDto;
+        return searchProfileApplicationService.createSearchProfile(createSearchProfileDto);
     }
 
     private SearchFilter prepareSearchFilter() {
@@ -222,12 +222,12 @@ public class SearchProfileApplicationServiceTest {
                         new LocalityFilter("Label-2"),
                         new LocalityFilter("Label-3")
                 ))
-                .setCantonFilters(Arrays.asList(
+                .setCantonFilters(Collections.singletonList(
                         new CantonFilter("Bern", "BE")
                 ))
-                .setRadiusSearchFilters(Arrays.asList(
+                .setRadiusSearchFilter(
                         new RadiusSearchFilter(GeoPointFixture.testGeoPoint(), 20)
-                ))
+                )
                 .build();
     }
 }

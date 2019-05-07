@@ -39,7 +39,7 @@ public class SearchFilterDto {
     private List<CantonFilterDto> cantonFilters = new ArrayList<>();
 
     @Valid
-    private List<RadiusSearchFilterDto> radiusSearchFilters = new ArrayList<>();
+    private RadiusSearchFilterDto radiusSearchFilter;
 
     public SearchFilterDto() {}
 
@@ -151,12 +151,12 @@ public class SearchFilterDto {
         return this;
     }
 
-    public List<RadiusSearchFilterDto> getRadiusSearchFilters() {
-        return radiusSearchFilters;
+    public RadiusSearchFilterDto getRadiusSearchFilter() {
+        return radiusSearchFilter;
     }
 
-    public SearchFilterDto setRadiusSearchFilters(List<RadiusSearchFilterDto> radiusSearchFilters) {
-        this.radiusSearchFilters = radiusSearchFilters;
+    public SearchFilterDto setRadiusSearchFilter(RadiusSearchFilterDto radiusSearchFilter) {
+        this.radiusSearchFilter = radiusSearchFilter;
         return this;
     }
 
@@ -174,6 +174,6 @@ public class SearchFilterDto {
                 .setOccupationFilters(OccupationFilterDto.toDto(searchFilter.getOccupationFilters()))
                 .setLocalityFilters(LocalityFilterDto.toDto(searchFilter.getLocalityFilters()))
                 .setCantonFilters(CantonFilterDto.toDto(searchFilter.getCantonFilters()))
-                .setRadiusSearchFilters(RadiusSearchFilterDto.toDto(searchFilter.getRadiusSearchFilters()));
+                .setRadiusSearchFilter(RadiusSearchFilterDto.toDto(searchFilter.getRadiusSearchFilter()));
     }
 }

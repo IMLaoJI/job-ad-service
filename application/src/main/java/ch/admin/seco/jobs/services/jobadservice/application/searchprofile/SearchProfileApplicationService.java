@@ -139,7 +139,7 @@ public class SearchProfileApplicationService {
                 .setOccupationFilters(convertOccupationsFromDto(searchFilterDto.getOccupationFilters()))
                 .setLocalityFilters(convertLocalitiesFromDto(searchFilterDto.getLocalityFilters()))
                 .setCantonFilters(convertCantonsFromDto(searchFilterDto.getCantonFilters()))
-                .setRadiusSearchFilters(convertRadiusSearchesFromDto(searchFilterDto.getRadiusSearchFilters()))
+                .setRadiusSearchFilter(convertRadiusSearchFromDto(searchFilterDto.getRadiusSearchFilter()))
                 .build();
     }
 
@@ -173,13 +173,10 @@ public class SearchProfileApplicationService {
                 .collect(Collectors.toList());
     }
 
-    private List<RadiusSearchFilter> convertRadiusSearchesFromDto(List<RadiusSearchFilterDto> radiusSearchFilterDtos) {
-        if (CollectionUtils.isEmpty(radiusSearchFilterDtos)) {
+    private RadiusSearchFilter convertRadiusSearchFromDto(RadiusSearchFilterDto radiusSearchFilterDto) {
+        if (radiusSearchFilterDto == null) {
             return null;
         }
-        return radiusSearchFilterDtos.stream()
-                .map(radiusSearchFilterDto ->
-                        new RadiusSearchFilter(radiusSearchFilterDto.getGeoPoint(), radiusSearchFilterDto.getDistance()))
-                .collect(Collectors.toList());
+        return new RadiusSearchFilter(radiusSearchFilterDto.getGeoPoint(), radiusSearchFilterDto.getDistance());
     }
 }
