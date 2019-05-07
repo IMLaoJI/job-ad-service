@@ -1,6 +1,6 @@
 dependencies {
     compile project(':application')
-    compile 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    compile 'ch.admin.seco.alv:alv-feign-starter'
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
