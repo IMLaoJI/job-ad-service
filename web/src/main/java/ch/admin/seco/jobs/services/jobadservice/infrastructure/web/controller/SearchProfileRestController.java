@@ -57,7 +57,6 @@ public class SearchProfileRestController {
     @ResponseStatus(HttpStatus.OK)
     public SearchProfileDto updateSearchProfile(@PathVariable SearchProfileId id, @RequestBody UpdateSearchProfileResource updateSearchProfileResource)
             throws SearchProfileNotExitsException {
-
         UpdateSearchProfileDto updateSearchProfileDto = new UpdateSearchProfileDto(
                 id, updateSearchProfileResource.name, SearchFilterDto.toDto(updateSearchProfileResource.searchFilter)
         );
