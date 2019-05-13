@@ -33,7 +33,7 @@ public class SearchProfile implements Aggregate<SearchProfile, SearchProfileId> 
     private LocalDateTime updatedTime;
 
     @NotBlank
-    @Size(max = 100) // TODO is there a limitation in size?
+    @Size(max = 50)
     private String name;
 
     @NotBlank
@@ -95,7 +95,6 @@ public class SearchProfile implements Aggregate<SearchProfile, SearchProfileId> 
     public static final class Builder {
 
         private SearchProfileId id;
-
 
         private String name;
 

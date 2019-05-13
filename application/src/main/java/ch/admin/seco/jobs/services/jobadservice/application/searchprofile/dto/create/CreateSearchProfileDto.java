@@ -9,7 +9,7 @@ import javax.validation.constraints.Size;
 public class CreateSearchProfileDto {
 
     @NotBlank
-    @Size(max = 100) // TODO do we have limitation of size?
+    @Size(max = 50)
     private String name;
 
     @NotBlank
