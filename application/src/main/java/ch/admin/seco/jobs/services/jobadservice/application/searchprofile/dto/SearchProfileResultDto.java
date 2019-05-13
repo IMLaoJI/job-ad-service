@@ -3,6 +3,9 @@ package ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileResult;
 import org.springframework.util.CollectionUtils;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,10 +14,14 @@ public class SearchProfileResultDto {
 
     private String id;
 
+    @NotNull
     private LocalDateTime updatedTime;
 
+    @NotBlank
+    @Size(max = 50)
     private String name;
 
+    @NotBlank
     private String userOwnerId;
 
     public SearchProfileResultDto() {}

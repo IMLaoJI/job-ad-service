@@ -4,16 +4,23 @@ import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.se
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 public class SearchProfileDto {
 
     private String id;
 
+    @NotNull
     private LocalDateTime createdTime;
 
+    @NotNull
     private LocalDateTime updatedTime;
 
+    @NotBlank
+    @Size(max = 50)
     private String name;
 
     private String ownerUserId;

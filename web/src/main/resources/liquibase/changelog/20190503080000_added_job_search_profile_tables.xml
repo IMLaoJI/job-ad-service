@@ -15,7 +15,7 @@
             <column name="UPDATED_TIME" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column name="NAME" type="VARCHAR(100)">
+            <column name="NAME" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
             <column name="OWNER_USER_ID" type="VARCHAR(64)">

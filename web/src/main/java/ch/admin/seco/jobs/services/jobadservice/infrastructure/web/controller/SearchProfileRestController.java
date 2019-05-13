@@ -86,7 +86,7 @@ public class SearchProfileRestController {
 
     static class CreateSearchProfileResource {
         @NotBlank
-        @Size(max = 100)
+        @Size(max = 50)
         public String name;
 
         @NotBlank
@@ -98,7 +98,7 @@ public class SearchProfileRestController {
 
     static class UpdateSearchProfileResource {
         @NotBlank
-        @Size(max = 100)
+        @Size(max = 50)
         public String name;
 
         @NotNull
