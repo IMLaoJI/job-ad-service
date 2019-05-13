@@ -48,7 +48,7 @@ public class SearchProfileApplicationService {
         this.searchProfileRepository = searchProfileRepository;
     }
 
-    @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.matchesCurrentUserId(#createFavouriteItemDto.ownerUserId)")
+    @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(#searchProfileId)")
     public SearchProfileDto getSearchProfile(SearchProfileId searchProfileId) throws SearchProfileNotExitsException {
         Condition.notNull(searchProfileId, "SearchProfileId can't be null");
         SearchProfile searchProfile = getById(searchProfileId);
@@ -95,7 +95,7 @@ public class SearchProfileApplicationService {
         return SearchProfileDto.toDto(searchProfile);
     }
 
-    @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(#createFavouriteItemDto.ownerUserId)")
+    @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(#searchProfileId)")
     public void deleteSearchProfile(SearchProfileId searchProfileId) {
         Condition.notNull(searchProfileId, "FavouriteItemId can't be null");
         SearchProfile searchProfile = getById(searchProfileId);

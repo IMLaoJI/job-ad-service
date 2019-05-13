@@ -135,7 +135,7 @@ public class SearchProfileApplicationServiceTest {
         List<CantonFilterDto> cantonFilterList = Arrays.asList(
                 new CantonFilterDto().setCode("ZH").setName("Zürich"));
         searchFilterDto.setCantonFilters(cantonFilterList);
-        UpdateSearchProfileDto updateSearchProfileDto = new UpdateSearchProfileDto(new SearchProfileId(createdSearchProfileDto.getId()), "Another Name", searchFilterDto);
+        UpdateSearchProfileDto updateSearchProfileDto = new UpdateSearchProfileDto(new SearchProfileId(createdSearchProfileDto.getId()), "Another Name", searchFilterDto, getCreateSearchProfileDto(search_profile_01.id()).getOwnerUserId());
         searchProfileApplicationService.updateSearchProfile(updateSearchProfileDto);
 
         // then

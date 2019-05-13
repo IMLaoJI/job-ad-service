@@ -48,7 +48,7 @@ public class SearchProfileRestController {
             throws AggregateNotFoundException {
 
         CreateSearchProfileDto createSearchProfileDto = new CreateSearchProfileDto(
-                createSearchProfileResource.name, createSearchProfileResource.userOwnerId, SearchFilterDto.toDto(createSearchProfileResource.searchFilter)
+                createSearchProfileResource.name, createSearchProfileResource.ownerUserId, SearchFilterDto.toDto(createSearchProfileResource.searchFilter)
         );
         return this.searchProfileApplicationService.createSearchProfile(createSearchProfileDto);
     }
@@ -58,13 +58,13 @@ public class SearchProfileRestController {
     public SearchProfileDto updateSearchProfile(@PathVariable SearchProfileId id, @RequestBody UpdateSearchProfileResource updateSearchProfileResource)
             throws SearchProfileNotExitsException {
         UpdateSearchProfileDto updateSearchProfileDto = new UpdateSearchProfileDto(
-                id, updateSearchProfileResource.name, SearchFilterDto.toDto(updateSearchProfileResource.searchFilter)
+                id, updateSearchProfileResource.name, SearchFilterDto.toDto(updateSearchProfileResource.searchFilter), updateSearchProfileResource.ownerUserId
         );
         return this.searchProfileApplicationService.updateSearchProfile(updateSearchProfileDto);
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteSearchProfile(@PathVariable SearchProfileId id) throws SearchProfileNotExitsException {
         this.searchProfileApplicationService.deleteSearchProfile(id);
     }
@@ -90,7 +90,7 @@ public class SearchProfileRestController {
         public String name;
 
         @NotBlank
-        public String userOwnerId;
+        public String ownerUserId;
 
         @NotNull
         public SearchFilter searchFilter;
@@ -103,5 +103,8 @@ public class SearchProfileRestController {
 
         @NotNull
         public SearchFilter searchFilter;
+
+        @NotBlank
+        public String ownerUserId;
     }
 }
