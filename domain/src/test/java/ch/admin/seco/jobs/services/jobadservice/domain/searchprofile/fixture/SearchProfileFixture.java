@@ -24,7 +24,7 @@ public class SearchProfileFixture {
 
     private static SearchFilter prepareSearchFilter() {
         return SearchFilter.builder()
-                .setSort(Sort.SCORE)
+                .setSort(Sort.RELEVANCE_DESC)
                 .setKeywords(ImmutableSet.of("Keyword-1", "Keyword-2", "Keyword-3", "Keyword-4"))
                 .setOccupationFilters(Arrays.asList(
                         new OccupationFilter("Label-1", OccupationFilterType.OCCUPATION),
