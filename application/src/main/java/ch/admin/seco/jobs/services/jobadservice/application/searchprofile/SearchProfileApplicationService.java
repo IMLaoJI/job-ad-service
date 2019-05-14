@@ -1,5 +1,8 @@
 package ch.admin.seco.jobs.services.jobadservice.application.searchprofile;
 
+import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
+import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.SearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.SearchProfileResultDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.create.CreateSearchProfileDto;
@@ -11,6 +14,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.se
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.update.UpdateSearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPublisher;
+import ch.admin.seco.jobs.services.jobadservice.domain.profession.Profession;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileId;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileRepository;
@@ -44,16 +48,45 @@ public class SearchProfileApplicationService {
 
     private final SearchProfileRepository searchProfileRepository;
 
-    public SearchProfileApplicationService(SearchProfileRepository searchProfileRepository) {
+    private final LocationService locationService;
+
+    private final ProfessionService professionService;
+
+    public SearchProfileApplicationService(SearchProfileRepository searchProfileRepository, LocationService locationService, ProfessionService professionService) {
         this.searchProfileRepository = searchProfileRepository;
+        this.locationService = locationService;
+        this.professionService = professionService;
     }
 
     @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(#searchProfileId)")
-    public SearchProfileDto getSearchProfile(SearchProfileId searchProfileId) throws SearchProfileNotExitsException {
+    public SearchProfileResultDto getSearchProfile(SearchProfileId searchProfileId) throws SearchProfileNotExitsException {
         Condition.notNull(searchProfileId, "SearchProfileId can't be null");
         SearchProfile searchProfile = getById(searchProfileId);
+        List<LocalityFilter> localityFilters = searchProfile.getSearchFilter().getLocalityFilters();
+        List<OccupationFilter> occupationFilters = searchProfile.getSearchFilter().getOccupationFilters();
 
-        return SearchProfileDto.toDto(searchProfile);
+        List<LocationDto> locations = localityFilters.stream()
+                .map(localityFilter -> locationService.findById(localityFilter.getLocalityId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+
+        List<Profession> professions = occupationFilters.stream()
+                .map(occupationFilter -> professionService.findById(occupationFilter.getLabelId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        SearchProfileResultDto searchProfileResultDto = new SearchProfileResultDto();
+
+        searchProfileResultDto.setId(searchProfile.getId().getValue());
+        searchProfileResultDto.setCreatedTime(searchProfile.getCreatedTime());
+        searchProfileResultDto.setUpdatedTime(searchProfile.getUpdatedTime());
+        searchProfileResultDto.setId(searchProfile.getId().getValue());
+        searchProfileResultDto.setId(searchProfile.getId().getValue());
+        searchProfileResultDto.setLocations(locations);
+        searchProfileResultDto.setProfessions(professions);
+
+        return searchProfileResultDto;
     }
 
     @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.matchesCurrentUserId(#createSearchProfileDto.ownerUserId)")
@@ -112,6 +145,7 @@ public class SearchProfileApplicationService {
         for (SearchProfile searchProfile : searchProfileList) {
             SearchProfileResult searchProfileResult = new SearchProfileResult(
                     searchProfile.getId().getValue()
+                    , searchProfile.getCreatedTime()
                     , searchProfile.getUpdatedTime()
                     , searchProfile.getName()
                     , searchProfile.getOwnerUserId()

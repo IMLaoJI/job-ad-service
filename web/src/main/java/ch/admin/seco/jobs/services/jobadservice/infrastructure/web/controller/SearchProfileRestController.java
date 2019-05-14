@@ -70,7 +70,7 @@ public class SearchProfileRestController {
     }
 
     @GetMapping("/{id}")
-    public SearchProfileDto findById(@PathVariable SearchProfileId id) {
+    public SearchProfileResultDto findById(@PathVariable SearchProfileId id) {
         return this.searchProfileApplicationService.getSearchProfile(id);
     }
 

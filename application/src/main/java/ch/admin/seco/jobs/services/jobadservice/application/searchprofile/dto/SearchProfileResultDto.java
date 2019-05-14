@@ -1,5 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto;
 
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LocationDto;
+import ch.admin.seco.jobs.services.jobadservice.domain.profession.Profession;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileResult;
 import org.springframework.util.CollectionUtils;
 
@@ -15,6 +17,9 @@ public class SearchProfileResultDto {
     private String id;
 
     @NotNull
+    private LocalDateTime createdTime;
+
+    @NotNull
     private LocalDateTime updatedTime;
 
     @NotBlank
@@ -23,6 +28,10 @@ public class SearchProfileResultDto {
 
     @NotBlank
     private String userOwnerId;
+
+    List<LocationDto> locations;
+
+    List<Profession> professions;
 
     public SearchProfileResultDto() {}
 
@@ -62,11 +71,39 @@ public class SearchProfileResultDto {
         return this;
     }
 
+    public LocalDateTime getCreatedTime() {
+        return createdTime;
+    }
+
+    public SearchProfileResultDto setCreatedTime(LocalDateTime createdTime) {
+        this.createdTime = createdTime;
+        return this;
+    }
+
+    public List<LocationDto> getLocations() {
+        return locations;
+    }
+
+    public SearchProfileResultDto setLocations(List<LocationDto> locations) {
+        this.locations = locations;
+        return this;
+    }
+
+    public List<Profession> getProfessions() {
+        return professions;
+    }
+
+    public SearchProfileResultDto setProfessions(List<Profession> professions) {
+        this.professions = professions;
+        return this;
+    }
+
     public static SearchProfileResultDto toDto(SearchProfileResult searchProfileResult) {
         if (searchProfileResult == null) {
             return null;
         }
         return new SearchProfileResultDto()
+                .setCreatedTime(searchProfileResult.getCreatedTime())
                 .setId(searchProfileResult.getId())
                 .setUpdatedTime(searchProfileResult.getUpdatedTime())
                 .setName(searchProfileResult.getName())

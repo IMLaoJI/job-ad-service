@@ -12,6 +12,9 @@ public class SearchProfileResult {
     @NotNull
     private LocalDateTime updatedTime;
 
+    @NotNull
+    private LocalDateTime createdTime;
+
     @NotBlank
     @Size(max = 50)
     private String name;
@@ -21,9 +24,10 @@ public class SearchProfileResult {
 
     public SearchProfileResult() {}
 
-    public SearchProfileResult(String id, LocalDateTime updatedTime, String name, String userOwnerId) {
+    public SearchProfileResult(String id, LocalDateTime updatedTime,LocalDateTime createdTime, String name, String userOwnerId) {
         this.id = id;
         this.updatedTime = updatedTime;
+        this.createdTime = createdTime;
         this.name = name;
         this.userOwnerId = userOwnerId;
     }
@@ -42,5 +46,9 @@ public class SearchProfileResult {
 
     public String getUserOwnerId() {
         return userOwnerId;
+    }
+
+    public LocalDateTime getCreatedTime() {
+        return createdTime;
     }
 }

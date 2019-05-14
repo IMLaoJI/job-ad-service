@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface LocationApiClient {
 
     @GetMapping("/{id}")
-    LocationResource getLocationById(@PathVariable("id") UUID id);
+    Optional<LocationResource> getLocationById(@PathVariable("id") UUID id);
 
     @GetMapping
     Optional<LocationResource> findLocationByPostalCodeAndCity(@RequestParam("zipCode") String zipCode, @RequestParam("city") String city);
