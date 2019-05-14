@@ -138,7 +138,13 @@ public class SearchProfileRestControllerIntTest {
     public void testFindByOwnerUserId() throws Exception {
         // given
         SearchProfileDto searchProfileDto = createSearchProfile();
-
+        SearchProfile searchProfile = SearchProfileFixture.testSearchProfile(search_profile_01.id());
+        CreateSearchProfileDto createSearchProfileDto = new CreateSearchProfileDto(
+                searchProfile.getName()
+                , searchProfile.getOwnerUserId()
+                , SearchFilterDto.toDto(searchProfile.getSearchFilter())
+        );
+        SearchProfileDto searchProfileDto2 = searchProfileApplicationService.createSearchProfile(createSearchProfileDto);
 
         // when
         ResultActions resultActions = this.mockMvc.perform(
@@ -146,6 +152,10 @@ public class SearchProfileRestControllerIntTest {
                         .contentType(TestUtil.APPLICATION_JSON_UTF8));
 
         // then
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect();
+
     }
 
     private SearchProfileDto createSearchProfile() {
