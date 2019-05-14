@@ -17,15 +17,14 @@ import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfi
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileResult;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileCreatedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileDeletedEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.CantonFilter;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.LocalityFilter;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.OccupationFilter;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.RadiusSearchFilter;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.SearchFilter;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.springframework.data.domain.Sort.Order.desc;
 
 @Service
 @Transactional
@@ -107,7 +108,9 @@ public class SearchProfileApplicationService {
     @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(ownerUserId)")
     public Page<SearchProfileResultDto> getSearchProfiles(String ownerUserId, int page, int size) {
         Condition.notNull(ownerUserId, "OwnerUserId can't be null");
-        List<SearchProfile> searchProfileList = this.searchProfileRepository.findAllByOwnerUserId(ownerUserId);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(desc("updatedTime"), desc("createdTime")));
+
+        List<SearchProfile> searchProfileList = this.searchProfileRepository.findAllByOwnerUserId(ownerUserId, pageable);
         List<SearchProfileResultDto> searchProfileResultDtos = new ArrayList<>();
         for (SearchProfile searchProfile : searchProfileList) {
             SearchProfileResult searchProfileResult = new SearchProfileResult(

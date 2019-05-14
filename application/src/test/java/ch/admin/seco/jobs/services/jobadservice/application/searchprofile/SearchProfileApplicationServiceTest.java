@@ -27,9 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_01;
-import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_02;
-import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_03;
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -76,19 +74,45 @@ public class SearchProfileApplicationServiceTest {
         CreateSearchProfileDto createSearchProfileDto1 = getCreateSearchProfileDto(search_profile_01.id());
         CreateSearchProfileDto createSearchProfileDto2 = getCreateSearchProfileDto(search_profile_02.id());
         CreateSearchProfileDto createSearchProfileDto3 = getCreateSearchProfileDto(search_profile_03.id());
+        CreateSearchProfileDto createSearchProfileDto4 = getCreateSearchProfileDto(search_profile_04.id());
+        CreateSearchProfileDto createSearchProfileDto5 = getCreateSearchProfileDto(search_profile_05.id());
+        CreateSearchProfileDto createSearchProfileDto6 = getCreateSearchProfileDto(search_profile_06.id());
+        CreateSearchProfileDto createSearchProfileDto7 = getCreateSearchProfileDto(search_profile_07.id());
+        CreateSearchProfileDto createSearchProfileDto8 = getCreateSearchProfileDto(search_profile_08.id());
+        CreateSearchProfileDto createSearchProfileDto9 = getCreateSearchProfileDto(search_profile_09.id());
+        CreateSearchProfileDto createSearchProfileDto10 = getCreateSearchProfileDto(search_profile_10.id());
 
-        // when
         SearchProfileDto createdSearchProfileDto1 = searchProfileApplicationService.createSearchProfile(createSearchProfileDto1);
         SearchProfileDto createdSearchProfileDto2 = searchProfileApplicationService.createSearchProfile(createSearchProfileDto2);
         SearchProfileDto createdSearchProfileDto3 = searchProfileApplicationService.createSearchProfile(createSearchProfileDto3);
+        SearchProfileDto createdSearchProfileDto4 = searchProfileApplicationService.createSearchProfile(createSearchProfileDto4);
+        SearchProfileDto createdSearchProfileDto5 = searchProfileApplicationService.createSearchProfile(createSearchProfileDto5);
+        SearchProfileDto createdSearchProfileDto6 = searchProfileApplicationService.createSearchProfile(createSearchProfileDto6);
+        SearchProfileDto createdSearchProfileDto7 = searchProfileApplicationService.createSearchProfile(createSearchProfileDto7);
+        SearchProfileDto createdSearchProfileDto8 = searchProfileApplicationService.createSearchProfile(createSearchProfileDto8);
+        SearchProfileDto createdSearchProfileDto9 = searchProfileApplicationService.createSearchProfile(createSearchProfileDto9);
+        SearchProfileDto createdSearchProfileDto10 = searchProfileApplicationService.createSearchProfile(createSearchProfileDto10);
+
+        // when
+        Page<SearchProfileResultDto> searchProfileResultPageOne = searchProfileApplicationService.getSearchProfiles(createSearchProfileDto1.getOwnerUserId(), 0, 5);
+        Page<SearchProfileResultDto> searchProfileResultPageTwo = searchProfileApplicationService.getSearchProfiles(createSearchProfileDto1.getOwnerUserId(), 1, 5);
 
         // then
-        domainEventMockUtils.assertMultipleDomainEventPublished(3,SearchProfileEvents.SEARCH_PROFILE_CREATED.getDomainEventType());
-        Page<SearchProfileResultDto> searchProfileResultDtos = searchProfileApplicationService.getSearchProfiles(createSearchProfileDto1.getOwnerUserId(), 0, 100);
-        assertThat(searchProfileResultDtos).hasSize(3);
-        assertThat(searchProfileResultDtos.getContent().get(0).getId()).isEqualTo(createdSearchProfileDto1.getId());
-        assertThat(searchProfileResultDtos.getContent().get(1).getId()).isEqualTo(createdSearchProfileDto2.getId());
-        assertThat(searchProfileResultDtos.getContent().get(2).getId()).isEqualTo(createdSearchProfileDto3.getId());
+        domainEventMockUtils.assertMultipleDomainEventPublished(10,SearchProfileEvents.SEARCH_PROFILE_CREATED.getDomainEventType());
+
+        assertThat(searchProfileResultPageOne).hasSize(5);
+        assertThat(searchProfileResultPageOne.getContent().get(0).getId()).isEqualTo(createdSearchProfileDto10.getId());
+        assertThat(searchProfileResultPageOne.getContent().get(1).getId()).isEqualTo(createdSearchProfileDto9.getId());
+        assertThat(searchProfileResultPageOne.getContent().get(2).getId()).isEqualTo(createdSearchProfileDto8.getId());
+        assertThat(searchProfileResultPageOne.getContent().get(3).getId()).isEqualTo(createdSearchProfileDto7.getId());
+        assertThat(searchProfileResultPageOne.getContent().get(4).getId()).isEqualTo(createdSearchProfileDto6.getId());
+
+        assertThat(searchProfileResultPageTwo).hasSize(5);
+        assertThat(searchProfileResultPageTwo.getContent().get(0).getId()).isEqualTo(createdSearchProfileDto5.getId());
+        assertThat(searchProfileResultPageTwo.getContent().get(1).getId()).isEqualTo(createdSearchProfileDto4.getId());
+        assertThat(searchProfileResultPageTwo.getContent().get(2).getId()).isEqualTo(createdSearchProfileDto3.getId());
+        assertThat(searchProfileResultPageTwo.getContent().get(3).getId()).isEqualTo(createdSearchProfileDto2.getId());
+        assertThat(searchProfileResultPageTwo.getContent().get(4).getId()).isEqualTo(createdSearchProfileDto1.getId());
     }
 
     @Test
