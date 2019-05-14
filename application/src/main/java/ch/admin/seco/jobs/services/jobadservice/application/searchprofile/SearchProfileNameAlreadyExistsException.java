@@ -4,6 +4,6 @@ public class SearchProfileNameAlreadyExistsException extends RuntimeException {
 
     SearchProfileNameAlreadyExistsException(String name, String ownerUserId) {
         super("SearchProfile with name " + name + "already exists. " +
-                "Please give rename your new SearchProfile for ownerUserId=" + ownerUserId + ".");
+                "Please rename your new SearchProfile for ownerUserId=" + ownerUserId + ".");
     }
 }

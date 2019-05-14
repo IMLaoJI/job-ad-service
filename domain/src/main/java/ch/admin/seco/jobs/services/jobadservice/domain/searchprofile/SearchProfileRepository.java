@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.searchprofile;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,5 +20,5 @@ public interface SearchProfileRepository  extends JpaRepository<SearchProfile, S
     // TODO Exclude SearchFilter
     @Transactional(propagation = Propagation.SUPPORTS)
     @Query("select sp from SearchProfile sp where sp.ownerUserId = :ownerUserId")
-    List<SearchProfile> findAllByOwnerUserId(@Param("ownerUserId") String ownerUserId);
+    List<SearchProfile> findAllByOwnerUserId(@Param("ownerUserId") String ownerUserId, Pageable pageable);
 }

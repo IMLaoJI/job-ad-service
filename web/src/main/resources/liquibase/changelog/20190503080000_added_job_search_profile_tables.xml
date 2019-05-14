@@ -18,7 +18,7 @@
             <column name="NAME" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
-            <column name="OWNER_USER_ID" type="VARCHAR(64)">
+            <column name="OWNER_USER_ID" type="VARCHAR(36)">
                 <constraints nullable="false"/>
             </column>
             <column name="SEARCH_FILTER_SORT" type="VARCHAR(36)"/>
@@ -41,7 +41,7 @@
             <column name="SEARCH_PROFILE_ID" type="VARCHAR(36)">
                 <constraints nullable="false"/>
             </column>
-            <column name="LABEL_ID" type="VARCHAR(255)">
+            <column name="LABEL_ID" type="VARCHAR(36)">
                 <constraints nullable="false"/>
             </column>
             <column name="TYPE" type="VARCHAR(36)">
@@ -55,7 +55,7 @@
             <column name="SEARCH_PROFILE_ID" type="VARCHAR(36)">
                 <constraints nullable="false"/>
             </column>
-            <column name="LOCALITY_ID" type="VARCHAR(255)">
+            <column name="LOCALITY_ID" type="VARCHAR(36)">
                 <constraints nullable="false"/>
             </column>
             <column name="LOCALITY_ORDER" type="INT"/>
