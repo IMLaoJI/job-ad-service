@@ -97,7 +97,7 @@ public class SearchProfileApplicationService {
 
     @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(#searchProfileId)")
     public void deleteSearchProfile(SearchProfileId searchProfileId) {
-        Condition.notNull(searchProfileId, "FavouriteItemId can't be null");
+        Condition.notNull(searchProfileId, "SearchProfileId can't be null");
         SearchProfile searchProfile = getById(searchProfileId);
         DomainEventPublisher.publish(new SearchProfileDeletedEvent(searchProfile));
         this.searchProfileRepository.delete(searchProfile);
