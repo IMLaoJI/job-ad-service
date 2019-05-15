@@ -1,8 +1,8 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.profession;
 
-import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
-
 import java.util.Map;
+
+import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 
 public class ProfessionSuggestion {
 
@@ -13,8 +13,6 @@ public class ProfessionSuggestion {
     private ProfessionCodeType type;
 
     private Language language;
-
-    private String classifier;
 
     private String label;
 
@@ -28,12 +26,11 @@ public class ProfessionSuggestion {
     }
 
     public ProfessionSuggestion(String id, String code, ProfessionCodeType type, Language language,
-                                String classifier, String label, Map<ProfessionCodeType, String> mappings) {
+            String label, Map<ProfessionCodeType, String> mappings) {
         this(id);
         this.code = code;
         this.type = type;
         this.language = language;
-        this.classifier = classifier;
         this.label = label;
         this.mappings = mappings;
     }
@@ -52,10 +49,6 @@ public class ProfessionSuggestion {
 
     public Language getLanguage() {
         return language;
-    }
-
-    public String getClassifier() {
-        return classifier;
     }
 
     public String getLabel() {

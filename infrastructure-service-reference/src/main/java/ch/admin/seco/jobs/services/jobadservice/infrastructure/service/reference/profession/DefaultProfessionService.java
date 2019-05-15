@@ -1,14 +1,15 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.service.reference.profession;
 
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.domain.profession.Profession;
 import ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType;
 import ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionId;
 import ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionSuggestion;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class DefaultProfessionService implements ProfessionService {
@@ -51,7 +52,6 @@ public class DefaultProfessionService implements ProfessionService {
                 resource.getCode(),
                 resource.getType(),
                 resource.getLanguage(),
-                resource.getClassifier(),
                 resource.getLabel(),
                 resource.getMappings()
         );

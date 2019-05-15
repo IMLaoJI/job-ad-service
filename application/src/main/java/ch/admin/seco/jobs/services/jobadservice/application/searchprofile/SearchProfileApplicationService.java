@@ -1,5 +1,23 @@
 package ch.admin.seco.jobs.services.jobadservice.application.searchprofile;
 
+import static org.springframework.data.domain.Sort.Order.desc;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LocationDto;
@@ -7,7 +25,13 @@ import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.Cr
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.ResolvedSearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.SearchProfileResultDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.UpdateSearchProfileDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.*;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.CantonFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.LocalityFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.OccupationFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.RadiusSearchFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.ResolvedOccupationFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.ResolvedSearchFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.SearchFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPublisher;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
@@ -15,20 +39,11 @@ import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfi
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileCreatedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileDeletedEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.*;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static org.springframework.data.domain.Sort.Order.desc;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.CantonFilter;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.LocalityFilter;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.OccupationFilter;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.RadiusSearchFilter;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.SearchFilter;
 
 @Service
 @Transactional
@@ -131,11 +146,11 @@ public class SearchProfileApplicationService {
                 .map(Optional::get)
                 .collect(Collectors.toList());
 
-        List<OccupationSuggestionDto> occupationSuggestions = searchFilter.getOccupationFilters().stream()
+        List<ResolvedOccupationFilterDto> occupations = searchFilter.getOccupationFilters().stream()
                 .map(occupationFilter -> professionService.findById(occupationFilter.getLabelId()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .map(OccupationSuggestionDto::toDto)
+                .map(ResolvedOccupationFilterDto::toDto)
                 .collect(Collectors.toList());
 
         return new ResolvedSearchProfileDto()
@@ -143,10 +158,10 @@ public class SearchProfileApplicationService {
                 .setCreatedTime(searchProfile.getCreatedTime())
                 .setName(searchProfile.getName())
                 .setOwnerUserId(searchProfile.getOwnerUserId())
-                .setSearchFilter(toResolvedSearchFilterDto(searchFilter, locations, occupationSuggestions));
+                .setSearchFilter(toResolvedSearchFilterDto(searchFilter, locations, occupations));
     }
 
-    private ResolvedSearchFilterDto toResolvedSearchFilterDto(SearchFilter searchFilter, List<LocationDto> locations, List<OccupationSuggestionDto> occupationSuggestions) {
+    private ResolvedSearchFilterDto toResolvedSearchFilterDto(SearchFilter searchFilter, List<LocationDto> locations, List<ResolvedOccupationFilterDto> occupationSuggestions) {
         return new ResolvedSearchFilterDto()
                 .setSort(searchFilter.getSort())
                 .setContractType(searchFilter.getContractType())

@@ -1,12 +1,12 @@
 package ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LocationDto;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.ContractType;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.Sort;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LocationDto;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.ContractType;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.Sort;
 
 public class ResolvedSearchFilterDto {
 
@@ -34,7 +34,7 @@ public class ResolvedSearchFilterDto {
 
     private List<LocationDto> locations;
 
-    private List<OccupationSuggestionDto> occupations;
+    private List<ResolvedOccupationFilterDto> occupations;
 
     public Sort getSort() {
         return sort;
@@ -144,11 +144,11 @@ public class ResolvedSearchFilterDto {
         return this;
     }
 
-    public List<OccupationSuggestionDto> getOccupations() {
+    public List<ResolvedOccupationFilterDto> getOccupations() {
         return occupations;
     }
 
-    public ResolvedSearchFilterDto setOccupations(List<OccupationSuggestionDto> occupations) {
+    public ResolvedSearchFilterDto setOccupations(List<ResolvedOccupationFilterDto> occupations) {
         this.occupations = occupations;
         return this;
     }
