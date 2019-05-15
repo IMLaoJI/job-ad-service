@@ -3,6 +3,8 @@ package ch.admin.seco.jobs.services.jobadservice.application.searchprofile;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.CreateSearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.ResolvedSearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.SearchProfileResultDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.UpdateSearchProfileDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.CantonFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.SearchFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
@@ -10,6 +12,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfi
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileEvents;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileFixture;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.CantonFilter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,9 +23,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_01;
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_02;
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_03;
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_04;
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_05;
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_06;
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_07;
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_08;
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_09;
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_10;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -137,32 +151,34 @@ public class SearchProfileApplicationServiceTest {
         // then
         assertThatThrownBy(() -> this.searchProfileApplicationService.createSearchProfile(createSearchProfileDto2))
                 .isInstanceOf(SearchProfileNameAlreadyExistsException.class)
-                .hasMessageContaining("SearchProfile with name " + createSearchProfileDto2.getName() + "already exists. " +
+                .hasMessageContaining("SearchProfile with name " + createSearchProfileDto2.getName() + " already exists. " +
                         "Please rename your new SearchProfile for ownerUserId=" + createSearchProfileDto2.getOwnerUserId() + ".");
     }
 
-    // TODO FIXME
-//    @Test
-//    public void testUpdateSearchProfile() {
-//        // given
-//        CreateSearchProfileDto createSearchProfileDto = getCreateSearchProfileDto(search_profile_01.id());
-//        ResolvedSearchProfileDto createdResolvedSearchProfileDto = searchProfileApplicationService.createSearchProfile(createSearchProfileDto);
-//        domainEventMockUtils.assertSingleDomainEventPublished(SearchProfileEvents.SEARCH_PROFILE_CREATED.getDomainEventType());
-//
-//        // when
-//        SearchFilterDto searchFilterDto = createdResolvedSearchProfileDto.getSearchFilter();
-//        List<CantonFilterDto> cantonFilterList = Arrays.asList(
-//                new CantonFilterDto().setCode("ZH").setName("Zürich"));
-//        searchFilterDto.setCantonFilters(cantonFilterList);
-//        UpdateSearchProfileDto updateSearchProfileDto = new UpdateSearchProfileDto(new SearchProfileId(createdResolvedSearchProfileDto.getId()), "Another Name", searchFilterDto, getCreateSearchProfileDto(search_profile_01.id()).getOwnerUserId());
-//        searchProfileApplicationService.updateSearchProfile(updateSearchProfileDto);
-//
-//        // then
-//        Optional<SearchProfile> updatedSearchProfile = searchProfileRepository.findById(new SearchProfileId(createdResolvedSearchProfileDto.getId()));
-//        assertThat(updatedSearchProfile).isPresent();
-//        assertThat(updatedSearchProfile.get().getName()).isEqualTo(updateSearchProfileDto.getName());
-//        assertThat(updatedSearchProfile.get().getSearchFilter().getCantonFilters()).contains(new CantonFilter("Zürich", "ZH"));
-//    }
+    @Test
+    public void testUpdateSearchProfile() {
+        // given
+        CreateSearchProfileDto createSearchProfileDto = getCreateSearchProfileDto(search_profile_01.id());
+        ResolvedSearchProfileDto createdResolvedSearchProfileDto = searchProfileApplicationService.createSearchProfile(createSearchProfileDto);
+        domainEventMockUtils.assertSingleDomainEventPublished(SearchProfileEvents.SEARCH_PROFILE_CREATED.getDomainEventType());
+
+        // when
+        UpdateSearchProfileDto updateSearchProfileDto = new UpdateSearchProfileDto();
+        updateSearchProfileDto.setId(createdResolvedSearchProfileDto.getId());
+        updateSearchProfileDto.setName("Another Name");
+        updateSearchProfileDto.setSearchFilter(createSearchProfileDto.getSearchFilter());
+        List<CantonFilterDto> cantonFilterList = Arrays.asList(
+                new CantonFilterDto().setCode("ZH").setName("Zürich"));
+        updateSearchProfileDto.getSearchFilter().setCantonFilters(cantonFilterList);
+
+        searchProfileApplicationService.updateSearchProfile(updateSearchProfileDto);
+
+        // then
+        Optional<SearchProfile> updatedSearchProfile = searchProfileRepository.findById(new SearchProfileId(createdResolvedSearchProfileDto.getId()));
+        assertThat(updatedSearchProfile).isPresent();
+        assertThat(updatedSearchProfile.get().getName()).isEqualTo(updateSearchProfileDto.getName());
+        assertThat(updatedSearchProfile.get().getSearchFilter().getCantonFilters()).contains(new CantonFilter("Zürich", "ZH"));
+    }
 
     @Test
     public void testDeleteSearchProfile() {
