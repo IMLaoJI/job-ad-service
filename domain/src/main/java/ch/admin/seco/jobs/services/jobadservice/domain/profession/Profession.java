@@ -5,10 +5,15 @@ import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 public class Profession {
 
     private ProfessionId id;
+
     private String avamCode;
+
     private String sbn3Code;
+
     private String sbn5Code;
+
     private String bfsCode;
+
     private String label;
 
     protected Profession() {

@@ -3,11 +3,17 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.service.referenc
 public class OccupationLabelMappingResource {
 
     private String id;
+
     private String bfsCode;
+
     private String avamCode;
+
     private String sbn3Code;
+
     private String sbn5Code;
+
     private String iscoCode;
+
     private String description;
 
     public String getId() {

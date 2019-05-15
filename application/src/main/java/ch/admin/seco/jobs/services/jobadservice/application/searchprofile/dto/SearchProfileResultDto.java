@@ -1,7 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LocationDto;
-import ch.admin.seco.jobs.services.jobadservice.domain.profession.Profession;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.OccupationSuggestionDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileResult;
 import org.springframework.util.CollectionUtils;
 
@@ -31,7 +31,7 @@ public class SearchProfileResultDto {
 
     List<LocationDto> locations;
 
-    List<Profession> professions;
+    List<OccupationSuggestionDto> occupationSuggestions;
 
     public SearchProfileResultDto() {}
 
@@ -89,12 +89,12 @@ public class SearchProfileResultDto {
         return this;
     }
 
-    public List<Profession> getProfessions() {
-        return professions;
+    public List<OccupationSuggestionDto> getOccupationSuggestions() {
+        return occupationSuggestions;
     }
 
-    public SearchProfileResultDto setProfessions(List<Profession> professions) {
-        this.professions = professions;
+    public SearchProfileResultDto setOccupationSuggestions(List<OccupationSuggestionDto> occupationSuggestions) {
+        this.occupationSuggestions = occupationSuggestions;
         return this;
     }
 

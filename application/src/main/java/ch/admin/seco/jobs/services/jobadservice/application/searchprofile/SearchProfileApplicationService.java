@@ -6,15 +6,10 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.SearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.SearchProfileResultDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.create.CreateSearchProfileDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.CantonFilterDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.LocalityFilterDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.OccupationFilterDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.RadiusSearchFilterDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.SearchFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.*;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.update.UpdateSearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPublisher;
-import ch.admin.seco.jobs.services.jobadservice.domain.profession.Profession;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileId;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileRepository;
@@ -24,11 +19,8 @@ import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.Sear
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,10 +64,11 @@ public class SearchProfileApplicationService {
                 .map(Optional::get)
                 .collect(Collectors.toList());
 
-        List<Profession> professions = occupationFilters.stream()
+        List<OccupationSuggestionDto> professionSuggestions = occupationFilters.stream()
                 .map(occupationFilter -> professionService.findById(occupationFilter.getLabelId()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
+                .map(OccupationSuggestionDto::toDto)
                 .collect(Collectors.toList());
         SearchProfileResultDto searchProfileResultDto = new SearchProfileResultDto();
 
@@ -85,7 +78,7 @@ public class SearchProfileApplicationService {
         searchProfileResultDto.setName(searchProfile.getName());
         searchProfileResultDto.setUserOwnerId(searchProfile.getOwnerUserId());
         searchProfileResultDto.setLocations(locations);
-        searchProfileResultDto.setProfessions(professions);
+        searchProfileResultDto.setOccupationSuggestions(professionSuggestions);
 
         return searchProfileResultDto;
     }
