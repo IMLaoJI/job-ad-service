@@ -4,6 +4,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilte
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.OccupationFilterType;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +45,7 @@ public class OccupationFilterDto {
 
     public static List<OccupationFilterDto> toDto(List<OccupationFilter> occupationFilters) {
         if (CollectionUtils.isEmpty(occupationFilters)) {
-            return null;
+            return Collections.emptyList();
         }
         return occupationFilters.stream().map(OccupationFilterDto::toDto).collect(Collectors.toList());
     }

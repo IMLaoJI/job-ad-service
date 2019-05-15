@@ -2,7 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.OccupationSuggestionDto;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileResult;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
 import org.springframework.util.CollectionUtils;
 
 import javax.validation.constraints.NotBlank;
@@ -27,7 +27,7 @@ public class SearchProfileResultDto {
     private String name;
 
     @NotBlank
-    private String userOwnerId;
+    private String ownerUserId;
 
     List<LocationDto> locations;
 
@@ -62,12 +62,12 @@ public class SearchProfileResultDto {
         return this;
     }
 
-    public String getUserOwnerId() {
-        return userOwnerId;
+    public String getOwnerUserId() {
+        return ownerUserId;
     }
 
-    public SearchProfileResultDto setUserOwnerId(String userOwnerId) {
-        this.userOwnerId = userOwnerId;
+    public SearchProfileResultDto setOwnerUserId(String ownerUserId) {
+        this.ownerUserId = ownerUserId;
         return this;
     }
 
@@ -98,22 +98,22 @@ public class SearchProfileResultDto {
         return this;
     }
 
-    public static SearchProfileResultDto toDto(SearchProfileResult searchProfileResult) {
-        if (searchProfileResult == null) {
+    public static SearchProfileResultDto toDto(SearchProfile searchProfile) {
+        if (searchProfile == null) {
             return null;
         }
         return new SearchProfileResultDto()
-                .setCreatedTime(searchProfileResult.getCreatedTime())
-                .setId(searchProfileResult.getId())
-                .setUpdatedTime(searchProfileResult.getUpdatedTime())
-                .setName(searchProfileResult.getName())
-                .setUserOwnerId(searchProfileResult.getUserOwnerId());
+                .setCreatedTime(searchProfile.getCreatedTime())
+                .setId(searchProfile.getId().getValue())
+                .setUpdatedTime(searchProfile.getUpdatedTime())
+                .setName(searchProfile.getName())
+                .setOwnerUserId(searchProfile.getOwnerUserId());
     }
 
-    public static List<SearchProfileResultDto> toDto(List<SearchProfileResult> searchProfileResults) {
-        if (CollectionUtils.isEmpty(searchProfileResults)) {
+    public static List<SearchProfileResultDto> toDto(List<SearchProfile> searchProfileList) {
+        if (CollectionUtils.isEmpty(searchProfileList)) {
             return null;
         }
-        return searchProfileResults.stream().map(SearchProfileResultDto::toDto).collect(Collectors.toList());
+        return searchProfileList.stream().map(SearchProfileResultDto::toDto).collect(Collectors.toList());
     }
 }

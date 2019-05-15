@@ -3,6 +3,7 @@ package ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.s
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.LocalityFilter;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class LocalityFilterDto {
 
     public static List<LocalityFilterDto> toDto(List<LocalityFilter> localityFilters) {
         if (CollectionUtils.isEmpty(localityFilters)) {
-            return null;
+            return Collections.emptyList();
         }
         return localityFilters.stream().map(LocalityFilterDto::toDto).collect(Collectors.toList());
     }

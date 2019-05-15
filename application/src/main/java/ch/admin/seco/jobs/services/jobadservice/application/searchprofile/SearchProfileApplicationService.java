@@ -13,10 +13,10 @@ import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPu
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileId;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileRepository;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileResult;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileCreatedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileDeletedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.*;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -64,21 +64,21 @@ public class SearchProfileApplicationService {
                 .map(Optional::get)
                 .collect(Collectors.toList());
 
-        List<OccupationSuggestionDto> professionSuggestions = occupationFilters.stream()
+        List<OccupationSuggestionDto> occupationSuggestions = occupationFilters.stream()
                 .map(occupationFilter -> professionService.findById(occupationFilter.getLabelId()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .map(OccupationSuggestionDto::toDto)
                 .collect(Collectors.toList());
-        SearchProfileResultDto searchProfileResultDto = new SearchProfileResultDto();
 
-        searchProfileResultDto.setId(searchProfile.getId().getValue());
-        searchProfileResultDto.setCreatedTime(searchProfile.getCreatedTime());
-        searchProfileResultDto.setUpdatedTime(searchProfile.getUpdatedTime());
-        searchProfileResultDto.setName(searchProfile.getName());
-        searchProfileResultDto.setUserOwnerId(searchProfile.getOwnerUserId());
-        searchProfileResultDto.setLocations(locations);
-        searchProfileResultDto.setOccupationSuggestions(professionSuggestions);
+        SearchProfileResultDto searchProfileResultDto = new SearchProfileResultDto()
+                .setId(searchProfile.getId().getValue())
+                .setCreatedTime(searchProfile.getCreatedTime())
+                .setUpdatedTime(searchProfile.getUpdatedTime())
+                .setName(searchProfile.getName())
+                .setOwnerUserId(searchProfile.getOwnerUserId())
+                .setLocations(locations)
+                .setOccupationSuggestions(occupationSuggestions);
 
         return searchProfileResultDto;
     }
@@ -86,9 +86,9 @@ public class SearchProfileApplicationService {
     @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.matchesCurrentUserId(#createSearchProfileDto.ownerUserId)")
     public SearchProfileDto createSearchProfile(CreateSearchProfileDto createSearchProfileDto) {
         Condition.notNull(createSearchProfileDto, "CreateSearchProfileDto can't be null");
-        Optional<SearchProfile> tmpSearchProfile = searchProfileRepository.findByNameAndOwnerUserId(createSearchProfileDto.getName(), createSearchProfileDto.getOwnerUserId());
-        if (tmpSearchProfile.isPresent()) {
-            throw new SearchProfileNameAlreadyExistsException(tmpSearchProfile.get().getName(), tmpSearchProfile.get().getOwnerUserId());
+        Optional<SearchProfile> existingSearchProfile = this.searchProfileRepository.findByNameAndOwnerUserId(createSearchProfileDto.getName(), createSearchProfileDto.getOwnerUserId());
+        if (existingSearchProfile.isPresent()) {
+            throw new SearchProfileNameAlreadyExistsException(existingSearchProfile.get().getName(), existingSearchProfile.get().getOwnerUserId());
         }
 
         SearchProfile searchProfile = new SearchProfile.Builder()
@@ -110,9 +110,9 @@ public class SearchProfileApplicationService {
         Condition.notNull(updateSearchProfileDto, "UpdateSearchProfileDto can't be null");
         SearchProfile searchProfile = getById(updateSearchProfileDto.getId());
 
-        Optional<SearchProfile> existingNameOfSearchProfile = searchProfileRepository.findByNameAndOwnerUserId(updateSearchProfileDto.getName(), searchProfile.getOwnerUserId());
-        if (existingNameOfSearchProfile.isPresent()) {
-            if (!searchProfile.getId().equals(existingNameOfSearchProfile.get().getId())) {
+        Optional<SearchProfile> existingSearchProfile = searchProfileRepository.findByNameAndOwnerUserId(updateSearchProfileDto.getName(), searchProfile.getOwnerUserId());
+        if (existingSearchProfile.isPresent()) {
+            if (!searchProfile.getId().equals(existingSearchProfile.get().getId())) {
                 throw new SearchProfileNameAlreadyExistsException(searchProfile.getName(), searchProfile.getOwnerUserId());
             }
         }
@@ -137,18 +137,9 @@ public class SearchProfileApplicationService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(desc("updatedTime"), desc("createdTime")));
 
         List<SearchProfile> searchProfileList = this.searchProfileRepository.findAllByOwnerUserId(ownerUserId, pageable);
-        List<SearchProfileResultDto> searchProfileResultDtos = new ArrayList<>();
-        for (SearchProfile searchProfile : searchProfileList) {
-            SearchProfileResult searchProfileResult = new SearchProfileResult(
-                    searchProfile.getId().getValue()
-                    , searchProfile.getCreatedTime()
-                    , searchProfile.getUpdatedTime()
-                    , searchProfile.getName()
-                    , searchProfile.getOwnerUserId()
-            );
-            searchProfileResultDtos.add(SearchProfileResultDto.toDto(searchProfileResult));
-        }
-        return  new PageImpl<>(searchProfileResultDtos);
+        List<SearchProfileResultDto> result = Lists.newArrayList(SearchProfileResultDto.toDto(searchProfileList));
+
+        return new PageImpl<>(result);
     }
 
     private SearchProfile getById(SearchProfileId id) {
@@ -175,7 +166,7 @@ public class SearchProfileApplicationService {
 
     private List<OccupationFilter> convertOccupationsFromDto(List<OccupationFilterDto> occupationFilterDtos) {
         if (CollectionUtils.isEmpty(occupationFilterDtos)) {
-            return null;
+            return Collections.emptyList();
         }
         return occupationFilterDtos.stream()
                 .map(occupationFilterDto ->
@@ -185,7 +176,7 @@ public class SearchProfileApplicationService {
 
     private List<LocalityFilter> convertLocalitiesFromDto(List<LocalityFilterDto> localityFilterDtos) {
         if (CollectionUtils.isEmpty(localityFilterDtos)) {
-            return null;
+            return Collections.emptyList();
         }
         return localityFilterDtos.stream()
                 .map(localityFilterDto ->
@@ -195,7 +186,7 @@ public class SearchProfileApplicationService {
 
     private List<CantonFilter> convertCantonsFromDto(List<CantonFilterDto> cantonFilterDtos) {
         if (CollectionUtils.isEmpty(cantonFilterDtos)) {
-            return null;
+            return Collections.emptyList();
         }
         return cantonFilterDtos.stream()
                 .map(cantonFilterDto ->

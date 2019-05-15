@@ -66,12 +66,11 @@ public class OccupationSuggestionDto {
     }
 
     public OccupationFilterType getClassifier() {
-        classifier = isClassification(this.type);
         return classifier;
     }
 
-    public OccupationSuggestionDto setClassifier(OccupationFilterType classifier) {
-        this.classifier = classifier;
+    private OccupationSuggestionDto setClassifier() {
+        this.classifier = isClassification(this.type);
         return this;
     }
 
@@ -102,7 +101,7 @@ public class OccupationSuggestionDto {
                 .setCode(suggestion.getCode())
                 .setType(suggestion.getType())
                 .setLanguage(suggestion.getLanguage())
-                .setClassifier(isClassification(suggestion.getType()))
+                .setClassifier()
                 .setLabel(suggestion.getLabel())
                 .setMappings(suggestion.getMappings());
     }

@@ -3,6 +3,7 @@ package ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.s
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.CantonFilter;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +45,7 @@ public class CantonFilterDto {
 
     public static List<CantonFilterDto> toDto(List<CantonFilter> cantonFilters) {
         if (CollectionUtils.isEmpty(cantonFilters)) {
-            return null;
+            return Collections.emptyList();
         }
         return cantonFilters.stream().map(CantonFilterDto::toDto).collect(Collectors.toList());
     }

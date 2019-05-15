@@ -27,10 +27,7 @@ import java.util.Optional;
 import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_01;
 import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_02;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -116,13 +113,8 @@ public class SearchProfileRestControllerIntTest {
     @WithJobSeeker
     public void testFindById() throws Exception {
         // given
-        SearchProfileDto searchProfileDto= createSearchProfile();
-
-        SearchProfileRestController.CreateSearchProfileResource createSearchProfileResource = new SearchProfileRestController.CreateSearchProfileResource();
-        SearchProfile testSearchProfile = SearchProfileFixture.testSearchProfile(new SearchProfileId());
-        createSearchProfileResource.name = testSearchProfile.getName();
-        createSearchProfileResource.ownerUserId = testSearchProfile.getOwnerUserId();
-        createSearchProfileResource.searchFilter = testSearchProfile.getSearchFilter();
+        SearchProfileDto searchProfileDto = createSearchProfile();
+        SearchProfileId id = new SearchProfileId(searchProfileDto.getId());
 
         // when
         ResultActions resultActions = this.mockMvc.perform(
