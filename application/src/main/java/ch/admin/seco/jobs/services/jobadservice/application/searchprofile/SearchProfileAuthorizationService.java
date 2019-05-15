@@ -27,6 +27,10 @@ public class SearchProfileAuthorizationService {
         return (currentUserId != null) && currentUserId.equals(userId);
     }
 
+    public boolean isCurrentUserOwner(String searchProfileId) {
+        return isCurrentUserOwner(new SearchProfileId(searchProfileId));
+    }
+
     public boolean isCurrentUserOwner(SearchProfileId searchProfileId) {
         Optional<SearchProfile> searchProfileById = this.searchProfileRepository.findById(searchProfileId);
         if (!searchProfileById.isPresent()) {

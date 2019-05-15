@@ -1,10 +1,8 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture;
 
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.GeoPointFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileId;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.CantonFilter;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.RadiusSearchFilter;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.SearchFilter;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.Sort;
 import com.google.common.collect.ImmutableSet;
@@ -22,6 +20,7 @@ public class SearchProfileFixture {
                 .build();
     }
 
+    // plain search filter
     private static SearchFilter prepareSearchFilter() {
         return SearchFilter.builder()
                 .setSort(Sort.RELEVANCE_DESC)
@@ -31,9 +30,6 @@ public class SearchProfileFixture {
                 .setCantonFilters(Collections.singletonList(
                         new CantonFilter("Bern", "BE")
                 ))
-                .setRadiusSearchFilter(
-                        new RadiusSearchFilter(GeoPointFixture.testGeoPoint(),20)
-                )
                 .build();
     }
 }

@@ -15,7 +15,7 @@ public class SearchFilterDto {
 
     private ContractType contractType;
 
-    private Set<String> keywords; // TODO ?? converter
+    private Set<String> keywords;
 
     private Integer workloadPercentageMin;
 
