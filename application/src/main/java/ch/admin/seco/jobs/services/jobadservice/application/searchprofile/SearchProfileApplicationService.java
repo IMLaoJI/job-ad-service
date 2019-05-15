@@ -138,7 +138,7 @@ public class SearchProfileApplicationService {
         LOG.debug("SearchProfile {} has been deleted for user {}.", searchProfile.getId().getValue(), searchProfile.getOwnerUserId());
     }
 
-    @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(ownerUserId)")
+    @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(#ownerUserId)")
     public Page<SearchProfileResultDto> getSearchProfiles(String ownerUserId, int page, int size) {
         Condition.notNull(ownerUserId, "OwnerUserId can't be null");
         Pageable pageable = PageRequest.of(page, size, Sort.by(desc("updatedTime"), desc("createdTime")));

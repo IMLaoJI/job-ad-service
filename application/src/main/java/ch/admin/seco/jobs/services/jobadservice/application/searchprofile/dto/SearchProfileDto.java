@@ -89,6 +89,7 @@ public class SearchProfileDto {
                 .setId(searchProfile.getId().getValue())
                 .setCreatedTime(searchProfile.getCreatedTime())
                 .setUpdatedTime(searchProfile.getUpdatedTime())
+                .setOwnerUserId(searchProfile.getOwnerUserId())
                 .setName(searchProfile.getName())
                 .setSearchFilter(SearchFilterDto.toDto(searchProfile.getSearchFilter()));
     }

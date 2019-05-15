@@ -25,8 +25,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.Optional;
 
 import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_01;
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_02;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -138,7 +140,7 @@ public class SearchProfileRestControllerIntTest {
     public void testFindByOwnerUserId() throws Exception {
         // given
         SearchProfileDto searchProfileDto = createSearchProfile();
-        SearchProfile searchProfile = SearchProfileFixture.testSearchProfile(search_profile_01.id());
+        SearchProfile searchProfile = SearchProfileFixture.testSearchProfile(search_profile_02.id());
         CreateSearchProfileDto createSearchProfileDto = new CreateSearchProfileDto(
                 searchProfile.getName()
                 , searchProfile.getOwnerUserId()
@@ -148,14 +150,16 @@ public class SearchProfileRestControllerIntTest {
 
         // when
         ResultActions resultActions = this.mockMvc.perform(
-                MockMvcRequestBuilders.get(URL + "/_search" + searchProfileDto.getOwnerUserId())
+                MockMvcRequestBuilders.get(URL + "/_search")
+                        .param("ownerUserId", WithJobSeeker.USER_ID)
                         .contentType(TestUtil.APPLICATION_JSON_UTF8));
 
         // then
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect();
-
+                .andExpect(header().string("X-Total-Count", "2"))
+                .andExpect(jsonPath("$.[0].id").value(searchProfileDto2.getId()))
+                .andExpect(jsonPath("$.[1].id").value(searchProfileDto.getId()));
     }
 
     private SearchProfileDto createSearchProfile() {
