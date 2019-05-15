@@ -21,7 +21,7 @@ public class SearchProfileFixture {
     }
 
     // plain search filter
-    private static SearchFilter prepareSearchFilter() {
+    public static SearchFilter prepareSearchFilter() {
         return SearchFilter.builder()
                 .setSort(Sort.RELEVANCE_DESC)
                 .setKeywords(ImmutableSet.of("java", "angular"))
