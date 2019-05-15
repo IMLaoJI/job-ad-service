@@ -82,8 +82,8 @@ public class SearchProfileApplicationService {
         searchProfileResultDto.setId(searchProfile.getId().getValue());
         searchProfileResultDto.setCreatedTime(searchProfile.getCreatedTime());
         searchProfileResultDto.setUpdatedTime(searchProfile.getUpdatedTime());
-        searchProfileResultDto.setId(searchProfile.getId().getValue());
-        searchProfileResultDto.setId(searchProfile.getId().getValue());
+        searchProfileResultDto.setName(searchProfile.getName());
+        searchProfileResultDto.setUserOwnerId(searchProfile.getOwnerUserId());
         searchProfileResultDto.setLocations(locations);
         searchProfileResultDto.setProfessions(professions);
 
