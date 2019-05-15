@@ -52,7 +52,6 @@ public class SearchProfileRestControllerIntTest {
         this.searchProfileRepository.deleteAll();
     }
 
-    // TODO FIXME
     @Test
     @WithJobSeeker
     public void testCreateSearchProfile() throws Exception {
@@ -69,8 +68,6 @@ public class SearchProfileRestControllerIntTest {
         post.andExpect(status().isCreated());
     }
 
-
-    // TODO FIXME
     @Test
     @WithJobSeeker
     public void testUpdateSearchProfile() throws Exception {
