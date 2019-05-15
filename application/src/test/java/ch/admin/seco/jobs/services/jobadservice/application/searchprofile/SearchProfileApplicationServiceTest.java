@@ -137,7 +137,7 @@ public class SearchProfileApplicationServiceTest {
         // then
         assertThatThrownBy(() -> this.searchProfileApplicationService.createSearchProfile(createSearchProfileDto2))
                 .isInstanceOf(SearchProfileNameAlreadyExistsException.class)
-                .hasMessageContaining("SearchProfile with name " + createSearchProfileDto2.getName() + "already exists. " +
+                .hasMessageContaining("SearchProfile with name " + createSearchProfileDto2.getName() + " already exists. " +
                         "Please rename your new SearchProfile for ownerUserId=" + createSearchProfileDto2.getOwnerUserId() + ".");
     }
 
