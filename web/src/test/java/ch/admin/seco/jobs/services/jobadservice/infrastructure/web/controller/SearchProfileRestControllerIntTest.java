@@ -153,8 +153,7 @@ public class SearchProfileRestControllerIntTest {
 
         // then
         resultActions
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect();
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
 
     }
 
