@@ -25,13 +25,4 @@ public abstract class SearchProfileEvent extends DomainEvent<SearchProfileId> {
         return this.name;
     }
 
-    private void setSearchProfileId(SearchProfileId searchProfileId) {
-        this.searchProfileId = searchProfileId;
-        additionalAttributes.put("searchProfileId", searchProfileId.getValue());
-    }
-
-    private void setName(String name) {
-        this.name = name;
-        additionalAttributes.put("name", name);
-    }
 }
