@@ -3,6 +3,7 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.SearchProfileApplicationService;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.CreateSearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.ResolvedSearchProfileDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.UpdateSearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.SearchFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileId;
@@ -21,6 +22,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.Optional;
 
 import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_01;
 import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_02;
@@ -49,50 +52,46 @@ public class SearchProfileRestControllerIntTest {
         this.searchProfileRepository.deleteAll();
     }
 
-    // TODO FIXME
-//    @Test
-//    @WithJobSeeker
-//    public void testCreateSearchProfile() throws Exception {
-//        // given
-//        SearchProfileRestController.CreateSearchProfileResource createSearchProfileResource = new SearchProfileRestController.CreateSearchProfileResource();
-//        SearchProfile searchProfile = SearchProfileFixture.testSearchProfile(search_profile_01.id());
-//        createSearchProfileResource.name = searchProfile.getName();
-//        createSearchProfileResource.ownerUserId = searchProfile.getOwnerUserId();
-//        createSearchProfileResource.searchFilter = searchProfile.getSearchFilter();
-//
-//        // when
-//        ResultActions post = post(createSearchProfileResource, URL);
-//
-//        // then
-//        post.andExpect(status().isCreated());
-//    }
+    @Test
+    @WithJobSeeker
+    public void testCreateSearchProfile() throws Exception {
+        // given
+        SearchProfile searchProfile = SearchProfileFixture.testSearchProfile(search_profile_01.id());
+        CreateSearchProfileDto createSearchProfileDto = new CreateSearchProfileDto(
+                searchProfile.getName(), searchProfile.getOwnerUserId(), SearchFilterDto.toDto(searchProfile.getSearchFilter())
+        );
 
+        // when
+        ResultActions post = post(createSearchProfileDto, URL);
 
-    // TODO FIXME
-//    @Test
-//    @WithJobSeeker
-//    public void testUpdateSearchProfile() throws Exception {
-//        // given
-//        ResolvedSearchProfileDto resolvedSearchProfileDto = createSearchProfile();
-//
-//        SearchProfileRestController.UpdateSearchProfileResource updateSearchProfileResource = new SearchProfileRestController.UpdateSearchProfileResource();
-//        String adjustedName = "Adjusted Name";
-//        updateSearchProfileResource.name = adjustedName;
-//        updateSearchProfileResource.searchFilter = SearchProfileFixture.testSearchProfile(new SearchProfileId(resolvedSearchProfileDto.getId())).getSearchFilter();
-//        updateSearchProfileResource.ownerUserId = SearchProfileFixture.testSearchProfile(new SearchProfileId(resolvedSearchProfileDto.getId())).getOwnerUserId();
-//
-//        // when
-//        ResultActions put = this.mockMvc.perform(
-//                MockMvcRequestBuilders.put(URL + "/" + resolvedSearchProfileDto.getId())
-//                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-//                        .content(TestUtil.convertObjectToJsonBytes(updateSearchProfileResource)));
-//        put.andExpect(status().isOk());
-//
-//        // then
-//        Optional<SearchProfile> searchProfile = this.searchProfileRepository.findById(new SearchProfileId(resolvedSearchProfileDto.getId()));
-//        assertThat(searchProfile).isPresent();
-//        assertThat(searchProfile.get().getName()).isEqualTo(adjustedName);
-//    }
+        // then
+        post.andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithJobSeeker
+    public void testUpdateSearchProfile() throws Exception {
+        // given
+        ResolvedSearchProfileDto resolvedSearchProfileDto = createSearchProfile();
+
+        String adjustedName = "Adjusted Name";
+        UpdateSearchProfileDto updateSearchProfileDto = new UpdateSearchProfileDto();
+        updateSearchProfileDto.setId(resolvedSearchProfileDto.getId());
+        updateSearchProfileDto.setName(adjustedName);
+        updateSearchProfileDto.setSearchFilter(SearchFilterDto.toDto(SearchProfileFixture.prepareSearchFilter()));
+
+        // when
+        ResultActions put = this.mockMvc.perform(
+                MockMvcRequestBuilders.put(URL + "/" + resolvedSearchProfileDto.getId())
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(updateSearchProfileDto)));
+        put.andExpect(status().isOk());
+
+        // then
+        Optional<SearchProfile> searchProfile = this.searchProfileRepository.findById(new SearchProfileId(resolvedSearchProfileDto.getId()));
+        assertThat(searchProfile).isPresent();
+        assertThat(searchProfile.get().getName()).isEqualTo(adjustedName);
+    }
 
     @Test
     @WithJobSeeker

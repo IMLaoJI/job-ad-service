@@ -44,9 +44,6 @@
             <column name="LABEL_ID" type="VARCHAR(36)">
                 <constraints nullable="false"/>
             </column>
-            <column name="TYPE" type="VARCHAR(36)">
-                <constraints nullable="false"/>
-            </column>
             <column name="OCCUPATION_ORDER" type="INT"/>
         </createTable>
     </changeSet>

@@ -3,8 +3,6 @@ package ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilt
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Embeddable;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
 import java.util.Objects;
 
@@ -15,12 +13,8 @@ public class OccupationFilter {
     @NotBlank
     private String labelId;
 
-    @Enumerated(EnumType.STRING)
-    private OccupationFilterType type;
-
-    public OccupationFilter(String labelId, OccupationFilterType type) {
+    public OccupationFilter(String labelId) {
         this.labelId = labelId;
-        this.type = type;
     }
 
     private OccupationFilter() {
@@ -31,21 +25,16 @@ public class OccupationFilter {
         return labelId;
     }
 
-    public OccupationFilterType getType() {
-        return type;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OccupationFilter that = (OccupationFilter) o;
-        return Objects.equals(labelId, that.labelId) &&
-                type == that.type;
+        return Objects.equals(labelId, that.labelId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(labelId, type);
+        return Objects.hash(labelId);
     }
 }
