@@ -1,12 +1,18 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.service.reference.location;
 
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LocationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.GeoPoint;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.upperCase;
 import static org.springframework.util.StringUtils.hasText;
@@ -28,6 +34,12 @@ public class DefaultLocationService implements LocationService {
     @Autowired
     public DefaultLocationService(LocationApiClient locationApiClient) {
         this.locationApiClient = locationApiClient;
+    }
+
+    @Override
+    public Optional<LocationDto> findById(String id) {
+        return this.locationApiClient.getLocationById(UUID.fromString(id))
+                .map(this::toLocation);
     }
 
     @Override
@@ -59,6 +71,18 @@ public class DefaultLocationService implements LocationService {
                 && MANAGED_COUNTRY_CODES.contains(upperCase(location.getCountryIsoCode()));
     }
 
+
+    private LocationDto toLocation(LocationResource resource) {
+        return new LocationDto()
+                .setId(resource.getId().toString())
+                .setCity(resource.getCity())
+                .setPostalCode(resource.getZipCode())
+                .setCommunalCode(resource.getCommunalCode())
+                .setRegionCode(resource.getRegionCode())
+                .setCantonCode(resource.getCantonCode())
+                .setCoordinates(toGeoPoint(resource));
+    }
+
     private Location enrichLocationWithLocationResource(Location location, LocationResource resource) {
         return new Location.Builder()
                 .setRemarks(location.getRemarks())
@@ -68,12 +92,12 @@ public class DefaultLocationService implements LocationService {
                 .setRegionCode(resource.getRegionCode())
                 .setCantonCode(resource.getCantonCode())
                 .setCountryIsoCode(location.getCountryIsoCode())
-                .setCoordinates(getGeoPoint(resource))
+                .setCoordinates(toGeoPoint(resource))
                 .build();
     }
 
-    private GeoPoint getGeoPoint(LocationResource matchingLocationResource) {
-        GeoPointResource geoPoint = matchingLocationResource.getGeoPoint();
+    private GeoPoint toGeoPoint(LocationResource locationResource) {
+        GeoPointResource geoPoint = locationResource.getGeoPoint();
         return geoPoint == null ? null : new GeoPoint(geoPoint.getLongitude(), geoPoint.getLatitude());
     }
 }

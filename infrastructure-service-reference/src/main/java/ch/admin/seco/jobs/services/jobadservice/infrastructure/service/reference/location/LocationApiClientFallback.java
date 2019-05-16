@@ -13,9 +13,9 @@ public class LocationApiClientFallback implements LocationApiClient {
     private static Logger LOG = LoggerFactory.getLogger(LocationApiClientFallback.class);
 
     @Override
-    public LocationResource getLocationById(UUID id) {
+    public Optional<LocationResource> getLocationById(UUID id) {
         LOG.warn("Fallback active for LocationApiClientFallback.getLocationById(" + id + ")");
-        return null;
+        return Optional.empty();
     }
 
     @Override
