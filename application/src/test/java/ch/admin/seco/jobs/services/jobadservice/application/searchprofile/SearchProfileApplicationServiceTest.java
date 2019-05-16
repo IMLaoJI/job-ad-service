@@ -172,7 +172,7 @@ public class SearchProfileApplicationServiceTest {
 				new CantonFilterDto().setCode("ZH").setName("Zürich"));
 		updateSearchProfileDto.getSearchFilter().setCantonFilters(cantonFilterList);
 
-		searchProfileApplicationService.updateSearchProfile(search_profile_01.id(), updateSearchProfileDto);
+		searchProfileApplicationService.updateSearchProfile(new SearchProfileId(createdResolvedSearchProfileDto.getId()), updateSearchProfileDto);
 
 		// then
 		Optional<SearchProfile> updatedSearchProfile = searchProfileRepository.findById(new SearchProfileId(createdResolvedSearchProfileDto.getId()));
