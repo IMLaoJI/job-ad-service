@@ -1,15 +1,13 @@
 package ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto;
 
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.SearchFilterDto;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-public class UpdateSearchProfileDto {
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.SearchFilterDto;
 
-    private String id;
+public class UpdateSearchProfileDto {
 
     @NotBlank
     @Size(max = 50)
@@ -18,14 +16,6 @@ public class UpdateSearchProfileDto {
     @Valid
     @NotNull
     private SearchFilterDto searchFilter;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

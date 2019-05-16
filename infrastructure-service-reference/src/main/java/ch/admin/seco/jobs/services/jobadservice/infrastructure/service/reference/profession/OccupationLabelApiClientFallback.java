@@ -1,10 +1,11 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.service.reference.profession;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import org.springframework.stereotype.Component;
 
 @Component
 public class OccupationLabelApiClientFallback implements OccupationLabelApiClient {
@@ -20,7 +21,7 @@ public class OccupationLabelApiClientFallback implements OccupationLabelApiClien
     @Override
     public Optional<OccupationLabelSuggestionResource> getOccupationInfoById(String id) {
         LOG.warn("Fallback active for OccupationLabelApiClientFallback.getOccupationInfoById(" + id + ")");
-        return null;
+        return Optional.empty();
     }
 
 }

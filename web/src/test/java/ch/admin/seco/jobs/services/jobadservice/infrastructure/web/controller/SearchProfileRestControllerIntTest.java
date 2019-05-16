@@ -1,18 +1,19 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.SearchProfileApplicationService;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.CreateSearchProfileDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.ResolvedSearchProfileDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.UpdateSearchProfileDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.SearchFilterDto;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileId;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileRepository;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileFixture;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_01;
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_02;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,12 +24,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.util.Optional;
-
-import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_01;
-import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_02;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.SearchProfileApplicationService;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.CreateSearchProfileDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.ResolvedSearchProfileDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.UpdateSearchProfileDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.SearchFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileId;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileRepository;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileFixture;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -76,7 +81,6 @@ public class SearchProfileRestControllerIntTest {
 
         String adjustedName = "Adjusted Name";
         UpdateSearchProfileDto updateSearchProfileDto = new UpdateSearchProfileDto();
-        updateSearchProfileDto.setId(resolvedSearchProfileDto.getId());
         updateSearchProfileDto.setName(adjustedName);
         updateSearchProfileDto.setSearchFilter(SearchFilterDto.toDto(SearchProfileFixture.prepareSearchFilter()));
 
