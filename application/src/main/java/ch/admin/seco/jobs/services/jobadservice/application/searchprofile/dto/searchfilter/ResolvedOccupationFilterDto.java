@@ -93,7 +93,7 @@ public class ResolvedOccupationFilterDto {
 				.collect(Collectors.toList());
 	}
 
-	public static OccupationFilterType isClassification(ProfessionCodeType codeType) {
+	private static OccupationFilterType isClassification(ProfessionCodeType codeType) {
 		if (ProfessionCodeType.SBN3.equals(codeType) || ProfessionCodeType.SBN5.equals(codeType)) {
 			return OccupationFilterType.CLASSIFICATION;
 		}

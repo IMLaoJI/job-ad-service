@@ -1,5 +1,23 @@
 package ch.admin.seco.jobs.services.jobadservice.application.searchprofile;
 
+import static org.springframework.data.domain.Sort.Order.desc;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LocationDto;
@@ -7,7 +25,13 @@ import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.Cr
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.ResolvedSearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.SearchProfileResultDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.UpdateSearchProfileDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.*;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.CantonFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.LocalityFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.OccupationFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.RadiusSearchFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.ResolvedOccupationFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.ResolvedSearchFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.SearchFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPublisher;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
@@ -15,20 +39,11 @@ import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfi
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileCreatedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileDeletedEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.*;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static org.springframework.data.domain.Sort.Order.desc;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.CantonFilter;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.LocalityFilter;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.OccupationFilter;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.RadiusSearchFilter;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.SearchFilter;
 
 @Service
 @Transactional
@@ -80,14 +95,14 @@ public class SearchProfileApplicationService {
     @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(#updateSearchProfileDto.id)")
     public ResolvedSearchProfileDto updateSearchProfile(UpdateSearchProfileDto updateSearchProfileDto) {
         Condition.notNull(updateSearchProfileDto, "UpdateSearchProfileDto can't be null");
-        SearchProfile searchProfile = getById(new SearchProfileId(updateSearchProfileDto.getId()));
-        Optional<SearchProfile> existingSearchProfile = searchProfileRepository.findByNameAndOwnerUserId(updateSearchProfileDto.getName(), searchProfile.getOwnerUserId());
-        if (existingSearchProfile.isPresent() && !searchProfile.getId().equals(existingSearchProfile.get().getId())) {
-            throw new SearchProfileNameAlreadyExistsException(searchProfile.getName(), searchProfile.getOwnerUserId());
+        SearchProfile searchProfileToUpdate = getById(new SearchProfileId(updateSearchProfileDto.getId()));
+        Optional<SearchProfile> searchProfileWithSameName = searchProfileRepository.findByNameAndOwnerUserId(updateSearchProfileDto.getName(), searchProfileToUpdate.getOwnerUserId());
+        if (searchProfileWithSameName.isPresent() && !searchProfileToUpdate.getId().equals(searchProfileWithSameName.get().getId())) {
+            throw new SearchProfileNameAlreadyExistsException(searchProfileToUpdate.getName(), searchProfileToUpdate.getOwnerUserId());
         }
-        searchProfile.update(updateSearchProfileDto.getName(), toSearchFilter(updateSearchProfileDto.getSearchFilter()));
-        LOG.debug("{} has been updated.", searchProfile.toString());
-        return toResolvedSearchProfileDto(searchProfile);
+        searchProfileToUpdate.update(updateSearchProfileDto.getName(), toSearchFilter(updateSearchProfileDto.getSearchFilter()));
+        LOG.debug("{} has been updated.", searchProfileToUpdate.toString());
+        return toResolvedSearchProfileDto(searchProfileToUpdate);
     }
 
     @PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(#searchProfileId)")
@@ -103,12 +118,12 @@ public class SearchProfileApplicationService {
     public Page<SearchProfileResultDto> getSearchProfiles(String ownerUserId, int page, int size) {
         Condition.notNull(ownerUserId, "OwnerUserId can't be null");
         Pageable pageable = PageRequest.of(page, size, Sort.by(desc("updatedTime"), desc("createdTime")));
-        Page<SearchProfile> searchProfileList = this.searchProfileRepository.findAllByOwnerUserId(ownerUserId, pageable);
-        List<SearchProfileResultDto> result = toSearchProfileResultDtos(searchProfileList.getContent());
-        return new PageImpl<>(result, pageable, searchProfileList.getTotalElements());
+        Page<SearchProfile> searchProfiles = this.searchProfileRepository.findAllByOwnerUserId(ownerUserId, pageable);
+        List<SearchProfileResultDto> result = toSearchProfileResults(searchProfiles.getContent());
+        return new PageImpl<>(result, pageable, searchProfiles.getTotalElements());
     }
 
-    private List<SearchProfileResultDto> toSearchProfileResultDtos(List<SearchProfile> searchProfileList) {
+    private List<SearchProfileResultDto> toSearchProfileResults(List<SearchProfile> searchProfileList) {
         return searchProfileList.stream()
                 .map(this::toSearchProfileResultDto)
                 .collect(Collectors.toList());

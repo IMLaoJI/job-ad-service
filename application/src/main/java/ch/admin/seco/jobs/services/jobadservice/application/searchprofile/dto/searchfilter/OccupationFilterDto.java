@@ -1,9 +1,9 @@
 package ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter;
 
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.OccupationFilter;
-
 import java.util.List;
 import java.util.stream.Collectors;
+
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.OccupationFilter;
 
 public class OccupationFilterDto {
 
@@ -30,6 +30,8 @@ public class OccupationFilterDto {
 	}
 
 	public static List<OccupationFilterDto> toDto(List<OccupationFilter> occupationFilters) {
-		return occupationFilters.stream().map(OccupationFilterDto::toDto).collect(Collectors.toList());
+		return occupationFilters.stream()
+				.map(OccupationFilterDto::toDto)
+				.collect(Collectors.toList());
 	}
 }
