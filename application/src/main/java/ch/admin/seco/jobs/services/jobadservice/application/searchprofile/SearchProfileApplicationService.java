@@ -187,7 +187,7 @@ public class SearchProfileApplicationService {
 
     private List<OccupationFilter> toOccupationFilters(List<OccupationFilterDto> occupationFilterDtos) {
         return occupationFilterDtos.stream()
-                .map(occupationFilterDto -> new OccupationFilter(occupationFilterDto.getLabelId(), occupationFilterDto.getType()))
+                .map(occupationFilterDto -> new OccupationFilter(occupationFilterDto.getLabelId()))
                 .collect(Collectors.toList());
     }
 
