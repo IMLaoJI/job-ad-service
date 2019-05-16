@@ -1,12 +1,12 @@
 package ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LocationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.ContractType;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.Sort;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class ResolvedSearchFilterDto {
 
@@ -28,7 +28,7 @@ public class ResolvedSearchFilterDto {
 
     private Boolean euresDisplay;
 
-    private List<CantonFilterDto> cantonFilters = new ArrayList<>();
+    private List<CantonFilterDto> cantons = new ArrayList<>();
 
     private RadiusSearchFilterDto radiusSearchFilter;
 
@@ -117,12 +117,12 @@ public class ResolvedSearchFilterDto {
         return this;
     }
 
-    public List<CantonFilterDto> getCantonFilters() {
-        return cantonFilters;
+    public List<CantonFilterDto> getCantons() {
+        return cantons;
     }
 
-    public ResolvedSearchFilterDto setCantonFilters(List<CantonFilterDto> cantonFilters) {
-        this.cantonFilters = cantonFilters;
+    public ResolvedSearchFilterDto setCantons(List<CantonFilterDto> cantons) {
+        this.cantons = cantons;
         return this;
     }
 
