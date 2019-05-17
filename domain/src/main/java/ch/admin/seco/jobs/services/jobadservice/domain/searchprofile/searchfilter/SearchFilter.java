@@ -1,29 +1,11 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.ElementCollection;
-import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.JoinColumn;
-import javax.persistence.OrderColumn;
+import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
+import java.util.*;
 
 @Embeddable
 @Access(AccessType.FIELD)
@@ -84,15 +66,8 @@ public class SearchFilter {
 	@Valid
 	private List<CantonFilter> cantonFilters = new ArrayList<>();
 
-	@OrderColumn(name = "SEARCH_FILTER_RADIUS_ORDER")
-	@Embedded
-	@AttributeOverrides({
-			@AttributeOverride(name = "geoPoint.lon", column = @Column(name = "SEARCH_FILTER_RADIUS_GEO_POINT_LON")),
-			@AttributeOverride(name = "geoPoint.lat", column = @Column(name = "SEARCH_FILTER_RADIUS_GEO_POINT_LAT")),
-			@AttributeOverride(name = "distance", column = @Column(name = "SEARCH_FILTER_RADIUS_DISTANCE"))
-	})
-	@Valid
-	private RadiusSearchFilter radiusSearchFilter;
+	@Column(name = "SEARCH_FILTER_RADIUS_DISTANCE")
+	private Integer distance;
 
 	private SearchFilter(Builder builder) {
 		this.sort = builder.sort;
@@ -107,7 +82,7 @@ public class SearchFilter {
 		this.occupationFilters.addAll(builder.occupationFilters);
 		this.localityFilters.addAll(builder.localityFilters);
 		this.cantonFilters.addAll(builder.cantonFilters);
-		this.radiusSearchFilter = builder.radiusSearchFilter;
+		this.distance = builder.distance;
 	}
 
 	private SearchFilter() {
@@ -138,8 +113,8 @@ public class SearchFilter {
 		return Collections.unmodifiableList(this.cantonFilters);
 	}
 
-	public RadiusSearchFilter getRadiusSearchFilter() {
-		return radiusSearchFilter;
+	public Integer getDistance() {
+		return distance;
 	}
 
 	public ContractType getContractType() {
@@ -196,7 +171,7 @@ public class SearchFilter {
 
 		private List<LocalityFilter> localityFilters;
 
-		private RadiusSearchFilter radiusSearchFilter;
+		private Integer distance;
 
 		public Builder setSort(Sort sort) {
 			this.sort = sort;
@@ -258,8 +233,8 @@ public class SearchFilter {
 			return this;
 		}
 
-		public Builder setRadiusSearchFilter(RadiusSearchFilter radiusSearchFilter) {
-			this.radiusSearchFilter = radiusSearchFilter;
+		public Builder setDistance(Integer distance) {
+			this.distance = distance;
 			return this;
 		}
 

@@ -1,13 +1,12 @@
 package ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.validation.Valid;
-
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.ContractType;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.SearchFilter;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.Sort;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SearchFilterDto {
 
@@ -38,8 +37,7 @@ public class SearchFilterDto {
 	@Valid
 	private List<CantonFilterDto> cantonFilters = new ArrayList<>();
 
-	@Valid
-	private RadiusSearchFilterDto radiusSearchFilter;
+	private Integer distance;
 
 	public SearchFilterDto() {
 	}
@@ -152,12 +150,12 @@ public class SearchFilterDto {
 		return this;
 	}
 
-	public RadiusSearchFilterDto getRadiusSearchFilter() {
-		return radiusSearchFilter;
+	public Integer getDistance() {
+		return distance;
 	}
 
-	public SearchFilterDto setRadiusSearchFilter(RadiusSearchFilterDto radiusSearchFilter) {
-		this.radiusSearchFilter = radiusSearchFilter;
+	public SearchFilterDto setDistance(Integer distance) {
+		this.distance = distance;
 		return this;
 	}
 
@@ -175,6 +173,6 @@ public class SearchFilterDto {
 				.setOccupationFilters(OccupationFilterDto.toDto(searchFilter.getOccupationFilters()))
 				.setLocalityFilters(LocalityFilterDto.toDto(searchFilter.getLocalityFilters()))
 				.setCantonFilters(CantonFilterDto.toDto(searchFilter.getCantonFilters()))
-				.setRadiusSearchFilter(RadiusSearchFilterDto.toDto(searchFilter.getRadiusSearchFilter()));
+				.setDistance(searchFilter.getDistance());
 	}
 }
