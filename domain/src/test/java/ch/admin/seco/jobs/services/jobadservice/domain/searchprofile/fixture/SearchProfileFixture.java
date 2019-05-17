@@ -1,13 +1,13 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileId;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.CantonFilter;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.SearchFilter;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.Sort;
-import com.google.common.collect.ImmutableSet;
-
-import java.util.Collections;
 
 public class SearchProfileFixture {
 
@@ -24,7 +24,7 @@ public class SearchProfileFixture {
     public static SearchFilter prepareSearchFilter() {
         return SearchFilter.builder()
                 .setSort(Sort.RELEVANCE_DESC)
-                .setKeywords(ImmutableSet.of("java", "angular"))
+                .setKeywords(Arrays.asList("java", "angular"))
                 .setOccupationFilters(Collections.emptyList())
                 .setLocalityFilters(Collections.emptyList())
                 .setCantonFilters(Collections.singletonList(
