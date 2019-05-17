@@ -1,23 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.application.searchprofile;
 
-import static org.springframework.data.domain.Sort.Order.desc;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LocationDto;
@@ -25,13 +7,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.Cr
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.ResolvedSearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.SearchProfileResultDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.UpdateSearchProfileDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.CantonFilterDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.LocalityFilterDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.OccupationFilterDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.RadiusSearchFilterDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.ResolvedOccupationFilterDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.ResolvedSearchFilterDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.SearchFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.*;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPublisher;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
@@ -42,8 +18,19 @@ import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.Sear
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.CantonFilter;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.LocalityFilter;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.OccupationFilter;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.RadiusSearchFilter;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.SearchFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.springframework.data.domain.Sort.Order.desc;
 
 @Service
 @Transactional
@@ -176,7 +163,7 @@ public class SearchProfileApplicationService {
 				.setDisplayRestricted(searchFilter.getDisplayRestricted())
 				.setEuresDisplay(searchFilter.getEuresDisplay())
 				.setCantons(CantonFilterDto.toDto(searchFilter.getCantonFilters()))
-				.setRadiusSearchFilter(RadiusSearchFilterDto.toDto(searchFilter.getRadiusSearchFilter()))
+				.setDistance(searchFilter.getDistance())
 				.setOccupations(occupationSuggestions)
 				.setLocations(locations);
 	}
@@ -199,7 +186,7 @@ public class SearchProfileApplicationService {
 				.setOccupationFilters(toOccupationFilters(searchFilterDto.getOccupationFilters()))
 				.setLocalityFilters(toLocalityFilters(searchFilterDto.getLocalityFilters()))
 				.setCantonFilters(toCantonFilters(searchFilterDto.getCantonFilters()))
-				.setRadiusSearchFilter(toRadiusSearchFilter(searchFilterDto.getRadiusSearchFilter()))
+				.setDistance(searchFilterDto.getDistance())
 				.build();
 	}
 
@@ -221,10 +208,4 @@ public class SearchProfileApplicationService {
 				.collect(Collectors.toList());
 	}
 
-	private RadiusSearchFilter toRadiusSearchFilter(RadiusSearchFilterDto radiusSearchFilterDto) {
-		if (radiusSearchFilterDto == null) {
-			return null;
-		}
-		return new RadiusSearchFilter(radiusSearchFilterDto.getGeoPoint(), radiusSearchFilterDto.getDistance());
-	}
 }
