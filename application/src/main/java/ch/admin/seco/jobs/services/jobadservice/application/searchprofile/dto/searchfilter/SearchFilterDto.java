@@ -6,8 +6,8 @@ import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilte
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 public class SearchFilterDto {
 
@@ -15,7 +15,7 @@ public class SearchFilterDto {
 
     private ContractType contractType;
 
-    private Set<String> keywords;
+    private LinkedHashSet<String> keywords;
 
     private Integer workloadPercentageMin;
 
@@ -61,11 +61,11 @@ public class SearchFilterDto {
         return this;
     }
 
-    public Set<String> getKeywords() {
+    public LinkedHashSet<String> getKeywords() {
         return keywords;
     }
 
-    public SearchFilterDto setKeywords(Set<String> keywords) {
+    public SearchFilterDto setKeywords(LinkedHashSet<String> keywords) {
         this.keywords = keywords;
         return this;
     }
@@ -164,7 +164,7 @@ public class SearchFilterDto {
         return new SearchFilterDto()
                 .setSort(searchFilter.getSort())
                 .setContractType(searchFilter.getContractType())
-                .setKeywords(searchFilter.getKeywords())
+                .setKeywords(new LinkedHashSet<>(searchFilter.getKeywords()))
                 .setWorkloadPercentageMin(searchFilter.getWorkloadPercentageMin())
                 .setWorkloadPercentageMax(searchFilter.getWorkloadPercentageMax())
                 .setCompanyName(searchFilter.getCompanyName())
