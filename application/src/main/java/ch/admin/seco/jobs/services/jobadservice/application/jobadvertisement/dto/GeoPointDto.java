@@ -24,4 +24,8 @@ public class GeoPointDto {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return "" + lat + ", " + lon;
+    }
 }
