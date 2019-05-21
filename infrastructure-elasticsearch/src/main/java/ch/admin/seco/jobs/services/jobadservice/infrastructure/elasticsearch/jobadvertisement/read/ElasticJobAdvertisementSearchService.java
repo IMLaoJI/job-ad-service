@@ -80,7 +80,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
 
 	private static final String PATH_CREATED_TIME = "jobAdvertisement.createdTime";
-	private static final String RATE_OF_DECAY = "2" + KILOMETERS;
+	private static final String DECAY_RATE_2KM = "2km";
 
 	private static Logger LOG = LoggerFactory.getLogger(ElasticJobAdvertisementSearchService.class);
 
@@ -148,9 +148,10 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 				.withTypes(TYPE_DOC)
 				.build();
 
-
+		if (LOG.isTraceEnabled()) {
 			LOG.trace("query: {}", searchQuery.getQuery());
 			LOG.trace("filter: {}", searchQuery.getFilter());
+		}
 
 		return elasticsearchTemplate.query(searchQuery, response -> extractSearchResult(pageable, response));
 	}
@@ -314,7 +315,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
 	private QueryBuilder createQuery(JobAdvertisementSearchRequest jobSearchRequest) {
 		if (isEmpty(jobSearchRequest.getKeywords()) && isEmpty(jobSearchRequest.getProfessionCodes())) {
-			return matchAllQuery();
+			return functionScoreQuery(createFilter(jobSearchRequest)); //TODO: Check if this needs branching
 		} else {
 			return mustAll(createKeywordQuery(jobSearchRequest), createOccupationQuery(jobSearchRequest));
 		}
@@ -503,9 +504,9 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 					.point(radiusSearchRequest.getGeoPoint().getLat(), radiusSearchRequest.getGeoPoint().getLon())
 					.distance(radiusSearchRequest.getDistance(), KILOMETERS);
 
-			GaussDecayFunctionBuilder gaussDecayFunctionBuilder = gaussDecayFunction(PATH_LOCATION_COORDINATES, radiusSearchRequest.getGeoPoint().toString(), RATE_OF_DECAY);
+			GaussDecayFunctionBuilder gaussDecayFunctionBuilder = gaussDecayFunction(PATH_LOCATION_COORDINATES, radiusSearchRequest.getGeoPoint().toString(), DECAY_RATE_2KM);
 
-			localityFilter.should(functionScoreQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder)).boost(10f);
+			localityFilter.should(functionScoreQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder)).boost(2f);
 		}
 
 		if (isNotEmpty(jobSearchRequest.getCantonCodes())) {
