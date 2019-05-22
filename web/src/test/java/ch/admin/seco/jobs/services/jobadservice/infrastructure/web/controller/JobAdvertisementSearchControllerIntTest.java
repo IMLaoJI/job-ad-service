@@ -319,12 +319,13 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
-    public void shouldDecayTheScoreOfResultsBasedOnDistanceInitialGeoPoint() throws Exception {
+    public void shouldDecayTheScoreOfResultsBasedOnDistanceOfInitialGeoPoint() throws Exception {
         // GIVEN
         // DISTANCES:
+        // Bern - Bern - 0km
         // Bern - Lausanne 78.33km
         // Bern - Sion 79km,
-        // Bern - Zurich 95km,
+        // Bern - Zurich 95km
         index(listOfJobAdsForGeoDistanceTests());
 
         // WHEN
@@ -337,12 +338,13 @@ public class JobAdvertisementSearchControllerIntTest {
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
                         .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
         );
+
+        //THEN
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "4"))
                 .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job01")))
                 .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
-
 
                 .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job04")))
                 .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")))

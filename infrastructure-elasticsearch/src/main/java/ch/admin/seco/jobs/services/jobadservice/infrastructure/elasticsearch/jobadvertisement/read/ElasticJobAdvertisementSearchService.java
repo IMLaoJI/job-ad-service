@@ -315,7 +315,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
 	private QueryBuilder createQuery(JobAdvertisementSearchRequest jobSearchRequest) {
 		if (isEmpty(jobSearchRequest.getKeywords()) && isEmpty(jobSearchRequest.getProfessionCodes())) {
-			return functionScoreQuery(createFilter(jobSearchRequest)); //TODO: Check if this needs branching
+			return functionScoreQuery(createFilter(jobSearchRequest));
 		} else {
 			return mustAll(createKeywordQuery(jobSearchRequest), createOccupationQuery(jobSearchRequest));
 		}
