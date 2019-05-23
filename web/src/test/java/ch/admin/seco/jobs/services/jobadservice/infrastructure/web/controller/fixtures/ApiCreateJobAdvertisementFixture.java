@@ -18,15 +18,16 @@ import java.util.List;
 public class ApiCreateJobAdvertisementFixture {
 
     public static final String phoneFormatted = "+41 58 844 44 44";
+    private static final String phoneUnformatted = "+41588444444";
 
-    public static ApiCreateJobAdvertisementDto createJobAdvertismentDto01(){
+    public static ApiCreateJobAdvertisementDto createJobAdvertisementDto() {
         ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = new ApiCreateJobAdvertisementDto();
 
         ApiContactDto apiContactDto = new ApiContactDto();
         apiContactDto.setSalutation(Salutation.MR);
         apiContactDto.setFirstName("Test First Name");
         apiContactDto.setLastName("Test Last Name");
-        apiContactDto.setPhone(phoneFormatted);
+        apiContactDto.setPhone(phoneUnformatted);
         apiContactDto.setEmail("Test@mail.com");
         apiContactDto.setLanguageIsoCode("en");
         apiCreateJobAdvertisementDto.setContact(apiContactDto);
@@ -49,7 +50,7 @@ public class ApiCreateJobAdvertisementFixture {
         apiCompanyDto.setPostalCode("3001");
         apiCompanyDto.setCity("Bern");
         apiCompanyDto.setCountryIsoCode("CH");
-        apiCompanyDto.setPhone("+41588444444");
+        apiCompanyDto.setPhone(phoneUnformatted);
         apiCreateJobAdvertisementDto.setCompany(apiCompanyDto);
 
         ApiEmploymentDto apiEmploymentDto = new ApiEmploymentDto();
@@ -68,8 +69,29 @@ public class ApiCreateJobAdvertisementFixture {
         apiCreateJobAdvertisementDto.setOccupation(apiOccupationDto);
 
         ApiApplyChannelDto apiApplyChannelDto = new ApiApplyChannelDto();
-        apiApplyChannelDto.setPhoneNumber("+41588444444");
+        apiApplyChannelDto.setPhoneNumber(phoneUnformatted);
         apiCreateJobAdvertisementDto.setApplyChannel(apiApplyChannelDto);
+
+        return apiCreateJobAdvertisementDto;
+    }
+
+    public static ApiCreateJobAdvertisementDto createJobAdDtoWithPhoneWithText() {
+        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertisementDto();
+        apiCreateJobAdvertisementDto.getCompany().setPhone("+4111a111111");
+
+        return apiCreateJobAdvertisementDto;
+    }
+
+    public static ApiCreateJobAdvertisementDto createJobAdDtoWithPhoneFalseFormatted() {
+        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertisementDto();
+        apiCreateJobAdvertisementDto.getCompany().setPhone("+41123456789");
+
+        return apiCreateJobAdvertisementDto;
+    }
+
+    public static ApiCreateJobAdvertisementDto createJobAdDtoWithPhoneTooLong() {
+        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertisementDto();
+        apiCreateJobAdvertisementDto.getCompany().setPhone("+4111 111 1111111");
 
         return apiCreateJobAdvertisementDto;
     }

@@ -24,7 +24,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.ApiCreateJobAdvertisementFixture.createJobAdvertismentDto01;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.ApiCreateJobAdvertisementFixture.createJobAdvertisementDto;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.ApiCreateJobAdvertisementFixture.phoneFormatted;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -61,7 +61,7 @@ public class JobAdvertisementApiRestControllerIntTest {
     public void testCreateApiJobAdvertisement() throws Exception {
         // given
         this.index(createJob(job01.id()));
-        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertismentDto01();
+        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertisementDto();
 
         //when
         when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
@@ -78,7 +78,7 @@ public class JobAdvertisementApiRestControllerIntTest {
     @WithApiUser
     public void testCheckPhoneNumberFormat() throws Exception {
         // given
-        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertismentDto01();
+        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertisementDto();
 
         //when
         when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);

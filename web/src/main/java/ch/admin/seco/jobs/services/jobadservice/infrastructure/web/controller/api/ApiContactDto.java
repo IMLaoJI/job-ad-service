@@ -2,6 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.a
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.LanguageIsoCode;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.PhoneNumber;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -22,7 +23,7 @@ public class ApiContactDto {
     private String lastName;
 
     @NotBlank
-    @Size(min=9, max=20)
+    @PhoneNumber
     private String phone;
 
     @NotBlank

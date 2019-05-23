@@ -1,6 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.api;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.CountryIsoCode;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.PhoneNumber;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -38,7 +39,7 @@ public class ApiCompanyDto {
     @Size(max=100)
     private String postOfficeBoxCity;
 
-    @Size(min=9, max=20)
+    @PhoneNumber
     private String phone;
 
     @Size(max=50)
