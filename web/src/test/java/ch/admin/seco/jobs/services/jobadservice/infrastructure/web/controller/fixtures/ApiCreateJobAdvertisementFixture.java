@@ -24,7 +24,7 @@ public class ApiCreateJobAdvertisementFixture {
         apiContactDto.setSalutation(Salutation.MR);
         apiContactDto.setFirstName("Test First Name");
         apiContactDto.setLastName("Test Last Name");
-        apiContactDto.setPhone("+41123123123");
+        apiContactDto.setPhone("+41 58 844 44 44");
         apiContactDto.setEmail("Test@mail.com");
         apiContactDto.setLanguageIsoCode("en");
         apiCreateJobAdvertisementDto.setContact(apiContactDto);
@@ -47,6 +47,7 @@ public class ApiCreateJobAdvertisementFixture {
         apiCompanyDto.setPostalCode("3001");
         apiCompanyDto.setCity("Bern");
         apiCompanyDto.setCountryIsoCode("CH");
+        apiCompanyDto.setPhone("+41588444444");
         apiCreateJobAdvertisementDto.setCompany(apiCompanyDto);
 
         ApiEmploymentDto apiEmploymentDto = new ApiEmploymentDto();
@@ -64,7 +65,9 @@ public class ApiCreateJobAdvertisementFixture {
         apiOccupationDto.setAvamOccupationCode("123456789");
         apiCreateJobAdvertisementDto.setOccupation(apiOccupationDto);
 
-        apiCreateJobAdvertisementDto.setApplyChannel(new ApiApplyChannelDto());
+        ApiApplyChannelDto apiApplyChannelDto = new ApiApplyChannelDto();
+        apiApplyChannelDto.setPhoneNumber("+41588444444");
+        apiCreateJobAdvertisementDto.setApplyChannel(apiApplyChannelDto);
 
         return apiCreateJobAdvertisementDto;
     }

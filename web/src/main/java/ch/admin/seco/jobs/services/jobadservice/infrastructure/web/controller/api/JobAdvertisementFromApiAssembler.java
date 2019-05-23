@@ -1,22 +1,18 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.api;
 
 import ch.admin.seco.jobs.services.jobadservice.application.HtmlToMarkdownConverter;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmployerDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.CancellationResource;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -26,6 +22,8 @@ import static org.springframework.util.StringUtils.hasText;
 
 @Component
 public class JobAdvertisementFromApiAssembler {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(JobAdvertisementFromApiAssembler.class);
 
 	private final HtmlToMarkdownConverter htmlToMarkdownConverter;
 
@@ -67,7 +65,7 @@ public class JobAdvertisementFromApiAssembler {
 				.setSalutation(apiContact.getSalutation())
 				.setFirstName(trimOrNull(apiContact.getFirstName()))
 				.setLastName(trimOrNull(apiContact.getLastName()))
-				.setPhone(trimOrNull(apiContact.getPhone()))
+				.setPhone(sanitizePhoneNumber(apiContact.getPhone()))
 				.setEmail(trimOrNull(apiContact.getEmail()))
 				.setLanguageIsoCode(trimOrNull(apiContact.getLanguageIsoCode()));
 	}
@@ -114,7 +112,7 @@ public class JobAdvertisementFromApiAssembler {
 				.setPostOfficeBoxNumber(trimOrNull(apiCompany.getPostOfficeBoxNumber()))
 				.setPostOfficeBoxPostalCode(trimOrNull(apiCompany.getPostOfficeBoxPostalCode()))
 				.setPostOfficeBoxCity(trimOrNull(apiCompany.getPostOfficeBoxCity()))
-				.setPhone(trimOrNull(apiCompany.getPhone()))
+				.setPhone(sanitizePhoneNumber(trimOrNull(apiCompany.getPhone())))
 				.setEmail(trimOrNull(apiCompany.getEmail()))
 				.setWebsite(trimOrNull(apiCompany.getWebsite()))
 				.setSurrogate(apiCompany.isSurrogate());
@@ -189,7 +187,7 @@ public class JobAdvertisementFromApiAssembler {
 				.setRawPostAddress(trimOrNull(apiApplyChannel.getMailAddress()))
 				.setPostAddress(AddressParser.parse(trimOrNull(apiApplyChannel.getMailAddress()), trimOrNull(apiCreateDto.getCompany().getName())))
 				.setEmailAddress(trimOrNull(apiApplyChannel.getEmailAddress()))
-				.setPhoneNumber(trimOrNull(apiApplyChannel.getPhoneNumber()))
+				.setPhoneNumber(sanitizePhoneNumber(trimOrNull(apiApplyChannel.getPhoneNumber())))
 				.setFormUrl(trimOrNull(apiApplyChannel.getFormUrl()))
 				.setAdditionalInfo(trimOrNull(apiApplyChannel.getAdditionalInfo()));
 	}
@@ -202,8 +200,25 @@ public class JobAdvertisementFromApiAssembler {
 				.setSalutation(apiPublicContact.getSalutation())
 				.setFirstName(trimOrNull(apiPublicContact.getFirstName()))
 				.setLastName(trimOrNull(apiPublicContact.getLastName()))
-				.setPhone(trimOrNull(apiPublicContact.getPhone()))
+				.setPhone(sanitizePhoneNumber(trimOrNull(apiPublicContact.getPhone())))
 				.setEmail(trimOrNull(apiPublicContact.getEmail()));
+	}
+
+	/*
+	 * Check for a valid phone number and remove remarks.
+	 */
+	private String sanitizePhoneNumber(String phone) {
+		if (hasText(phone)) {
+			try {
+				Phonenumber.PhoneNumber phoneNumber = PhoneNumberUtil.getInstance().parse(phone, "CH");
+				if (PhoneNumberUtil.getInstance().isValidNumber(phoneNumber)) {
+					return PhoneNumberUtil.getInstance().format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
+				}
+			} catch (NumberParseException e) {
+				LOGGER.warn("JobAdvertisementFromApiAssembler.convert ::: ApiCreateJobAdvertisementDto has invalid phone number: {}", phone);
+			}
+		}
+		return null;
 	}
 
 	private static String trimOrNull(String value) {

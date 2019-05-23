@@ -1,14 +1,12 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.api;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.LanguageIsoCode;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Contact;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.LanguageIsoCode;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.PhoneNumber;
 
 public class ApiContactDto {
 
@@ -24,7 +22,7 @@ public class ApiContactDto {
     private String lastName;
 
     @NotBlank
-    @PhoneNumber
+    @Size(min=9, max=20)
     private String phone;
 
     @NotBlank
