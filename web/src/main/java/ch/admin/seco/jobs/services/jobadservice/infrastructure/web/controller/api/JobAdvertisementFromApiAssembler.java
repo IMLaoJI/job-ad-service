@@ -205,7 +205,8 @@ public class JobAdvertisementFromApiAssembler {
 	}
 
 	/*
-	 * Check for a valid phone number and remove remarks.
+	 * Check for a valid phone number and format as international number (with spaces)
+	 * example: +41 79 555 12 34
 	 */
 	private String sanitizePhoneNumber(String phone) {
 		if (hasText(phone)) {

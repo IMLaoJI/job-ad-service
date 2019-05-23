@@ -17,6 +17,8 @@ import java.util.List;
 
 public class ApiCreateJobAdvertisementFixture {
 
+    public static final String phoneFormatted = "+41 58 844 44 44";
+
     public static ApiCreateJobAdvertisementDto createJobAdvertismentDto01(){
         ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = new ApiCreateJobAdvertisementDto();
 
@@ -24,7 +26,7 @@ public class ApiCreateJobAdvertisementFixture {
         apiContactDto.setSalutation(Salutation.MR);
         apiContactDto.setFirstName("Test First Name");
         apiContactDto.setLastName("Test Last Name");
-        apiContactDto.setPhone("+41 58 844 44 44");
+        apiContactDto.setPhone(phoneFormatted);
         apiContactDto.setEmail("Test@mail.com");
         apiContactDto.setLanguageIsoCode("en");
         apiCreateJobAdvertisementDto.setContact(apiContactDto);
