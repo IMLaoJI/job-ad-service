@@ -71,4 +71,14 @@ public class JobAdvertisementFromApiAssemblerTest {
                 .isThrownBy(() -> jobAdvertisementFromApiAssembler.sanitizePhoneNumber(phone));
     }
 
+    @Test
+    public void testPhoneNumberParsedIsNull() {
+        // given
+        String phone = "0385 9 a9999 a 999999999999999999999999";
+
+        // then
+        assertThatExceptionOfType(ConditionException.class)
+                .isThrownBy(() -> jobAdvertisementFromApiAssembler.sanitizePhoneNumber(phone));
+    }
+
 }
