@@ -6,14 +6,13 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
+import ch.admin.seco.jobs.services.jobadservice.core.conditions.ConditionException;
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.CancellationResource;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -23,8 +22,6 @@ import static org.springframework.util.StringUtils.hasText;
 
 @Component
 public class JobAdvertisementFromApiAssembler {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(JobAdvertisementFromApiAssembler.class);
 
 	private final HtmlToMarkdownConverter htmlToMarkdownConverter;
 
@@ -216,16 +213,15 @@ public class JobAdvertisementFromApiAssembler {
                 validatePhoneNumber(phone, phoneNumber);
                 return PhoneNumberUtil.getInstance().format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
             } catch (NumberParseException e) {
-                validatePhoneNumber(phone, null);
+				throw  new ConditionException("Failed to parse phone number %s .", phone);
             }
         }
         return null;
     }
 
     private void validatePhoneNumber(String phone, Phonenumber.PhoneNumber phoneNumber) {
-        String validationMessage = String.format("Phone number %s is not valid and can't be formatted.", phone);
+        String validationMessage = String.format("Failed to parse phone number %s .", phone);
 
-        Condition.notNull(phoneNumber, validationMessage);
         Condition.isTrue(PhoneNumberUtil.getInstance().isValidNumber(phoneNumber), validationMessage);
     }
 
