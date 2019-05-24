@@ -7,7 +7,6 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.job
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.WithApiUser;
-import org.codehaus.jettison.json.JSONArray;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,9 +27,10 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.ApiCreateJobAdvertisementFixture.createJobAdvertisementDto;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.ApiCreateJobAdvertisementFixture.phoneFormatted;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -84,20 +85,12 @@ public class JobAdvertisementApiRestControllerIntTest {
         when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
         when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
 
-        ResultActions post = post(apiCreateJobAdvertisementDto, URL);
-
-        String contentAsString = post.andReturn().getResponse().getContentAsString();
-        JSONArray ja = new JSONArray("[" + contentAsString + "]");
-        // get applyChannel phone through: jobContent.applyChannel.phoneNumber
-        String applyChannelPhone = ja.getJSONObject(0).getJSONObject("jobContent").getJSONObject("applyChannel").getString("phoneNumber");
-        // get company phone through: jobContent.company.phone
-        String phoneCompany = ja.getJSONObject(0).getJSONObject("jobContent").getJSONObject("company").getString("phone");
-
         // then
-        post.andExpect(status().isCreated());
-        assertThat(post.andReturn().getResponse().getHeader("token")).isNotBlank();
-        assertThat(applyChannelPhone).isEqualTo(phoneFormatted);
-        assertThat(phoneCompany).isEqualTo(phoneFormatted);
+        post(apiCreateJobAdvertisementDto, URL)
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.jobContent.applyChannel.phoneNumber").value(equalTo(phoneFormatted)))
+                .andExpect(jsonPath("$.jobContent.company.phone").value(equalTo(phoneFormatted)));
     }
 
     private void index(JobAdvertisement jobAdvertisement) {
