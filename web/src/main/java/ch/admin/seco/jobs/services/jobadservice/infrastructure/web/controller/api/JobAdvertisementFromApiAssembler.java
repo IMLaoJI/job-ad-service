@@ -213,7 +213,7 @@ public class JobAdvertisementFromApiAssembler {
                 validatePhoneNumber(phone, phoneNumber);
                 return PhoneNumberUtil.getInstance().format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
             } catch (NumberParseException e) {
-				throw  new ConditionException("Failed to parse phone number %s .", phone);
+                throw new ConditionException("Failed to parse phone number %s .", phone);
             }
         }
         return null;
