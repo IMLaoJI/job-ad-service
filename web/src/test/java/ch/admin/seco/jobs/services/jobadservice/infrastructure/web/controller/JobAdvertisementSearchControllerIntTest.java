@@ -10,6 +10,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.Pro
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.RadiusSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.GeoPointDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.GeoPoint;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel;
@@ -57,6 +58,7 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job07;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job08;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture.testJobContent;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobDescriptionFixture.testJobDescription;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
@@ -326,6 +328,7 @@ public class JobAdvertisementSearchControllerIntTest {
         // Bern - Lausanne 78.33km
         // Bern - Sion 79km,
         // Bern - Zurich 95km
+
         index(listOfJobAdsForGeoDistanceTests());
 
         // WHEN
@@ -346,6 +349,7 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job01")))
                 .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
 
+
                 .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job04")))
                 .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")))
 
@@ -355,7 +359,77 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(jsonPath("$.[3].jobAdvertisement.id").value(equalTo("job02")))
                 .andExpect(jsonPath("$.[3].jobAdvertisement.jobContent.location.city").value(equalTo("Zürich")));
 
+    }
 
+
+    @Test
+    public void shouldDecayTheScoreOfResultsBasedOnDistanceOfInitialGeoPointOnKeywordSearch() throws Exception {
+        //TODO: clean up
+        index(testJobAdvertisementWithContentAndLocation(job05.id(),
+                testJobContent()
+                        .setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build())).setLocation(
+                        testLocation()
+                                .setCity("Lausanne")
+                                .setCommunalCode("5586")
+                                .setRegionCode("VD01")
+                                .setCantonCode("VD")
+                                .setPostalCode("1000")
+                                .setCountryIsoCode("CH")
+                                .setCoordinates(new GeoPoint(6.6523078, 46.552043))
+                                .build()).build()));
+        index(testJobAdvertisementWithContentAndLocation(job06.id(),
+                testJobContent()
+                        .setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build())).setLocation(
+                        testLocation()
+                                .setCity("Bern")
+                                .setCommunalCode("351")
+                                .setRegionCode("BE01")
+                                .setCantonCode("BE")
+                                .setPostalCode("3000")
+                                .setCountryIsoCode("CH")
+                                .setCoordinates(new GeoPoint(7.441,46.948))
+                                .build()).build()));
+        index(testJobAdvertisementWithContentAndLocation(job07.id(),
+                testJobContent()
+                        .setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build())).setLocation(
+                        testLocation()
+                                .setCity("Sion")
+                                .setCommunalCode("6266")
+                                .setRegionCode("VS06")
+                                .setCantonCode("VS")
+                                .setPostalCode("1950")
+                                .setCountryIsoCode("CH")
+                                .setCoordinates(new GeoPoint(7.359, 46.234))
+                                .build()).build()));
+        // WHEN
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE});
+        jobAdvertisementSearchRequest.setKeywords(new String[]{"Koch"});
+        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(150));
+
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
+        );
+
+        //THEN
+
+        resultActions
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "3"))
+
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job05")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("<em>Koch</em>")))
+
+                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job07")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Sion")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("<em>Koch</em>")))
+
+                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job06")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("<em>Koch</em>")));
     }
 
     @Test

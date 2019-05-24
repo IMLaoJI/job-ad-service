@@ -80,7 +80,9 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
 
 	private static final String PATH_CREATED_TIME = "jobAdvertisement.createdTime";
-	private static final String DECAY_RATE_2KM = "2km";
+	private static final String SCALE_IN_KM = "30km";
+	private static final String OFFSET_IN_KM = "10km";
+	private static final double DECAY_RATE = 0.8;
 
 	private static Logger LOG = LoggerFactory.getLogger(ElasticJobAdvertisementSearchService.class);
 
@@ -315,9 +317,22 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
 	private QueryBuilder createQuery(JobAdvertisementSearchRequest jobSearchRequest) {
 		if (isEmpty(jobSearchRequest.getKeywords()) && isEmpty(jobSearchRequest.getProfessionCodes())) {
-			return functionScoreQuery(createFilter(jobSearchRequest));
+			return functionScoreQuery(createFilter(jobSearchRequest)); //TODO: Clean this up, createFilter is applied twice here.
+
+			//TODO: Branch Out CantonSearch here?
+
 		} else {
-			return mustAll(createKeywordQuery(jobSearchRequest), createOccupationQuery(jobSearchRequest));
+			BoolQueryBuilder boolQueryBuilder = mustAll(createKeywordQuery(jobSearchRequest), createOccupationQuery(jobSearchRequest));
+			if (hasRadiusSearchRequest(jobSearchRequest)) {
+				RadiusSearchRequest radiusSearchRequest = jobSearchRequest.getRadiusSearchRequest();
+				GeoDistanceQueryBuilder geoDistanceQueryBuilder = geoDistanceQuery(PATH_LOCATION_COORDINATES)
+						.point(radiusSearchRequest.getGeoPoint().getLat(), radiusSearchRequest.getGeoPoint().getLon())
+						.distance(radiusSearchRequest.getDistance(), KILOMETERS);
+				GaussDecayFunctionBuilder gaussDecayFunctionBuilder = gaussDecayFunction(PATH_LOCATION_COORDINATES, radiusSearchRequest.getGeoPoint().toString(), SCALE_IN_KM, OFFSET_IN_KM, DECAY_RATE);
+				boolQueryBuilder.should(functionScoreQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder).boost(2f));
+			}
+
+			return boolQueryBuilder;
 		}
 	}
 
@@ -492,21 +507,17 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
 		return contractTypeFilter;
 	}
-
+	//TODO: Try to remove the localityfilter and apply it directly to the queries
 	private BoolQueryBuilder localityFilter(JobAdvertisementSearchRequest jobSearchRequest) {
 		BoolQueryBuilder localityFilter = boolQuery();
 
 		if (hasRadiusSearchRequest(jobSearchRequest)) {
-
 			RadiusSearchRequest radiusSearchRequest = jobSearchRequest.getRadiusSearchRequest();
-
 			GeoDistanceQueryBuilder geoDistanceQueryBuilder = geoDistanceQuery(PATH_LOCATION_COORDINATES)
 					.point(radiusSearchRequest.getGeoPoint().getLat(), radiusSearchRequest.getGeoPoint().getLon())
 					.distance(radiusSearchRequest.getDistance(), KILOMETERS);
-
-			GaussDecayFunctionBuilder gaussDecayFunctionBuilder = gaussDecayFunction(PATH_LOCATION_COORDINATES, radiusSearchRequest.getGeoPoint().toString(), DECAY_RATE_2KM);
-
-			localityFilter.should(functionScoreQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder)).boost(2f);
+			GaussDecayFunctionBuilder gaussDecayFunctionBuilder = gaussDecayFunction(PATH_LOCATION_COORDINATES, radiusSearchRequest.getGeoPoint().toString(), SCALE_IN_KM, OFFSET_IN_KM, DECAY_RATE);
+			localityFilter.should(functionScoreQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder));
 		}
 
 		if (isNotEmpty(jobSearchRequest.getCantonCodes())) {
