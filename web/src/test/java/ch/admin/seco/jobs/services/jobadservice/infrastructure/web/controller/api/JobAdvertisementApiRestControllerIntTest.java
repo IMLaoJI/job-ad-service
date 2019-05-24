@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,11 +24,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.ApiCreateJobAdvertisementFixture.createJobAdvertismentDto01;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.ApiCreateJobAdvertisementFixture.createJobAdvertisementDto;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.ApiCreateJobAdvertisementFixture.phoneFormatted;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -56,10 +59,10 @@ public class JobAdvertisementApiRestControllerIntTest {
 
     @Test
     @WithApiUser
-    public void testCreateFavouriteItem() throws Exception {
+    public void testCreateApiJobAdvertisement() throws Exception {
         // given
         this.index(createJob(job01.id()));
-        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertismentDto01();
+        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertisementDto();
 
         //when
         when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
@@ -70,6 +73,24 @@ public class JobAdvertisementApiRestControllerIntTest {
         // then
         post.andExpect(status().isCreated());
         assertThat(post.andReturn().getResponse().getHeader("token")).isNotBlank();
+    }
+
+    @Test
+    @WithApiUser
+    public void testCheckPhoneNumberFormat() throws Exception {
+        // given
+        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertisementDto();
+
+        //when
+        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
+        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
+
+        // then
+        post(apiCreateJobAdvertisementDto, URL)
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.jobContent.applyChannel.phoneNumber").value(equalTo(phoneFormatted)))
+                .andExpect(jsonPath("$.jobContent.company.phone").value(equalTo(phoneFormatted)));
     }
 
     private void index(JobAdvertisement jobAdvertisement) {
