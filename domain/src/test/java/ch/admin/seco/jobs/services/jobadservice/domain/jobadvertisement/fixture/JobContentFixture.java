@@ -1,5 +1,8 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobContent.Builder;
+
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.ApplyChannelFixture.testApplyChannel;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.ApplyChannelFixture.testDisplayApplyChannel;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.CompanyFixture.testCompany;
@@ -14,15 +17,13 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.fixture.JobCenterFixture.testJobCenter;
 import static java.util.Collections.singletonList;
 
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobContent.Builder;
-
 public class JobContentFixture {
 
     public static Builder of(JobAdvertisementId id) {
         return testJobContent()
                 .setDisplayCompany(CompanyFixture.of(id).build())
                 .setCompany(CompanyFixture.of(id).build())
+                .setEmployment(testEmployment().build())
                 .setLanguageSkills(singletonList(testLanguageSkill().build()))
                 .setPublicContact(PublicContactFixture.of(id).build())
                 .setApplyChannel(ApplyChannelFixture.of(id).build())
