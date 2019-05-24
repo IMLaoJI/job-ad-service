@@ -5,6 +5,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
+import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.CancellationResource;
@@ -204,25 +205,31 @@ public class JobAdvertisementFromApiAssembler {
 				.setEmail(trimOrNull(apiPublicContact.getEmail()));
 	}
 
-	/*
-	 * Check for a valid phone number and format as international number (with spaces)
-	 * example: +41 79 555 12 34
-	 */
-	private String sanitizePhoneNumber(String phone) {
-		if (hasText(phone)) {
-			try {
-				Phonenumber.PhoneNumber phoneNumber = PhoneNumberUtil.getInstance().parse(phone, "CH");
-				if (PhoneNumberUtil.getInstance().isValidNumber(phoneNumber)) {
-					return PhoneNumberUtil.getInstance().format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
-				}
-			} catch (NumberParseException e) {
-				LOGGER.warn("JobAdvertisementFromApiAssembler.convert ::: ApiCreateJobAdvertisementDto has invalid phone number: {}", phone);
-			}
-		}
-		return null;
-	}
+    /*
+     * Check for a valid phone number and format as international number (with spaces)
+     * example: +41 79 555 12 34
+     */
+    String sanitizePhoneNumber(String phone) {
+        if (hasText(phone)) {
+            try {
+                Phonenumber.PhoneNumber phoneNumber = PhoneNumberUtil.getInstance().parse(phone, "CH");
+                validatePhoneNumber(phone, phoneNumber);
+                return PhoneNumberUtil.getInstance().format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
+            } catch (NumberParseException e) {
+                validatePhoneNumber(phone, null);
+            }
+        }
+        return null;
+    }
 
-	private static String trimOrNull(String value) {
-		return (hasText(value)) ? value.trim() : null;
-	}
+    private void validatePhoneNumber(String phone, Phonenumber.PhoneNumber phoneNumber) {
+        String validationMessage = String.format("Phone number %s is not valid and can't be formatted.", phone);
+
+        Condition.notNull(phoneNumber, validationMessage);
+        Condition.isTrue(PhoneNumberUtil.getInstance().isValidNumber(phoneNumber), validationMessage);
+    }
+
+    private static String trimOrNull(String value) {
+        return (hasText(value)) ? value.trim() : null;
+    }
 }
