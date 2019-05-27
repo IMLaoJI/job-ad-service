@@ -20,6 +20,7 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.job
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.unit.DistanceUnit;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.GeoDistanceQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
@@ -326,6 +327,8 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 			GeoDistanceQueryBuilder geoDistanceQueryBuilder = getDistanceQuery(radiusSearchRequest);
 			GaussDecayFunctionBuilder gaussDecayFunctionBuilder = getGaussDecayFunctionBuilder(radiusSearchRequest);
 			combinedBoolQueryBuilder
+					.must(geoDistanceQuery(PATH_LOCATION_COORDINATES).point(radiusSearchRequest.getGeoPoint().getLat(), radiusSearchRequest.getGeoPoint().getLon())
+							.distance(radiusSearchRequest.getDistance(), DistanceUnit.KILOMETERS))
 					.should(prepareFunctionQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder));
 		}
 

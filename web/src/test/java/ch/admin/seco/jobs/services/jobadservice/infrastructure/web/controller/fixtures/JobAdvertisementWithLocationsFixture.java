@@ -130,7 +130,9 @@ public class JobAdvertisementWithLocationsFixture {
     public static List<JobAdvertisement> listOfJobAdsForDecayingScoreSearchTests() {
         return Stream.of(testJobAdvertisementWithContentAndLocation(job05.id(),
                 testJobContent()
-                        .setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build())).setLocation(
+                        .setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build()))
+                        .setX28OccupationCodes("11000411")
+                        .setLocation(
                         testLocation()
                                 .setCity("Lausanne")
                                 .setCommunalCode("5586")
@@ -142,7 +144,9 @@ public class JobAdvertisementWithLocationsFixture {
                                 .build()).build()),
         testJobAdvertisementWithContentAndLocation(job06.id(),
                 testJobContent()
-                        .setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build())).setLocation(
+                        .setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build()))
+                        .setX28OccupationCodes("11000411")
+                        .setLocation(
                         testLocation()
                                 .setCity("Bern")
                                 .setCommunalCode("351")
@@ -154,7 +158,9 @@ public class JobAdvertisementWithLocationsFixture {
                                 .build()).build()),
         testJobAdvertisementWithContentAndLocation(job07.id(),
                 testJobContent()
-                        .setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build())).setLocation(
+                        .setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build()))
+                        .setX28OccupationCodes("11000411")
+                        .setLocation(
                         testLocation()
                                 .setCity("Sion")
                                 .setCommunalCode("6266")
