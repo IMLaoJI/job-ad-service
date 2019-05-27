@@ -42,4 +42,5 @@
     <include file="classpath:/liquibase/changelog/20190417080000_spring_integration.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20190417090000_delete_task_tables.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20190503080000_added_job_search_profile_tables.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/liquibase/changelog/20190517080000_remove_geopoints_from_job_search_profile_table.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
