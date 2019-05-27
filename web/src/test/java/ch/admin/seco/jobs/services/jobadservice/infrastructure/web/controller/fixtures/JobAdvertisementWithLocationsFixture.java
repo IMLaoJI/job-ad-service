@@ -7,9 +7,19 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job02;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job03;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job04;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job05;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job06;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job07;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithLocationAndPublicationStartDate;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.testJobAdvertisementWithContentAndLocation;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture.testJobContent;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobDescriptionFixture.testJobDescription;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
 public class JobAdvertisementWithLocationsFixture {
@@ -24,7 +34,7 @@ public class JobAdvertisementWithLocationsFixture {
                                 .setCantonCode("BE")
                                 .setPostalCode("3000")
                                 .setCountryIsoCode("CH")
-                                .setCoordinates(new GeoPoint(7.441,46.948))
+                                .setCoordinates(new GeoPoint(7.441, 46.948))
                                 .build()),
                 createJobWithLocationAndPublicationStartDate(job02.id(), LocalDate.now().plusDays(1),
                         testLocation()
@@ -115,5 +125,44 @@ public class JobAdvertisementWithLocationsFixture {
                                 .setPostalCode("1000")
                                 .setCountryIsoCode(null)
                                 .build())).collect(toList());
+    }
+
+    public static List<JobAdvertisement> listOfJobAdsForDecayingScoreSearchTests() {
+        return Stream.of(testJobAdvertisementWithContentAndLocation(job05.id(),
+                testJobContent()
+                        .setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build())).setLocation(
+                        testLocation()
+                                .setCity("Lausanne")
+                                .setCommunalCode("5586")
+                                .setRegionCode("VD01")
+                                .setCantonCode("VD")
+                                .setPostalCode("1000")
+                                .setCountryIsoCode("CH")
+                                .setCoordinates(new GeoPoint(6.6523078, 46.552043))
+                                .build()).build()),
+        testJobAdvertisementWithContentAndLocation(job06.id(),
+                testJobContent()
+                        .setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build())).setLocation(
+                        testLocation()
+                                .setCity("Bern")
+                                .setCommunalCode("351")
+                                .setRegionCode("BE01")
+                                .setCantonCode("BE")
+                                .setPostalCode("3000")
+                                .setCountryIsoCode("CH")
+                                .setCoordinates(new GeoPoint(7.441, 46.948))
+                                .build()).build()),
+        testJobAdvertisementWithContentAndLocation(job07.id(),
+                testJobContent()
+                        .setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build())).setLocation(
+                        testLocation()
+                                .setCity("Sion")
+                                .setCommunalCode("6266")
+                                .setRegionCode("VS06")
+                                .setCantonCode("VS")
+                                .setPostalCode("1950")
+                                .setCountryIsoCode("CH")
+                                .setCoordinates(new GeoPoint(7.359, 46.234))
+                                .build()).build())).collect(toList());
     }
 }

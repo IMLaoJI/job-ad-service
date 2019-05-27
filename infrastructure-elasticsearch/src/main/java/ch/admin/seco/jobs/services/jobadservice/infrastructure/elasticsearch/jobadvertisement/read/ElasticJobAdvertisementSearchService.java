@@ -25,6 +25,7 @@ import org.elasticsearch.index.query.GeoDistanceQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.elasticsearch.index.query.functionscore.GaussDecayFunctionBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -131,9 +132,9 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 	private final FavouriteItemRepository favouriteItemRepository;
 
 	public ElasticJobAdvertisementSearchService(CurrentUserContext currentUserContext,
-			ElasticsearchTemplate elasticsearchTemplate,
-			ElasticsearchConfiguration.CustomEntityMapper customEntityMapper,
-			FavouriteItemRepository favouriteItemRepository) {
+												ElasticsearchTemplate elasticsearchTemplate,
+												ElasticsearchConfiguration.CustomEntityMapper customEntityMapper,
+												FavouriteItemRepository favouriteItemRepository) {
 		this.currentUserContext = currentUserContext;
 		this.elasticsearchTemplate = elasticsearchTemplate;
 		this.favouriteItemRepository = favouriteItemRepository;
@@ -310,30 +311,59 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 	}
 
 	private NativeSearchQueryBuilder createSearchQueryBuilder(JobAdvertisementSearchRequest jobSearchRequest) {
+		if (isLocationSearch(jobSearchRequest)) {
+			return prepareLocationSearchQuery(jobSearchRequest);
+		}
+		return prepareSearchQuery(jobSearchRequest);
+	}
+
+	private NativeSearchQueryBuilder prepareSearchQuery(JobAdvertisementSearchRequest jobSearchRequest) {
+
+		BoolQueryBuilder combinedBoolQueryBuilder = mustAll(createKeywordQuery(jobSearchRequest), createOccupationQuery(jobSearchRequest));
+
+		if (hasRadiusSearchRequest(jobSearchRequest)) {
+			RadiusSearchRequest radiusSearchRequest = jobSearchRequest.getRadiusSearchRequest();
+			GeoDistanceQueryBuilder geoDistanceQueryBuilder = getDistanceQuery(radiusSearchRequest);
+			GaussDecayFunctionBuilder gaussDecayFunctionBuilder = getGaussDecayFunctionBuilder(radiusSearchRequest);
+			combinedBoolQueryBuilder
+					.should(prepareFunctionQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder));
+		}
+
 		return new NativeSearchQueryBuilder()
-				.withQuery(createQuery(jobSearchRequest))
+				.withQuery(combinedBoolQueryBuilder)
 				.withFilter(createFilter(jobSearchRequest));
 	}
 
-	private QueryBuilder createQuery(JobAdvertisementSearchRequest jobSearchRequest) {
-		if (isEmpty(jobSearchRequest.getKeywords()) && isEmpty(jobSearchRequest.getProfessionCodes())) {
-			return functionScoreQuery(createFilter(jobSearchRequest)); //TODO: Clean this up, createFilter is applied twice here.
-
-			//TODO: Branch Out CantonSearch here?
-
-		} else {
-			BoolQueryBuilder boolQueryBuilder = mustAll(createKeywordQuery(jobSearchRequest), createOccupationQuery(jobSearchRequest));
-			if (hasRadiusSearchRequest(jobSearchRequest)) {
-				RadiusSearchRequest radiusSearchRequest = jobSearchRequest.getRadiusSearchRequest();
-				GeoDistanceQueryBuilder geoDistanceQueryBuilder = geoDistanceQuery(PATH_LOCATION_COORDINATES)
-						.point(radiusSearchRequest.getGeoPoint().getLat(), radiusSearchRequest.getGeoPoint().getLon())
-						.distance(radiusSearchRequest.getDistance(), KILOMETERS);
-				GaussDecayFunctionBuilder gaussDecayFunctionBuilder = gaussDecayFunction(PATH_LOCATION_COORDINATES, radiusSearchRequest.getGeoPoint().toString(), SCALE_IN_KM, OFFSET_IN_KM, DECAY_RATE);
-				boolQueryBuilder.should(functionScoreQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder).boost(2f));
-			}
-
-			return boolQueryBuilder;
+	private NativeSearchQueryBuilder prepareLocationSearchQuery(JobAdvertisementSearchRequest jobSearchRequest) {
+		NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
+		BoolQueryBuilder boolQueryBuilder = boolQuery();
+		if (hasRadiusSearchRequest(jobSearchRequest)) {
+			return prepareRadiusSearchQuery(jobSearchRequest);
 		}
+		if (isNotEmpty(jobSearchRequest.getCommunalCodes())) {
+			if (containsAbroadCode(jobSearchRequest.getCommunalCodes())) {
+				boolQueryBuilder.should(boolQuery()
+						.must(existsQuery(PATH_LOCATION_COUNTRY_ISO_CODE))
+						.mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, SWITZERLAND_COUNTRY_ISO_CODE)));
+			}
+			boolQueryBuilder.should(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
+		}
+		if (isNotEmpty(jobSearchRequest.getCantonCodes())) {
+			boolQueryBuilder.should(termsQuery(PATH_LOCATION_CANTON_CODE, jobSearchRequest.getCantonCodes()));
+		}
+		return nativeSearchQueryBuilder
+				.withQuery(matchAllQuery())
+				.withQuery(boolQueryBuilder)
+				.withFilter(createFilter(jobSearchRequest));
+	}
+
+	private NativeSearchQueryBuilder prepareRadiusSearchQuery(JobAdvertisementSearchRequest jobSearchRequest) {
+		RadiusSearchRequest radiusSearchRequest = jobSearchRequest.getRadiusSearchRequest();
+		GeoDistanceQueryBuilder geoDistanceQueryBuilder = getDistanceQuery(radiusSearchRequest);
+		GaussDecayFunctionBuilder gaussDecayFunctionBuilder = getGaussDecayFunctionBuilder(radiusSearchRequest);
+		return new NativeSearchQueryBuilder()
+				.withQuery(prepareFunctionQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder))
+				.withFilter(createFilter(jobSearchRequest));
 	}
 
 	private BoolQueryBuilder createOccupationQuery(JobAdvertisementSearchRequest jobSearchRequest) {
@@ -407,7 +437,6 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 				statusFilter(jobSearchRequest),
 				displayFilter(jobSearchRequest),
 				publicationStartDateFilter(onlineSinceDays),
-				localityFilter(jobSearchRequest),
 				workingTimeFilter(jobSearchRequest),
 				contractTypeFilter(jobSearchRequest),
 				companyFilter(jobSearchRequest.getCompanyName())
@@ -507,42 +536,6 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
 		return contractTypeFilter;
 	}
-	//TODO: Try to remove the localityfilter and apply it directly to the queries
-	private BoolQueryBuilder localityFilter(JobAdvertisementSearchRequest jobSearchRequest) {
-		BoolQueryBuilder localityFilter = boolQuery();
-
-		if (hasRadiusSearchRequest(jobSearchRequest)) {
-			RadiusSearchRequest radiusSearchRequest = jobSearchRequest.getRadiusSearchRequest();
-			GeoDistanceQueryBuilder geoDistanceQueryBuilder = geoDistanceQuery(PATH_LOCATION_COORDINATES)
-					.point(radiusSearchRequest.getGeoPoint().getLat(), radiusSearchRequest.getGeoPoint().getLon())
-					.distance(radiusSearchRequest.getDistance(), KILOMETERS);
-			GaussDecayFunctionBuilder gaussDecayFunctionBuilder = gaussDecayFunction(PATH_LOCATION_COORDINATES, radiusSearchRequest.getGeoPoint().toString(), SCALE_IN_KM, OFFSET_IN_KM, DECAY_RATE);
-			localityFilter.should(functionScoreQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder));
-		}
-
-		if (isNotEmpty(jobSearchRequest.getCantonCodes())) {
-			localityFilter.should(termsQuery(PATH_LOCATION_CANTON_CODE, jobSearchRequest.getCantonCodes()));
-		}
-		if (isNotEmpty(jobSearchRequest.getCommunalCodes())) {
-			if (containsAbroadCode(jobSearchRequest.getCommunalCodes())) {
-				localityFilter.should(boolQuery()
-						.must(existsQuery(PATH_LOCATION_COUNTRY_ISO_CODE))
-						.mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, SWITZERLAND_COUNTRY_ISO_CODE))
-				);
-			}
-			localityFilter.should(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
-		}
-
-		return localityFilter;
-	}
-
-	private boolean hasRadiusSearchRequest(JobAdvertisementSearchRequest jobSearchRequest) {
-		return jobSearchRequest.getRadiusSearchRequest() != null;
-	}
-
-	private boolean containsAbroadCode(String[] communalCodes) {
-		return Arrays.asList(communalCodes).contains(FILTER_COMMUNAL_CODE_ABROAD);
-	}
 
 	private BoolQueryBuilder workingTimeFilter(JobAdvertisementSearchRequest jobSearchRequest) {
 		BoolQueryBuilder workingTimeFilter = boolQuery();
@@ -556,10 +549,6 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 		}
 
 		return workingTimeFilter;
-	}
-
-	private boolean canViewRestrictedJobAds() {
-		return this.currentUserContext.hasAnyRoles(Role.JOBSEEKER_CLIENT, Role.SYSADMIN);
 	}
 
 	private static BoolQueryBuilder mustAll(BoolQueryBuilder... queryBuilders) {
@@ -616,4 +605,35 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 				})
 				.collect(Collectors.toList());
 	}
+
+	private boolean hasRadiusSearchRequest(JobAdvertisementSearchRequest jobSearchRequest) {
+		return jobSearchRequest.getRadiusSearchRequest() != null;
+	}
+
+	private boolean containsAbroadCode(String[] communalCodes) {
+		return Arrays.asList(communalCodes).contains(FILTER_COMMUNAL_CODE_ABROAD);
+	}
+
+	private boolean canViewRestrictedJobAds() {
+		return this.currentUserContext.hasAnyRoles(Role.JOBSEEKER_CLIENT, Role.SYSADMIN);
+	}
+
+	private FunctionScoreQueryBuilder prepareFunctionQuery(GeoDistanceQueryBuilder geoDistanceQueryBuilder, GaussDecayFunctionBuilder gaussDecayFunctionBuilder) {
+		return functionScoreQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder).boost(2f);
+	}
+
+	private GaussDecayFunctionBuilder getGaussDecayFunctionBuilder(RadiusSearchRequest radiusSearchRequest) {
+		return gaussDecayFunction(PATH_LOCATION_COORDINATES, radiusSearchRequest.getGeoPoint().toString(), SCALE_IN_KM, OFFSET_IN_KM, DECAY_RATE);
+	}
+
+	private GeoDistanceQueryBuilder getDistanceQuery(RadiusSearchRequest radiusSearchRequest) {
+		return geoDistanceQuery(PATH_LOCATION_COORDINATES)
+				.point(radiusSearchRequest.getGeoPoint().getLat(), radiusSearchRequest.getGeoPoint().getLon())
+				.distance(radiusSearchRequest.getDistance(), KILOMETERS);
+	}
+
+	private boolean isLocationSearch(JobAdvertisementSearchRequest jobSearchRequest) {
+		return isEmpty(jobSearchRequest.getKeywords()) && isEmpty(jobSearchRequest.getProfessionCodes());
+	}
+
 }
