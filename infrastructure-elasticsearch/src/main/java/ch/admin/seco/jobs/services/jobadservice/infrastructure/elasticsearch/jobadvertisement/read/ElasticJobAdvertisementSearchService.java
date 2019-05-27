@@ -333,7 +333,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 		}
 		if (isNotEmpty(jobSearchRequest.getCommunalCodes())) {
 			if (containsAbroadCode(jobSearchRequest.getCommunalCodes())) {
-				combinedBoolQueryBuilder.should(boolQuery()
+				combinedBoolQueryBuilder.must(boolQuery()
 						.must(existsQuery(PATH_LOCATION_COUNTRY_ISO_CODE))
 						.mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, SWITZERLAND_COUNTRY_ISO_CODE)));
 			}
