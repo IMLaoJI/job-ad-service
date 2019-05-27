@@ -371,6 +371,27 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")));
     }
 
+
+    @Test
+    public void shouldFilterJobsOutsideOfCantonOnOccupationSearch() throws Exception {
+        // GIVEN
+        index(listOfJobAdsForDecayingScoreSearchTests());
+
+        // WHEN
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
+        searchRequest.setCantonCodes(new String[]{"BE"});
+        searchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, X28_CODE_KOCH)});
+
+        // THEN
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "1"))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job06")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")));
+    }
+
     @Test
     public void shouldSearchByKeyword() throws Exception {
         // GIVEN

@@ -331,6 +331,18 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 							.distance(radiusSearchRequest.getDistance(), DistanceUnit.KILOMETERS))
 					.should(prepareFunctionQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder));
 		}
+		if (isNotEmpty(jobSearchRequest.getCommunalCodes())) {
+			if (containsAbroadCode(jobSearchRequest.getCommunalCodes())) {
+				combinedBoolQueryBuilder.should(boolQuery()
+						.must(existsQuery(PATH_LOCATION_COUNTRY_ISO_CODE))
+						.mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, SWITZERLAND_COUNTRY_ISO_CODE)));
+			}
+			combinedBoolQueryBuilder.should(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
+		}
+
+		if (isNotEmpty(jobSearchRequest.getCantonCodes())) {
+			combinedBoolQueryBuilder.must(termsQuery(PATH_LOCATION_CANTON_CODE, jobSearchRequest.getCantonCodes()));
+		}
 
 		return new NativeSearchQueryBuilder()
 				.withQuery(combinedBoolQueryBuilder)
