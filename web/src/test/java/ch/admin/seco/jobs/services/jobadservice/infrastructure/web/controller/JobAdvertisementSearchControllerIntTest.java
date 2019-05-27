@@ -103,6 +103,8 @@ public class JobAdvertisementSearchControllerIntTest {
 
     private static final GeoPointDto SION_GEO_POINT = new GeoPointDto().setLat(46.234).setLon(7.359);
 
+    private static final String X28_CODE_KOCH = "11000411";
+
     @Qualifier("jobAdvertisementRepository")
     @Autowired
     private JobAdvertisementRepository jobAdvertisementJpaRepository;
@@ -347,6 +349,27 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("<em>Koch</em>")));
     }
 
+    @Test
+    public void shouldFilterJobsOutsideOfRadiusOnOccupationSearch() throws Exception {
+        //GIVEN
+        index(listOfJobAdsForDecayingScoreSearchTests());
+
+        // WHEN
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE});
+        jobAdvertisementSearchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, X28_CODE_KOCH)});
+
+        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(30));
+
+        // THEN
+        post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "1"))
+
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job05")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")));
+    }
 
     @Test
     public void shouldSearchByKeyword() throws Exception {
