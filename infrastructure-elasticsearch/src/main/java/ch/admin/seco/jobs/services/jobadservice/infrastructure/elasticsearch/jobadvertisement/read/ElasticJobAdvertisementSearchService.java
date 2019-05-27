@@ -20,6 +20,7 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.job
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.unit.DistanceUnit;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.GeoDistanceQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
@@ -81,9 +82,9 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
 
 	private static final String PATH_CREATED_TIME = "jobAdvertisement.createdTime";
-	private static final String SCALE_IN_KM = "30km";
-	private static final String OFFSET_IN_KM = "10km";
-	private static final double DECAY_RATE = 0.8;
+	private static final String SCALE_IN_KM = "150km";
+	private static final String OFFSET_IN_KM = "30km";
+	private static final double DECAY_RATE = 0.5;
 
 	private static Logger LOG = LoggerFactory.getLogger(ElasticJobAdvertisementSearchService.class);
 
@@ -328,6 +329,18 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 			combinedBoolQueryBuilder
 					.must(geoDistanceQueryBuilder)
 					.should(prepareFunctionQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder));
+		}
+		if (isNotEmpty(jobSearchRequest.getCommunalCodes())) {
+			if (containsAbroadCode(jobSearchRequest.getCommunalCodes())) {
+				combinedBoolQueryBuilder.must(boolQuery()
+						.must(existsQuery(PATH_LOCATION_COUNTRY_ISO_CODE))
+						.mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, SWITZERLAND_COUNTRY_ISO_CODE)));
+			}
+			combinedBoolQueryBuilder.should(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
+		}
+
+		if (isNotEmpty(jobSearchRequest.getCantonCodes())) {
+			combinedBoolQueryBuilder.must(termsQuery(PATH_LOCATION_CANTON_CODE, jobSearchRequest.getCantonCodes()));
 		}
 
 		return new NativeSearchQueryBuilder()

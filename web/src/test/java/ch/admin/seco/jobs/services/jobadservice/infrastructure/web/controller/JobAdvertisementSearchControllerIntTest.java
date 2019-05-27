@@ -57,6 +57,7 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job07;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job08;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture.testJobContent;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobDescriptionFixture.testJobDescription;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
@@ -368,6 +369,58 @@ public class JobAdvertisementSearchControllerIntTest {
 
                 .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job05")))
                 .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")));
+    }
+
+    @Test
+    public void shouldFilterSwissJobsOnOccupationSearchForAbroadJobs() throws Exception {
+        //GIVEN
+        index(listOfJobAdsForDecayingScoreSearchTests());
+        index(testJobAdvertisementWithContentAndLocation(job05.id(),
+                testJobContent()
+                        .setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build()))
+                        .setX28OccupationCodes("11000411")
+                        .setLocation(
+                                testLocation()
+                                        .setCity("Ausland")
+                                        .setCommunalCode(null)
+                                        .setRegionCode(null)
+                                        .setCantonCode(null)
+                                        .setPostalCode("91244")
+                                        .setCountryIsoCode("FR")
+                                        .build()).build()));
+        // WHEN
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{ABROAD_COMMUNAL_CODE});
+        jobAdvertisementSearchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, X28_CODE_KOCH)});
+
+        // THEN
+        post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "1"))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job05")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")));
+    }
+
+
+    @Test
+    public void shouldFilterJobsOutsideOfCantonOnOccupationSearch() throws Exception {
+        // GIVEN
+        index(listOfJobAdsForDecayingScoreSearchTests());
+
+        // WHEN
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
+        searchRequest.setCantonCodes(new String[]{"BE"});
+        searchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, X28_CODE_KOCH)});
+
+        // THEN
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "1"))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job06")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
                 .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")));
     }
 
