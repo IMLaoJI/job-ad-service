@@ -82,9 +82,9 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
 
 	private static final String PATH_CREATED_TIME = "jobAdvertisement.createdTime";
-	private static final String SCALE_IN_KM = "30km";
-	private static final String OFFSET_IN_KM = "10km";
-	private static final double DECAY_RATE = 0.8;
+	private static final String SCALE_IN_KM = "150km";
+	private static final String OFFSET_IN_KM = "30km";
+	private static final double DECAY_RATE = 0.5;
 
 	private static Logger LOG = LoggerFactory.getLogger(ElasticJobAdvertisementSearchService.class);
 
