@@ -11,4 +11,5 @@ dependencies {
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.glassfish:javax.el'
     testCompile 'com.h2database:h2'
+    testCompile 'com.google.guava:guava'
 }

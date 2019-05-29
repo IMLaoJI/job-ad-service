@@ -1,6 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.api;
 
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.ApplyChannel;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.PhoneNumber;
 
 import javax.validation.constraints.Size;

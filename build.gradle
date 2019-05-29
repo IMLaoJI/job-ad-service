@@ -64,7 +64,6 @@ subprojects {
             dependency 'com.fasterxml.uuid:java-uuid-generator:3.1.4'
             dependency 'com.google.guava:guava:27.1-jre'
             dependency 'com.mattbertolini:liquibase-slf4j:2.0.0'
-            dependency 'io.jsonwebtoken:jjwt:0.9.0'
             dependency 'io.springfox:springfox-bean-validators:2.8.0'
             dependency "io.springfox:springfox-swagger2:${springfox_swagger2_version}"
             dependency "io.springfox:springfox-swagger-ui:${springfox_swagger2_version}"
@@ -84,6 +83,8 @@ subprojects {
             dependency "ch.admin.seco.alv:alv-spring-integration-leader-starter:${alv_shared_library_version}"
             dependency "ch.admin.seco.alv:alv-logger-starter:${alv_shared_library_version}"
             dependency "ch.admin.seco.alv:alv-feign-starter:${alv_shared_library_version}"
+            dependency "ch.admin.seco.alv:alv-jwt-starter:${alv_shared_library_version}"
+
         }
         imports {
             mavenBom "org.springframework.boot:spring-boot-dependencies:${spring_boot_version}"

@@ -4,12 +4,12 @@ import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromAvamDto;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
@@ -27,7 +27,6 @@ import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisem
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementFromAvamDtoTestFixture.testCreateJobAdvertisementDto;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementFromAvamDtoTestFixture.testCreateJobAdvertisementDtoWithCompanyAnonymous;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.RejectionDtoTestFixture.testRejectionDto;
-import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.UpdateJobAdvertisementFromAvamDtoTestFixture.testUpdateJobAdvertisementFromAvamDto;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.ApplyChannelFixture.testApplyChannel;
@@ -118,6 +117,14 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         assertThat(occupation.getEducationCode()).isEqualToIgnoringCase(occupationDto.getEducationCode());
         assertThat(occupation.getQualificationCode()).isEqualByComparingTo(occupationDto.getQualificationCode());
 
+        Employment employment = jobAdvertisement.getJobContent().getEmployment();
+        EmploymentDto employmentDto = createJobAdvertisementDto.getEmployment();
+        assertThat(employment.getStartDate()).isEqualTo(employmentDto.getStartDate());
+        assertThat(employment.getEndDate()).isEqualTo(employmentDto.getEndDate());
+        assertThat(employment.getWorkloadPercentageMin()).isEqualTo(employmentDto.getWorkloadPercentageMin());
+        assertThat(employment.getWorkloadPercentageMax()).isEqualTo(employmentDto.getWorkloadPercentageMax());
+        assertThat(employment.getWorkForms()).isNotNull();
+        assertThat(employment.getWorkForms()).isEqualTo(employmentDto.getWorkForms());
 
         domainEventMockUtils.assertSingleDomainEventPublished(JOB_ADVERTISEMENT_APPROVED.getDomainEventType());
     }

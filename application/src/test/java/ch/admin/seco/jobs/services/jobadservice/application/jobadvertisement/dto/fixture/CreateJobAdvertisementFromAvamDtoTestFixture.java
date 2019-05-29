@@ -6,7 +6,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Company;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Qualification;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
-import org.assertj.core.util.Sets;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkForm;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -17,6 +17,7 @@ import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisem
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel.PROFICIENT;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience.MORE_THAN_1_YEAR;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.CompanyFixture.testCompany;
+import static com.google.common.collect.Sets.immutableEnumSet;
 import static java.time.LocalDate.now;
 
 public class CreateJobAdvertisementFromAvamDtoTestFixture {
@@ -48,7 +49,7 @@ public class CreateJobAdvertisementFromAvamDtoTestFixture {
                         .setPermanent(false)
                         .setWorkloadPercentageMin(80)
                         .setWorkloadPercentageMax(100)
-                        .setWorkForms(Sets.newHashSet()),
+                        .setWorkForms(immutableEnumSet(WorkForm.HOME_WORK, WorkForm.SHIFT_WORK)),
                 new ApplyChannelDto()
                         .setRawPostAddress("rawPostAddress")
                         .setPostAddress(new AddressDto()
