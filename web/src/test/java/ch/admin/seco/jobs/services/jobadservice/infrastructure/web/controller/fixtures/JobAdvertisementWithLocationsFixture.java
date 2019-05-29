@@ -123,7 +123,7 @@ public class JobAdvertisementWithLocationsFixture {
                                 .setRegionCode(null)
                                 .setCantonCode(null)
                                 .setPostalCode("1000")
-                                .setCountryIsoCode(null)
+                                .setCountryIsoCode("CH")
                                 .build())).collect(toList());
     }
 
