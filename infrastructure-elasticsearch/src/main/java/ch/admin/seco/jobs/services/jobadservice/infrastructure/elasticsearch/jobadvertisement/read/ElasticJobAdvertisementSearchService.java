@@ -322,11 +322,11 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 				filterQueryBuilder.must(termsQuery(PATH_LOCATION_CANTON_CODE, jobSearchRequest.getCantonCodes()));
 			}
 
-			if (isMultipleLocationSearch(jobSearchRequest)) {
+			if (isMultipleLocationSearch(jobSearchRequest.getCommunalCodes())) {
 				filterQueryBuilder.must(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
 			}
 
-			if (isSingleLocationAbroadSearch(jobSearchRequest)) {
+			if (isSingleLocationAbroadSearch(jobSearchRequest.getCommunalCodes())) {
 				filterQueryBuilder
 						.must(existsQuery(PATH_LOCATION_COUNTRY_ISO_CODE))
 						.mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, SWITZERLAND_COUNTRY_ISO_CODE));
@@ -592,8 +592,8 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 		return jobSearchRequest.getRadiusSearchRequest() != null;
 	}
 
-	private boolean isMultipleLocationSearch(JobAdvertisementSearchRequest jobSearchRequest) {
-		return isNotEmpty(jobSearchRequest.getCommunalCodes()) && jobSearchRequest.getCommunalCodes().length > 1;
+	private boolean isMultipleLocationSearch(String[] communalCodes) {
+		return isNotEmpty(communalCodes) && communalCodes.length > 1;
 	}
 
 	private boolean canViewRestrictedJobAds() {
@@ -616,10 +616,10 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 				.distance(radiusSearchRequest.getDistance(), KILOMETERS);
 	}
 
-	private boolean isSingleLocationAbroadSearch(JobAdvertisementSearchRequest jobSearchRequest) {
-		return isNotEmpty(jobSearchRequest.getCommunalCodes())
-				&& Arrays.asList(jobSearchRequest.getCommunalCodes()).contains(COMMUNAL_CODE_ABROAD)
-				&& jobSearchRequest.getCommunalCodes().length == 1;
+	private boolean isSingleLocationAbroadSearch(String[] communalCodes) {
+		return isNotEmpty(communalCodes)
+				&& Arrays.asList(communalCodes).contains(COMMUNAL_CODE_ABROAD)
+				&& communalCodes.length == 1;
 	}
 
 	private boolean isCantonSearch(String[] cantonCodes) {
