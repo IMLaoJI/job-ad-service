@@ -1,69 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.read;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.TYPE_DOC;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
-import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
-import static org.apache.commons.lang3.ArrayUtils.toArray;
-import static org.apache.commons.lang3.ArrayUtils.toStringArray;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
-import static org.elasticsearch.index.query.QueryBuilders.geoDistanceQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchPhrasePrefixQuery;
-import static org.elasticsearch.index.query.QueryBuilders.multiMatchQuery;
-import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
-import static org.elasticsearch.index.query.QueryBuilders.termQuery;
-import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
-import static org.elasticsearch.join.query.JoinQueryBuilders.hasChildQuery;
-import static org.springframework.data.domain.Sort.Order.asc;
-import static org.springframework.data.domain.Sort.Order.desc;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.search.join.ScoreMode;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.unit.DistanceUnit;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.Operator;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.elasticsearch.core.DefaultResultMapper;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.core.ResultsMapper;
-import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
-import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.SearchQuery;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
-
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.FavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchResult;
@@ -81,12 +17,73 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.ElasticsearchConfiguration;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.lucene.search.join.ScoreMode;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.GeoDistanceQueryBuilder;
+import org.elasticsearch.index.query.MultiMatchQueryBuilder;
+import org.elasticsearch.index.query.Operator;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
+import org.elasticsearch.index.query.functionscore.GaussDecayFunctionBuilder;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.core.DefaultResultMapper;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ResultsMapper;
+import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
+import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.SearchQuery;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.TYPE_DOC;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME;
+import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
+import static org.apache.commons.lang3.ArrayUtils.toArray;
+import static org.apache.commons.lang3.ArrayUtils.toStringArray;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.elasticsearch.common.unit.DistanceUnit.KILOMETERS;
+import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.gaussDecayFunction;
+import static org.elasticsearch.join.query.JoinQueryBuilders.hasChildQuery;
+import static org.springframework.data.domain.Sort.Order.asc;
+import static org.springframework.data.domain.Sort.Order.desc;
+import static org.springframework.util.StringUtils.isEmpty;
 
 @Service
 public class ElasticJobAdvertisementSearchService implements JobAdvertisementSearchService {
 
 
 	private static final String PATH_CREATED_TIME = "jobAdvertisement.createdTime";
+	private static final String SCALE_IN_KM = "150km";
+	private static final String OFFSET_IN_KM = "30km";
+	private static final double DECAY_RATE = 0.5;
 
 	private static Logger LOG = LoggerFactory.getLogger(ElasticJobAdvertisementSearchService.class);
 
@@ -120,7 +117,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 	private static final String PATH_WORKLOAD_PERCENTAGE_MAX = PATH_CTX + "jobContent.employment.workloadPercentageMax";
 	private static final String PATH_WORKLOAD_TIME_PERCENTAGE_MIN = PATH_CTX + "jobContent.employment.workloadPercentageMin";
 	private static final String PATH_LANGUAGE_SKILL_CODE = PATH_CTX + "jobContent.languageSkills.languageIsoCode";
-	private static final String FILTER_COMMUNAL_CODE_ABROAD = "9999";
+	private static final String COMMUNAL_CODE_ABROAD = "9999";
 	private static final String SWITZERLAND_COUNTRY_ISO_CODE = "CH";
 	private static final String RELEVANCE = "_score";
 	private static final int ONLINE_SINCE_DAYS = 60;
@@ -135,9 +132,9 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 	private final FavouriteItemRepository favouriteItemRepository;
 
 	public ElasticJobAdvertisementSearchService(CurrentUserContext currentUserContext,
-			ElasticsearchTemplate elasticsearchTemplate,
-			ElasticsearchConfiguration.CustomEntityMapper customEntityMapper,
-			FavouriteItemRepository favouriteItemRepository) {
+												ElasticsearchTemplate elasticsearchTemplate,
+												ElasticsearchConfiguration.CustomEntityMapper customEntityMapper,
+												FavouriteItemRepository favouriteItemRepository) {
 		this.currentUserContext = currentUserContext;
 		this.elasticsearchTemplate = elasticsearchTemplate;
 		this.favouriteItemRepository = favouriteItemRepository;
@@ -314,17 +311,28 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 	}
 
 	private NativeSearchQueryBuilder createSearchQueryBuilder(JobAdvertisementSearchRequest jobSearchRequest) {
+		BoolQueryBuilder boolQueryBuilder = createQuery(jobSearchRequest);
+		BoolQueryBuilder filterQueryBuilder = createFilter(jobSearchRequest);
+
+		if (isRadiusNeeded(jobSearchRequest)) {
+			boolQueryBuilder.must(prepareRadiusQuery(jobSearchRequest.getRadiusSearchRequest()));
+		} else {
+			filterQueryBuilder.must(localityFilter(jobSearchRequest));
+		}
+
 		return new NativeSearchQueryBuilder()
-				.withQuery(createQuery(jobSearchRequest))
-				.withFilter(createFilter(jobSearchRequest));
+				.withQuery(boolQueryBuilder)
+				.withFilter(filterQueryBuilder);
 	}
 
-	private QueryBuilder createQuery(JobAdvertisementSearchRequest jobSearchRequest) {
+
+	private BoolQueryBuilder createQuery(JobAdvertisementSearchRequest jobSearchRequest) {
 		if (isEmpty(jobSearchRequest.getKeywords()) && isEmpty(jobSearchRequest.getProfessionCodes())) {
-			return matchAllQuery();
+			return boolQuery().must(matchAllQuery());
 		} else {
 			return mustAll(createKeywordQuery(jobSearchRequest), createOccupationQuery(jobSearchRequest));
 		}
+
 	}
 
 	private BoolQueryBuilder createOccupationQuery(JobAdvertisementSearchRequest jobSearchRequest) {
@@ -392,17 +400,34 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 		return keywordQuery;
 	}
 
-	private QueryBuilder createFilter(JobAdvertisementSearchRequest jobSearchRequest) {
+	private BoolQueryBuilder createFilter(JobAdvertisementSearchRequest jobSearchRequest) {
 		Integer onlineSinceDays = Optional.ofNullable(jobSearchRequest.getOnlineSince()).orElse(ONLINE_SINCE_DAYS);
 		return mustAll(
 				statusFilter(jobSearchRequest),
 				displayFilter(jobSearchRequest),
 				publicationStartDateFilter(onlineSinceDays),
-				localityFilter(jobSearchRequest),
 				workingTimeFilter(jobSearchRequest),
 				contractTypeFilter(jobSearchRequest),
 				companyFilter(jobSearchRequest.getCompanyName())
 		);
+	}
+
+	private BoolQueryBuilder localityFilter(JobAdvertisementSearchRequest jobSearchRequest) {
+		BoolQueryBuilder localityFilter = boolQuery();
+		if (isCantonSearch(jobSearchRequest.getCantonCodes())) {
+			localityFilter.should(termsQuery(PATH_LOCATION_CANTON_CODE, jobSearchRequest.getCantonCodes()));
+		}
+
+		if (isMultipleLocationSearch(jobSearchRequest.getCommunalCodes())) {
+			localityFilter.should(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
+		}
+
+		if (isSingleLocationAbroadSearch(jobSearchRequest.getCommunalCodes())) {
+			localityFilter.should(boolQuery()
+					.must(existsQuery(PATH_LOCATION_COUNTRY_ISO_CODE))
+					.mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, SWITZERLAND_COUNTRY_ISO_CODE)));
+		}
+		return localityFilter;
 	}
 
 	private BoolQueryBuilder statusFilter(JobAdvertisementSearchRequest jobSearchRequest) {
@@ -499,40 +524,6 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 		return contractTypeFilter;
 	}
 
-	private BoolQueryBuilder localityFilter(JobAdvertisementSearchRequest jobSearchRequest) {
-		BoolQueryBuilder localityFilter = boolQuery();
-
-		if (hasRadiusSearchRequest(jobSearchRequest)) {
-			RadiusSearchRequest radiusSearchRequest = jobSearchRequest.getRadiusSearchRequest();
-			localityFilter.should(geoDistanceQuery(PATH_LOCATION_COORDINATES)
-					.point(radiusSearchRequest.getGeoPoint().getLat(), radiusSearchRequest.getGeoPoint().getLon())
-					.distance(radiusSearchRequest.getDistance(), DistanceUnit.KILOMETERS));
-		}
-
-		if (isNotEmpty(jobSearchRequest.getCantonCodes())) {
-			localityFilter.should(termsQuery(PATH_LOCATION_CANTON_CODE, jobSearchRequest.getCantonCodes()));
-		}
-		if (isNotEmpty(jobSearchRequest.getCommunalCodes())) {
-			if (containsAbroadCode(jobSearchRequest.getCommunalCodes())) {
-				localityFilter.should(boolQuery()
-						.must(existsQuery(PATH_LOCATION_COUNTRY_ISO_CODE))
-						.mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, SWITZERLAND_COUNTRY_ISO_CODE))
-				);
-			}
-			localityFilter.should(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
-		}
-
-		return localityFilter;
-	}
-
-	private boolean hasRadiusSearchRequest(JobAdvertisementSearchRequest jobSearchRequest) {
-		return jobSearchRequest.getRadiusSearchRequest() != null;
-	}
-
-	private boolean containsAbroadCode(String[] communalCodes) {
-		return Arrays.asList(communalCodes).contains(FILTER_COMMUNAL_CODE_ABROAD);
-	}
-
 	private BoolQueryBuilder workingTimeFilter(JobAdvertisementSearchRequest jobSearchRequest) {
 		BoolQueryBuilder workingTimeFilter = boolQuery();
 
@@ -545,10 +536,6 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 		}
 
 		return workingTimeFilter;
-	}
-
-	private boolean canViewRestrictedJobAds() {
-		return this.currentUserContext.hasAnyRoles(Role.JOBSEEKER_CLIENT, Role.SYSADMIN);
 	}
 
 	private static BoolQueryBuilder mustAll(BoolQueryBuilder... queryBuilders) {
@@ -605,4 +592,43 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 				})
 				.collect(Collectors.toList());
 	}
+
+	private boolean isRadiusNeeded(JobAdvertisementSearchRequest jobSearchRequest) {
+		return jobSearchRequest.getRadiusSearchRequest() != null;
+	}
+
+	private boolean isMultipleLocationSearch(String[] communalCodes) {
+		return isNotEmpty(communalCodes) && communalCodes.length > 1;
+	}
+
+	private boolean canViewRestrictedJobAds() {
+		return this.currentUserContext.hasAnyRoles(Role.JOBSEEKER_CLIENT, Role.SYSADMIN);
+	}
+
+	private FunctionScoreQueryBuilder prepareRadiusQuery(RadiusSearchRequest radiusSearchRequest) {
+		GeoDistanceQueryBuilder geoDistanceQueryBuilder = getDistanceQuery(radiusSearchRequest);
+		GaussDecayFunctionBuilder gaussDecayFunctionBuilder = getGaussDecayFunctionBuilder(radiusSearchRequest);
+		return functionScoreQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder).boost(2f);
+	}
+
+	private GaussDecayFunctionBuilder getGaussDecayFunctionBuilder(RadiusSearchRequest radiusSearchRequest) {
+		return gaussDecayFunction(PATH_LOCATION_COORDINATES, radiusSearchRequest.getGeoPoint().toString(), SCALE_IN_KM, OFFSET_IN_KM, DECAY_RATE);
+	}
+
+	private GeoDistanceQueryBuilder getDistanceQuery(RadiusSearchRequest radiusSearchRequest) {
+		return geoDistanceQuery(PATH_LOCATION_COORDINATES)
+				.point(radiusSearchRequest.getGeoPoint().getLat(), radiusSearchRequest.getGeoPoint().getLon())
+				.distance(radiusSearchRequest.getDistance(), KILOMETERS);
+	}
+
+	private boolean isSingleLocationAbroadSearch(String[] communalCodes) {
+		return isNotEmpty(communalCodes)
+				&& Arrays.asList(communalCodes).contains(COMMUNAL_CODE_ABROAD)
+				&& communalCodes.length == 1;
+	}
+
+	private boolean isCantonSearch(String[] cantonCodes) {
+		return isNotEmpty(cantonCodes);
+	}
+
 }

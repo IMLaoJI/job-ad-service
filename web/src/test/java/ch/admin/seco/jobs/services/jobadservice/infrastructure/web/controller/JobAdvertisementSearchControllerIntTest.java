@@ -10,6 +10,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.Pro
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.RadiusSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.GeoPointDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.GeoPoint;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel;
@@ -56,26 +57,13 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job06;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job07;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job08;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithCompanyName;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithContractType;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithDescription;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithLanguageSkills;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithLocation;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithOccupation;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithPublicDisplayAndWithRestrictedDisplay;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithPublicDisplayAndWithoutRestrictedDisplay;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithWorkload;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithX28Code;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithoutPublicDisplayAndWithRestrictedDisplay;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJobWithoutPublicDisplayAndWithoutRestrictedDisplay;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJob;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJobWithoutPublicDisplayAndWithRestrictedDisplay;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createRestrictedJobWithoutPublicDisplayAndWithoutRestrictedDisplay;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture.testJobContent;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobDescriptionFixture.testJobDescription;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForAbroadSearchTests;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForDecayingScoreSearchTests;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForGeoDistanceTests;
 import static java.time.LocalDate.now;
 import static java.util.Arrays.asList;
@@ -117,6 +105,8 @@ public class JobAdvertisementSearchControllerIntTest {
 
     private static final GeoPointDto SION_GEO_POINT = new GeoPointDto().setLat(46.234).setLon(7.359);
 
+    private static final String X28_CODE_KOCH = "11000411";
+
     @Qualifier("jobAdvertisementRepository")
     @Autowired
     private JobAdvertisementRepository jobAdvertisementJpaRepository;
@@ -148,14 +138,8 @@ public class JobAdvertisementSearchControllerIntTest {
         index(createJob(job03.id()));
 
         // WHEN
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(new JobAdvertisementSearchRequest()))
-        );
-
-        // THEN
-        resultActions
+        post(new JobAdvertisementSearchRequest(), API_JOB_ADVERTISEMENTS+ "/_search")
+                // THEN
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"));
@@ -169,13 +153,8 @@ public class JobAdvertisementSearchControllerIntTest {
         // WHEN
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
         jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"9999"});
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
-        );
 
-        resultActions
+        post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search")
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
                 .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job04")))
@@ -195,13 +174,9 @@ public class JobAdvertisementSearchControllerIntTest {
         // WHEN
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
         jobAdvertisementSearchRequest.setRadiusSearchRequest(null);
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
-        );
 
-        resultActions
+        // THEN
+        this.post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search")
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "4"));
     }
@@ -223,13 +198,9 @@ public class JobAdvertisementSearchControllerIntTest {
         // WHEN
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
         jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(BERN_GEO_POINT).setDistance(150));
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
-        );
 
-        resultActions
+        // THEN
+        post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search")
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "0"));
     }
@@ -244,13 +215,9 @@ public class JobAdvertisementSearchControllerIntTest {
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
         jobAdvertisementSearchRequest.setCommunalCodes(new String[]{BERN_COMMUNAL_CODE});
         jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(BERN_GEO_POINT).setDistance(20));
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
-        );
 
-        resultActions
+        // THEN
+        post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
                 .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job01")))
@@ -266,13 +233,8 @@ public class JobAdvertisementSearchControllerIntTest {
         jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE});
         jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(20));
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
-        );
-
-        resultActions
+        // THEN
+        post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
                 .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job04")))
@@ -289,19 +251,14 @@ public class JobAdvertisementSearchControllerIntTest {
         jobAdvertisementSearchRequest.setCommunalCodes(new String[]{SION_COMMUNAL_CODE});
         jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(SION_GEO_POINT).setDistance(80));
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
-        );
-
-        resultActions
+        // THEN
+        post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job04")))
-                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")))
-                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job03")))
-                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Sion")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job03")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Sion")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")))
                 .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job01")))
                 .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")));
     }
@@ -311,15 +268,12 @@ public class JobAdvertisementSearchControllerIntTest {
         // GIVEN
         index(listOfJobAdsForAbroadSearchTests());
 
+        // WHEN
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
         jobAdvertisementSearchRequest.setCommunalCodes(new String[]{ABROAD_COMMUNAL_CODE, BERN_COMMUNAL_CODE});
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(jobAdvertisementSearchRequest))
-        );
 
-        resultActions
+        // THEN
+        post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "4"))
                 .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job04")))
@@ -330,7 +284,234 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
                 .andExpect(jsonPath("$.[3].jobAdvertisement.id").value(equalTo("job01")))
                 .andExpect(jsonPath("$.[3].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")));
+    }
 
+    @Test
+    public void shouldSearchForMultipleLocationsInSwitzerland() throws Exception {
+        // GIVEN
+        index(listOfJobAdsForAbroadSearchTests());
+
+        // WHEN
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE, BERN_COMMUNAL_CODE});
+
+        // THEN
+        post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "2"))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job06")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job01")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")));
+    }
+
+    @Test
+    public void shouldDecayTheScoreOfResultsBasedOnDistanceOfInitialGeoPoint() throws Exception {
+        // GIVEN
+        // DISTANCES:
+        // Bern - Bern - 0km
+        // Bern - Lausanne 78.33km
+        // Bern - Sion 79km,
+        // Bern - Zurich 95km
+
+        index(listOfJobAdsForGeoDistanceTests());
+
+        // WHEN
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{BERN_COMMUNAL_CODE});
+        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(BERN_GEO_POINT).setDistance(100));
+
+        // THEN
+        post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "4"))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job01")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
+
+
+                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job04")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")))
+
+                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job03")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Sion")))
+
+                .andExpect(jsonPath("$.[3].jobAdvertisement.id").value(equalTo("job02")))
+                .andExpect(jsonPath("$.[3].jobAdvertisement.jobContent.location.city").value(equalTo("Zürich")));
+
+    }
+
+
+    @Test
+    public void shouldDecayTheScoreOfResultsBasedOnDistanceOfInitialGeoPointOnKeywordSearch() throws Exception {
+
+        index(listOfJobAdsForDecayingScoreSearchTests());
+        // WHEN
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE});
+        jobAdvertisementSearchRequest.setKeywords(new String[]{"Koch"});
+        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(150));
+
+        // THEN
+        post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "3"))
+
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job05")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("<em>Koch</em>")))
+
+                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job07")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Sion")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("<em>Koch</em>")))
+
+                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job06")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("<em>Koch</em>")));
+    }
+
+    @Test
+    public void shouldFilterJobsOutsideOfRadiusOnOccupationSearch() throws Exception {
+        //GIVEN
+        index(listOfJobAdsForDecayingScoreSearchTests());
+
+        // WHEN
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE});
+        jobAdvertisementSearchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, X28_CODE_KOCH)});
+
+        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(30));
+
+        // THEN
+        post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "1"))
+
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job05")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")));
+    }
+
+    @Test
+    public void shouldFilterSwissJobsOnOccupationSearchForAbroadJobs() throws Exception {
+        //GIVEN
+        index(listOfJobAdsForDecayingScoreSearchTests());
+        index(testJobAdvertisementWithContentAndLocation(job05.id(),
+                testJobContent()
+                        .setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build()))
+                        .setX28OccupationCodes(X28_CODE_KOCH)
+                        .setLocation(
+                                testLocation()
+                                        .setCity("Ausland")
+                                        .setCommunalCode(null)
+                                        .setRegionCode(null)
+                                        .setCantonCode(null)
+                                        .setPostalCode("91244")
+                                        .setCountryIsoCode("FR")
+                                        .build()).build()));
+        // WHEN
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{ABROAD_COMMUNAL_CODE});
+        jobAdvertisementSearchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, X28_CODE_KOCH)});
+
+        // THEN
+        post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "1"))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job05")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")));
+    }
+
+    @Test
+    public void jobWithMoreKeywordHitsShouldHaveHigherScore() throws Exception {
+        //GIVEN
+        index(testJobAdvertisementWithContentAndLocation(job05.id(),
+                testJobContent()
+                        .setJobDescriptions(singletonList(testJobDescription()
+                                .setTitle("Koch")
+                                .setDescription("keyword1, keyword3")
+                                .build()))
+                        .setX28OccupationCodes(X28_CODE_KOCH)
+                        .setLocation(
+                                testLocation()
+                                        .setCity("Lausanne")
+                                        .setCommunalCode("5586")
+                                        .setRegionCode("VD01")
+                                        .setCantonCode("VD")
+                                        .setPostalCode("1000")
+                                        .setCountryIsoCode("CH")
+                                        .setCoordinates(new GeoPoint(6.6523078, 46.552043))
+                                        .build()).build()));
+        index(testJobAdvertisementWithContentAndLocation(job06.id(),
+                testJobContent()
+                        .setJobDescriptions(singletonList(testJobDescription()
+                                .setTitle("Koch")
+                                .setDescription("keyword1, keyword2, keyword3").build()))
+                        .setX28OccupationCodes(X28_CODE_KOCH)
+                        .setLocation(
+                                testLocation()
+                                        .setCity("Bern")
+                                        .setCommunalCode("351")
+                                        .setRegionCode("BE01")
+                                        .setCantonCode("BE")
+                                        .setPostalCode("3000")
+                                        .setCountryIsoCode("CH")
+                                        .setCoordinates(new GeoPoint(7.441, 46.948))
+                                        .build()).build()));
+        // WHEN
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE});
+        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(100));
+        jobAdvertisementSearchRequest.setKeywords(new String[]{"keyword1", "keyword2", "keyword3"});
+
+        // THEN
+        post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "2"))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job06")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")))
+				.andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job05")))
+				.andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")))
+				.andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")));
+
+    }
+
+    @Test
+    public void shouldFilterJobsOutsideOfCantonOnOccupationSearch() throws Exception {
+        // GIVEN
+        index(listOfJobAdsForDecayingScoreSearchTests());
+
+        // WHEN
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
+        searchRequest.setCantonCodes(new String[]{"BE"});
+        searchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, X28_CODE_KOCH)});
+
+        // THEN
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "1"))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job06")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")));
+    }
+
+    @Test
+    public void shouldShowAbroadAndCantonBernJobs() throws Exception {
+        // GIVEN
+        index(listOfJobAdsForAbroadSearchTests());
+
+        // WHEN
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
+        searchRequest.setCantonCodes(new String[]{"BE"});
+        searchRequest.setCommunalCodes(new String[]{ABROAD_COMMUNAL_CODE});
+
+        // THEN
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "4"));
     }
 
     @Test
@@ -344,14 +525,9 @@ public class JobAdvertisementSearchControllerIntTest {
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
         searchRequest.setKeywords(new String[]{"entwickler", "java"});
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
         // THEN
-        resultActions.andExpect(status().isOk())
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
 
@@ -374,14 +550,9 @@ public class JobAdvertisementSearchControllerIntTest {
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
         searchRequest.setKeywords(new String[]{"*extern"});
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
         // THEN
-        resultActions.andExpect(status().isOk())
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
 
@@ -403,14 +574,9 @@ public class JobAdvertisementSearchControllerIntTest {
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
         searchRequest.setKeywords(new String[]{"dänisch"});
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
         // THEN
-        resultActions.andExpect(status().isOk())
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"));
     }
@@ -433,14 +599,8 @@ public class JobAdvertisementSearchControllerIntTest {
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
         searchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.BFS, DEFAULT_BFS_CODE)});
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
         // THEN
-        resultActions
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
@@ -465,14 +625,8 @@ public class JobAdvertisementSearchControllerIntTest {
                 new ProfessionCode(ProfessionCodeType.X28, "44")
         });
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
         // THEN
-        resultActions
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
@@ -501,14 +655,8 @@ public class JobAdvertisementSearchControllerIntTest {
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
         searchRequest.setCantonCodes(new String[]{"BE"});
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
         // THEN
-        resultActions
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
@@ -529,14 +677,8 @@ public class JobAdvertisementSearchControllerIntTest {
         searchRequest.setWorkloadPercentageMin(60);
         searchRequest.setWorkloadPercentageMax(80);
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
         // THEN
-        resultActions
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
@@ -557,14 +699,8 @@ public class JobAdvertisementSearchControllerIntTest {
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
         searchRequest.setCompanyName("goes");
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
         // THEN
-        resultActions
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
@@ -584,14 +720,8 @@ public class JobAdvertisementSearchControllerIntTest {
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
         searchRequest.setPermanent(true);
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
         // THEN
-        resultActions
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
@@ -611,14 +741,8 @@ public class JobAdvertisementSearchControllerIntTest {
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
         searchRequest.setDisplayRestricted(true);
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
         // THEN
-        resultActions
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
@@ -639,14 +763,8 @@ public class JobAdvertisementSearchControllerIntTest {
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
         // THEN
-        resultActions
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
@@ -669,14 +787,8 @@ public class JobAdvertisementSearchControllerIntTest {
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
         // THEN
-        resultActions
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "2"))
@@ -696,14 +808,8 @@ public class JobAdvertisementSearchControllerIntTest {
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
         // THEN
-        resultActions
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "1"))
@@ -725,14 +831,8 @@ public class JobAdvertisementSearchControllerIntTest {
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
         // THEN
-        resultActions
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "5"))
@@ -776,14 +876,8 @@ public class JobAdvertisementSearchControllerIntTest {
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
         searchRequest.setEuresDisplay(true);
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
         // THEN
-        resultActions
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
@@ -834,14 +928,8 @@ public class JobAdvertisementSearchControllerIntTest {
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
         searchRequest.setEuresDisplay(false);
 
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(API_JOB_ADVERTISEMENTS + "/_search")
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonBytes(searchRequest))
-        );
-
         // THEN
-        resultActions
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "4"))
@@ -1003,11 +1091,8 @@ public class JobAdvertisementSearchControllerIntTest {
                         "OwnerUserDisplayName", "Adli", "JobDescT",
                         "test", "StellennummerEgov"));
 
-        // WHEN
-        ResultActions resultActions = post(request, API_JOB_ADVERTISEMENTS + "/_search/managed")
-                .andExpect(status().isOk());
-
-        resultActions
+        post(request, API_JOB_ADVERTISEMENTS + "/_search/managed")
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "5"))
                 .andExpect(jsonPath("$.[*].owner.userDisplayName").value(hasItem("<em>OwnerUserDisplayName</em>")))
