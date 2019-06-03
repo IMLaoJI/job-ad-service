@@ -315,7 +315,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 		BoolQueryBuilder filterQueryBuilder = createFilter(jobSearchRequest);
 
 		if (isRadiusNeeded(jobSearchRequest)) {
-			boolQueryBuilder.must(prepareRadiusQuery(jobSearchRequest));
+			boolQueryBuilder.must(prepareRadiusQuery(jobSearchRequest.getRadiusSearchRequest()));
 		} else {
 
 			if (isCantonSearch(jobSearchRequest.getCantonCodes())) {
@@ -600,8 +600,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 		return this.currentUserContext.hasAnyRoles(Role.JOBSEEKER_CLIENT, Role.SYSADMIN);
 	}
 
-	private FunctionScoreQueryBuilder prepareRadiusQuery(JobAdvertisementSearchRequest jobSearchRequest) {
-		RadiusSearchRequest radiusSearchRequest = jobSearchRequest.getRadiusSearchRequest();
+	private FunctionScoreQueryBuilder prepareRadiusQuery(RadiusSearchRequest radiusSearchRequest) {
 		GeoDistanceQueryBuilder geoDistanceQueryBuilder = getDistanceQuery(radiusSearchRequest);
 		GaussDecayFunctionBuilder gaussDecayFunctionBuilder = getGaussDecayFunctionBuilder(radiusSearchRequest);
 		return functionScoreQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder).boost(2f);
