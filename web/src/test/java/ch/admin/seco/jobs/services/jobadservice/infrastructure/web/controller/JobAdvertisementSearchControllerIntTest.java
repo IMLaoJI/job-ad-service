@@ -398,7 +398,7 @@ public class JobAdvertisementSearchControllerIntTest {
         index(testJobAdvertisementWithContentAndLocation(job05.id(),
                 testJobContent()
                         .setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build()))
-                        .setX28OccupationCodes("11000411")
+                        .setX28OccupationCodes(X28_CODE_KOCH)
                         .setLocation(
                                 testLocation()
                                         .setCity("Ausland")
@@ -431,7 +431,7 @@ public class JobAdvertisementSearchControllerIntTest {
                                 .setTitle("Koch")
                                 .setDescription("keyword1, keyword3")
                                 .build()))
-                        .setX28OccupationCodes("11000411")
+                        .setX28OccupationCodes(X28_CODE_KOCH)
                         .setLocation(
                                 testLocation()
                                         .setCity("Lausanne")
@@ -447,7 +447,7 @@ public class JobAdvertisementSearchControllerIntTest {
                         .setJobDescriptions(singletonList(testJobDescription()
                                 .setTitle("Koch")
                                 .setDescription("keyword1, keyword2, keyword3").build()))
-                        .setX28OccupationCodes("11000411")
+                        .setX28OccupationCodes(X28_CODE_KOCH)
                         .setLocation(
                                 testLocation()
                                         .setCity("Bern")
@@ -495,6 +495,23 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job06")))
                 .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
                 .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")));
+    }
+
+    @Test
+    public void shouldShowAbroadAndCantonBernJobs() throws Exception {
+        // GIVEN
+        index(listOfJobAdsForAbroadSearchTests());
+
+        // WHEN
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
+        searchRequest.setCantonCodes(new String[]{"BE"});
+        searchRequest.setCommunalCodes(new String[]{ABROAD_COMMUNAL_CODE});
+
+        // THEN
+        post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "4"));
     }
 
     @Test

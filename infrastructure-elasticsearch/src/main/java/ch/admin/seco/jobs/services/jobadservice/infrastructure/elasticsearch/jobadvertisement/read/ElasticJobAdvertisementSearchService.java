@@ -317,20 +317,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 		if (isRadiusNeeded(jobSearchRequest)) {
 			boolQueryBuilder.must(prepareRadiusQuery(jobSearchRequest.getRadiusSearchRequest()));
 		} else {
-
-			if (isCantonSearch(jobSearchRequest.getCantonCodes())) {
-				filterQueryBuilder.must(termsQuery(PATH_LOCATION_CANTON_CODE, jobSearchRequest.getCantonCodes()));
-			}
-
-			if (isMultipleLocationSearch(jobSearchRequest.getCommunalCodes())) {
-				filterQueryBuilder.must(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
-			}
-
-			if (isSingleLocationAbroadSearch(jobSearchRequest.getCommunalCodes())) {
-				filterQueryBuilder
-						.must(existsQuery(PATH_LOCATION_COUNTRY_ISO_CODE))
-						.mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, SWITZERLAND_COUNTRY_ISO_CODE));
-			}
+			filterQueryBuilder.must(localityFilter(jobSearchRequest));
 		}
 
 		return new NativeSearchQueryBuilder()
@@ -423,6 +410,24 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 				contractTypeFilter(jobSearchRequest),
 				companyFilter(jobSearchRequest.getCompanyName())
 		);
+	}
+
+	private BoolQueryBuilder localityFilter(JobAdvertisementSearchRequest jobSearchRequest) {
+		BoolQueryBuilder localityFilter = boolQuery();
+		if (isCantonSearch(jobSearchRequest.getCantonCodes())) {
+			localityFilter.should(termsQuery(PATH_LOCATION_CANTON_CODE, jobSearchRequest.getCantonCodes()));
+		}
+
+		if (isMultipleLocationSearch(jobSearchRequest.getCommunalCodes())) {
+			localityFilter.should(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
+		}
+
+		if (isSingleLocationAbroadSearch(jobSearchRequest.getCommunalCodes())) {
+			localityFilter.should(boolQuery()
+					.must(existsQuery(PATH_LOCATION_COUNTRY_ISO_CODE))
+					.mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, SWITZERLAND_COUNTRY_ISO_CODE)));
+		}
+		return localityFilter;
 	}
 
 	private BoolQueryBuilder statusFilter(JobAdvertisementSearchRequest jobSearchRequest) {
