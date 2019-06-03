@@ -315,24 +315,22 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 		BoolQueryBuilder filterQueryBuilder = createFilter(jobSearchRequest);
 
 		if (isRadiusNeeded(jobSearchRequest)) {
-			RadiusSearchRequest radiusSearchRequest = jobSearchRequest.getRadiusSearchRequest();
-			GeoDistanceQueryBuilder geoDistanceQueryBuilder = getDistanceQuery(radiusSearchRequest);
-			GaussDecayFunctionBuilder gaussDecayFunctionBuilder = getGaussDecayFunctionBuilder(radiusSearchRequest);
-			boolQueryBuilder.must(prepareBoostedFunctionQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder));
-		}
+			boolQueryBuilder.must(prepareBoostedFunctionQuery(jobSearchRequest));
+		} else {
 
-		if (isCantonSearch(jobSearchRequest.getCantonCodes())) {
-			boolQueryBuilder.must(termsQuery(PATH_LOCATION_CANTON_CODE, jobSearchRequest.getCantonCodes()));
-		}
+			if (isCantonSearch(jobSearchRequest.getCantonCodes())) {
+				filterQueryBuilder.must(termsQuery(PATH_LOCATION_CANTON_CODE, jobSearchRequest.getCantonCodes()));
+			}
 
-		if (isMultipleLocationSearch(jobSearchRequest)) {
-			boolQueryBuilder.must(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
-		}
+			if (isMultipleLocationSearch(jobSearchRequest)) {
+				filterQueryBuilder.must(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
+			}
 
-		if (isSingleLocationAbroadSearch(jobSearchRequest)) {
-				boolQueryBuilder
+			if (isSingleLocationAbroadSearch(jobSearchRequest)) {
+				filterQueryBuilder
 						.must(existsQuery(PATH_LOCATION_COUNTRY_ISO_CODE))
 						.mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, SWITZERLAND_COUNTRY_ISO_CODE));
+			}
 		}
 
 		return new NativeSearchQueryBuilder()
@@ -603,7 +601,10 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 		return this.currentUserContext.hasAnyRoles(Role.JOBSEEKER_CLIENT, Role.SYSADMIN);
 	}
 
-	private FunctionScoreQueryBuilder prepareBoostedFunctionQuery(GeoDistanceQueryBuilder geoDistanceQueryBuilder, GaussDecayFunctionBuilder gaussDecayFunctionBuilder) {
+	private FunctionScoreQueryBuilder prepareBoostedFunctionQuery(JobAdvertisementSearchRequest jobSearchRequest) {
+		RadiusSearchRequest radiusSearchRequest = jobSearchRequest.getRadiusSearchRequest();
+		GeoDistanceQueryBuilder geoDistanceQueryBuilder = getDistanceQuery(radiusSearchRequest);
+		GaussDecayFunctionBuilder gaussDecayFunctionBuilder = getGaussDecayFunctionBuilder(radiusSearchRequest);
 		return functionScoreQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder).boost(2f);
 	}
 
