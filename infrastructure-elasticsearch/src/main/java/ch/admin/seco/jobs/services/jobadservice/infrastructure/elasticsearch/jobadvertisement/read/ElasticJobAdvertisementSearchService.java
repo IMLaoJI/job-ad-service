@@ -117,7 +117,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 	private static final String PATH_WORKLOAD_PERCENTAGE_MAX = PATH_CTX + "jobContent.employment.workloadPercentageMax";
 	private static final String PATH_WORKLOAD_TIME_PERCENTAGE_MIN = PATH_CTX + "jobContent.employment.workloadPercentageMin";
 	private static final String PATH_LANGUAGE_SKILL_CODE = PATH_CTX + "jobContent.languageSkills.languageIsoCode";
-	private static final String FILTER_COMMUNAL_CODE_ABROAD = "9999";
+	private static final String COMMUNAL_CODE_ABROAD = "9999";
 	private static final String SWITZERLAND_COUNTRY_ISO_CODE = "CH";
 	private static final String RELEVANCE = "_score";
 	private static final int ONLINE_SINCE_DAYS = 60;
@@ -321,21 +321,26 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 			boolQueryBuilder.must(prepareBoostedFunctionQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder));
 		}
 
-		if (isNotEmpty(jobSearchRequest.getCantonCodes())) {
+		if (isCantonSearch(jobSearchRequest.getCantonCodes())) {
 			boolQueryBuilder.must(termsQuery(PATH_LOCATION_CANTON_CODE, jobSearchRequest.getCantonCodes()));
 		}
 
-		if (isAbroadSearch(jobSearchRequest)){
-			//TODO fago: Search for "ABROAD" is handled correctled, but I need to fix case when we search for "ABROAD" + "X"
-				boolQueryBuilder.must(boolQuery()
+		if (isMultipleLocationSearch(jobSearchRequest)) {
+			boolQueryBuilder.must(termsQuery(PATH_LOCATION_COMMUNAL_CODE, jobSearchRequest.getCommunalCodes()));
+		}
+
+		if (isSingleLocationAbroadSearch(jobSearchRequest)) {
+				boolQueryBuilder
 						.must(existsQuery(PATH_LOCATION_COUNTRY_ISO_CODE))
-						.mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, SWITZERLAND_COUNTRY_ISO_CODE)));
+						.mustNot(termsQuery(PATH_LOCATION_COUNTRY_ISO_CODE, SWITZERLAND_COUNTRY_ISO_CODE));
 		}
 
 		return new NativeSearchQueryBuilder()
 				.withQuery(boolQueryBuilder)
 				.withFilter(filterQueryBuilder);
 	}
+
+
 
 	private BoolQueryBuilder createQuery(JobAdvertisementSearchRequest jobSearchRequest) {
 		if (isEmpty(jobSearchRequest.getKeywords()) && isEmpty(jobSearchRequest.getProfessionCodes())) {
@@ -590,8 +595,8 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 		return jobSearchRequest.getRadiusSearchRequest() != null;
 	}
 
-	private boolean isAbroadSearch(JobAdvertisementSearchRequest jobSearchRequest) {
-		return jobSearchRequest.getCommunalCodes() != null && Arrays.asList(jobSearchRequest.getCommunalCodes()).contains(FILTER_COMMUNAL_CODE_ABROAD);
+	private boolean isMultipleLocationSearch(JobAdvertisementSearchRequest jobSearchRequest) {
+		return isNotEmpty(jobSearchRequest.getCommunalCodes()) && jobSearchRequest.getCommunalCodes().length > 1;
 	}
 
 	private boolean canViewRestrictedJobAds() {
@@ -610,6 +615,16 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 		return geoDistanceQuery(PATH_LOCATION_COORDINATES)
 				.point(radiusSearchRequest.getGeoPoint().getLat(), radiusSearchRequest.getGeoPoint().getLon())
 				.distance(radiusSearchRequest.getDistance(), KILOMETERS);
+	}
+
+	private boolean isSingleLocationAbroadSearch(JobAdvertisementSearchRequest jobSearchRequest) {
+		return isNotEmpty(jobSearchRequest.getCommunalCodes())
+				&& Arrays.asList(jobSearchRequest.getCommunalCodes()).contains(COMMUNAL_CODE_ABROAD)
+				&& jobSearchRequest.getCommunalCodes().length == 1;
+	}
+
+	private boolean isCantonSearch(String[] cantonCodes) {
+		return isNotEmpty(cantonCodes);
 	}
 
 }

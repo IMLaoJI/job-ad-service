@@ -264,8 +264,6 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
-    @Ignore
-    //TODO fago: fix test
     public void shouldSearchForAbroadAndBernJobs() throws Exception {
         // GIVEN
         index(listOfJobAdsForAbroadSearchTests());
@@ -286,7 +284,25 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
                 .andExpect(jsonPath("$.[3].jobAdvertisement.id").value(equalTo("job01")))
                 .andExpect(jsonPath("$.[3].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")));
+    }
 
+    @Test
+    public void shouldSearchForMultipleLocationsInSwitzerland() throws Exception {
+        // GIVEN
+        index(listOfJobAdsForAbroadSearchTests());
+
+        // WHEN
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE, BERN_COMMUNAL_CODE});
+
+        // THEN
+        post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(header().string("X-Total-Count", "2"))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job06")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job01")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")));
     }
 
     @Test
@@ -454,7 +470,11 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(header().string("X-Total-Count", "2"))
                 .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job06")))
                 .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
-                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")));
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")))
+				.andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job05")))
+				.andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")))
+				.andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")));
+
     }
 
     @Test

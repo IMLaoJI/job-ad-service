@@ -83,7 +83,7 @@ public class JobAdvertisementWithLocationsFixture {
                 createJobWithLocationAndPublicationStartDate(job02.id(), LocalDate.now().plusDays(noOfDays++),
                         testLocation()
                                 .setCity("Ausland")
-                                .setCommunalCode("7001")
+                                .setCommunalCode("9999")
                                 .setRegionCode("A")
                                 .setCantonCode("FL")
                                 .setPostalCode("9490")
@@ -92,7 +92,7 @@ public class JobAdvertisementWithLocationsFixture {
                 createJobWithLocationAndPublicationStartDate(job03.id(), LocalDate.now().plusDays(noOfDays++),
                         testLocation()
                                 .setCity("Ausland")
-                                .setCommunalCode(null)
+                                .setCommunalCode("9999")
                                 .setRegionCode(null)
                                 .setCantonCode(null)
                                 .setPostalCode("91244")
@@ -101,7 +101,7 @@ public class JobAdvertisementWithLocationsFixture {
                 createJobWithLocationAndPublicationStartDate(job04.id(), LocalDate.now().plusDays(noOfDays++),
                         testLocation()
                                 .setCity("Ausland")
-                                .setCommunalCode(null)
+                                .setCommunalCode("9999")
                                 .setRegionCode(null)
                                 .setCantonCode(null)
                                 .setPostalCode("94541")
@@ -119,7 +119,7 @@ public class JobAdvertisementWithLocationsFixture {
                 createJobWithLocationAndPublicationStartDate(job06.id(), LocalDate.now().plusDays(noOfDays),
                         testLocation()
                                 .setCity("Lausanne")
-                                .setCommunalCode(null)
+                                .setCommunalCode("5586")
                                 .setRegionCode(null)
                                 .setCantonCode(null)
                                 .setPostalCode("1000")
