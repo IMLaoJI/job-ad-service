@@ -316,7 +316,6 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
 		if (isRadiusNeeded(jobSearchRequest)) {
 			boolQueryBuilder.must(prepareRadiusQuery(jobSearchRequest));
-
 		} else {
 
 			if (isCantonSearch(jobSearchRequest.getCantonCodes())) {
@@ -338,7 +337,6 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 				.withQuery(boolQueryBuilder)
 				.withFilter(filterQueryBuilder);
 	}
-
 
 
 	private BoolQueryBuilder createQuery(JobAdvertisementSearchRequest jobSearchRequest) {
