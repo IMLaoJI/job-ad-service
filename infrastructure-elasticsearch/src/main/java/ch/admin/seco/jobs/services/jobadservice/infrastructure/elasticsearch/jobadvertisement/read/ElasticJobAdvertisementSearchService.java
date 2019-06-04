@@ -20,10 +20,10 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.job
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.GeoDistanceQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.elasticsearch.index.query.functionscore.GaussDecayFunctionBuilder;
@@ -63,18 +63,30 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.J
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.TYPE_DOC;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
 import static org.apache.commons.lang3.ArrayUtils.toArray;
 import static org.apache.commons.lang3.ArrayUtils.toStringArray;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.elasticsearch.common.unit.DistanceUnit.KILOMETERS;
-import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.elasticsearch.index.query.Operator.AND;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
+import static org.elasticsearch.index.query.QueryBuilders.functionScoreQuery;
+import static org.elasticsearch.index.query.QueryBuilders.fuzzyQuery;
+import static org.elasticsearch.index.query.QueryBuilders.geoDistanceQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchPhrasePrefixQuery;
+import static org.elasticsearch.index.query.QueryBuilders.multiMatchQuery;
+import static org.elasticsearch.index.query.QueryBuilders.prefixQuery;
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
+import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
 import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.gaussDecayFunction;
 import static org.elasticsearch.join.query.JoinQueryBuilders.hasChildQuery;
 import static org.springframework.data.domain.Sort.Order.asc;
 import static org.springframework.data.domain.Sort.Order.desc;
-import static org.springframework.util.StringUtils.isEmpty;
 
 @Service
 public class ElasticJobAdvertisementSearchService implements JobAdvertisementSearchService {
@@ -194,15 +206,10 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 		Pageable updatedPageable = appendUniqueSortingKey(pageable);
 
 		SearchQuery query = new NativeSearchQueryBuilder()
-				.withQuery(createManagedJobAdsKeywordsQuery(searchRequest.getKeywordsText()))
-				.withFilter(mustAll(
-						publicationStartDateFilter(searchRequest.getOnlineSinceDays()),
-						ownerUserIdFilter(searchRequest.getOwnerUserId()),
-						ownerCompanyIdFilter(searchRequest.getCompanyId()),
-						stateFilter(searchRequest.getState())))
-				.withPageable(updatedPageable)
-				.withHighlightFields(new HighlightBuilder.Field("*").fragmentSize(300).numOfFragments(1))
-				.build();
+                .withQuery(createManagedJobAdsKeywordsQuery(searchRequest.getKeywordsText(), searchRequest.getCompanyId()))
+                .withPageable(updatedPageable)
+                .withHighlightFields(new HighlightBuilder.Field("*").fragmentSize(300).numOfFragments(1))
+                .build();
 
 		if (LOG.isTraceEnabled()) {
 			LOG.trace("query: {}", query.getQuery());
@@ -210,7 +217,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 			LOG.trace("sort: {}", query.getSort());
 		}
 
-		return elasticsearchTemplate.query(query, response -> extractHighlightedResults(updatedPageable, response));
+        return elasticsearchTemplate.query(query, response -> extractHighlightedResults(updatedPageable, response));
 	}
 
 	private Page<JobAdvertisementSearchResult> extractSearchResult(Pageable pageable, SearchResponse response) {
@@ -268,32 +275,34 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 		return new AggregatedPageImpl<>(highlightedResults, pageable, searchHits.totalHits, searchResults.getAggregations(), searchResults.getScrollId());
 	}
 
-	private QueryBuilder createManagedJobAdsKeywordsQuery(String keywordsText) {
-		if (isBlank(keywordsText)) {
-			return matchAllQuery();
-		}
+    private QueryBuilder createManagedJobAdsKeywordsQuery(String keywordsText, String companyId) {
+        if (isBlank(keywordsText)) {
+            return matchAllQuery();
+        }
 
-		String[] keywords = keywordsText.split(MANAGED_JOB_AD_KEYWORD_DELIMITER);
+        String[] keywords = keywordsText.split(MANAGED_JOB_AD_KEYWORD_DELIMITER);
 
-		BoolQueryBuilder keywordQuery = boolQuery();
-		Stream.of(keywords)
-				.flatMap(keyword -> Stream.of(
-						multiMatchQuery(keyword, PATH_OWNER_USER_DISPLAY_NAME, PATH_LOCATION_CITY)
-								.field(PATH_TITLE, 1.5f).type(MultiMatchQueryBuilder.Type.PHRASE_PREFIX),
-						termQuery(PATH_AVAM_JOB_ID, keyword).boost(10f),
-						termQuery(PATH_EGOV_JOB_ID, keyword).boost(10f)
-				))
-				.forEach(keywordQuery::should);
+        BoolQueryBuilder bq = boolQuery();
+        for (String keyword : keywords) {
+            bq.should(prefixQuery(PATH_TITLE + ".keyword", keyword));
+            bq.should(prefixQuery(PATH_LOCATION_CITY + ".keyword", keyword));
+			bq.should(prefixQuery(PATH_OWNER_USER_DISPLAY_NAME, keyword));
 
-		String allKeywords = String.join(" ", keywords);
-		if (isNotBlank(allKeywords)) {
-			keywordQuery.should(multiMatchQuery(allKeywords, PATH_OWNER_USER_DISPLAY_NAME, PATH_LOCATION_CITY, PATH_TITLE)
-					.boost(2f)
-					.operator(Operator.AND));
-		}
+            bq.should(fuzzyQuery(PATH_TITLE + ".keyword", keyword).fuzziness(Fuzziness.ONE));
+            bq.should(fuzzyQuery(PATH_OWNER_USER_DISPLAY_NAME + ".keyword", keyword).fuzziness(Fuzziness.ONE));
+            bq.should(fuzzyQuery(PATH_LOCATION_CITY + ".keyword", keyword).fuzziness(Fuzziness.ONE));
 
-		return mustAll(keywordQuery);
-	}
+			bq.should(termQuery(PATH_AVAM_JOB_ID, keyword).boost(10f));
+			bq.should(termQuery(PATH_EGOV_JOB_ID, keyword).boost(10f));
+        }
+        QueryBuilder qb = termQuery("jobAdvertisement.owner.companyId", companyId);
+
+        BoolQueryBuilder keywordQuery = boolQuery();
+        keywordQuery.must(bq);
+        keywordQuery.must(qb);
+
+        return keywordQuery;
+    }
 
 	private Sort createSort(SearchSort sort) {
 		switch (sort) {
@@ -393,7 +402,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 			if (isNotBlank(allKeywords)) {
 				keywordQuery.should(multiMatchQuery(allKeywords, PATH_DESCRIPTION, PATH_TITLE, PATH_LANGUAGE_SKILL_CODE)
 						.boost(2f)
-						.operator(Operator.AND));
+                        .operator(AND));
 			}
 		}
 

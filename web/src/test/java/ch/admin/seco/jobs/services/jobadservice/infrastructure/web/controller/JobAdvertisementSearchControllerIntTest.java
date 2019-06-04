@@ -1096,8 +1096,8 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "5"))
                 .andExpect(jsonPath("$.[*].owner.userDisplayName").value(hasItem("<em>OwnerUserDisplayName</em>")))
-                .andExpect(jsonPath("$.[*].jobContent.location.city").value(hasItem("<em>Adliswil</em>")))
-                .andExpect(jsonPath("$.[*].jobContent.jobDescriptions.[*].title").value(hasItem("<em>JobDescTitle</em>")))
+                .andExpect(jsonPath("$.[*].jobContent.location.city").value(hasItem("Adliswil")))
+                .andExpect(jsonPath("$.[*].jobContent.jobDescriptions.[*].title").value(hasItem("JobDescTitle")))
                 .andExpect(jsonPath("$.[*].stellennummerAvam").value(hasItem("<em>test</em>")))
                 .andExpect(jsonPath("$.[*].stellennummerEgov").value(hasItem("<em>StellennummerEgov</em>")));
     }
