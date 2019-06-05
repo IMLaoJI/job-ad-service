@@ -3,8 +3,10 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.config;
 import ch.admin.seco.alv.shared.jwt.JWTFilterConfigurer;
 import ch.admin.seco.alv.shared.jwt.TokenToAuthenticationConverter;
 import ch.admin.seco.jobs.services.jobadservice.application.security.Role;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -15,6 +17,7 @@ import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 
 @Configuration
 @Import(SecurityProblemSupport.class)
+@Order(SecurityProperties.BASIC_AUTH_ORDER)
 @EnableWebSecurity
 public class MicroserviceSecurityConfig extends WebSecurityConfigurerAdapter {
 
