@@ -24,6 +24,7 @@ import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.GeoDistanceQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
+import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.elasticsearch.index.query.functionscore.GaussDecayFunctionBuilder;
@@ -207,11 +208,15 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
 		SearchQuery query = new NativeSearchQueryBuilder()
                 .withQuery(createManagedJobAdsKeywordsQuery(searchRequest.getKeywordsText(), searchRequest.getCompanyId()))
+                .withFilter(mustAll(
+                        publicationStartDateFilter(searchRequest.getOnlineSinceDays()),
+                        ownerUserIdFilter(searchRequest.getOwnerUserId()),
+                        stateFilter(searchRequest.getState())))
                 .withPageable(updatedPageable)
                 .withHighlightFields(new HighlightBuilder.Field("*").fragmentSize(300).numOfFragments(1))
                 .build();
 
-		if (LOG.isTraceEnabled()) {
+        if (LOG.isTraceEnabled()) {
 			LOG.trace("query: {}", query.getQuery());
 			LOG.trace("filter: {}", query.getFilter());
 			LOG.trace("sort: {}", query.getSort());
@@ -277,7 +282,12 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
     private QueryBuilder createManagedJobAdsKeywordsQuery(String keywordsText, String companyId) {
         if (isBlank(keywordsText)) {
-            return matchAllQuery();
+            QueryBuilder qb = termQuery(PATH_OWNER_COMPANY_ID, companyId);
+
+            BoolQueryBuilder keywordQuery = boolQuery();
+            keywordQuery.must(qb);
+
+            return keywordQuery;
         }
 
         String[] keywords = keywordsText.split(MANAGED_JOB_AD_KEYWORD_DELIMITER);
@@ -292,15 +302,20 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
             bq.should(fuzzyQuery(PATH_OWNER_USER_DISPLAY_NAME + ".keyword", keyword).fuzziness(Fuzziness.ONE));
             bq.should(fuzzyQuery(PATH_LOCATION_CITY + ".keyword", keyword).fuzziness(Fuzziness.ONE));
 
-			bq.should(termQuery(PATH_AVAM_JOB_ID, keyword).boost(10f));
+            bq.should(termQuery(PATH_AVAM_JOB_ID, keyword).boost(10f));
 			bq.should(termQuery(PATH_EGOV_JOB_ID, keyword).boost(10f));
         }
-        QueryBuilder qb = termQuery("jobAdvertisement.owner.companyId", companyId);
+        QueryBuilder qb = termQuery(PATH_OWNER_COMPANY_ID, companyId);
 
         BoolQueryBuilder keywordQuery = boolQuery();
         keywordQuery.must(bq);
         keywordQuery.must(qb);
-
+        String allKeywords = String.join(" ", keywords);
+        if (isNotBlank(allKeywords)) {
+            keywordQuery.should(multiMatchQuery(allKeywords, PATH_OWNER_USER_DISPLAY_NAME, PATH_LOCATION_CITY, PATH_TITLE)
+                    .boost(2f)
+                    .operator(Operator.AND));
+        }
         return keywordQuery;
     }
 

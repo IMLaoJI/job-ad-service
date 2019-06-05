@@ -1225,9 +1225,9 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[0].jobContent.jobDescriptions[0].title").value(equalTo("<em>desc3</em>")))
-                .andExpect(jsonPath("$.[1].jobContent.jobDescriptions[0].title").value(equalTo("<em>desc2</em>")))
-                .andExpect(jsonPath("$.[2].jobContent.jobDescriptions[0].title").value(equalTo("<em>desc1</em>")));
+                .andExpect(jsonPath("$.[0].jobContent.jobDescriptions[0].title").value(equalTo("desc3")))
+                .andExpect(jsonPath("$.[1].jobContent.jobDescriptions[0].title").value(equalTo("desc2")))
+                .andExpect(jsonPath("$.[2].jobContent.jobDescriptions[0].title").value(equalTo("desc1")));
     }
 
     @Test
@@ -1273,9 +1273,9 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[0].jobContent.jobDescriptions[0].title").value(equalTo("<em>desc1</em>"))) // this title is 1st due to multiple descriptions
-                .andExpect(jsonPath("$.[1].jobContent.jobDescriptions[0].title").value(equalTo("<em>desc3</em>")))
-                .andExpect(jsonPath("$.[2].jobContent.jobDescriptions[0].title").value(equalTo("<em>desc2</em>")));
+                .andExpect(jsonPath("$.[0].jobContent.jobDescriptions[0].title").value(equalTo("desc1"))) // this title is 1st due to multiple descriptions
+                .andExpect(jsonPath("$.[1].jobContent.jobDescriptions[0].title").value(equalTo("desc3")))
+                .andExpect(jsonPath("$.[2].jobContent.jobDescriptions[0].title").value(equalTo("desc2")));
     }
 
     @Test
@@ -1367,9 +1367,9 @@ public class JobAdvertisementSearchControllerIntTest {
         resultActions
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("<em>ZurichZ</em>")))
-                .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("<em>ZurichB</em>")))
-                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("<em>ZurichA</em>")));
+                .andExpect(jsonPath("$.[0].jobContent.location.city").value(equalTo("ZurichZ")))
+                .andExpect(jsonPath("$.[1].jobContent.location.city").value(equalTo("ZurichB")))
+                .andExpect(jsonPath("$.[2].jobContent.location.city").value(equalTo("ZurichA")));
     }
 
     @Test
