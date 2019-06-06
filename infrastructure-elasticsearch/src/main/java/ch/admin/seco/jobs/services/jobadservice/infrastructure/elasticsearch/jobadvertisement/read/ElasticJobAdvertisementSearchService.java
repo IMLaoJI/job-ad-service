@@ -82,7 +82,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
 	private static final String PATH_CREATED_TIME = "jobAdvertisement.createdTime";
 	private static final String SCALE_IN_KM = "150km";
-	private static final String OFFSET_IN_KM = "30km";
+	private static final String OFFSET_IN_KM = "2km";
 	private static final double DECAY_RATE = 0.5;
 
 	private static Logger LOG = LoggerFactory.getLogger(ElasticJobAdvertisementSearchService.class);
@@ -608,7 +608,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 	private FunctionScoreQueryBuilder prepareRadiusQuery(RadiusSearchRequest radiusSearchRequest) {
 		GeoDistanceQueryBuilder geoDistanceQueryBuilder = getDistanceQuery(radiusSearchRequest);
 		GaussDecayFunctionBuilder gaussDecayFunctionBuilder = getGaussDecayFunctionBuilder(radiusSearchRequest);
-		return functionScoreQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder).boost(2f);
+		return functionScoreQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder).boost(1.5f);
 	}
 
 	private GaussDecayFunctionBuilder getGaussDecayFunctionBuilder(RadiusSearchRequest radiusSearchRequest) {

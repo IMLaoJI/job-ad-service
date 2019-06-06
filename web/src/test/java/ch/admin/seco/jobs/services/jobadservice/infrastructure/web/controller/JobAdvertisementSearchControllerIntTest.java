@@ -63,6 +63,7 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForAbroadSearchTests;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForCloseRangeDistanceTests;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForDecayingScoreSearchTests;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForGeoDistanceTests;
 import static java.time.LocalDate.now;
@@ -100,6 +101,8 @@ public class JobAdvertisementSearchControllerIntTest {
     private static final String ABROAD_COMMUNAL_CODE = "9999";
 
     private static final GeoPointDto BERN_GEO_POINT = new GeoPointDto().setLat(46.948).setLon(7.441);
+
+    private static final GeoPointDto KÖNIZ_GEO_POINT = new GeoPointDto().setLat(46.921).setLon(7.413);
 
     private static final GeoPointDto LAUSANNE_GEO_POINT = new GeoPointDto().setLat(46.552043).setLon(6.6523078);
 
@@ -145,26 +148,34 @@ public class JobAdvertisementSearchControllerIntTest {
                 .andExpect(header().string("X-Total-Count", "3"));
     }
 
+
     @Test
-    public void shouldSearchForAbroadJobs() throws Exception {
+    public void shouldDecayScoreAfterInitialOffsetOf2Km() throws Exception {
         // GIVEN
-        index(listOfJobAdsForAbroadSearchTests());
+        index(listOfJobAdsForCloseRangeDistanceTests());
 
         // WHEN
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"9999"});
+        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"355"});
+        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(KÖNIZ_GEO_POINT).setDistance(30));
 
-        post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search")
+        post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job04")))
-                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
-                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job03")))
-                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")))
-                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job02")))
-                .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Ausland")));
 
+                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job01")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Köniz")))
+                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")))
+
+                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job03")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")))
+                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")))
+
+                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job02")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Ostermundigen")))
+                .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.jobDescriptions[0].title").value(equalTo("Koch")));
     }
+
 
     @Test
     public void shouldIgnoreGeoDistanceWhenNoRadiusSearchRequestIsProvided() throws Exception {

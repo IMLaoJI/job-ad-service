@@ -24,6 +24,8 @@ import static java.util.stream.Collectors.toList;
 
 public class JobAdvertisementWithLocationsFixture {
 
+	private static final String X28_CODE_KOCH = "11000411";
+
     public static List<JobAdvertisement> listOfJobAdsForGeoDistanceTests() {
         return Stream.of(
                 createJobWithLocationAndPublicationStartDate(job01.id(), LocalDate.now(),
@@ -171,4 +173,52 @@ public class JobAdvertisementWithLocationsFixture {
                                 .setCoordinates(new GeoPoint(7.359, 46.234))
                                 .build()).build())).collect(toList());
     }
+
+	public static List<JobAdvertisement> listOfJobAdsForCloseRangeDistanceTests() {
+		return Stream.of(
+				testJobAdvertisementWithContentAndLocation(job01.id(),
+				testJobContent()
+						.setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build()))
+						.setX28OccupationCodes(X28_CODE_KOCH)
+						.setLocation(
+								testLocation()
+										.setCity("Köniz")
+										.setCommunalCode("355")
+										.setRegionCode("BE01")
+										.setCantonCode("BE")
+										.setPostalCode("3098")
+										.setCountryIsoCode("CH")
+										.setCoordinates(new GeoPoint(7.413, 46.921))
+										.build()).build()),
+		testJobAdvertisementWithContentAndLocation(job02.id(),
+				testJobContent()
+						.setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build()))
+						.setX28OccupationCodes(X28_CODE_KOCH)
+						.setLocation(
+								testLocation()
+										.setCity("Ostermundigen")
+										.setCommunalCode("363")
+										.setRegionCode("BE01")
+										.setCantonCode("BE")
+										.setPostalCode("3072")
+										.setCountryIsoCode("CH")
+										.setCoordinates(new GeoPoint(7.498, 46.958))
+										.build()).build()),
+		testJobAdvertisementWithContentAndLocation(job03.id(),
+				testJobContent()
+						.setJobDescriptions(singletonList(testJobDescription()
+								.setTitle("Koch")
+								.build()))
+						.setX28OccupationCodes(X28_CODE_KOCH)
+						.setLocation(
+								testLocation()
+										.setCity("Bern")
+										.setCommunalCode("351")
+										.setRegionCode("BE01")
+										.setCantonCode("BE")
+										.setPostalCode("3000")
+										.setCountryIsoCode("CH")
+										.setCoordinates(new GeoPoint(7.441, 46.948))
+										.build()).build())).collect(toList());
+	}
 }
