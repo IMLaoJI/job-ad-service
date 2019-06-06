@@ -608,7 +608,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 	private FunctionScoreQueryBuilder prepareRadiusQuery(RadiusSearchRequest radiusSearchRequest) {
 		GeoDistanceQueryBuilder geoDistanceQueryBuilder = getDistanceQuery(radiusSearchRequest);
 		GaussDecayFunctionBuilder gaussDecayFunctionBuilder = getGaussDecayFunctionBuilder(radiusSearchRequest);
-		return functionScoreQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder).boost(2f);
+		return functionScoreQuery(geoDistanceQueryBuilder, gaussDecayFunctionBuilder).boost(1.5f);
 	}
 
 	private GaussDecayFunctionBuilder getGaussDecayFunctionBuilder(RadiusSearchRequest radiusSearchRequest) {
