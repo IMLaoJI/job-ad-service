@@ -282,34 +282,30 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
     private QueryBuilder createManagedJobAdsKeywordsQuery(String keywordsText, String companyId) {
         if (isBlank(keywordsText)) {
-            QueryBuilder qb = termQuery(PATH_OWNER_COMPANY_ID, companyId);
-
-            BoolQueryBuilder keywordQuery = boolQuery();
-            keywordQuery.must(qb);
-
-            return keywordQuery;
+			return boolQuery().must(termQuery(PATH_OWNER_COMPANY_ID, companyId));
         }
 
         String[] keywords = keywordsText.split(MANAGED_JOB_AD_KEYWORD_DELIMITER);
 
-        BoolQueryBuilder bq = boolQuery();
+        BoolQueryBuilder boolQuery = boolQuery();
         for (String keyword : keywords) {
-            bq.should(prefixQuery(PATH_TITLE + ".keyword", keyword));
-            bq.should(prefixQuery(PATH_LOCATION_CITY + ".keyword", keyword));
-			bq.should(prefixQuery(PATH_OWNER_USER_DISPLAY_NAME, keyword));
+            boolQuery.should(prefixQuery(PATH_TITLE + ".keyword", keyword));
+            boolQuery.should(prefixQuery(PATH_LOCATION_CITY + ".keyword", keyword));
+			boolQuery.should(prefixQuery(PATH_OWNER_USER_DISPLAY_NAME, keyword));
 
-            bq.should(fuzzyQuery(PATH_TITLE + ".keyword", keyword).fuzziness(Fuzziness.ONE));
-            bq.should(fuzzyQuery(PATH_OWNER_USER_DISPLAY_NAME + ".keyword", keyword).fuzziness(Fuzziness.ONE));
-            bq.should(fuzzyQuery(PATH_LOCATION_CITY + ".keyword", keyword).fuzziness(Fuzziness.ONE));
+            boolQuery.should(fuzzyQuery(PATH_TITLE + ".keyword", keyword).fuzziness(Fuzziness.ONE));
+            boolQuery.should(fuzzyQuery(PATH_OWNER_USER_DISPLAY_NAME + ".keyword", keyword).fuzziness(Fuzziness.ONE));
+            boolQuery.should(fuzzyQuery(PATH_LOCATION_CITY + ".keyword", keyword).fuzziness(Fuzziness.ONE));
 
-            bq.should(termQuery(PATH_AVAM_JOB_ID, keyword).boost(10f));
-			bq.should(termQuery(PATH_EGOV_JOB_ID, keyword).boost(10f));
+            boolQuery.should(termQuery(PATH_AVAM_JOB_ID, keyword).boost(10f));
+			boolQuery.should(termQuery(PATH_EGOV_JOB_ID, keyword).boost(10f));
         }
-        QueryBuilder qb = termQuery(PATH_OWNER_COMPANY_ID, companyId);
+
 
         BoolQueryBuilder keywordQuery = boolQuery();
-        keywordQuery.must(bq);
-        keywordQuery.must(qb);
+		keywordQuery.must(termQuery(PATH_OWNER_COMPANY_ID, companyId));
+        keywordQuery.must(boolQuery);
+
         String allKeywords = String.join(" ", keywords);
         if (isNotBlank(allKeywords)) {
             keywordQuery.should(multiMatchQuery(allKeywords, PATH_OWNER_USER_DISPLAY_NAME, PATH_LOCATION_CITY, PATH_TITLE)
