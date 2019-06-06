@@ -30,7 +30,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -73,6 +75,43 @@ public class JobAdvertisementApiRestControllerIntTest {
         // then
         post.andExpect(status().isCreated());
         assertThat(post.andReturn().getResponse().getHeader("token")).isNotBlank();
+    }
+
+    @Test
+    @WithApiUser
+    public void testCreateApiJobAdvertisementWithSurrogateFlag() throws Exception {
+        // given
+        this.index(createJob(job01.id()));
+        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDtoWithoutEmployer = createJobAdvertisementDto();
+        apiCreateJobAdvertisementDtoWithoutEmployer.getCompany().setSurrogate(false);
+        apiCreateJobAdvertisementDtoWithoutEmployer.setEmployer(null);
+
+        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDtoWithEmployer = createJobAdvertisementDto();
+        apiCreateJobAdvertisementDtoWithEmployer.getCompany().setSurrogate(true);
+        ApiEmployerDto apiEmployerDto = new ApiEmployerDto();
+        apiEmployerDto.setCountryIsoCode("DE");
+        apiEmployerDto.setName("test name");
+        apiEmployerDto.setCity("test city");
+        apiEmployerDto.setPostalCode("1000");
+        apiCreateJobAdvertisementDtoWithEmployer.setEmployer(apiEmployerDto);
+
+        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDtoWithInvalidEmployer = createJobAdvertisementDto();
+        apiCreateJobAdvertisementDtoWithInvalidEmployer.getCompany().setSurrogate(true);
+        ApiEmployerDto invalidApiEmployerDto = new ApiEmployerDto();
+        apiCreateJobAdvertisementDtoWithInvalidEmployer.setEmployer(invalidApiEmployerDto);
+
+        //when
+        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
+        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
+
+        ResultActions validPostWithoutEmployer = post(apiCreateJobAdvertisementDtoWithoutEmployer, URL);
+        ResultActions validPostWithEmployer = post(apiCreateJobAdvertisementDtoWithEmployer, URL);
+        ResultActions invalidPostWithEmployer = post(apiCreateJobAdvertisementDtoWithInvalidEmployer, URL);
+
+        // then
+        validPostWithoutEmployer.andExpect(status().isCreated());
+        validPostWithEmployer.andExpect(status().isCreated());
+        invalidPostWithEmployer.andExpect(status().isBadRequest());
     }
 
     @Test
