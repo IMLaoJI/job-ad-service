@@ -19,8 +19,9 @@
 <div th:if="${contactInformation?.salutation}" th:text="#{mail.complaint.body.contactinformation.salutation(${contactInformation?.salutation})}"></div>
 <div th:if="${contactInformation?.name}" th:text="#{mail.complaint.body.contactinformation.name(${contactInformation?.name})}"></div>
 <div th:if="${contactInformation?.phone}" th:text="#{mail.complaint.body.contactinformation.phone(${contactInformation?.phone})}"></div>
-<div th:if="${contactInformation?.email}"th:text="#{mail.complaint.body.contactinformation.email(${contactInformation?.email})}"></div>
+<div th:if="${contactInformation?.email}" th:text="#{mail.complaint.body.contactinformation.email(${contactInformation?.email})}"></div>
 <p><strong th:text="#{mail.complaint.body.complaintmessage}"></strong></p>
+<!-- // TODO add ComplaintType and Translations for it (use from UI) -->
 <em th:text="${complaintMessage}"></em>
 
 </body>

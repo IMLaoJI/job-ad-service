@@ -15,6 +15,9 @@ public class ComplaintDto {
     private ContactInformationDto contactInformation;
 
     @NotBlank
+    private ComplaintType complaintType;
+
+    @NotBlank
     @Size(max = 1000)
     private String complaintMessage;
 
@@ -37,6 +40,15 @@ public class ComplaintDto {
         return this;
     }
 
+    public ComplaintType getComplaintType() {
+        return complaintType;
+    }
+
+    public ComplaintDto setComplaintType(ComplaintType complaintType) {
+        this.complaintType = complaintType;
+        return this;
+    }
+
     public String getComplaintMessage() {
         return complaintMessage;
     }
@@ -50,7 +62,8 @@ public class ComplaintDto {
     public String toString() {
         return "ComplaintDto{" +
                 "jobAdvertisementId='" + jobAdvertisementId + '\'' +
-                ", contactInformation=" + contactInformation +
+                ", contactInformation=" + contactInformation + '\'' +
+                ", complaintType=" + complaintType + '\'' +
                 ", complaintMessage='" + complaintMessage + '\'' +
                 '}';
     }

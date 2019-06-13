@@ -48,6 +48,7 @@ public class ComplaintApplicationService {
         variables.put("stellennummerEgov", jobAdvertisement.getStellennummerEgov());
         variables.put("stellennummerAvam", jobAdvertisement.getStellennummerAvam());
         variables.put("contactInformation", complaintDto.getContactInformation());
+        variables.put("complaintType", complaintDto.getComplaintType());
         variables.put("complaintMessage", complaintDto.getComplaintMessage());
         variables.put("linkToJobAdDetail", complaintProperties.getLinkToJobAdDetail() + complaintDto.getJobAdvertisementId());
 
