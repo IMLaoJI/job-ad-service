@@ -1,12 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.read;
 
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.FavouriteItemDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchResult;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchService;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ManagedJobAdSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCode;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.RadiusSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUser;
@@ -20,12 +15,9 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.job
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.unit.DistanceUnit;
 import org.elasticsearch.common.unit.Fuzziness;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.GeoDistanceQueryBuilder;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.Operator;
-import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.elasticsearch.index.query.functionscore.GaussDecayFunctionBuilder;
 import org.elasticsearch.search.SearchHit;
@@ -34,6 +26,7 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -48,13 +41,7 @@ import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -64,26 +51,12 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.J
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.INDEX_NAME_JOB_ADVERTISEMENT;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService.TYPE_DOC;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument.FAVOURITE_ITEM_RELATION_NAME;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
-import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
-import static org.apache.commons.lang3.ArrayUtils.toArray;
-import static org.apache.commons.lang3.ArrayUtils.toStringArray;
+import static org.apache.commons.lang3.ArrayUtils.*;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.elasticsearch.common.unit.DistanceUnit.KILOMETERS;
 import static org.elasticsearch.index.query.Operator.AND;
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
-import static org.elasticsearch.index.query.QueryBuilders.functionScoreQuery;
-import static org.elasticsearch.index.query.QueryBuilders.fuzzyQuery;
-import static org.elasticsearch.index.query.QueryBuilders.geoDistanceQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchPhrasePrefixQuery;
-import static org.elasticsearch.index.query.QueryBuilders.multiMatchQuery;
-import static org.elasticsearch.index.query.QueryBuilders.prefixQuery;
-import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
-import static org.elasticsearch.index.query.QueryBuilders.termQuery;
-import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
+import static org.elasticsearch.index.query.QueryBuilders.*;
 import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.gaussDecayFunction;
 import static org.elasticsearch.join.query.JoinQueryBuilders.hasChildQuery;
 import static org.springframework.data.domain.Sort.Order.asc;
@@ -143,6 +116,9 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 	private final ResultsMapper resultsMapper;
 
 	private final FavouriteItemRepository favouriteItemRepository;
+
+	@Value("${alv.feature.toggle.isGaussDecayEnabled}")
+	boolean isGaussDecayEnabled;
 
 	public ElasticJobAdvertisementSearchService(CurrentUserContext currentUserContext,
 												ElasticsearchTemplate elasticsearchTemplate,
@@ -334,8 +310,8 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 		BoolQueryBuilder boolQueryBuilder = createQuery(jobSearchRequest);
 		BoolQueryBuilder filterQueryBuilder = createFilter(jobSearchRequest);
 
-		if (isRadiusNeeded(jobSearchRequest)) {
-			boolQueryBuilder.must(prepareRadiusQuery(jobSearchRequest.getRadiusSearchRequest()));
+		if (isRadiusNeeded(jobSearchRequest) && isGaussDecayEnabled) {
+				boolQueryBuilder.must(prepareRadiusQuery(jobSearchRequest.getRadiusSearchRequest()));
 		} else {
 			filterQueryBuilder.must(localityFilter(jobSearchRequest));
 		}
@@ -434,6 +410,14 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 
 	private BoolQueryBuilder localityFilter(JobAdvertisementSearchRequest jobSearchRequest) {
 		BoolQueryBuilder localityFilter = boolQuery();
+
+		if (isRadiusNeeded(jobSearchRequest) && !isGaussDecayEnabled) {
+			RadiusSearchRequest radiusSearchRequest = jobSearchRequest.getRadiusSearchRequest();
+			localityFilter.should(geoDistanceQuery(PATH_LOCATION_COORDINATES)
+					.point(radiusSearchRequest.getGeoPoint().getLat(), radiusSearchRequest.getGeoPoint().getLon())
+					.distance(radiusSearchRequest.getDistance(), DistanceUnit.KILOMETERS));
+		}
+
 		if (isCantonSearch(jobSearchRequest.getCantonCodes())) {
 			localityFilter.should(termsQuery(PATH_LOCATION_CANTON_CODE, jobSearchRequest.getCantonCodes()));
 		}

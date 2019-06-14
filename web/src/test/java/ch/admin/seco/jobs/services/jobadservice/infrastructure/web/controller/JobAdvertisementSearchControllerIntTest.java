@@ -3,20 +3,10 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.FavouriteItemApplicationService;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.FavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.create.CreateFavouriteItemDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ManagedJobAdSearchRequest;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCode;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCodeType;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.RadiusSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.GeoPointDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.GeoPoint;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageSkill;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Location;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
@@ -30,6 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -43,42 +34,25 @@ import reactor.util.function.Tuples;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REJECTED;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.API;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.EXTERN;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture.testJobAdvertisement;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job02;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job03;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job04;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job05;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job06;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job07;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job08;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture.testJobContent;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobDescriptionFixture.testJobDescription;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForAbroadSearchTests;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForCloseRangeDistanceTests;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForDecayingScoreSearchTests;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForGeoDistanceTests;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.*;
 import static java.time.LocalDate.now;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.CombinableMatcher.both;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.Assume.assumeTrue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -109,6 +83,9 @@ public class JobAdvertisementSearchControllerIntTest {
     private static final GeoPointDto SION_GEO_POINT = new GeoPointDto().setLat(46.234).setLon(7.359);
 
     private static final String X28_CODE_KOCH = "11000411";
+
+    @Value("${alv.feature.toggle.isGaussDecayEnabled}")
+    boolean isGaussDecayEnabled;
 
     @Qualifier("jobAdvertisementRepository")
     @Autowired
@@ -151,7 +128,9 @@ public class JobAdvertisementSearchControllerIntTest {
 
     @Test
     public void shouldDecayScoreAfterInitialOffsetOf2Km() throws Exception {
+
         // GIVEN
+        assumeTrue(isGaussDecayEnabled);
         index(listOfJobAdsForCloseRangeDistanceTests());
 
         // WHEN
@@ -265,13 +244,7 @@ public class JobAdvertisementSearchControllerIntTest {
         // THEN
         post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(header().string("X-Total-Count", "3"))
-                .andExpect(jsonPath("$.[0].jobAdvertisement.id").value(equalTo("job03")))
-                .andExpect(jsonPath("$.[0].jobAdvertisement.jobContent.location.city").value(equalTo("Sion")))
-                .andExpect(jsonPath("$.[1].jobAdvertisement.id").value(equalTo("job04")))
-                .andExpect(jsonPath("$.[1].jobAdvertisement.jobContent.location.city").value(equalTo("Lausanne")))
-                .andExpect(jsonPath("$.[2].jobAdvertisement.id").value(equalTo("job01")))
-                .andExpect(jsonPath("$.[2].jobAdvertisement.jobContent.location.city").value(equalTo("Bern")));
+                .andExpect(header().string("X-Total-Count", "3"));
     }
 
     @Test
@@ -318,6 +291,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
     @Test
     public void shouldDecayTheScoreOfResultsBasedOnDistanceOfInitialGeoPoint() throws Exception {
+
         // GIVEN
         // DISTANCES:
         // Bern - Bern - 0km
@@ -325,6 +299,7 @@ public class JobAdvertisementSearchControllerIntTest {
         // Bern - Sion 79km,
         // Bern - Zurich 95km
 
+        assumeTrue(isGaussDecayEnabled);
         index(listOfJobAdsForGeoDistanceTests());
 
         // WHEN
@@ -355,7 +330,10 @@ public class JobAdvertisementSearchControllerIntTest {
     @Test
     public void shouldDecayTheScoreOfResultsBasedOnDistanceOfInitialGeoPointOnKeywordSearch() throws Exception {
 
+
+
         index(listOfJobAdsForDecayingScoreSearchTests());
+        assumeTrue(isGaussDecayEnabled);
         // WHEN
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
         jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE});
