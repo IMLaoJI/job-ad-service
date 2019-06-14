@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.businesslogging;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Component;
 
 import ch.admin.seco.alv.shared.logger.business.BusinessLogData;
@@ -31,6 +32,6 @@ public class LogstashBusinessLogger implements BusinessLogger {
 	}
 
 	private String extractAuthorities(CurrentUser currentUser) {
-		return currentUser != null ? currentUser.getAuthorities().toString() : null;
+		return currentUser != null ? String.join(", ", currentUser.getAuthorities()) : Strings.EMPTY;
 	}
 }
