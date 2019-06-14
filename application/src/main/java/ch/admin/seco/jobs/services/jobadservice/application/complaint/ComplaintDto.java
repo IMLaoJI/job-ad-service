@@ -1,5 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.application.complaint;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -15,6 +17,7 @@ public class ComplaintDto {
     private ContactInformationDto contactInformation;
 
     @NotBlank
+    @Enumerated(EnumType.STRING)
     private ComplaintType complaintType;
 
     @NotBlank
