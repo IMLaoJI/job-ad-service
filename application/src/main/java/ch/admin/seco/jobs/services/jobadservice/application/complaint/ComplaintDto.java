@@ -16,7 +16,7 @@ public class ComplaintDto {
     @NotNull
     private ContactInformationDto contactInformation;
 
-    @NotBlank
+    @NotNull
     @Enumerated(EnumType.STRING)
     private ComplaintType complaintType;
 
