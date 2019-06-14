@@ -21,7 +21,9 @@
 <div th:if="${contactInformation?.phone}" th:text="#{mail.complaint.body.contactinformation.phone(${contactInformation?.phone})}"></div>
 <div th:if="${contactInformation?.email}" th:text="#{mail.complaint.body.contactinformation.email(${contactInformation?.email})}"></div>
 <p><strong th:text="#{mail.complaint.body.complaintmessage}"></strong></p>
-<!-- // TODO add ComplaintType and Translations for it (use from UI) -->
+<p><strong th:if="${complaintType == ComplaintType.BRIBE}" th:text="#{mail.complaint.body.complainttype.bribe}"></strong></p>
+<p><strong th:if="${complaintType == ComplaintType.OFFENSIVE}" th:text="#{mail.complaint.body.complainttype.offensive}"></strong></p>
+<p><strong th:if="${complaintType == ComplaintType.DISCRIMINATION}" th:text="#{mail.complaint.body.complainttype.discrimination}"></strong></p>
 <em th:text="${complaintMessage}"></em>
 
 </body>
