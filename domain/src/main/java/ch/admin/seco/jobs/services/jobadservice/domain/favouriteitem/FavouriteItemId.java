@@ -4,8 +4,13 @@ import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.AggregateId;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.IdGenerator;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Embeddable;
 import java.util.Objects;
 
+@Embeddable
+@Access(AccessType.FIELD)
 public class FavouriteItemId implements AggregateId<FavouriteItemId> {
 
     private String value;
