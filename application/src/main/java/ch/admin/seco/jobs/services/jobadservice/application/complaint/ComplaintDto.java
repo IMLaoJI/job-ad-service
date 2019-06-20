@@ -1,5 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.application.complaint;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -13,6 +15,10 @@ public class ComplaintDto {
     @Valid
     @NotNull
     private ContactInformationDto contactInformation;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private ComplaintType complaintType;
 
     @NotBlank
     @Size(max = 1000)
@@ -37,6 +43,15 @@ public class ComplaintDto {
         return this;
     }
 
+    public ComplaintType getComplaintType() {
+        return complaintType;
+    }
+
+    public ComplaintDto setComplaintType(ComplaintType complaintType) {
+        this.complaintType = complaintType;
+        return this;
+    }
+
     public String getComplaintMessage() {
         return complaintMessage;
     }
@@ -50,7 +65,8 @@ public class ComplaintDto {
     public String toString() {
         return "ComplaintDto{" +
                 "jobAdvertisementId='" + jobAdvertisementId + '\'' +
-                ", contactInformation=" + contactInformation +
+                ", contactInformation=" + contactInformation + '\'' +
+                ", complaintType=" + complaintType + '\'' +
                 ", complaintMessage='" + complaintMessage + '\'' +
                 '}';
     }

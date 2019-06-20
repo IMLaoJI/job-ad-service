@@ -2,6 +2,8 @@ package ch.admin.seco.jobs.services.jobadservice.application.complaint;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -11,12 +13,14 @@ import java.util.Locale;
 public class ContactInformationDto {
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     private Salutation salutation;
 
     @NotBlank
     @Size(max = 255)
     private String name;
 
+    @NotBlank
     private String phone;
 
     @Email
