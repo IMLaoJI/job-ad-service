@@ -38,7 +38,7 @@ public class AvamWebServiceClient {
     }
 
     public void deregister(JobAdvertisement jobAdvertisement) {
-        LOG.info("Start sending deregister of jobAdvertisement id=" + jobAdvertisement.getId().getValue() + " stellennummerAvam=" + jobAdvertisement.getStellennummerEgov() + " stellennummerEgov=" + jobAdvertisement.getStellennummerEgov() + " to AVAM");
+        LOG.info("Start sending deregister of jobAdvertisement id=" + jobAdvertisement.getId().getValue() + " stellennummerAvam=" + jobAdvertisement.getStellennummerAvam() + " stellennummerEgov=" + jobAdvertisement.getStellennummerEgov() + " to AVAM");
         LOG.debug(jobAdvertisement.toString());
         AvamAction action = AvamAction.ABMELDUNG;
         TOsteEgov tOsteEgov = assembler.toOsteEgov(jobAdvertisement, action);
