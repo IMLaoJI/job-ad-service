@@ -25,7 +25,6 @@ import static ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine.now
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamDateTimeFormatter.formatLocalDate;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.JobAdvertisementToAvamAssembler.fetchFirstEmail;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
 
 public class JobAdvertisementToAvamAssemblerTest {
 
@@ -108,12 +107,11 @@ public class JobAdvertisementToAvamAssemblerTest {
 	}
 
 	@Test
-	public void shouldBeShortEmployment() {
+	public void shouldBeShortTermEmployment() {
 		// given
-		Employment employment = resolveEmploymentWithShortEmployment();
 		Company company = resolveCompanyWithSurrogate(false);
 
-		JobAdvertisement jobAdvertisement = createJobAdvertisementForCompanyAndEmployer(company, null, shortEmployment());
+		JobAdvertisement jobAdvertisement = createJobAdvertisementForCompanyAndEmployer(company, null, shortTermEmployment());
 
 		JobAdvertisementToAvamAssembler assembler = new JobAdvertisementToAvamAssembler();
 
@@ -123,16 +121,16 @@ public class JobAdvertisementToAvamAssemblerTest {
 		// then
 		assertThat(oste).isNotNull();
 
-		assertTrue(employment.isShortEmployment());
+		assertThat(oste).isNotNull();
+		assertThat(oste.getFristTyp()).isEqualTo(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.SHORT_TERM));
 	}
 
 	@Test
-	public void shouldBeTemporaryEmployment() {
+	public void shouldbeFixedTermEmployment() {
 		// given
-		Employment employment = resolveEmploymentWithShortEmployment();
 		Company company = resolveCompanyWithSurrogate(false);
 
-		JobAdvertisement jobAdvertisement = createJobAdvertisementForCompanyAndEmployer(company, null, temporaryEmployment());
+		JobAdvertisement jobAdvertisement = createJobAdvertisementForCompanyAndEmployer(company, null, fixedTermEmployment());
 
 		JobAdvertisementToAvamAssembler assembler = new JobAdvertisementToAvamAssembler();
 
@@ -141,15 +139,13 @@ public class JobAdvertisementToAvamAssemblerTest {
 
 		// then
 		assertThat(oste).isNotNull();
-
-		assertThat(oste.getFristTyp()).isEqualTo(AvamFristTyp.BEFR.name());
 		assertThat(oste.getVertragsdauer()).isNotBlank();
+		assertThat(oste.getFristTyp()).isEqualTo(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.FIXED_TERM));
 	}
 
 	@Test
 	public void shouldBePermanentEmployment() {
 		// given
-		Employment employment = resolveEmploymentWithShortEmployment();
 		Company company = resolveCompanyWithSurrogate(false);
 
 		JobAdvertisement jobAdvertisement = createJobAdvertisementForCompanyAndEmployer(company, null, permanentEmployment());
@@ -161,8 +157,7 @@ public class JobAdvertisementToAvamAssemblerTest {
 
 		// then
 		assertThat(oste).isNotNull();
-
-		assertThat(oste.getFristTyp()).isEqualTo(AvamFristTyp.UNBEFR.name());
+		assertThat(oste.getFristTyp()).isEqualTo(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.PERMANENT));
 	}
 
 
@@ -209,13 +204,6 @@ public class JobAdvertisementToAvamAssemblerTest {
 	}
 
 
-	private static Employment shortEmployment() {
-		return new Employment.Builder()
-				.setShortEmployment(true)
-				.setWorkloadPercentageMax(100)
-				.setWorkloadPercentageMin(80)
-				.build();
-	}
 
 	private static Employment permanentEmployment() {
 		return new Employment.Builder()
@@ -225,7 +213,7 @@ public class JobAdvertisementToAvamAssemblerTest {
 				.build();
 	}
 
-	private static Employment temporaryEmployment() {
+	private static Employment fixedTermEmployment() {
 		return new Employment.Builder()
 				.setPermanent(false)
 				.setShortEmployment(false)
@@ -234,6 +222,15 @@ public class JobAdvertisementToAvamAssemblerTest {
 				.setWorkloadPercentageMin(80)
 				.build();
 	}
+
+	private static Employment shortTermEmployment() {
+		return new Employment.Builder()
+				.setShortEmployment(true)
+				.setWorkloadPercentageMax(100)
+				.setWorkloadPercentageMin(80)
+				.build();
+	}
+
 
 	private Company resolveCompanyWithSurrogate(boolean surrogate) {
 		return new Company.Builder<>()

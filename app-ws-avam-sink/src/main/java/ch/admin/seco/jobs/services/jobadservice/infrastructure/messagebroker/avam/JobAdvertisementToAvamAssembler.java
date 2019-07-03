@@ -116,7 +116,7 @@ public class JobAdvertisementToAvamAssembler {
 			avamJobAdvertisement.setStellenantritt(formatLocalDate(employment.getStartDate()));
 		}
 
-		determineFristTyp(avamJobAdvertisement, employment);
+		determineEmploymentTermType(avamJobAdvertisement, employment);
 
 		avamJobAdvertisement.setPensumVon((short) employment.getWorkloadPercentageMin());
 		avamJobAdvertisement.setPensumBis((short) employment.getWorkloadPercentageMax());
@@ -138,15 +138,17 @@ public class JobAdvertisementToAvamAssembler {
 		}
 	}
 
-	private void determineFristTyp(TOsteEgov avamJobAdvertisement, Employment employment) {
+	private void determineEmploymentTermType(TOsteEgov avamJobAdvertisement, Employment employment) {
 		boolean permanent = safeBoolean(employment.isPermanent());
-		avamJobAdvertisement.setFristTyp(AvamCodeResolver.FRIST_TYPE.getLeft(AvamFristTyp.UNBEFR));
+		avamJobAdvertisement.setFristTyp(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.PERMANENT));
+
 		if (!permanent) {
-			avamJobAdvertisement.setFristTyp(AvamCodeResolver.FRIST_TYPE.getLeft(AvamFristTyp.KURZ));
-			if (!employment.isShortEmployment()) {
-				avamJobAdvertisement.setFristTyp(AvamCodeResolver.FRIST_TYPE.getLeft(AvamFristTyp.BEFR));
-				avamJobAdvertisement.setVertragsdauer(formatLocalDate(employment.getEndDate()));
+			if (employment.isShortEmployment()) {
+				avamJobAdvertisement.setFristTyp(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.SHORT_TERM));
+				return;
 			}
+			avamJobAdvertisement.setFristTyp(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.FIXED_TERM));
+			avamJobAdvertisement.setVertragsdauer(formatLocalDate(employment.getEndDate()));
 		}
 	}
 

@@ -117,9 +117,9 @@ public class AvamCodeResolver {
             .put("3", Qualification.UNSKILLED)
             .toImmutable();
 
-    public static final MappingBuilder<String, AvamFristTyp> FRIST_TYPE = new MappingBuilder<String, AvamFristTyp>()
-            .put("BEFR", AvamFristTyp.BEFR)
-            .put("UNBEFR", AvamFristTyp.UNBEFR)
-            .put("KURZ", AvamFristTyp.KURZ)
+    public static final MappingBuilder<String, EmploymentTermType> EMPLOYMENT_TERM_TYPE = new MappingBuilder<String, EmploymentTermType>()
+            .put("BEFR", EmploymentTermType.FIXED_TERM)
+            .put("UNBEFR", EmploymentTermType.PERMANENT)
+            .put("KURZ", EmploymentTermType.SHORT_TERM)
             .toImmutable();
 }
