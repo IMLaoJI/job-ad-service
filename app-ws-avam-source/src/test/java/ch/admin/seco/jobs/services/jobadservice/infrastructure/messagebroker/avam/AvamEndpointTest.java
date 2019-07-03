@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
@@ -28,7 +29,10 @@ import org.springframework.ws.test.server.ResponseMatchers;
 
 import java.io.IOException;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.*;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.APPROVE;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.CANCEL;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.CREATE_FROM_AVAM;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.REJECT;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.ACTION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -93,10 +97,15 @@ public class AvamEndpointTest {
         Message<String> received = (Message<String>) messageCollector.forChannel(source.output()).poll();
         assertThat(received).isNotNull();
         assertThat(received.getHeaders().get(ACTION)).isEqualTo(APPROVE.name());
+
         ApprovalDto approvalDto = approvalDtoJacksonTester.parse(received.getPayload()).getObject();
+        EmploymentDto employment = approvalDto.getUpdateJobAdvertisement().getEmployment();
         assertThat(approvalDto.getStellennummerEgov()).isEqualTo("EGOV-0001");
         assertThat(approvalDto.getStellennummerAvam()).isEqualTo("AVAM-0001");
         assertThat(approvalDto.getDate()).isEqualTo("2018-03-01");
+        assertThat(employment.getEndDate()).isNull();
+        assertThat(employment.isShortEmployment()).isFalse();
+        assertThat(employment.isPermanent()).isTrue();
     }
 
     @Test
@@ -134,9 +143,14 @@ public class AvamEndpointTest {
         assertThat(received.getHeaders().get(ACTION)).isEqualTo(CREATE_FROM_AVAM.name());
 
         AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto = createJobAdvertisementAvamDtoJacksonTester.parse(received.getPayload()).getObject();
+        EmploymentDto employment = createJobAdvertisementFromAvamDto.getEmployment();
+
         assertThat(createJobAdvertisementFromAvamDto.getStellennummerAvam()).isEqualTo("AVAM-0003");
         assertThat(createJobAdvertisementFromAvamDto.getTitle()).isEqualTo("Test Title");
         assertThat(createJobAdvertisementFromAvamDto.getDescription()).isEqualTo("Test Description");
+        assertThat(employment.getEndDate()).isNotNull();
+        assertThat(employment.isShortEmployment()).isFalse();
+        assertThat(employment.isPermanent()).isFalse();
     }
 
     @Test

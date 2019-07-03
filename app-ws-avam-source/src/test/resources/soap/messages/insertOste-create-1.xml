@@ -120,7 +120,7 @@
         <teletext>0</teletext>
         <teletextKanalCode></teletextKanalCode>
         <teletextZusatztext></teletextZusatztext>
-        <fristTyp>UNBEFR</fristTyp>
+        <fristTyp>BEFR</fristTyp>
         <untHausNr>31</untHausNr>
         <untLand></untLand>
         <untName>SECO</untName>
@@ -135,7 +135,7 @@
         <untTelefon></untTelefon>
         <untEmail></untEmail>
         <untUrl></untUrl>
-        <vertragsdauer></vertragsdauer>
+        <vertragsdauer>2012-03-01-00.00.00.0</vertragsdauer>
         <waehrungCode></waehrungCode>
         <anonym>0</anonym>
         <publikation>1</publikation>
