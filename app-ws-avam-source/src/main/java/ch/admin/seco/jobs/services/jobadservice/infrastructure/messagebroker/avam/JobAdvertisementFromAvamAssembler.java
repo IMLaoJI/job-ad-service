@@ -187,9 +187,10 @@ public class JobAdvertisementFromAvamAssembler {
         return new EmploymentDto()
                 .setStartDate(parseToLocalDate(avamJobAdvertisement.getStellenantritt()))
                 .setEndDate(parseToLocalDate(avamJobAdvertisement.getVertragsdauer()))
-                .setShortEmployment(safeBoolean(avamJobAdvertisement.isKurzeinsatz(), false))
+                .setShortEmployment(safeBoolean(avamJobAdvertisement.getFristTyp().equals(AvamCodeResolver.FRIST_TYPE.getLeft(AvamFristTyp.KURZ)), false))
                 .setImmediately(safeBoolean(avamJobAdvertisement.isAbSofort(), avamJobAdvertisement.getStellenantritt() == null))
-                .setPermanent(safeBoolean(avamJobAdvertisement.isUnbefristet(), avamJobAdvertisement.getVertragsdauer() == null))
+                .setPermanent(safeBoolean(avamJobAdvertisement.getFristTyp().equals(AvamCodeResolver.FRIST_TYPE.getLeft(AvamFristTyp.UNBEFR)),
+                        avamJobAdvertisement.getVertragsdauer() == null))
                 .setWorkloadPercentageMin(workingTimePercentage.getMin())
                 .setWorkloadPercentageMax(workingTimePercentage.getMax())
                 .setWorkForms(createWorkForms(avamJobAdvertisement));

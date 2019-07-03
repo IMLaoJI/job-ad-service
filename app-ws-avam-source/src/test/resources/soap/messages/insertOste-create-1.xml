@@ -120,7 +120,7 @@
         <teletext>0</teletext>
         <teletextKanalCode></teletextKanalCode>
         <teletextZusatztext></teletextZusatztext>
-        <unbefristet>1</unbefristet>
+        <fristTyp>UNBEFR</fristTyp>
         <untHausNr>31</untHausNr>
         <untLand></untLand>
         <untName>SECO</untName>

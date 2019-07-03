@@ -478,7 +478,7 @@
             </xs:restriction>
         </xs:simpleType>
     </xs:element>
-    <xs:element name="unbefristet" nillable="true" type="xs:boolean" minOccurs="0"/>
+    <xs:element name="fristTyp" type="xs:string"/>
     <xs:element name="untHausNr" nillable="true">
         <xs:simpleType>
             <xs:restriction base="xs:string">
@@ -655,7 +655,6 @@
         </xs:simpleType>
     </xs:element>
     <xs:element name="meldepflicht" nillable="false" type="xs:boolean" />
-    <xs:element name="kurzeinsatz" nillable="true" type="xs:boolean" minOccurs="0"/>
     <xs:element name="sperrfrist" nillable="true">
         <xs:simpleType>
             <xs:restriction base="xs:string">
@@ -732,123 +731,16 @@
 
 
 <xs:complexType name="WSArbeitsform">
-<xs:sequence>
-<xs:element name="arbeitsformCode" type="xs:string"/>
-</xs:sequence>
+    <xs:sequence>
+        <xs:element name="arbeitsformCode" type="xs:string"/>
+    </xs:sequence>
 </xs:complexType>
 
 <xs:complexType name="WSArbeitsformArray">
-<xs:sequence>
-<xs:element maxOccurs="unbounded" minOccurs="0" name="WSArbeitsformArrayItem" type="tns:WSArbeitsform"/>
-</xs:sequence>
+    <xs:sequence>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="WSArbeitsformArrayItem" type="tns:WSArbeitsform"/>
+    </xs:sequence>
 </xs:complexType>
-
-
-<!--
-Codes abfragen in AVAM
--->
-	<xs:complexType name="T_Code">
-		<xs:sequence>
-			<xs:element name="domain" type="xs:string"/>
-			<xs:element name="code" type="xs:string"/>
-			<xs:element name="kurztextDe" type="xs:string"/>
-			<xs:element name="kurztextFr" type="xs:string"/>
-			<xs:element name="kurztextIt" type="xs:string"/>
-			<xs:element name="textDe" type="xs:string"/>
-			<xs:element name="textFr" type="xs:string"/>
-			<xs:element name="textIt" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="T_CodeArray">
-		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="T_CodeArrayItem" type="tns:T_Code"/>
-		</xs:sequence>
-	</xs:complexType>
-
-
-	<!--
-		RAV-Adressen abfragen
-	-->
-	<xs:complexType name="WSRavAdresse">
-		<xs:sequence>
-			<xs:element name="code" type="xs:string"/>
-			<xs:element name="nameDE" type="xs:string"/>
-			<xs:element name="nameFR" type="xs:string"/>
-			<xs:element name="nameIT" type="xs:string"/>
-			<xs:element name="strasseDE" type="xs:string"/>
-			<xs:element name="strasseFR" type="xs:string"/>
-			<xs:element name="strasseIT" type="xs:string"/>
-			<xs:element name="hausNr" type="xs:string"/>
-			<xs:element name="plz" type="xs:string"/>
-			<xs:element name="ortDE" type="xs:string"/>
-			<xs:element name="ortFR" type="xs:string"/>
-			<xs:element name="ortIT" type="xs:string"/>
-			<xs:element name="leiter" type="xs:string"/>
-			<xs:element name="telefon" type="xs:string"/>
-			<xs:element name="fax" type="xs:string"/>
-			<xs:element name="email" type="xs:string"/>
-			<xs:element name="arbeitsspracheCode" type="xs:string"/>
-			<xs:element name="adressTypCode" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="WSRavAdresseArray">
-		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="WSRavAdresseArrayItem" type="tns:WSRavAdresse"/>
-		</xs:sequence>
-	</xs:complexType>
-
-	<!--
-		RAV-Sachbearbeiter abfragen 
-	-->
-	<xs:complexType name="WSFunktion">
-		<xs:sequence>
-			<xs:element name="funktionCode" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="WSFunktionArray">
-		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="WSFunktionArrayItem" type="tns:WSFunktion"/>
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="WSArbeitsamtbereich">
-		<xs:sequence>
-			<xs:element name="arbeitsamtBereich" type="xs:string"/>
-			<xs:element name="bueroNummer" type="xs:string"/>
-			<xs:element name="email" type="xs:string"/>
-			<xs:element name="telefon" type="xs:string"/>
-			<xs:element name="mobil" type="xs:string"/>
-			<xs:element name="fax" type="xs:string"/>
-			<xs:element name="benutzerDetailId" type="xs:integer"/>
-			<xs:element name="funktionen" type="tns:WSFunktionArray"/>
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="WSArbeitsamtbereichArray">
-		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="WSArbeitsamtbereichArrayItem" type="tns:WSArbeitsamtbereich"/>
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="WSRavSachbearbeiter">
-		<xs:sequence>
-			<xs:element name="name" type="xs:string"/>
-			<xs:element name="vorname" type="xs:string"/>
-			<xs:element name="benutzerId" type="xs:string"/>
-			<xs:element name="spracheCode" type="xs:string"/>
-			<xs:element name="geschlechtCode" type="xs:string"/>
-			<xs:element name="arbeitsamtBereiche" type="tns:WSArbeitsamtbereichArray"/>
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="WSRavSachbearbeiterArray">
-		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="WSRavSachbearbeiterArrayItem" type="tns:WSRavSachbearbeiter"/>
-		</xs:sequence>
-	</xs:complexType>
 
 	<!--
 		Nachrichten Objekte
@@ -866,55 +758,6 @@ Codes abfragen in AVAM
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element form="qualified" name="deliverOsteReturn" nillable="true" type="xs:string"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-
-	<xs:element name="getCode">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="credentials" nillable="false" type="tns:WSCredentials"/>
-				<xs:element name="domain" nillable="true" type="xs:string"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-
-	<xs:element name="getCodeResponse">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element form="qualified" name="codeReturn" nillable="true" type="tns:T_CodeArray"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-
-	<xs:element name="getRavAdressen">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="credentials" nillable="false" type="tns:WSCredentials"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-
-	<xs:element name="getRavAdressenResponse">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element form="qualified" name="ravAdressenReturn" nillable="true" type="tns:WSRavAdresseArray"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-
-	<xs:element name="getRavSachbearbeiter">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="credentials" nillable="false" type="tns:WSCredentials"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-
-	<xs:element name="getRavSachbearbeiterResponse">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element form="qualified" name="ravSachbearbeiterReturn" nillable="true" type="tns:WSRavSachbearbeiterArray"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

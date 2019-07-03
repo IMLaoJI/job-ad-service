@@ -116,4 +116,10 @@ public class AvamCodeResolver {
             .put("2", Qualification.SEMISKILLED)
             .put("3", Qualification.UNSKILLED)
             .toImmutable();
+
+    public static final MappingBuilder<String, AvamFristTyp> FRIST_TYPE = new MappingBuilder<String, AvamFristTyp>()
+            .put("BEFR", AvamFristTyp.BEFR)
+            .put("UNBEFR", AvamFristTyp.UNBEFR)
+            .put("KURZ", AvamFristTyp.KURZ)
+            .toImmutable();
 }

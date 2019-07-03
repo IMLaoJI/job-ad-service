@@ -25,10 +25,6 @@
 		===========
 
 		- Oste in AVAM eintragen
-		- Lesen der für eGov relevanten T_Code Einträgen.
-		- Publikation des STES im eGov
-		- Abfragen von RAV-Adressen
-		- Abfragen von RAV-Sachbearbeitern
 	</documentation>
 
 	<types>
@@ -46,24 +42,6 @@
 	<message name="deliverOsteRequest">
 		<part element="xsd1:deliverOste" name="parameters"/>
 	</message>
-	<message name="getCodeResponse">
-		<part element="xsd1:getCodeResponse" name="parameters"/>
-	</message>
-	<message name="getCodeRequest">
-		<part element="xsd1:getCode" name="parameters"/>
-	</message>
-	<message name="getRavAdressenResponse">
-		<part element="xsd1:getRavAdressenResponse" name="parameters"/>
-	</message>
-	<message name="getRavAdressenRequest">
-		<part element="xsd1:getRavAdressen" name="parameters"/>
-	</message>
-	<message name="getRavSachbearbeiterResponse">
-		<part element="xsd1:getRavSachbearbeiterResponse" name="parameters"/>
-	</message>
-	<message name="getRavSachbearbeiterRequest">
-		<part element="xsd1:getRavSachbearbeiter" name="parameters"/>
-	</message>
 
 	<!--
 		Port Deklaration
@@ -72,18 +50,6 @@
 		<operation name="deliverOste">
 			<input message="tns:deliverOsteRequest" name="deliverOsteRequest"/>
 			<output message="tns:deliverOsteResponse" name="deliverOsteResponse"/>
-		</operation>
-		<operation name="getCode">
-			<input message="tns:getCodeRequest" name="getCodeRequest"/>
-			<output message="tns:getCodeResponse" name="getCodeResponse"/>
-		</operation>
-		<operation name="getRavAdressen">
-			<input message="tns:getRavAdressenRequest" name="getRavAdressenRequest"/>
-			<output message="tns:getRavAdressenResponse" name="getRavAdressenResponse"/>
-		</operation>
-		<operation name="getRavSachbearbeiter">
-			<input message="tns:getRavSachbearbeiterRequest" name="getRavSachbearbeiterRequest"/>
-			<output message="tns:getRavSachbearbeiterResponse" name="getRavSachbearbeiterResponse"/>
 		</operation>
 	</portType>
 
@@ -98,33 +64,6 @@
 				<soap:body use="literal"/>
 			</input>
 			<output name="deliverOsteResponse">
-				<soap:body use="literal"/>
-			</output>
-		</operation>
-		<operation name="getCode">
-			<soap:operation soapAction="getCode" style="document"/>
-			<input name="getCodeRequest">
-				<soap:body use="literal"/>
-			</input>
-			<output name="getCodeResponse">
-				<soap:body use="literal"/>
-			</output>
-		</operation>
-		<operation name="getRavAdressen">
-			<soap:operation soapAction="getRavAdressen" style="document"/>
-			<input name="getRavAdressenRequest">
-				<soap:body use="literal"/>
-			</input>
-			<output name="getRavAdressenResponse">
-				<soap:body use="literal"/>
-			</output>
-		</operation>
-		<operation name="getRavSachbearbeiter">
-			<soap:operation soapAction="getRavSachbearbeiter" style="document"/>
-			<input name="getRavSachbearbeiterRequest">
-				<soap:body use="literal"/>
-			</input>
-			<output name="getRavSachbearbeiterResponse">
 				<soap:body use="literal"/>
 			</output>
 		</operation>
