@@ -15,9 +15,6 @@ if (project.hasProperty('prod')) {
 } else {
     apply from: "${rootProject.rootDir}/gradle/profile_dev.gradle"
 }
-if (project.hasProperty('zipkin')) {
-    apply from: "${rootProject.rootDir}/gradle/zipkin.gradle"
-}
 
 import org.ajoberstar.grgit.Grgit
 
