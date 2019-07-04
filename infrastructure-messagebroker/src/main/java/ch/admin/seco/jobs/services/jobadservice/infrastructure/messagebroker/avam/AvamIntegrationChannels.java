@@ -7,6 +7,8 @@ import org.springframework.integration.dsl.MessageChannels;
 import org.springframework.integration.store.ChannelMessageStore;
 import org.springframework.integration.store.MessageGroupQueue;
 
+import ch.admin.seco.alv.shared.spring.integration.actuator.QueueChannelHealthProvider;
+
 @Configuration
 class AvamIntegrationChannels {
 
@@ -19,6 +21,21 @@ class AvamIntegrationChannels {
 	@Bean
 	QueueChannel avamInputChannel() {
 		return MessageChannels.queue("avam-input-channel", new MessageGroupQueue(this.channelMessageStore, "AVAM_GROUP")).get();
+	}
+
+	@Bean
+	QueueChannelHealthProvider avamQueueChannelHealthProvider() {
+		return new QueueChannelHealthProvider() {
+			@Override
+			public QueueChannel queueChannel() {
+				return avamInputChannel();
+			}
+
+			@Override
+			public int threshold() {
+				return 0;
+			}
+		};
 	}
 
 }

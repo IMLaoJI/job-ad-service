@@ -2,9 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.av
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.channel.QueueChannel;
 
-import ch.admin.seco.alv.shared.spring.integration.actuator.QueueChannelHealthProvider;
 import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
 
@@ -40,21 +38,6 @@ public class AvamConfig {
 	@Bean
 	AvamDomainEventSenderGateway avamDomainEventSenderGateway() {
 		return new AvamDomainEventSenderGateway(avamIntegrationChannels);
-	}
-
-	@Bean
-	QueueChannelHealthProvider avamQueueChannelHealthProvider() {
-		return new QueueChannelHealthProvider() {
-			@Override
-			public QueueChannel queueChannel() {
-				return avamIntegrationChannels.avamInputChannel();
-			}
-
-			@Override
-			public int threshold() {
-				return 0;
-			}
-		};
 	}
 }
 
