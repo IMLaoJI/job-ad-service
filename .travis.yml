@@ -36,7 +36,7 @@ deploy:
 - provider: script
   skip_cleanup: true
   script: >-
-    ./gradlew bootJar pushDockerImage publish -Pprod -Pzipkin -x test -Pversion=${TRAVIS_JOB_NUMBER}-SNAPSHOT -PaddLatestTagToDockerImage=true --stacktrace
+    ./gradlew bootJar pushDockerImage publish -Pprod -x test -Pversion=${TRAVIS_JOB_NUMBER}-SNAPSHOT -PaddLatestTagToDockerImage=true --stacktrace
     && .ci-travis/push-version-bump.sh ${TRAVIS_JOB_NUMBER}-SNAPSHOT ${GIT_USER} ${GIT_PWD}
   on:
     all_branches: true
@@ -44,14 +44,14 @@ deploy:
 
 - provider: script
   skip_cleanup: true
-  script: "./gradlew bootJar pushDockerImage publish -Pprod -Pzipkin -x test -Pversion=`echo ${TRAVIS_BRANCH} | cut -c9-`"
+  script: "./gradlew bootJar pushDockerImage publish -Pprod -x test -Pversion=`echo ${TRAVIS_BRANCH} | cut -c9-`"
   on:
     all_branches: true
     condition: "$TRAVIS_BRANCH =~ ^release.*$"
 
 - provider: script
   skip_cleanup: true
-  script: "./gradlew bootJar pushDockerImage publish -Pprod -Pzipkin -x test -Pversion=${TRAVIS_TAG}"
+  script: "./gradlew bootJar pushDockerImage publish -Pprod -x test -Pversion=${TRAVIS_TAG}"
   on:
     tags: true
 
