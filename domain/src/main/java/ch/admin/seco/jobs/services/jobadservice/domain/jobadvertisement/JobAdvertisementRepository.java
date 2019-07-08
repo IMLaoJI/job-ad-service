@@ -4,6 +4,7 @@ import static org.hibernate.jpa.QueryHints.HINT_CACHE_MODE;
 import static org.hibernate.jpa.QueryHints.HINT_FETCH_SIZE;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -60,7 +61,7 @@ public interface JobAdvertisementRepository extends JpaRepository<JobAdvertiseme
     Page<JobAdvertisement> findOwnJobAdvertisements(Pageable pageable, @Param("userId") String userId, @Param("companyId") String companyId);
 
     @Query("select j from JobAdvertisement j where j.status = :status and j.owner.userId = :userId or j.owner.companyId = :companyId")
-    Page<JobAdvertisement> findOwnJobAdvertisementsByStatus(Pageable pageable, @Param("userId") String userId, @Param("companyId") String companyId, @Param("status") JobAdvertisementStatus status);
+    List<JobAdvertisement> findOwnJobAdvertisementsByStatus(Pageable pageable, @Param("userId") String userId, @Param("companyId") String companyId, @Param("status") JobAdvertisementStatus status);
 
     @Query("select j from JobAdvertisement j where j.jobCenterCode = :jobCenterCode")
     Stream<JobAdvertisement> findByJobCenterCode(@Param("jobCenterCode") String jobCenterCode);

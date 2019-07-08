@@ -94,15 +94,14 @@ public class JobAdvertisementApiRestControllerIntTest {
         when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
         when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
 
-        ResultActions resultActions;
-        resultActions = this.mockMvc.perform(
-                MockMvcRequestBuilders.post(URL + "/_search/byStatus")
-                        .param("status", JobAdvertisementStatus.CREATED.name())
-                        .contentType(TestUtil.APPLICATION_JSON_UTF8));
+        ApiSearchRequestDto apiSearchRequestDto = new ApiSearchRequestDto();
+        String [] statuses = {"CREATED","INSPECTING", "SOME INVALID STATUS"};
+        apiSearchRequestDto.setStatus(statuses);
+
+        post = post(apiSearchRequestDto, URL+ "/_search");
 
         // then
-        resultActions.andExpect(status().isOk());
-        assertThat(post.andReturn().getResponse().getHeader("token")).isNotBlank();
+        post.andExpect(status().isOk());
     }
 
     @Test
