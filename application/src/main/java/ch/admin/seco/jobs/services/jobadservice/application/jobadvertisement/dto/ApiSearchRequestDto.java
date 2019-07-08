@@ -2,15 +2,17 @@ package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dt
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
 
+import java.util.Set;
+
 public class ApiSearchRequestDto {
 
-    private JobAdvertisementStatus[] status;
+    private Set<JobAdvertisementStatus> status;
 
-    public JobAdvertisementStatus[] getStatus() {
+    public Set<JobAdvertisementStatus> getStatus() {
         return status;
     }
 
-    public ApiSearchRequestDto setStatus(JobAdvertisementStatus[] status) {
+    public ApiSearchRequestDto setStatus(Set<JobAdvertisementStatus> status) {
         this.status = status;
         return this;
     }

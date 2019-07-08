@@ -307,15 +307,15 @@ public class JobAdvertisementApplicationService {
         );
     }
 
-    public Page<JobAdvertisementDto> findJobAdvertisementsByStatus(Pageable pageable, ApiSearchRequestDto statuses) {
-        List<JobAdvertisementStatus> validStatuses = Arrays.asList(statuses.getStatus());
+    public Page<JobAdvertisementDto> findJobAdvertisementsByStatus(Pageable pageable, ApiSearchRequestDto searchRequest) {
         CurrentUser currentUser = currentUserContext.getCurrentUser();
 
-        if (currentUser == null || validStatuses.isEmpty()) {
+        if (currentUser == null || searchRequest.getStatus().isEmpty()) {
             return new PageImpl<>(Collections.EMPTY_LIST, pageable, 0);
         }
 
-        Page<JobAdvertisement> jobAdvertisements = jobAdvertisementRepository.findJobAdvertisementsByStatus(pageable, currentUser.getUserId(), currentUser.getCompanyId(), validStatuses);
+        Page<JobAdvertisement> jobAdvertisements = jobAdvertisementRepository.findJobAdvertisementsByStatus(pageable, currentUser.getUserId(), currentUser.getCompanyId(), searchRequest.getStatus()
+        );
         return new PageImpl<>(
                 jobAdvertisements.getContent().stream().map(JobAdvertisementDto::toDto).collect(toList()),
                 jobAdvertisements.getPageable(),
