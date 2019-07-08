@@ -1,14 +1,16 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.api;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
+
 public class ApiSearchRequestDto {
 
-    private String status[];
+    private JobAdvertisementStatus[] status;
 
-    public String[] getStatus() {
+    public JobAdvertisementStatus[] getStatus() {
         return status;
     }
 
-    public ApiSearchRequestDto setStatus(String[] status) {
+    public ApiSearchRequestDto setStatus(JobAdvertisementStatus[] status) {
         this.status = status;
         return this;
     }

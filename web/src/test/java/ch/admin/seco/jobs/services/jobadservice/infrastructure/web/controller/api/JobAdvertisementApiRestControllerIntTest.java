@@ -95,13 +95,39 @@ public class JobAdvertisementApiRestControllerIntTest {
         when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
 
         ApiSearchRequestDto apiSearchRequestDto = new ApiSearchRequestDto();
-        String [] statuses = {"CREATED","INSPECTING", "SOME INVALID STATUS"};
+        String[] statuses = {"CREATED", "INSPECTING"};
         apiSearchRequestDto.setStatus(statuses);
 
-        post = post(apiSearchRequestDto, URL+ "/_search");
+        post = post(apiSearchRequestDto, URL + "/_search");
 
         // then
         post.andExpect(status().isOk());
+    }
+
+    @Test
+    @WithApiUser
+    public void testGetApiJobAdvertisementByStatusWithInvalidValue() throws Exception {
+        // given
+        this.index(createJob(job01.id()));
+        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertisementDto();
+        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
+        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
+        ResultActions post = post(apiCreateJobAdvertisementDto, URL);
+        post.andExpect(status().isCreated());
+        assertThat(post.andReturn().getResponse().getHeader("token")).isNotBlank();
+
+        //when
+        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
+        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
+
+        ApiSearchRequestDto apiSearchRequestDto = new ApiSearchRequestDto();
+        String[] statuses = {"INVALID VALUE"};
+        apiSearchRequestDto.setStatus(statuses);
+
+        post = post(apiSearchRequestDto, URL + "/_search");
+
+        // then
+        post.andExpect(status().isBadRequest());
     }
 
     @Test
@@ -171,5 +197,18 @@ public class JobAdvertisementApiRestControllerIntTest {
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
                         .content(TestUtil.convertObjectToJsonBytes(request))
         );
+    }
+
+    private class ApiSearchRequestDto {
+        private String[] status;
+
+        public String[] getStatus() {
+            return status;
+        }
+
+        public ApiSearchRequestDto setStatus(String[] status) {
+            this.status = status;
+            return this;
+        }
     }
 }

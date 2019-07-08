@@ -73,7 +73,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -306,40 +306,20 @@ public class JobAdvertisementApplicationService {
         );
     }
 
-    public Page<JobAdvertisementDto> findJobAdvertisementsByStatus(Pageable pageable, String[] statuses) {
-        List<JobAdvertisementStatus> validStatuses = new ArrayList<>();
-        if (statuses != null) {
-            for (String status : statuses) {
-                JobAdvertisementStatus jobAdvertisementStatus = isStatusValid(status);
-                if (jobAdvertisementStatus != null) {
-                    validStatuses.add(jobAdvertisementStatus);
-                }
-            }
-        }
+    public Page<JobAdvertisementDto> findJobAdvertisementsByStatus(Pageable pageable, JobAdvertisementStatus[] statuses) {
+        List<JobAdvertisementStatus> validStatuses = Arrays.asList(statuses);
         CurrentUser currentUser = currentUserContext.getCurrentUser();
+
         if (currentUser == null || validStatuses.isEmpty()) {
             return new PageImpl<>(Collections.EMPTY_LIST, pageable, 0);
         }
 
-        List<JobAdvertisement> jobAdvertisements = new ArrayList();
-        for (JobAdvertisementStatus jobAdvertisementStatus : validStatuses) {
-            jobAdvertisements.addAll(jobAdvertisementRepository.findOwnJobAdvertisementsByStatus(pageable, currentUser.getUserId(), currentUser.getCompanyId(), jobAdvertisementStatus));
-        }
-
+        Page<JobAdvertisement> jobAdvertisements = jobAdvertisementRepository.findJobAdvertisementsByStatus(pageable, currentUser.getUserId(), currentUser.getCompanyId(), validStatuses);
         return new PageImpl<>(
-                jobAdvertisements.stream().map(JobAdvertisementDto::toDto).collect(toList())
-                , pageable
-                , jobAdvertisements.size()
+                jobAdvertisements.getContent().stream().map(JobAdvertisementDto::toDto).collect(toList()),
+                jobAdvertisements.getPageable(),
+                jobAdvertisements.getTotalElements()
         );
-    }
-
-    private JobAdvertisementStatus isStatusValid(String status) {
-        for (JobAdvertisementStatus jobAdvertisementStatus : JobAdvertisementStatus.values()) {
-            if (jobAdvertisementStatus.name().equals(status)) {
-                return jobAdvertisementStatus;
-            }
-        }
-        return null;
     }
 
     @IsSysAdmin

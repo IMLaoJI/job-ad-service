@@ -109,12 +109,12 @@ public class JobAdvertisementApplicationServiceForAPITest {
         CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(company);
         service.createFromApi(createJobAdvertisementDto);
         ApiSearchRequestDto apiSearchRequestDto = new ApiSearchRequestDto();
-        String [] statuses = {"CREATED","INSPECTING", "SOME INVALID STATUS"};
+        JobAdvertisementStatus[] statuses = {JobAdvertisementStatus.CREATED, JobAdvertisementStatus.INSPECTING};
         apiSearchRequestDto.setStatus(statuses);
         final PageRequest pageRequest = PageRequest.of(0, 25, Sort.by(Sort.Order.desc("createdTime")));
 
         //when
-        Page<JobAdvertisementDto> jobAdvertisementDtos= service.findJobAdvertisementsByStatus(pageRequest, apiSearchRequestDto.getStatus());
+        Page<JobAdvertisementDto> jobAdvertisementDtos = service.findJobAdvertisementsByStatus(pageRequest, apiSearchRequestDto.getStatus());
 
         //then
         assertThat(jobAdvertisementDtos.getContent()).isNotNull();
@@ -131,14 +131,14 @@ public class JobAdvertisementApplicationServiceForAPITest {
         verify(locationService, times(1)).isLocationValid(any());
     }
 
-    private class ApiSearchRequestDto{
-        private String[] status;
+    private class ApiSearchRequestDto {
+        private JobAdvertisementStatus[] status;
 
-        public String[] getStatus() {
+        public JobAdvertisementStatus[] getStatus() {
             return status;
         }
 
-        public ApiSearchRequestDto setStatus(String[] status) {
+        public ApiSearchRequestDto setStatus(JobAdvertisementStatus[] status) {
             this.status = status;
             return this;
         }
