@@ -8,6 +8,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.AddressDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApiSearchRequestDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
@@ -306,8 +307,8 @@ public class JobAdvertisementApplicationService {
         );
     }
 
-    public Page<JobAdvertisementDto> findJobAdvertisementsByStatus(Pageable pageable, JobAdvertisementStatus[] statuses) {
-        List<JobAdvertisementStatus> validStatuses = Arrays.asList(statuses);
+    public Page<JobAdvertisementDto> findJobAdvertisementsByStatus(Pageable pageable, ApiSearchRequestDto statuses) {
+        List<JobAdvertisementStatus> validStatuses = Arrays.asList(statuses.getStatus());
         CurrentUser currentUser = currentUserContext.getCurrentUser();
 
         if (currentUser == null || validStatuses.isEmpty()) {
