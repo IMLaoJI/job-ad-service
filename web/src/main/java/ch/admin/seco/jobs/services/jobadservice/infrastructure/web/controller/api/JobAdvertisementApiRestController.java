@@ -80,7 +80,7 @@ public class JobAdvertisementApiRestController {
      * - 403 Forbidden: User has not the required permission to perform this action
      */
     @PostMapping("/_search")
-    public PageResource<ApiJobAdvertisementDto> getJobAdvertisementsByStatus(@RequestBody @Valid ApiSearchRequestDto apiSearchRequestDto, @RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "25") int size) {
+    public PageResource<ApiJobAdvertisementDto> findJobAdvertisementsByStatus(@RequestBody @Valid ApiSearchRequestDto apiSearchRequestDto, @RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "25") int size) {
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdTime")));
         return PageResource.of(jobAdvertisementToApiAssembler.convertPage(jobAdvertisementApplicationService.findJobAdvertisementsByStatus(pageRequest, apiSearchRequestDto)));
     }
