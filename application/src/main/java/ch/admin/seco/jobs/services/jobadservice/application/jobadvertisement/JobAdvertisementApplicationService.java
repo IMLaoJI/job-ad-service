@@ -310,7 +310,7 @@ public class JobAdvertisementApplicationService {
     public Page<JobAdvertisementDto> findJobAdvertisementsByStatus(Pageable pageable, ApiSearchRequestDto searchRequest) {
         CurrentUser currentUser = currentUserContext.getCurrentUser();
 
-        if (currentUser == null || searchRequest.getStatus().isEmpty()) {
+        if (currentUser == null || searchRequest.getStatus() == null || searchRequest.getStatus().isEmpty()) {
             return new PageImpl<>(Collections.EMPTY_LIST, pageable, 0);
         }
 
