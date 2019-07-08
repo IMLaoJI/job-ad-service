@@ -306,7 +306,7 @@ public class JobAdvertisementApplicationService {
         );
     }
 
-    public Page<JobAdvertisementDto> findOwnJobAdvertisementsByStatus(Pageable pageable, String[] statuses) {
+    public Page<JobAdvertisementDto> findJobAdvertisementsByStatus(Pageable pageable, String[] statuses) {
         List<JobAdvertisementStatus> validStatuses = new ArrayList<>();
         if (statuses != null) {
             for (String status : statuses) {
