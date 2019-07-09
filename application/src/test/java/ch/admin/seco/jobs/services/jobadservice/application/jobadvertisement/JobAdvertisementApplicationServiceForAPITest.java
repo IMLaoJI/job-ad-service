@@ -6,6 +6,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CreatedJobAdvertisementIdWithTokenDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
@@ -16,6 +17,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,8 +77,8 @@ public class JobAdvertisementApplicationServiceForAPITest {
     @Test
     public void createFromApi() {
         //given
-         Company company = testCompany().build();
-         CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(company);
+        Company company = testCompany().build();
+        CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(company);
 
         //when
         CreatedJobAdvertisementIdWithTokenDto result = service.createFromApi(createJobAdvertisementDto);
@@ -95,5 +99,48 @@ public class JobAdvertisementApplicationServiceForAPITest {
 
         domainEventMockUtils.assertSingleDomainEventPublished(JobAdvertisementEvents.JOB_ADVERTISEMENT_CREATED.getDomainEventType());
         verify(locationService, times(1)).isLocationValid(any());
+    }
+
+
+    @Test
+    public void searchFromApi() {
+        //given
+        Company company = testCompany().build();
+        CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(company);
+        service.createFromApi(createJobAdvertisementDto);
+        ApiSearchRequestDto apiSearchRequestDto = new ApiSearchRequestDto();
+        JobAdvertisementStatus[] statuses = {JobAdvertisementStatus.CREATED, JobAdvertisementStatus.INSPECTING};
+        apiSearchRequestDto.setStatus(statuses);
+        final PageRequest pageRequest = PageRequest.of(0, 25, Sort.by(Sort.Order.desc("createdTime")));
+
+        //when
+        Page<JobAdvertisementDto> jobAdvertisementDtos = service.findJobAdvertisementsByStatus(pageRequest, apiSearchRequestDto.getStatus());
+
+        //then
+        assertThat(jobAdvertisementDtos.getContent()).isNotNull();
+        assertThat(jobAdvertisementDtos.getContent()).isNotEmpty();
+        assertThat(jobAdvertisementDtos.getContent().get(0).getStatus()).isEqualTo(JobAdvertisementStatus.CREATED);
+        assertThat(jobAdvertisementDtos.getContent().get(0).getSourceSystem()).isEqualTo(SourceSystem.API);
+        assertThat(jobAdvertisementDtos.getContent().get(0).getStellennummerEgov()).isEqualTo(TEST_STELLEN_NUMMER_EGOV);
+        assertThat(jobAdvertisementDtos.getContent().get(0).getPublication().isEuresAnonymous()).isFalse();
+        assertThat(jobAdvertisementDtos.getContent().get(0).getPublication().isCompanyAnonymous()).isFalse();
+        assertThat(jobAdvertisementDtos.getContent().get(0).isReportingObligation()).isFalse();
+        assertThat(jobAdvertisementDtos.getContent().get(0).getJobCenterCode()).isNull();
+
+        domainEventMockUtils.assertSingleDomainEventPublished(JobAdvertisementEvents.JOB_ADVERTISEMENT_CREATED.getDomainEventType());
+        verify(locationService, times(1)).isLocationValid(any());
+    }
+
+    private class ApiSearchRequestDto {
+        private JobAdvertisementStatus[] status;
+
+        public JobAdvertisementStatus[] getStatus() {
+            return status;
+        }
+
+        public ApiSearchRequestDto setStatus(JobAdvertisementStatus[] status) {
+            this.status = status;
+            return this;
+        }
     }
 }

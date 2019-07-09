@@ -1,6 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.api;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApiSearchRequestDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CreatedJobAdvertisementIdWithTokenDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
@@ -70,6 +71,18 @@ public class JobAdvertisementApiRestController {
     public PageResource<ApiJobAdvertisementDto> getJobAdvertisements(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "25") int size) {
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdTime")));
         return PageResource.of(jobAdvertisementToApiAssembler.convertPage(jobAdvertisementApplicationService.findOwnJobAdvertisements(pageRequest)));
+    }
+
+    /**
+     * Response status:
+     * - 200 Ok: The page with job ads has been returned
+     * - 401 Unauthorized: User is not logged in
+     * - 403 Forbidden: User has not the required permission to perform this action
+     */
+    @PostMapping("/_search")
+    public PageResource<ApiJobAdvertisementDto> findJobAdvertisementsByStatus(@RequestBody @Valid ApiSearchRequestDto apiSearchRequestDto, @RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "25") int size) {
+        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdTime")));
+        return PageResource.of(jobAdvertisementToApiAssembler.convertPage(jobAdvertisementApplicationService.findJobAdvertisementsByStatus(pageRequest, apiSearchRequestDto)));
     }
 
     /**

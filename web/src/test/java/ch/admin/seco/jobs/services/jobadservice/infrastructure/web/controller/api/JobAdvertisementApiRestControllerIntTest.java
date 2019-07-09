@@ -3,6 +3,7 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.a
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
@@ -79,6 +80,58 @@ public class JobAdvertisementApiRestControllerIntTest {
 
     @Test
     @WithApiUser
+    public void testGetApiJobAdvertisementByStatus() throws Exception {
+        // given
+        this.index(createJob(job01.id()));
+        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertisementDto();
+        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
+        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
+        ResultActions post = post(apiCreateJobAdvertisementDto, URL);
+        post.andExpect(status().isCreated());
+        assertThat(post.andReturn().getResponse().getHeader("token")).isNotBlank();
+
+        //when
+        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
+        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
+
+        ApiSearchRequestDto apiSearchRequestDto = new ApiSearchRequestDto();
+        String[] statuses = {"CREATED", "INSPECTING"};
+        apiSearchRequestDto.setStatus(statuses);
+
+        post = post(apiSearchRequestDto, URL + "/_search");
+
+        // then
+        post.andExpect(status().isOk());
+    }
+
+    @Test
+    @WithApiUser
+    public void testGetApiJobAdvertisementByStatusWithInvalidValue() throws Exception {
+        // given
+        this.index(createJob(job01.id()));
+        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertisementDto();
+        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
+        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
+        ResultActions post = post(apiCreateJobAdvertisementDto, URL);
+        post.andExpect(status().isCreated());
+        assertThat(post.andReturn().getResponse().getHeader("token")).isNotBlank();
+
+        //when
+        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
+        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
+
+        ApiSearchRequestDto apiSearchRequestDto = new ApiSearchRequestDto();
+        String[] statuses = {"INVALID VALUE"};
+        apiSearchRequestDto.setStatus(statuses);
+
+        post = post(apiSearchRequestDto, URL + "/_search");
+
+        // then
+        post.andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithApiUser
     public void testCreateApiJobAdvertisementWithSurrogateFlag() throws Exception {
         // given
         this.index(createJob(job01.id()));
@@ -144,5 +197,18 @@ public class JobAdvertisementApiRestControllerIntTest {
                         .contentType(TestUtil.APPLICATION_JSON_UTF8)
                         .content(TestUtil.convertObjectToJsonBytes(request))
         );
+    }
+
+    private class ApiSearchRequestDto {
+        private String[] status;
+
+        public String[] getStatus() {
+            return status;
+        }
+
+        public ApiSearchRequestDto setStatus(String[] status) {
+            this.status = status;
+            return this;
+        }
     }
 }
