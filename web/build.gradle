@@ -20,7 +20,6 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-actuator"
     compile "org.springframework.boot:spring-boot-starter-logging"
     compile "org.springframework.boot:spring-boot-starter-security"
-    compile "org.springframework.boot:spring-boot-starter-web"
     compile "org.springframework.boot:spring-boot-starter-undertow"
     compile "org.springframework.boot:spring-boot-starter-actuator"
 
@@ -32,12 +31,12 @@ dependencies {
     compile "org.springframework.cloud:spring-cloud-starter-config"
     compile 'ch.admin.seco.alv:alv-feign-starter'
     compile "ch.admin.seco.alv:alv-jwt-starter"
-    
+    compile "ch.admin.seco.alv:alv-spring-web-starter"
+    compile "ch.admin.seco.alv:alv-error-handling"
+    compile "ch.admin.seco.alv:alv-spring-springfox-swagger2"
+
     compile "org.springframework.security:spring-security-web"
 
-    compile "io.springfox:springfox-swagger2"
-    runtime "io.springfox:springfox-swagger-ui"
-    
     compile 'org.springframework.cloud:spring-cloud-starter-zipkin'
 
     compile "org.codehaus.jackson:jackson-core-asl"
@@ -47,8 +46,7 @@ dependencies {
     compile "com.fasterxml.jackson.module:jackson-module-afterburner"
 
     compile 'com.googlecode.libphonenumber:libphonenumber'
-    
-    compile "org.zalando:problem-spring-web"
+
     compile "org.jsoup:jsoup:1.11.3"
     compile 'org.postgresql:postgresql'
 
