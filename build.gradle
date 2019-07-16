@@ -65,11 +65,8 @@ subprojects {
             dependency 'com.google.guava:guava:27.1-jre'
             dependency 'com.mattbertolini:liquibase-slf4j:2.0.0'
             dependency 'io.springfox:springfox-bean-validators:2.8.0'
-            dependency "io.springfox:springfox-swagger2:${springfox_swagger2_version}"
-            dependency "io.springfox:springfox-swagger-ui:${springfox_swagger2_version}"
             dependency 'org.hibernate.validator:hibernate-validator:6.0.7.Final'
             dependency 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.2.Final'
-            dependency 'org.zalando:problem-spring-web:0.22.1'
             dependency 'com.googlecode.libphonenumber:libphonenumber:8.9.2'
             dependency 'junit:junit:4.12'
             dependency 'org.awaitility:awaitility:3.1.2'
@@ -83,6 +80,9 @@ subprojects {
             dependency "ch.admin.seco.alv:alv-spring-integration-leader-starter:${alv_shared_library_version}"
             dependency "ch.admin.seco.alv:alv-logger-starter:${alv_shared_library_version}"
             dependency "ch.admin.seco.alv:alv-feign-starter:${alv_shared_library_version}"
+            dependency "ch.admin.seco.alv:alv-spring-web-starter:${alv_shared_library_version}"
+            dependency "ch.admin.seco.alv:alv-error-handling:${alv_shared_library_version}"
+            dependency "ch.admin.seco.alv:alv-spring-springfox-swagger2:${alv_shared_library_version}"
             dependency "ch.admin.seco.alv:alv-jwt-starter:${alv_shared_library_version}"
 
         }
