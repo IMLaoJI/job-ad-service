@@ -69,6 +69,7 @@ public class ApiCreateJobAdvertisementFixture {
         apiCreateJobAdvertisementDto.setOccupation(apiOccupationDto);
 
         ApiApplyChannelDto apiApplyChannelDto = new ApiApplyChannelDto();
+        apiApplyChannelDto.setMailAddress("test@email.com");
         apiApplyChannelDto.setPhoneNumber(phoneUnformatted);
         apiCreateJobAdvertisementDto.setApplyChannel(apiApplyChannelDto);
 
