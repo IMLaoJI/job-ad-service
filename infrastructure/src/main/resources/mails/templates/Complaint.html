@@ -25,9 +25,9 @@
 <p><strong th:text="#{mail.complaint.body.contactinformation}"></strong></p>
 <div th:if="${contactInformation?.salutation}">
     <div th:switch="${contactInformation?.salutation}">
-        <div th:case="'MR'"
+        <div th:case="${T(ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation).MR}"
              th:text="#{mail.complaint.body.contactinformation.salutation.mr}"></div>
-        <div th:case="'MS'"
+        <div th:case="${T(ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation).MS}"
              th:text="#{mail.complaint.body.contactinformation.salutation.ms}"></div>
     </div>
 </div>
@@ -37,7 +37,6 @@
      th:text="#{mail.complaint.body.contactinformation.phone(${contactInformation?.phone})}"></div>
 <div th:if="${contactInformation?.email}"
      th:text="#{mail.complaint.body.contactinformation.email(${contactInformation?.email})}"></div>
-
 
 
 <div th:switch="${complaintType}">
