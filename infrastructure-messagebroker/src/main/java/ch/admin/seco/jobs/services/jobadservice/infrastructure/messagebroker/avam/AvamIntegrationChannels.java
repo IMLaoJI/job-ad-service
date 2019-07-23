@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.QueueChannel;
@@ -30,12 +31,6 @@ class AvamIntegrationChannels {
 			public QueueChannel queueChannel() {
 				return avamInputChannel();
 			}
-
-			@Override
-			public int threshold() {
-				return 0;
-			}
 		};
 	}
-
 }
