@@ -74,7 +74,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -314,8 +313,7 @@ public class JobAdvertisementApplicationService {
             return new PageImpl<>(Collections.EMPTY_LIST, pageable, 0);
         }
 
-        Page<JobAdvertisement> jobAdvertisements = jobAdvertisementRepository.findJobAdvertisementsByStatus(pageable, currentUser.getUserId(), currentUser.getCompanyId(), searchRequest.getStatus()
-        );
+        Page<JobAdvertisement> jobAdvertisements = jobAdvertisementRepository.findJobAdvertisementsByStatus(currentUser.getUserId(), currentUser.getCompanyId(), searchRequest.getStatus(), pageable);
         return new PageImpl<>(
                 jobAdvertisements.getContent().stream().map(JobAdvertisementDto::toDto).collect(toList()),
                 jobAdvertisements.getPageable(),

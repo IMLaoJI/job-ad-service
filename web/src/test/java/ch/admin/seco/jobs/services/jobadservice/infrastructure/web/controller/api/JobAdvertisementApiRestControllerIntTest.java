@@ -3,7 +3,6 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.a
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
@@ -23,7 +22,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.CREATED;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.INSPECTING;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job02;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job03;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.ApiCreateJobAdvertisementFixture.createJobAdvertisementDto;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.ApiCreateJobAdvertisementFixture.phoneFormatted;
@@ -83,25 +87,58 @@ public class JobAdvertisementApiRestControllerIntTest {
     public void testGetApiJobAdvertisementByStatus() throws Exception {
         // given
         this.index(createJob(job01.id()));
-        ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertisementDto();
-        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
-        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
-        ResultActions post = post(apiCreateJobAdvertisementDto, URL);
-        post.andExpect(status().isCreated());
-        assertThat(post.andReturn().getResponse().getHeader("token")).isNotBlank();
 
         //when
         when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
         when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
 
         ApiSearchRequestDto apiSearchRequestDto = new ApiSearchRequestDto();
-        String[] statuses = {"CREATED", "INSPECTING"};
-        apiSearchRequestDto.setStatus(statuses);
 
-        post = post(apiSearchRequestDto, URL + "/_search");
+        String[] statuses = {CREATED.name(), INSPECTING.name()};
+        apiSearchRequestDto.setStatus(statuses);
+        ResultActions post = post(apiSearchRequestDto, URL + "/_search");
+
+        String[] statusPublished = {PUBLISHED_PUBLIC.name()};
+        apiSearchRequestDto.setStatus(statusPublished);
+        ResultActions postPublished = post(apiSearchRequestDto, URL + "/_search");
 
         // then
-        post.andExpect(status().isOk());
+        post.andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(equalTo("0")));
+        postPublished.andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.[0].id").value(equalTo(job01.id().getValue())));
+    }
+
+
+    @Test
+    @WithApiUser
+    public void testGetApiJobAdvertisementByStatusInAscOrder() throws Exception {
+        // given
+        this.index(createJob(job01.id()));
+        this.index(createJob(job02.id()));
+        this.index(createJob(job03.id()));
+
+        //when
+        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
+        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
+
+        ApiSearchRequestDto apiSearchRequestDto = new ApiSearchRequestDto();
+        String[] statuses = {PUBLISHED_PUBLIC.name()};
+        apiSearchRequestDto.setStatus(statuses);
+
+        ResultActions   post = this.mockMvc.perform(
+                MockMvcRequestBuilders.post(URL + "/_search")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(apiSearchRequestDto))
+                        .param("sort", Sort.DATE_ASC.getValue())
+        );
+
+
+        // then
+        post.andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.[0].id").value(equalTo(job01.id().getValue())))
+                .andExpect(jsonPath("$.content.[1].id").value(equalTo(job02.id().getValue())))
+                .andExpect(jsonPath("$.content.[2].id").value(equalTo(job03.id().getValue())));
     }
 
     @Test

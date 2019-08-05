@@ -10,7 +10,7 @@ public class OwnerFixture {
     public static Builder of(JobAdvertisementId id){
         return testOwner()
                 .setAccessToken(format("access-token-%s", id.getValue()))
-                .setUserId(format("user-id-%s", id.getValue()))
+                .setUserId(format("api-user-id"))
                 .setUserDisplayName(format("user-display-name-%s", id.getValue()));
     }
 
