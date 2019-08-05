@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
@@ -20,23 +18,30 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 
 public class X28CreateJobAdvertisementDto {
 
+    @Size(max = 11)
     private String stellennummerEgov;
 
+    @Size(max = 11)
     private String stellennummerAvam;
 
     @NotBlank
+    @Size(max = 255)
     private String title;
 
     @NotBlank
+    @Size(max = 10000)
     private String description;
 
     private String numberOfJobs;
 
     @NotBlank
+    @Size(max = 100)
     private String fingerprint;
 
+    @Size(max = 1024)
     private String externalUrl;
 
+    @Size(max = 5)
     private String jobCenterCode;
 
     @Valid
