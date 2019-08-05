@@ -5,6 +5,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApiSearchRequestDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CreatedJobAdvertisementIdWithTokenDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
@@ -23,6 +24,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementDtoTestFixture.testCreateJobAdvertisementDto;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.CompanyFixture.testCompany;
@@ -109,16 +114,19 @@ public class JobAdvertisementApplicationServiceForAPITest {
         CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(company);
         service.createFromApi(createJobAdvertisementDto);
         ApiSearchRequestDto apiSearchRequestDto = new ApiSearchRequestDto();
-        JobAdvertisementStatus[] statuses = {JobAdvertisementStatus.CREATED, JobAdvertisementStatus.INSPECTING};
+        Set<JobAdvertisementStatus> statuses = new HashSet<>();
+        statuses.add(JobAdvertisementStatus.CREATED);
+        statuses.add(JobAdvertisementStatus.PUBLISHED_PUBLIC);
         apiSearchRequestDto.setStatus(statuses);
-        final PageRequest pageRequest = PageRequest.of(0, 25, Sort.by(Sort.Order.desc("createdTime")));
+        final PageRequest pageRequest = PageRequest.of(0, 25, Sort.by(Sort.Order.desc("updatedTime")));
 
         //when
-        Page<JobAdvertisementDto> jobAdvertisementDtos = service.findJobAdvertisementsByStatus(pageRequest, apiSearchRequestDto.getStatus());
+        Page<JobAdvertisementDto> jobAdvertisementDtos = service.findJobAdvertisementsByStatus(pageRequest, apiSearchRequestDto);
 
         //then
         assertThat(jobAdvertisementDtos.getContent()).isNotNull();
         assertThat(jobAdvertisementDtos.getContent()).isNotEmpty();
+        assertThat(jobAdvertisementDtos.getContent().size() == 1);
         assertThat(jobAdvertisementDtos.getContent().get(0).getStatus()).isEqualTo(JobAdvertisementStatus.CREATED);
         assertThat(jobAdvertisementDtos.getContent().get(0).getSourceSystem()).isEqualTo(SourceSystem.API);
         assertThat(jobAdvertisementDtos.getContent().get(0).getStellennummerEgov()).isEqualTo(TEST_STELLEN_NUMMER_EGOV);
@@ -129,18 +137,5 @@ public class JobAdvertisementApplicationServiceForAPITest {
 
         domainEventMockUtils.assertSingleDomainEventPublished(JobAdvertisementEvents.JOB_ADVERTISEMENT_CREATED.getDomainEventType());
         verify(locationService, times(1)).isLocationValid(any());
-    }
-
-    private class ApiSearchRequestDto {
-        private JobAdvertisementStatus[] status;
-
-        public JobAdvertisementStatus[] getStatus() {
-            return status;
-        }
-
-        public ApiSearchRequestDto setStatus(JobAdvertisementStatus[] status) {
-            this.status = status;
-            return this;
-        }
     }
 }
