@@ -118,14 +118,14 @@ public class JobAdvertisementApplicationServiceForAPITest {
         statuses.add(JobAdvertisementStatus.PUBLISHED_PUBLIC);
         apiSearchRequestDto.setStatus(statuses);
         final PageRequest pageRequest = PageRequest.of(0, 25, Sort.by(Sort.Order.desc("updatedTime")));
-      
+
         //when
         Page<JobAdvertisementDto> jobAdvertisementDtos = service.findJobAdvertisementsByStatus(pageRequest, apiSearchRequestDto);
 
         //then
         assertThat(jobAdvertisementDtos.getContent()).isNotNull();
         assertThat(jobAdvertisementDtos.getContent()).isNotEmpty();
-        assertThat(jobAdvertisementDtos.getContent().size() == 1);
+        assertThat(jobAdvertisementDtos.getContent().size()).isEqualTo(1);
         assertThat(jobAdvertisementDtos.getContent().get(0).getStatus()).isEqualTo(JobAdvertisementStatus.CREATED);
         assertThat(jobAdvertisementDtos.getContent().get(0).getSourceSystem()).isEqualTo(SourceSystem.API);
         assertThat(jobAdvertisementDtos.getContent().get(0).getStellennummerEgov()).isEqualTo(TEST_STELLEN_NUMMER_EGOV);
