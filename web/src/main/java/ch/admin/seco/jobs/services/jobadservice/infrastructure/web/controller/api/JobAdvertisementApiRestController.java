@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.api.SortOrder.ASC;
+
 @RestController
 @RequestMapping("/api/public/jobAdvertisements/v1")
 public class JobAdvertisementApiRestController {
@@ -80,8 +82,13 @@ public class JobAdvertisementApiRestController {
      * - 403 Forbidden: User has not the required permission to perform this action
      */
     @PostMapping("/_search")
-    public PageResource<ApiJobAdvertisementDto> findJobAdvertisementsByStatus(@RequestBody @Valid ApiSearchRequestDto apiSearchRequestDto, @RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "25") int size) {
-        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdTime")));
+    public PageResource<ApiJobAdvertisementDto> findJobAdvertisementsByStatus(@RequestBody @Valid ApiSearchRequestDto apiSearchRequestDto,
+                                                                              @RequestParam(name = "page", defaultValue = "0") int page,
+                                                                              @RequestParam(name = "size", defaultValue = "25") int size,
+                                                                              @RequestParam(name = "sort", defaultValue = "DESC") SortOrder sort) {
+        final PageRequest pageRequest = PageRequest.of(page, size,
+                sort.equals(ASC) ? Sort.by(Sort.Order.asc("updatedTime")) : Sort.by(Sort.Order.desc("updatedTime"))
+        );
         return PageResource.of(jobAdvertisementToApiAssembler.convertPage(jobAdvertisementApplicationService.findJobAdvertisementsByStatus(pageRequest, apiSearchRequestDto)));
     }
 
