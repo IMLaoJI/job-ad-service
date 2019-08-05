@@ -4,21 +4,22 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.Ph
 
 import javax.validation.constraints.Size;
 
+@AtLeastOneApplyChannelRequired
 public class ApiApplyChannelDto {
 
-    @Size(max=255)
+    @Size(max = 255)
     private String mailAddress;
 
-    @Size(max=50)
+    @Size(max = 50)
     private String emailAddress;
 
     @PhoneNumber
     private String phoneNumber;
 
-    @Size(max=255)
+    @Size(max = 255)
     private String formUrl;
 
-    @Size(max=255)
+    @Size(max = 255)
     private String additionalInfo;
 
     public String getMailAddress() {

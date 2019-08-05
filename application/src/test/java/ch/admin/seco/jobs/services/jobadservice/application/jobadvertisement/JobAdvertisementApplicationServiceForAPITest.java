@@ -25,7 +25,6 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -119,7 +118,7 @@ public class JobAdvertisementApplicationServiceForAPITest {
         statuses.add(JobAdvertisementStatus.PUBLISHED_PUBLIC);
         apiSearchRequestDto.setStatus(statuses);
         final PageRequest pageRequest = PageRequest.of(0, 25, Sort.by(Sort.Order.desc("updatedTime")));
-
+      
         //when
         Page<JobAdvertisementDto> jobAdvertisementDtos = service.findJobAdvertisementsByStatus(pageRequest, apiSearchRequestDto);
 

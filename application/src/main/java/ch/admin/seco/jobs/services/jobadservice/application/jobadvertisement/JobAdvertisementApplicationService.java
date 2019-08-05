@@ -313,6 +313,7 @@ public class JobAdvertisementApplicationService {
             return new PageImpl<>(Collections.EMPTY_LIST, pageable, 0);
         }
 
+
         Page<JobAdvertisement> jobAdvertisements = jobAdvertisementRepository.findJobAdvertisementsByStatus(currentUser.getUserId(), currentUser.getCompanyId(), searchRequest.getStatus(), pageable);
         return new PageImpl<>(
                 jobAdvertisements.getContent().stream().map(JobAdvertisementDto::toDto).collect(toList()),

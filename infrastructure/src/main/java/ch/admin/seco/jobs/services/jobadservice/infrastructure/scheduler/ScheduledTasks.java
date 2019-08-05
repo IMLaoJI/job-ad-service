@@ -30,7 +30,7 @@ public class ScheduledTasks {
 	@Scheduled(cron = "${jobAdvertisement.checkPublicationExpiration.cron}")
 	@LeaderAware("scheduler")
 	public void scheduledCheckPublicationExpiration() {
-		this.jobAdvertisementApplicationService.checkBlackoutPolicyExpiration();
+		this.jobAdvertisementApplicationService.checkPublicationExpiration();
 	}
 
 }
