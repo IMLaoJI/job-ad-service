@@ -1,5 +1,16 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.events;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvent;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.integration.channel.QueueChannel;
+import org.springframework.messaging.Message;
+
+import java.util.Collections;
+
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture.testJobAdvertisement;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
@@ -8,18 +19,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.util.Collections;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-
-import org.springframework.integration.channel.QueueChannel;
-import org.springframework.messaging.Message;
-
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents;
 
 public class DomainEventSenderGatewayTest {
 
@@ -60,6 +59,27 @@ public class DomainEventSenderGatewayTest {
 		Object payload = message.getPayload();
 		assertThat(payload).isInstanceOf(JobAdvertisementEventDto.class);
 	}
+
+	@Test
+	public void shouldIgnoreEventIfJobAdIsRestricted() {
+		//given
+		DomainEventSenderGateway domainEventSenderGateway = new DomainEventSenderGateway(
+				domainEventIntegrationChannels,
+				Collections.singleton(JobAdvertisementEvents.JOB_ADVERTISEMENT_UPDATED.getDomainEventType())
+		);
+
+		JobAdvertisementEvent jobAdvertisementEvent = new JobAdvertisementEvent(
+				JobAdvertisementEvents.JOB_ADVERTISEMENT_UPDATED,
+				testJobAdvertisement().setStatus(JobAdvertisementStatus.PUBLISHED_RESTRICTED).build()
+		);
+
+		// when
+		domainEventSenderGateway.handleJobAdvertisementEvent(jobAdvertisementEvent);
+
+		// then
+		verify(queueChannel, never()).send(any());
+	}
+
 
 	@Test
 	public void shouldIgnoreEvent() {
