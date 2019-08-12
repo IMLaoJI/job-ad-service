@@ -46,9 +46,9 @@ include::api-general.adoc[]
 
 include::api-create.adoc[]
 
-include::api-getAll.adoc[]
-
 include::api-get.adoc[]
+
+include::api-getAll.adoc[]
 
 include::api-update.adoc[]
 
