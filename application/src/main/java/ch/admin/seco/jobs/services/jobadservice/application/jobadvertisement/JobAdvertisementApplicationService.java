@@ -146,6 +146,8 @@ public class JobAdvertisementApplicationService {
     public CreatedJobAdvertisementIdWithTokenDto createFromApi(CreateJobAdvertisementDto createJobAdvertisementDto) {
         LOG.debug("Start creating new job ad from API");
         Condition.notNull(createJobAdvertisementDto, "CreateJobAdvertisementDto can't be null");
+        Condition.isTrue(professionService.isValidAvamCode(createJobAdvertisementDto.getOccupation().getAvamOccupationCode()),
+				String.format("Invalid AVAM Occupation Code: %s", createJobAdvertisementDto.getOccupation().getAvamOccupationCode()));
         LOG.debug("Create '{}'", createJobAdvertisementDto.getJobDescriptions().get(0).getTitle());
 
         final JobAdvertisementCreator creator = getJobAdvertisementCreatorFromInternal(createJobAdvertisementDto);
