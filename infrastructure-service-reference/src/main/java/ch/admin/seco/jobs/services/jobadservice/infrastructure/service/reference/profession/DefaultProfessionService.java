@@ -43,7 +43,7 @@ public class DefaultProfessionService implements ProfessionService {
 	}
 
 	@Override
-	public boolean isValidAvamCode(String avamCode) {
+	public boolean isKnownAvamCode(String avamCode) {
 		return occupationLabelApiClient.getOccupationMapping(ProfessionCodeType.AVAM.name(), avamCode) != null;
 	}
 

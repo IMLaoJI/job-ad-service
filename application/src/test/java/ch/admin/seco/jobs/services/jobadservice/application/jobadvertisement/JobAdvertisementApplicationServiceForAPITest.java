@@ -72,7 +72,7 @@ public class JobAdvertisementApplicationServiceForAPITest {
         domainEventMockUtils = new DomainEventMockUtils();
         when(locationService.enrichCodes(any())).thenReturn(testLocation().build());
         when(locationService.isLocationValid(any())).thenReturn(Boolean.TRUE);
-        when(professionService.isValidAvamCode(any())).thenReturn(Boolean.TRUE);
+        when(professionService.isKnownAvamCode(any())).thenReturn(Boolean.TRUE);
         when(egovNumberGenerator.nextStringValue()).thenReturn(TEST_STELLEN_NUMMER_EGOV);
     }
 
@@ -115,11 +115,11 @@ public class JobAdvertisementApplicationServiceForAPITest {
         CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(company);
 
         //when
-        when(professionService.isValidAvamCode(createJobAdvertisementDto.getOccupation().getAvamOccupationCode())).thenReturn(Boolean.FALSE);
+        when(professionService.isKnownAvamCode(createJobAdvertisementDto.getOccupation().getAvamOccupationCode())).thenReturn(Boolean.FALSE);
 
         //then
 		assertThatThrownBy(() -> service.createFromApi(createJobAdvertisementDto)).isInstanceOf(ConditionException.class);
-        verify(professionService, times(1)).isValidAvamCode(any());
+        verify(professionService, times(1)).isKnownAvamCode(any());
     }
 
 

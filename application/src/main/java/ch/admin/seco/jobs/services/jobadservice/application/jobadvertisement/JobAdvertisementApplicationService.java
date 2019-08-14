@@ -147,8 +147,8 @@ public class JobAdvertisementApplicationService {
         LOG.debug("Start creating new job ad from API");
         Condition.notNull(createJobAdvertisementDto, "CreateJobAdvertisementDto can't be null");
         String avamOccupationCode = createJobAdvertisementDto.getOccupation().getAvamOccupationCode();
-        Condition.isTrue(professionService.isValidAvamCode(avamOccupationCode),
-				String.format("Invalid AVAM Occupation Code: %s", avamOccupationCode));
+        Condition.isTrue(professionService.isKnownAvamCode(avamOccupationCode),
+				String.format("Unknown AVAM Occupation Code: %s", avamOccupationCode));
         LOG.debug("Create '{}'", createJobAdvertisementDto.getJobDescriptions().get(0).getTitle());
 
         final JobAdvertisementCreator creator = getJobAdvertisementCreatorFromInternal(createJobAdvertisementDto);

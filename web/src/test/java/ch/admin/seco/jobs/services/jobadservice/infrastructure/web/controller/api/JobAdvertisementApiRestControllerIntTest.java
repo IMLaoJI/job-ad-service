@@ -68,7 +68,7 @@ public class JobAdvertisementApiRestControllerIntTest {
         this.jobAdvertisementElasticsearchRepository.deleteAll();
         when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
         when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
-        when(professionService.isValidAvamCode(ArgumentMatchers.any())).thenReturn(Boolean.TRUE);
+        when(professionService.isKnownAvamCode(ArgumentMatchers.any())).thenReturn(Boolean.TRUE);
     }
 
     @Test
