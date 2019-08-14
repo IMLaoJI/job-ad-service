@@ -11,4 +11,5 @@ public interface ProfessionService {
 
     Profession findByAvamCode(String avamCode);
 
+    boolean isValidAvamCode(String avamCode);
 }
