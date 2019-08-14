@@ -22,7 +22,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -56,13 +55,13 @@ public class JobAdvertisementApplicationServiceForAPITest {
     @Autowired
     private JobAdvertisementApplicationService service;
 
-    @SpyBean
+    @Autowired
     private ProfessionService professionService;
 
-    @SpyBean
+    @Autowired
     private LocationService locationService;
 
-    @SpyBean
+    @Autowired
     private DataFieldMaxValueIncrementer egovNumberGenerator;
 
     private DomainEventMockUtils domainEventMockUtils;
@@ -71,8 +70,8 @@ public class JobAdvertisementApplicationServiceForAPITest {
     public void setUp() {
         domainEventMockUtils = new DomainEventMockUtils();
         when(locationService.enrichCodes(any())).thenReturn(testLocation().build());
-        when(locationService.isLocationValid(any())).thenReturn(Boolean.TRUE);
-        when(professionService.isKnownAvamCode(any())).thenReturn(Boolean.TRUE);
+        when(locationService.isLocationValid(any())).thenReturn(true);
+        when(professionService.isKnownAvamCode(any())).thenReturn(true);
         when(egovNumberGenerator.nextStringValue()).thenReturn(TEST_STELLEN_NUMMER_EGOV);
     }
 
@@ -109,13 +108,13 @@ public class JobAdvertisementApplicationServiceForAPITest {
     }
 
     @Test
-    public void createFromApiWithInvalidAvamCode() {
+    public void createFromApiWithUnknownAvamCode() {
         //given
         Company company = testCompany().build();
         CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(company);
 
         //when
-        when(professionService.isKnownAvamCode(createJobAdvertisementDto.getOccupation().getAvamOccupationCode())).thenReturn(Boolean.FALSE);
+        when(professionService.isKnownAvamCode(createJobAdvertisementDto.getOccupation().getAvamOccupationCode())).thenReturn(false);
 
         //then
 		assertThatThrownBy(() -> service.createFromApi(createJobAdvertisementDto)).isInstanceOf(ConditionException.class);
