@@ -22,7 +22,8 @@ Seco eGovernment Services <{contact-mail}>
 * Specify the company name, address and email, at least one technical contact person with email address and phone number, and user name. Please also specify the expected volume of job registrations.
 * The technical contact will receive an email with further instructions.
 
-= Important notes (latest change: August 30, 2018)
+= Important notes (latest change: August 15, 2019)
+- **Occupation** codes: Use the most recent link:AVAM-Berufsliste_API_April_2019.xlsx[List of occupation codes]. The relevant codes are in column D, not column A.
 - The recommended format for job descriptions is **Markdown formating**. You may use simple html tags as well but they will be converted to Markdown.
 Some markdown references you might find helpful:
 * http://en.wikipedia.org/wiki/Markdown

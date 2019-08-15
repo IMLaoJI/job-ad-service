@@ -23,7 +23,7 @@ Swiss public employment service - *Job-Room* (https://www.job-room.ch) and
 * Job ads are published one by one using the _Create_ method.
 * They are immediately assigned an _id_ and a _stellennummerEgov_, both serve as unique identifiers within Job-Room.
 * All vacancies reported to the API must have an occupation code. Based on that code, the system determines whether the job falls under the registration requirement
-(see link:AVAM-Berufsliste-Juni-2018.xlsx[List of occupations]
+(see link:AVAM-Berufsliste_API_April_2019.xlsx[List of occupation codes])
 * If no: the job ad is directly published on Job-Room and will be visible and searchable to the public. The maximum publication period is 60 days.
 Job ads under publication can at any time be canceled via the API.
 * If yes: the flag _reportingObligation_ is set to true and the job ad is transmitted to the database of the Swiss public employment service (PES), called AVAM.
