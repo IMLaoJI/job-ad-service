@@ -9,6 +9,7 @@ public interface ProfessionService {
 
     Optional<ProfessionSuggestion> findById(String id);
 
-    Profession findByAvamCode(String avamCode);
+	Optional<Profession> findByAvamCode(String avamCode);
 
+    boolean isKnownAvamCode(String avamCode);
 }

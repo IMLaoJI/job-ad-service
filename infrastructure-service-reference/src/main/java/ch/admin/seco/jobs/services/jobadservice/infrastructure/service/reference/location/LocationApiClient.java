@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Optional;
 import java.util.UUID;
 
-@AlvUnauthorizedFeignClient(name = "referenceservice", contextId = "location-api", url = "${feign.referenceservice.url:}", fallback = LocationApiClientFallback.class, path = "/api/localities" )
+@AlvUnauthorizedFeignClient(name = "referenceservice", contextId = "location-api", url = "${feign.referenceservice.url:}", path = "/api/localities" )
 public interface LocationApiClient {
 
     @GetMapping("/{id}")

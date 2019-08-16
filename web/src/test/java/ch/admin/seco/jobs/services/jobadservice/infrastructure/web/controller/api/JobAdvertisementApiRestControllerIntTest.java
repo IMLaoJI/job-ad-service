@@ -1,8 +1,12 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.api;
 
+import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
+import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
+import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.TestUtil;
@@ -34,6 +38,7 @@ import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.contro
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -58,10 +63,25 @@ public class JobAdvertisementApiRestControllerIntTest {
     @MockBean
     private LocationService locationService;
 
+    @MockBean
+    private ProfessionService professionService;
+
+    @MockBean
+    private ReportingObligationService reportingObligationService;
+
+    @MockBean
+    private JobCenterService jobCenterService;
+
+
     @Before
     public void setUp() {
         this.jobAdvertisementRepository.deleteAll();
         this.jobAdvertisementElasticsearchRepository.deleteAll();
+        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
+        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
+        when(professionService.isKnownAvamCode(ArgumentMatchers.any())).thenReturn(true);
+        when(reportingObligationService.hasReportingObligation(any(), any(), any())).thenReturn(true);
+        when(jobCenterService.findJobCenterByCode((any()))).thenReturn(new JobCenter());
     }
 
     @Test
@@ -72,9 +92,6 @@ public class JobAdvertisementApiRestControllerIntTest {
         ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertisementDto();
 
         //when
-        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
-        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
-
         ResultActions post = post(apiCreateJobAdvertisementDto, URL);
 
         // then
@@ -90,9 +107,6 @@ public class JobAdvertisementApiRestControllerIntTest {
         this.index(createJob(job01.id()));
 
         //when
-        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
-        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
-
         ApiSearchRequestDto apiSearchRequestDto = new ApiSearchRequestDto();
 
         String[] statuses = {CREATED.name(), INSPECTING.name()};
@@ -120,9 +134,6 @@ public class JobAdvertisementApiRestControllerIntTest {
         this.index(createJob(job03.id()));
 
         //when
-        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
-        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
-
         ApiSearchRequestDto apiSearchRequestDto = new ApiSearchRequestDto();
         String[] statuses = {PUBLISHED_PUBLIC.name()};
         apiSearchRequestDto.setStatus(statuses);
@@ -148,16 +159,11 @@ public class JobAdvertisementApiRestControllerIntTest {
         // given
         this.index(createJob(job01.id()));
         ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertisementDto();
-        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
-        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
         ResultActions post = post(apiCreateJobAdvertisementDto, URL);
         post.andExpect(status().isCreated());
         assertThat(post.andReturn().getResponse().getHeader("token")).isNotBlank();
 
         //when
-        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
-        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
-
         ApiSearchRequestDto apiSearchRequestDto = new ApiSearchRequestDto();
         String[] statuses = {"INVALID VALUE"};
         apiSearchRequestDto.setStatus(statuses);
@@ -191,10 +197,6 @@ public class JobAdvertisementApiRestControllerIntTest {
         ApiEmployerDto invalidApiEmployerDto = new ApiEmployerDto();
         apiCreateJobAdvertisementDtoWithInvalidEmployer.setEmployer(invalidApiEmployerDto);
 
-        //when
-        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
-        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
-
         ResultActions validPostWithoutEmployer = post(apiCreateJobAdvertisementDtoWithoutEmployer, URL);
         ResultActions validPostWithEmployer = post(apiCreateJobAdvertisementDtoWithEmployer, URL);
         ResultActions invalidPostWithEmployer = post(apiCreateJobAdvertisementDtoWithInvalidEmployer, URL);
@@ -210,10 +212,6 @@ public class JobAdvertisementApiRestControllerIntTest {
     public void testCheckPhoneNumberFormat() throws Exception {
         // given
         ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = createJobAdvertisementDto();
-
-        //when
-        when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
-        when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
 
         // then
         post(apiCreateJobAdvertisementDto, URL)
