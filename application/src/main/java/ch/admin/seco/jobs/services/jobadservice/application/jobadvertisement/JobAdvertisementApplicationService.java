@@ -56,7 +56,6 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupati
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.PublicContact;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Publication;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
-import ch.admin.seco.jobs.services.jobadservice.domain.profession.Profession;
 import ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +77,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.function.Function;
 
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.INSPECTING;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REFINING;
@@ -701,9 +699,19 @@ public class JobAdvertisementApplicationService {
 	private Occupation enrichOccupationWithProfessionCodes(Occupation occupation) {
 		Condition.notNull(occupation, "Occupation can't be null");
 		return professionService.findByAvamCode(occupation.getAvamOccupationCode())
-				.map(toEnrichedOccupation(occupation))
+				.map(profession -> new Occupation.Builder()
+						.setAvamOccupationCode(occupation.getAvamOccupationCode())
+						.setSbn3Code(profession.getSbn3Code())
+						.setSbn5Code(profession.getSbn5Code())
+						.setBfsCode(profession.getBfsCode())
+						.setLabel(profession.getLabel())
+						.setWorkExperience(occupation.getWorkExperience())
+						.setEducationCode(occupation.getEducationCode())
+						.setQualification(occupation.getQualificationCode())
+						.build())
 				.orElse(occupation);
 	}
+
 	private boolean checkReportingObligation(Occupation occupation, Location location, Employment employment) {
 		Condition.notNull(occupation, "Occupation can't be null");
 		Condition.notNull(location, "Location can't be null");
@@ -724,19 +732,6 @@ public class JobAdvertisementApplicationService {
 		return reportingObligation || reportToAvam
 				? jobCenterService.findJobCenterCode(location.getCountryIsoCode(), location.getPostalCode())
 				: null;
-	}
-
-	private Function<Profession, Occupation> toEnrichedOccupation(Occupation occupation) {
-		return profession -> new Occupation.Builder()
-				.setAvamOccupationCode(occupation.getAvamOccupationCode())
-				.setSbn3Code(profession.getSbn3Code())
-				.setSbn5Code(profession.getSbn5Code())
-				.setBfsCode(profession.getBfsCode())
-				.setLabel(profession.getLabel())
-				.setWorkExperience(occupation.getWorkExperience())
-				.setEducationCode(occupation.getEducationCode())
-				.setQualification(occupation.getQualificationCode())
-				.build();
 	}
 
 	private List<JobDescription> toJobDescriptions(List<JobDescriptionDto> jobDescriptionDtos) {
