@@ -33,7 +33,7 @@ Some markdown references you might find helpful:
 for jobs under reporting obligation. If the address is missing, this causes extra work for the public employment agent.
 - **Postal codes** must be valid. From beginning of September, postal codes will be validated and invalid data will be rejected.
 - **Phone number validation**: The minimum length of a phone number will be reduced in order to accomodate Liechtenstein phone numbers.
-The format is [+][0-9]{8,}.
+The format is [+][1-9][0-9]{7,18}.
 - You can find a list of language codes supported by Job-Room at link:Job-Room-Languages.xlsx[List of supported languages]
 - It is not possible currently to **cancel** a job advertisement in status INSPECTING.
 Only cancel job ads in status PUBLISHED_RESTRICTED or PUBLISHED_PUBLIC.
