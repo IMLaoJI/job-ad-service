@@ -9,11 +9,19 @@ Seco eGovernment Services <{contact-mail}>
 :sectnums:
 :sectnumlevels: 2
 
-= Testing and productive access credentials
+= The Job-Room Jobs API
+The Job-Room Jobs API provides an additional channel for employers to publish job advertisements to the Swiss Public
+Employment Services system and thereby to comply with the reporting obligation
+(https://www.arbeit.swiss/secoalv/en/home/menue/unternehmen/stellenmeldepflicht.html).
 
+= Important notes (latest change: August 20, 2019)
+- **Occupation** codes: Use the most recent link:AVAM-Berufsliste_API_April_2019.xlsx[List of occupation codes]. The relevant codes are in column D, not column A.
+- **Filtering by status:** You can now filter job ads by status <<Filter by status>>
+- **Access token:** On creation of a job ad, you get an access token back as a header which allows the owner to view the job ad even if it is restricted.
+
+= Testing and productive access credentials
 - For testing:
 * Use URL link:{api-url}/jobAdvertisements/v1[{api-url}/jobAdvertisements/v1]
-* Test users apiuser01 to apiuser99 are available (password same as user name).
 * Do NOT use any confidential data in the test environment but DO use real postal codes.
 - The URL for the productive API is https://api.job-room.ch/jobAdvertisements/v1
 * Do NOT submit test data to the production environment!
@@ -22,8 +30,7 @@ Seco eGovernment Services <{contact-mail}>
 * Specify the company name, address and email, at least one technical contact person with email address and phone number, and user name. Please also specify the expected volume of job registrations.
 * The technical contact will receive an email with further instructions.
 
-= Important notes (latest change: August 15, 2019)
-- **Occupation** codes: Use the most recent link:AVAM-Berufsliste_API_April_2019.xlsx[List of occupation codes]. The relevant codes are in column D, not column A.
+= Important notes
 - The recommended format for job descriptions is **Markdown formating**. You may use simple html tags as well but they will be converted to Markdown.
 Some markdown references you might find helpful:
 * http://en.wikipedia.org/wiki/Markdown

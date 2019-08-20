@@ -1,4 +1,6 @@
-== Get all job advertisements belonging to the owner, filtered by its status
+=== Filter by status
+
+Get all job advertisements belonging to the owner, filtered by status
 
 === Request
 `POST {api-url}/jobAdvertisements/v1/_search?page=0&size25&sort=DESC`
@@ -6,9 +8,11 @@
 [source,json]
 ----
 {
-    "status": ["INSPECTING"]
+    "status": ["INSPECTING", "REJECTED"]
 }
 ----
+
+The request must indicate one or more valid statuses.
 
 [cols="10,10,10,70"]
 |===

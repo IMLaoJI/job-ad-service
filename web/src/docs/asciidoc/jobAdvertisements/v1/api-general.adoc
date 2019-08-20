@@ -4,7 +4,7 @@ It is an alternative to the web form available at https://www.job-room.ch/#/comp
 
 Companies that wish to use the jobs API will need to request access credentials.
 
-For technical questions regarding the jobs API, use the contact addresses above. Please provide the name of the company and a technical contact person.
+For technical questions regarding the jobs API, use the contact address above. Please provide the name of the company and a technical contact person.
 For nontechnical questions (e. g. legal, administrative) regarding the job registration requirement, please refer to https://www.arbeit.swiss/secoalv/en/home/menue/unternehmen/stellenmeldepflicht.html.
 
 == Jobs registration process
