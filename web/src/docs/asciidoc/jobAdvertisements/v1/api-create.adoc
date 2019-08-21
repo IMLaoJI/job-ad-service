@@ -59,9 +59,9 @@ The company that handles the recruitment. This information is published.
 | Path | Type | Description | Constraints
 
 | name | String(255) | The name of the company | Required
-| street | String(50) | | Optional
-| houseNumber | String(10) | | Optional
-| postOfficeBoxNumber | String(10) | | Optional
+| street | String(50) | | Provide a street or post office box address
+| houseNumber | String(10) | | Provide a street or post office box address
+| postOfficeBoxNumber | String(10) | | Provide a street or post office box address
 | postOfficeBoxPostalCode | String(10) | | Optional
 | postOfficeBoxCity | String(100) | | Optional
 | postalCode | String(10) | | Required. Must be a valid swiss postal code if the company is located in Switzerland
@@ -69,7 +69,7 @@ The company that handles the recruitment. This information is published.
 | countryIsoCode | String(2) | | Required (ISO 3166-1 alpha-2)
 | website | String(255) | | Optional (Format: http://www.example.org)
 | phone | String(20) | | Optional (Format: +41123456789)
-| email | String(50) | Only one addresses allowed | Optional
+| email | String(50) | Only one address allowed | Optional
 | surrogate | Boolean | Does the company act as a surrogate for the actual employer? | Required (`true` or `false`)
 |===
 
