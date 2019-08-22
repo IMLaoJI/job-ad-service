@@ -11,10 +11,10 @@
 | externalReference | String(255) | Your internal reference to this job ad | Optional |
 | reportToAvam | Boolean | Should the ad be transmitted to the PES (RAV)? | Required (`true` or `false`) | Usually false. Use this option if you want a PES agent to know about your vacancy
 | numberOfJobs | String(3) | The number of identical positions | Optional | Use this option only if you have a number of identical vacancies. The number will be transmitted to the PES agent. 
-| contact | <<Contact>> | Contact person about the job ad | Required | Administrative contact, not for publication
+| contact | <<Contact>> | Contact person about the job ad | Required | Administrative contact; not for publication, will be treated confidentially
 | jobDescriptions | Array<<<JobDescription>>> | Language specific title and description | Required 1..4 | The text of the job advertisement; may be multilingual
-| company | <<Company>> | The company that handles the recruitment | Required | May be a private employment agency acting as surrogate
-| employer | <<Employer>> | The actual employer that offers the job | Required, if _company.surrogate_ is `true` | For administrative purposes, not for publication
+| company | <<Company>> | The company that handles the recruitment | Required | May be a private placement agency or hiring of services agency
+| employer | <<Employer>> | The actual employer that offers the job | Required, if _company.surrogate_ is `true` | Not for publication, will be treated confidentially
 | employment | <<Employment>> | Certain employment conditions | Required |
 | location | <<Location>> | The work location | Required |
 | occupation | <<Occupation>> | Occupation, education and work experience | Required |
@@ -27,7 +27,8 @@
 ==== Contact
 Provide an administrative contact (e. g. an HR employee).
 
-Important: this contact is used for email notifications concerning the reporting obligation
+Important: this contact is used for email notifications concerning the reporting obligation.
+The contact details are not for publication and will be treated confidentially.
 [cols="30,10,30,30"]
 |===
 | Path | Type | Description | Constraints
@@ -58,9 +59,9 @@ The company that handles the recruitment. This information is published.
 | Path | Type | Description | Constraints
 
 | name | String(255) | The name of the company | Required
-| street | String(50) | | Optional
-| houseNumber | String(10) | | Optional
-| postOfficeBoxNumber | String(10) | | Optional
+| street | String(50) | | Provide a street or post office box address
+| houseNumber | String(10) | | Provide a street or post office box address
+| postOfficeBoxNumber | String(10) | | Provide a street or post office box address
 | postOfficeBoxPostalCode | String(10) | | Optional
 | postOfficeBoxCity | String(100) | | Optional
 | postalCode | String(10) | | Required. Must be a valid swiss postal code if the company is located in Switzerland
@@ -68,12 +69,14 @@ The company that handles the recruitment. This information is published.
 | countryIsoCode | String(2) | | Required (ISO 3166-1 alpha-2)
 | website | String(255) | | Optional (Format: http://www.example.org)
 | phone | String(20) | | Optional (Format: +41123456789)
-| email | String(50) | Only one addresses allowed | Optional
+| email | String(50) | Only one address allowed | Optional
 | surrogate | Boolean | Does the company act as a surrogate for the actual employer? | Required (`true` or `false`)
 |===
 
 ==== Employer
-Must be provided if the company handling the recruitment is not the actual employer; will not be published.
+If the recruitment is handled by a private placement agency or hiring of services agency, the _company.surrogate_ flag
+MUST be set to `true` and the actual employer information MUST be provided. This information is required for
+administrative purposes and will be treated strictly confidentially by SECO and the Public Employment Service.
 [cols="30,10,30,30"]
 |===
 | Path | Type | Description | Constraints
@@ -147,6 +150,7 @@ Provide at least one channel for applications.
 
 ==== PublicContact
 Provide a public contact if you want to give applicants the opportunity to ask questions about the job.
+The contact details will be published.
 [cols="30,10,30,30"]
 |===
 | Path | Type | Description | Constraints
@@ -385,6 +389,18 @@ based on the occupation code provided.
     }
 }
 ----
+
+=== Access token
+An access token is returned in the response headers.
+The token can be used to check the state of jobs under the reporting obligation. The link is built according to the following
+pattern:
+
+`\https://www.job-room.ch/manage-job-ads/{id of job-ad}?token={token}`
+[cols="10,20,70"]
+|===
+| Name | Type | Description
+| token | String | The access token
+|===
 
 === Response status
 [cols="10,20,70"]
