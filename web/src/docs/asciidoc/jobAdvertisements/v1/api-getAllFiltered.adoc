@@ -1,4 +1,4 @@
-=== Filter by status
+== Filter by status
 
 Get all job advertisements belonging to the owner, filtered by status
 

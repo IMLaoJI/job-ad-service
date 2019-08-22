@@ -390,14 +390,16 @@ based on the occupation code provided.
 }
 ----
 
-=== Response headers
+=== Access token
+An access token is returned in the response headers.
+The token can be used to check the state of jobs under the reporting obligation. The link is built according to the following
+pattern:
+
+`\https://www.job-room.ch/manage-job-ads/{id of job-ad}?token={token}`
 [cols="10,20,70"]
 |===
 | Name | Type | Description
-| token | String | The token can be used to check the state of jobs under the reporting obligation. The link has to be built according to the following
-pattern:
-\https://www.job-room.ch/manage-job-ads/{id of job-ad}?token={token}
-|
+| token | String | The access token
 |===
 
 === Response status
