@@ -1,22 +1,13 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors.ErrorConstants.ERR_CONCURRENCY_FAILURE;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
-
-import org.zalando.problem.DefaultProblem;
-import org.zalando.problem.Problem;
-import org.zalando.problem.ProblemBuilder;
-import org.zalando.problem.Status;
-import org.zalando.problem.spring.web.advice.ProblemHandling;
-import org.zalando.problem.spring.web.advice.validation.ConstraintViolationProblem;
-
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.SearchProfileNameAlreadyExistsException;
+import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
+import ch.admin.seco.jobs.services.jobadservice.application.security.Role;
+import ch.admin.seco.jobs.services.jobadservice.core.conditions.ConditionException;
+import ch.admin.seco.jobs.services.jobadservice.core.domain.AggregateNotFoundException;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.IllegalJobAdvertisementStatusTransitionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -24,11 +15,21 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.zalando.problem.DefaultProblem;
+import org.zalando.problem.Problem;
+import org.zalando.problem.ProblemBuilder;
+import org.zalando.problem.Status;
+import org.zalando.problem.spring.web.advice.ProblemHandling;
+import org.zalando.problem.spring.web.advice.validation.ConstraintViolationProblem;
 
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.SearchProfileNameAlreadyExistsException;
-import ch.admin.seco.jobs.services.jobadservice.core.conditions.ConditionException;
-import ch.admin.seco.jobs.services.jobadservice.core.domain.AggregateNotFoundException;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.IllegalJobAdvertisementStatusTransitionException;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors.ErrorConstants.ERR_CONCURRENCY_FAILURE;
 
 /**
  * Controller advice to translate the server side exceptions to client-friendly json structures.
@@ -36,6 +37,14 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.IllegalJ
  */
 @ControllerAdvice
 public class ExceptionTranslator implements ProblemHandling {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionTranslator.class);
+
+	private final CurrentUserContext currentUserContext;
+
+	public ExceptionTranslator(CurrentUserContext currentUserContext) {
+		this.currentUserContext = currentUserContext;
+	}
 
 	/**
 	 * Post-process Problem payload to add the message key for front-end if needed
@@ -46,6 +55,10 @@ public class ExceptionTranslator implements ProblemHandling {
 			return entity;
 		}
 		Problem problem = entity.getBody();
+
+		if (this.currentUserContext.hasRole(Role.API)) {
+		    LOGGER.info("Bad Request received from API user {}: {}", this.currentUserContext.getCurrentUser().getUserId(), problem.getTitle());
+        }
 		if (!(problem instanceof ConstraintViolationProblem || problem instanceof DefaultProblem)) {
 			return entity;
 		}
