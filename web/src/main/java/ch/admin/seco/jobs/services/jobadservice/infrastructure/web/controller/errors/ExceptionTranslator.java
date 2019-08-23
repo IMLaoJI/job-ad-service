@@ -57,7 +57,7 @@ public class ExceptionTranslator implements ProblemHandling {
 		Problem problem = entity.getBody();
 
 		if (this.currentUserContext.hasRole(Role.API)) {
-		    LOGGER.info("Bad Request received from API user {}: {}", this.currentUserContext.getCurrentUser().getUserId(), problem.getTitle());
+		    LOGGER.info("Bad Request received from API user '{}' : '{}'", this.currentUserContext.getCurrentUser().getUserId(), problem.getTitle());
         }
 		if (!(problem instanceof ConstraintViolationProblem || problem instanceof DefaultProblem)) {
 			return entity;
