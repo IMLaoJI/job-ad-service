@@ -38,6 +38,8 @@ import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.contro
 @ControllerAdvice
 public class ExceptionTranslator implements ProblemHandling {
 
+	private static final String MESSAGE = "message";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionTranslator.class);
 
 	private final CurrentUserContext currentUserContext;
@@ -56,8 +58,9 @@ public class ExceptionTranslator implements ProblemHandling {
 		}
 		Problem problem = entity.getBody();
 
-		if (this.currentUserContext.hasRole(Role.API)) {
-		    LOGGER.info("Bad Request received from API user '{}' : '{}'", this.currentUserContext.getCurrentUser().getUserId(), problem.getTitle());
+		if (isApiUser()) {
+		    LOGGER.info("'{}' received from API user '{}' : '{}'",
+					problem.getTitle(), this.currentUserContext.getCurrentUser().getUserId(), problem.getParameters().get(MESSAGE));
         }
 		if (!(problem instanceof ConstraintViolationProblem || problem instanceof DefaultProblem)) {
 			return entity;
@@ -71,7 +74,7 @@ public class ExceptionTranslator implements ProblemHandling {
 		if (problem instanceof ConstraintViolationProblem) {
 			builder
 					.with("violations", ((ConstraintViolationProblem) problem).getViolations())
-					.with("message", ErrorConstants.ERR_VALIDATION);
+					.with(MESSAGE, ErrorConstants.ERR_VALIDATION);
 			return new ResponseEntity<>(builder.build(), entity.getHeaders(), entity.getStatusCode());
 		} else {
 			builder
@@ -79,8 +82,8 @@ public class ExceptionTranslator implements ProblemHandling {
 					.withDetail(problem.getDetail())
 					.withInstance(problem.getInstance());
 			problem.getParameters().forEach(builder::with);
-			if (!problem.getParameters().containsKey("message") && problem.getStatus() != null) {
-				builder.with("message", "error.http." + problem.getStatus().getStatusCode());
+			if (!problem.getParameters().containsKey(MESSAGE) && problem.getStatus() != null) {
+				builder.with(MESSAGE, "error.http." + problem.getStatus().getStatusCode());
 			}
 			return new ResponseEntity<>(builder.build(), entity.getHeaders(), entity.getStatusCode());
 		}
@@ -97,7 +100,7 @@ public class ExceptionTranslator implements ProblemHandling {
 				.withType(ErrorConstants.CONSTRAINT_VIOLATION_TYPE)
 				.withTitle("Method argument not valid")
 				.withStatus(defaultConstraintViolationStatus())
-				.with("message", ErrorConstants.ERR_VALIDATION)
+				.with(MESSAGE, ErrorConstants.ERR_VALIDATION)
 				.with("fieldErrors", fieldErrors)
 				.build();
 		return create(ex, problem, request);
@@ -106,8 +109,10 @@ public class ExceptionTranslator implements ProblemHandling {
 	@ExceptionHandler(NoSuchElementException.class)
 	public ResponseEntity<Problem> handleNoSuchElementException(NoSuchElementException ex, NativeWebRequest request) {
 		Problem problem = Problem.builder()
+                .withTitle("Element not found")
 				.withStatus(Status.NOT_FOUND)
-				.with("message", ErrorConstants.ENTITY_NOT_FOUND_TYPE)
+                .withType(ErrorConstants.ENTITY_NOT_FOUND_TYPE)
+				.with(MESSAGE, ErrorConstants.ENTITY_NOT_FOUND_TYPE)
 				.build();
 		return create(ex, problem, request);
 	}
@@ -115,11 +120,12 @@ public class ExceptionTranslator implements ProblemHandling {
 	@ExceptionHandler(AggregateNotFoundException.class)
 	public ResponseEntity<Problem> handleAggregateNotFoundException(AggregateNotFoundException ex, NativeWebRequest request) {
 		Problem problem = Problem.builder()
+                .withTitle("Aggregate not found")
 				.withStatus(Status.NOT_FOUND)
 				.withType(ErrorConstants.ENTITY_NOT_FOUND_TYPE)
 				.with("aggregateName", ex.getAggregateName())
 				.with("aggregateId", ex.getIdentifierValue())
-				.with("message", ex.getMessage())
+				.with(MESSAGE, ex.getMessage())
 				.build();
 		return create(ex, problem, request);
 	}
@@ -127,9 +133,10 @@ public class ExceptionTranslator implements ProblemHandling {
 	@ExceptionHandler(ConditionException.class)
 	public ResponseEntity<Problem> handleConditionException(ConditionException ex, NativeWebRequest request) {
 		Problem problem = Problem.builder()
+                .withTitle("Condition violation")
 				.withStatus(Status.BAD_REQUEST)
 				.withType(ErrorConstants.CONDITION_VIOLATION_TYPE)
-				.with("message", ex.getMessage())
+				.with(MESSAGE, ex.getMessage())
 				.build();
 		return create(ex, problem, request);
 	}
@@ -137,9 +144,10 @@ public class ExceptionTranslator implements ProblemHandling {
 	@ExceptionHandler(IllegalJobAdvertisementStatusTransitionException.class)
 	public ResponseEntity<Problem> handleIllegalJobAdvertisementStatusTransitionException(IllegalJobAdvertisementStatusTransitionException ex, NativeWebRequest request) {
 		Problem problem = Problem.builder()
+                .withTitle("JobAdvertisement Status violation")
 				.withStatus(Status.BAD_REQUEST)
 				.withType(ErrorConstants.STATUS_VIOLATION_TYPE)
-				.with("message", ex.getMessage())
+				.with(MESSAGE, ex.getMessage())
 				.build();
 		return create(ex, problem, request);
 	}
@@ -147,9 +155,10 @@ public class ExceptionTranslator implements ProblemHandling {
 	@ExceptionHandler(ConcurrencyFailureException.class)
 	public ResponseEntity<Problem> handleConcurrencyFailure(ConcurrencyFailureException ex, NativeWebRequest request) {
 		Problem problem = Problem.builder()
+                .withTitle("Concurrency failure")
 				.withType(ErrorConstants.DEFAULT_TYPE)
 				.withStatus(Status.CONFLICT)
-				.with("message", ERR_CONCURRENCY_FAILURE)
+				.with(MESSAGE, ERR_CONCURRENCY_FAILURE)
 				.build();
 		return create(ex, problem, request);
 	}
@@ -157,11 +166,16 @@ public class ExceptionTranslator implements ProblemHandling {
 	@ExceptionHandler(SearchProfileNameAlreadyExistsException.class)
 	public ResponseEntity<Problem> handleSearchProfileNameAlreadyExistsException(SearchProfileNameAlreadyExistsException ex, NativeWebRequest request) {
 		Problem problem = Problem.builder()
+                .withTitle("SearchProfile already exists")
 				.withType(ErrorConstants.SEARCH_PROFILE_EXISTS)
 				.withStatus(Status.BAD_REQUEST)
-				.with("message", ex.getMessage())
+				.with(MESSAGE, ex.getMessage())
 				.build();
 		return create(ex, problem, request);
+	}
+
+	private boolean isApiUser() {
+		return this.currentUserContext.hasRole(Role.API);
 	}
 
 }
