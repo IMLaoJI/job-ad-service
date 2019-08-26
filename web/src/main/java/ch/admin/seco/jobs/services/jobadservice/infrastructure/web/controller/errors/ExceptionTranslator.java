@@ -59,8 +59,8 @@ public class ExceptionTranslator implements ProblemHandling {
 		Problem problem = entity.getBody();
 
 		if (isApiUser()) {
-		    LOGGER.info("'{}' received from API user '{}' : '{}'",
-					problem.getTitle(), this.currentUserContext.getCurrentUser().getUserId(), problem.getParameters().get(MESSAGE));
+		    LOGGER.info("'{}' received from API user '{}' : '{}'", problem.getTitle(),
+					this.currentUserContext.getCurrentUser().getUserId(), problem.getParameters().getOrDefault(MESSAGE, ErrorConstants.DEFAULT_TYPE));
         }
 		if (!(problem instanceof ConstraintViolationProblem || problem instanceof DefaultProblem)) {
 			return entity;
