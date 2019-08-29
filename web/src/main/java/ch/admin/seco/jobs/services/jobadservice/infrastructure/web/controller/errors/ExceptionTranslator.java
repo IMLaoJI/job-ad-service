@@ -56,15 +56,14 @@ public class ExceptionTranslator implements ProblemHandling {
 		if (entity == null || entity.getBody() == null) {
 			return entity;
 		}
-		Problem problem = entity.getBody();
+		final Problem problem = entity.getBody();
 
-		if (isApiUser()) {
-		    LOGGER.info("'{}' received from API user '{}' : '{}'", problem.getTitle(),
-					this.currentUserContext.getCurrentUser().getUserId(), problem.getParameters().getOrDefault(MESSAGE, ErrorConstants.DEFAULT_TYPE));
-        }
+		logForApiUser(problem);
+
 		if (!(problem instanceof ConstraintViolationProblem || problem instanceof DefaultProblem)) {
 			return entity;
 		}
+
 		ProblemBuilder builder = Problem.builder()
 				.withType(Problem.DEFAULT_TYPE.equals(problem.getType()) ? ErrorConstants.DEFAULT_TYPE : problem.getType())
 				.withStatus(problem.getStatus())
@@ -75,7 +74,6 @@ public class ExceptionTranslator implements ProblemHandling {
 			builder
 					.with("violations", ((ConstraintViolationProblem) problem).getViolations())
 					.with(MESSAGE, ErrorConstants.ERR_VALIDATION);
-			return new ResponseEntity<>(builder.build(), entity.getHeaders(), entity.getStatusCode());
 		} else {
 			builder
 					.withCause(((DefaultProblem) problem).getCause())
@@ -85,8 +83,9 @@ public class ExceptionTranslator implements ProblemHandling {
 			if (!problem.getParameters().containsKey(MESSAGE) && problem.getStatus() != null) {
 				builder.with(MESSAGE, "error.http." + problem.getStatus().getStatusCode());
 			}
-			return new ResponseEntity<>(builder.build(), entity.getHeaders(), entity.getStatusCode());
 		}
+
+		return new ResponseEntity<>(builder.build(), entity.getHeaders(), entity.getStatusCode());
 	}
 
 	@Override
@@ -174,8 +173,11 @@ public class ExceptionTranslator implements ProblemHandling {
 		return create(ex, problem, request);
 	}
 
-	private boolean isApiUser() {
-		return this.currentUserContext.hasRole(Role.API);
+	private void logForApiUser(Problem problem) {
+		if (this.currentUserContext.hasRole(Role.API)) {
+			LOGGER.info("'{}' received from API user '{}' : '{}'", problem.getTitle(),
+					this.currentUserContext.getCurrentUser().getUserId(), problem.getParameters().getOrDefault(MESSAGE, ErrorConstants.DEFAULT_TYPE));
+		}
 	}
 
 }
