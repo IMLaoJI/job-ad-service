@@ -1,13 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
-import static org.springframework.util.StringUtils.hasText;
-
-import java.util.Optional;
-
-import javax.transaction.Transactional;
-
-import org.springframework.stereotype.Component;
-
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUser;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
 import ch.admin.seco.jobs.services.jobadservice.application.security.Role;
@@ -15,6 +7,12 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
+import org.springframework.stereotype.Component;
+
+import javax.transaction.Transactional;
+import java.util.Optional;
+
+import static org.springframework.util.StringUtils.hasText;
 
 @Component
 @Transactional
@@ -91,6 +89,9 @@ public class JobAdvertisementAuthorizationService {
 			return true;
 		}
 		if (jobAdvertisement.getStatus() != JobAdvertisementStatus.PUBLISHED_RESTRICTED) {
+			return true;
+		}
+		if (isOwner(jobAdvertisement, this.currentUserContext.getCurrentUser())) {
 			return true;
 		}
 		return this.currentUserContext.getCurrentUser() != null
