@@ -3,6 +3,7 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.security;
 import static org.springframework.util.StringUtils.hasText;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -94,11 +95,11 @@ public class SpringSecurityBasedCurrentUserContext implements CurrentUserContext
     private List<String> getAuthorities() {
         Authentication auth = getAuthentication();
         if ((auth == null) || (auth.getPrincipal() == null)) {
-            return null;
+            return Collections.emptyList();
         }
         Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
         if ((authorities == null) || authorities.isEmpty()) {
-            return null;
+            return Collections.emptyList();
         }
         return authorities.stream()
                 .map(GrantedAuthority::getAuthority)
