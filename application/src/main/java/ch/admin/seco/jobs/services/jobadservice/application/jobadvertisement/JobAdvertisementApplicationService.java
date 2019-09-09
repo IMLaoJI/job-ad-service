@@ -216,7 +216,7 @@ public class JobAdvertisementApplicationService {
 		return jobAdvertisement.getId();
 	}
 
-	public JobAdvertisementId createFromX28(X28CreateJobAdvertisementDto createJobAdvertisementFromX28Dto) {
+	public JobAdvertisementId createFromExtern(X28CreateJobAdvertisementDto createJobAdvertisementFromX28Dto) {
 		LOG.debug("Start creating new job ad from X28");
 
 		Condition.notNull(createJobAdvertisementFromX28Dto, "CreateJobAdvertisementFromX28Dto can't be null");
@@ -279,16 +279,51 @@ public class JobAdvertisementApplicationService {
 		return jobAdvertisement.getId();
 	}
 
-	public JobAdvertisementId updateFromX28(UpdateJobAdvertisementFromX28Dto updateJobAdvertisementFromX28Dto) {
-		LOG.debug("Update JobAdvertisement '{}' from X28", updateJobAdvertisementFromX28Dto.getJobAdvertisementId());
+	public JobAdvertisementId updateFromExtern(JobAdvertisementId jobAdvertisementId, X28CreateJobAdvertisementDto createFromX28) {
+		LOG.debug("Update JobAdvertisement '{}' from Extern", jobAdvertisementId);
 
-		JobAdvertisementId jobAdvertisementId = new JobAdvertisementId(updateJobAdvertisementFromX28Dto.getJobAdvertisementId());
+		JobAdvertisement jobAdvertisement = jobAdvertisementRepository.findById(jobAdvertisementId)
+				.orElseThrow(() -> new EntityNotFoundException("JobAdvertisement not found. JobAdvertisementId: " + jobAdvertisementId.getValue()));
+
+        Location location = toLocation(createFromX28.toCreateLocationDto());
+        location = locationService.enrichCodes(location);
+
+        List<OccupationDto> occupationDtos = createFromX28.toOccupationDtos();
+        Condition.notEmpty(occupationDtos, "Occupations can't be empty");
+        List<Occupation> occupations = enrichAndToOccupations(occupationDtos);
+
+        Company company = toCompany(createFromX28.toCompanyDto());
+        JobAdvertisementUpdater updater = new JobAdvertisementUpdater.Builder(currentUserContext.getAuditUser())
+                .setNumberOfJobs(createFromX28.getNumberOfJobs())
+                .setJobDescription(createFromX28.getTitle(), createFromX28.getDescription())
+                .setJobCenterCode(createFromX28.getJobCenterCode())
+                .setDisplayCompany(determineDisplayCompany(createFromX28))
+                .setCompany(company)
+                .setEmployment(toEmployment(createFromX28.getEmployment()))
+                .setLocation(location)
+				.setX28OccupationCodes(createFromX28.getProfessionCodes())
+                .setOccupations(occupations)
+                .setLanguageSkills(toLanguageSkills(createFromX28.toLanguageSkillDtos()))
+                .setContact(toContact(createFromX28.toContactDto()))
+                .setPublicContact(toPublicContact(createFromX28.toPublicContactDto()))
+                .build();
+
+		jobAdvertisement.update(updater);
+
+		republishIfArchived(jobAdvertisementId);
+
+		return jobAdvertisement.getId();
+	}
+
+	public JobAdvertisementId enrichFromExtern(JobAdvertisementId jobAdvertisementId, String fingerprint, String professtionCodes) {
+		LOG.debug("Enrich JobAdvertisement '{}' from Extern", jobAdvertisementId);
+
 		JobAdvertisement jobAdvertisement = jobAdvertisementRepository.findById(jobAdvertisementId)
 				.orElseThrow(() -> new EntityNotFoundException("JobAdvertisement not found. JobAdvertisementId: " + jobAdvertisementId.getValue()));
 
 		JobAdvertisementUpdater updater = new JobAdvertisementUpdater.Builder(currentUserContext.getAuditUser())
-				.setFingerprint(updateJobAdvertisementFromX28Dto.getFingerprint())
-				.setX28OccupationCodes(updateJobAdvertisementFromX28Dto.getX28OccupationCodes())
+				.setFingerprint(fingerprint)
+				.setX28OccupationCodes(professtionCodes)
 				.build();
 
 		jobAdvertisement.update(updater);
@@ -351,20 +386,10 @@ public class JobAdvertisementApplicationService {
 		return JobAdvertisementDto.toDto(jobAdvertisement);
 	}
 
-	public JobAdvertisementDto findByStellennummerAvam(String stellennummerAvam) {
-		Optional<JobAdvertisement> jobAdvertisement = jobAdvertisementRepository.findByStellennummerAvam(stellennummerAvam);
-		return jobAdvertisement.map(JobAdvertisementDto::toDto).orElse(null);
-	}
-
 	@PreAuthorize("@jobAdvertisementAuthorizationService.canViewJob(#stellennummerAvam)")
 	public JobAdvertisementDto getByStellennummerAvam(String stellennummerAvam) {
 		JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerAvam(stellennummerAvam);
 		return JobAdvertisementDto.toDto(jobAdvertisement);
-	}
-
-	public JobAdvertisementDto findByStellennummerEgov(String stellennummerEgov) {
-		Optional<JobAdvertisement> jobAdvertisement = jobAdvertisementRepository.findByStellennummerEgov(stellennummerEgov);
-		return jobAdvertisement.map(JobAdvertisementDto::toDto).orElse(null);
 	}
 
 	public JobAdvertisementDto getByStellennummerEgovOrAvam(String stellennummerEgov, String stellennummerAvam) {
@@ -530,7 +555,7 @@ public class JobAdvertisementApplicationService {
 		publish(jobAdvertisement);
 	}
 
-	public void republishIfArchived(JobAdvertisementId jobAdvertisementId) {
+	public void  republishIfArchived(JobAdvertisementId jobAdvertisementId) {
 		Condition.notNull(jobAdvertisementId, "JobAdvertisementId can't be null");
 
 		JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);

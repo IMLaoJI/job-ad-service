@@ -77,13 +77,13 @@ public class JobAdvertisementApplicationServiceForX28Test {
     }
 
     @Test
-    public void createFromX28() {
+    public void createFromExtern() {
         //given
         X28CompanyDto x28CompanyDto = testX28CompanyDto();
         X28CreateJobAdvertisementDto createJobAdvertisementDto = createCreateJobAdvertisementDto(testX28CompanyDto());
 
         //when
-        JobAdvertisementId jobAdvertisementId = sut.createFromX28(createJobAdvertisementDto);
+        JobAdvertisementId jobAdvertisementId = sut.createFromExtern(createJobAdvertisementDto);
 
         //then
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(jobAdvertisementId);
@@ -111,12 +111,12 @@ public class JobAdvertisementApplicationServiceForX28Test {
     }
 
     @Test
-    public void createFromX28WithEmptyCountry() {
+    public void createFromExternWithEmptyCountry() {
         //given
         X28CreateJobAdvertisementDto createJobAdvertisementDto = createCreateJobAdvertisementDto(null);
 
         //when
-        JobAdvertisementId jobAdvertisementId = sut.createFromX28(createJobAdvertisementDto);
+        JobAdvertisementId jobAdvertisementId = sut.createFromExtern(createJobAdvertisementDto);
 
         //then
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(jobAdvertisementId);
@@ -125,21 +125,15 @@ public class JobAdvertisementApplicationServiceForX28Test {
     }
 
     @Test
-    public void updateFromX28() {
+    public void enrichFromExtern() {
         // given
         jobAdvertisementRepository.save(
                 testJobAdvertisement()
                         .setStatus(CREATED)
                         .build());
 
-        UpdateJobAdvertisementFromX28Dto updateJobAdvertisementFromX28Dto = new UpdateJobAdvertisementFromX28Dto(
-                job01.id().getValue(),
-                "fingerprint",
-                "x28"
-        );
-
         // when
-        sut.updateFromX28(updateJobAdvertisementFromX28Dto);
+        sut.enrichFromExtern(job01.id(), "fingerprint", "x28");
 
         // then
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(job01.id());

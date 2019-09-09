@@ -1,48 +1,29 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.x28;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
-import static java.time.LocalDate.now;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Optional;
-
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.*;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.ContactFixture;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28CompanyDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28ContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28CreateJobAdvertisementDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28LanguageSkillDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28LocationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28OccupationDto;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Publication;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Qualification;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.ContactFixture;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Optional;
+
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
+import static java.time.LocalDate.now;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -68,42 +49,72 @@ public class X28AdapterTest {
     }
 
     @Test
-    public void shouldCreateFromX28() {
+    public void shouldCreateJobAdvertisementFromX28() {
         when(jobAdvertisementRepository.findByStellennummerEgov(any())).thenReturn(Optional.empty());
+        when(jobAdvertisementRepository.findByStellennummerAvam(any())).thenReturn(Optional.empty());
+        when(jobAdvertisementRepository.findByFingerprint(any())).thenReturn(Optional.empty());
+        X28CreateJobAdvertisementDto x28Dto = createJobAdvertisementFromX28Dto();
+
+        sut.handleCreateFromX28Action(x28Dto);
+
+        verify(jobAdvertisementApplicationService, times(1)).createFromExtern(any());
+        verify(jobAdvertisementApplicationService, never()).enrichFromExtern(any(), any(), any());
+        verify(jobAdvertisementApplicationService, never()).updateFromExtern(any(), any());
+    }
+
+    @Test
+    public void shouldEnrichJobroomJobAdvertisementFromX28() {
+        when(jobAdvertisementRepository.findByStellennummerEgov(any())).thenReturn(Optional.of(createJobRoomJobAdvertisement(job01.id())));
         when(jobAdvertisementRepository.findByStellennummerAvam(any())).thenReturn(Optional.empty());
         X28CreateJobAdvertisementDto x28Dto = createJobAdvertisementFromX28Dto();
 
         sut.handleCreateFromX28Action(x28Dto);
 
-        verify(jobAdvertisementApplicationService, times(1)).createFromX28(any());
-        verify(jobAdvertisementApplicationService, never()).updateFromX28(any());
+        verify(jobAdvertisementApplicationService, never()).createFromExtern(any());
+        verify(jobAdvertisementApplicationService, times(1)).enrichFromExtern(any(), any(), any());
+        verify(jobAdvertisementApplicationService, never()).updateFromExtern(any(), any());
     }
 
     @Test
-    public void shouldUpdatefromEgov() {
-        when(jobAdvertisementRepository.findByStellennummerEgov(any())).thenReturn(Optional.of(createExternalJobWithStatus(job01.id(), "fingerprint", JobAdvertisementStatus.PUBLISHED_PUBLIC)));
-        when(jobAdvertisementRepository.findByStellennummerAvam(any())).thenReturn(Optional.empty());
-        X28CreateJobAdvertisementDto x28Dto = createJobAdvertisementFromX28Dto();
-
-        sut.handleCreateFromX28Action(x28Dto);
-
-        verify(jobAdvertisementApplicationService, never()).createFromX28(any());
-        verify(jobAdvertisementApplicationService, times(1)).updateFromX28(any());
-    }
-
-    @Test
-    public void shouldUpdatefromAvam() {
+    public void shouldEnrichAVAMJobAdvertisementFromX28() {
         when(jobAdvertisementRepository.findByStellennummerEgov(any())).thenReturn(Optional.empty());
-        when(jobAdvertisementRepository.findByStellennummerAvam(any())).thenReturn(Optional.of(createExternalJobWithStatus(job01.id(), "fingerprint", JobAdvertisementStatus.PUBLISHED_PUBLIC)));
+        when(jobAdvertisementRepository.findByStellennummerAvam(any())).thenReturn(Optional.of(createAVAMJobAdvertisement(job01.id())));
         X28CreateJobAdvertisementDto x28Dto = createJobAdvertisementFromX28Dto();
 
         sut.handleCreateFromX28Action(x28Dto);
 
-        verify(jobAdvertisementApplicationService, never()).createFromX28(any());
-        verify(jobAdvertisementApplicationService, times(1)).updateFromX28(any());
+        verify(jobAdvertisementApplicationService, never()).createFromExtern(any());
+        verify(jobAdvertisementApplicationService, times(1)).enrichFromExtern(any(), any(), any());
+        verify(jobAdvertisementApplicationService, never()).updateFromExtern(any(), any());
     }
 
-    private JobAdvertisement createExternalJobWithStatus(JobAdvertisementId jobAdvertisementId, String fingerprint, JobAdvertisementStatus status) {
+    @Test
+    public void shouldUpdateExternalJobAdvertisementFromX28() {
+        when(jobAdvertisementRepository.findByStellennummerEgov(any())).thenReturn(Optional.empty());
+        when(jobAdvertisementRepository.findByStellennummerAvam(any())).thenReturn(Optional.empty());
+        when(jobAdvertisementRepository.findByFingerprint(any())).thenReturn(Optional.of(createExternalJobAdvertisement(job01.id(), "fingerprint")));
+        X28CreateJobAdvertisementDto x28Dto = createJobAdvertisementFromX28Dto();
+
+        sut.handleCreateFromX28Action(x28Dto);
+
+        verify(jobAdvertisementApplicationService, never()).createFromExtern(any());
+        verify(jobAdvertisementApplicationService, never()).enrichFromExtern(any(), any(), any());
+        verify(jobAdvertisementApplicationService, times(1)).updateFromExtern(any(), any());
+    }
+
+    private JobAdvertisement createExternalJobAdvertisement(JobAdvertisementId jobAdvertisementId, String fingerprint) {
+        return creatJobAdvertisement(jobAdvertisementId, fingerprint, JobAdvertisementStatus.PUBLISHED_PUBLIC, SourceSystem.EXTERN);
+    }
+
+    private JobAdvertisement createJobRoomJobAdvertisement(JobAdvertisementId jobAdvertisementId) {
+        return creatJobAdvertisement(jobAdvertisementId, null, JobAdvertisementStatus.PUBLISHED_PUBLIC, SourceSystem.JOBROOM);
+    }
+
+    private JobAdvertisement createAVAMJobAdvertisement(JobAdvertisementId jobAdvertisementId) {
+        return creatJobAdvertisement(jobAdvertisementId, null, JobAdvertisementStatus.PUBLISHED_PUBLIC, SourceSystem.RAV);
+    }
+
+    private JobAdvertisement creatJobAdvertisement(JobAdvertisementId jobAdvertisementId, String fingerprint, JobAdvertisementStatus status, SourceSystem sourceSystem) {
         return new JobAdvertisement.Builder()
                 .setId(jobAdvertisementId)
                 .setFingerprint(fingerprint)
@@ -111,7 +122,7 @@ public class X28AdapterTest {
                 .setContact(ContactFixture.of(jobAdvertisementId).build())
                 .setJobContent(JobContentFixture.of(jobAdvertisementId).build())
                 .setPublication(new Publication.Builder().setEndDate(now()).build())
-                .setSourceSystem(SourceSystem.EXTERN)
+                .setSourceSystem(sourceSystem)
                 .setStellennummerEgov(jobAdvertisementId.getValue())
                 .setStellennummerAvam(null)
                 .setStatus(status)

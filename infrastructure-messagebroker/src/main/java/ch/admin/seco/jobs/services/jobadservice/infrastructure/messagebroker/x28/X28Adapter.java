@@ -1,29 +1,25 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.x28;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.CREATE_FROM_X28_CONDITION;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.JOB_AD_INT_ACTION_CHANNEL;
-
-import java.time.LocalDate;
-import java.util.Optional;
-import java.util.function.Predicate;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.cloud.stream.annotation.StreamListener;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.support.TransactionTemplate;
-
 import ch.admin.seco.alv.shared.spring.integration.leader.LeaderAware;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementAlreadyExistsException;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromX28Dto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.x28.X28CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import javax.annotation.Nullable;
+import java.time.LocalDate;
+import java.util.function.Predicate;
+
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.CREATE_FROM_X28_CONDITION;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.JOB_AD_INT_ACTION_CHANNEL;
 
 @Service
 public class X28Adapter {
@@ -64,46 +60,56 @@ public class X28Adapter {
 
 	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CREATE_FROM_X28_CONDITION)
 	public void handleCreateFromX28Action(X28CreateJobAdvertisementDto createFromX28) {
-		try {
-			logLastX28MessageDate(createFromX28.getFingerprint());
-			Optional<JobAdvertisementId> jobAdvertisementId = determineJobAdvertisementId(createFromX28);
-			if (jobAdvertisementId.isPresent()) {
-				jobAdvertisementApplicationService.updateFromX28(new UpdateJobAdvertisementFromX28Dto(
-						jobAdvertisementId.get().getValue(),
-						createFromX28.getFingerprint(),
-						createFromX28.getProfessionCodes()
-				));
-			} else {
-				jobAdvertisementApplicationService.createFromX28(createFromX28);
-			}
-		} catch (JobAdvertisementAlreadyExistsException e) {
-			LOG.debug(e.getMessage());
+		logLastX28MessageDate(createFromX28.getFingerprint());
 
-			jobAdvertisementApplicationService.republishIfArchived(e.getJobAdvertisementId());
+		final JobAdvertisementId jobAdvertisementId = determineJobAdvertisementId(createFromX28.getStellennummerEgov(), createFromX28.getStellennummerAvam());
+
+		if (jobAdvertisementId != null) {
+			jobAdvertisementApplicationService.enrichFromExtern(jobAdvertisementId, createFromX28.getFingerprint(), createFromX28.getProfessionCodes());
+		} else {
+			final JobAdvertisementId externalJobAdvertisementId = findJobAdvertisementIdByFingerprint(createFromX28.getFingerprint());
+
+			if (externalJobAdvertisementId != null) {
+				jobAdvertisementApplicationService.updateFromExtern(externalJobAdvertisementId, createFromX28);
+			} else {
+				jobAdvertisementApplicationService.createFromExtern(createFromX28);
+			}
 		}
 	}
 
-	private Optional<JobAdvertisementId> determineJobAdvertisementId(X28CreateJobAdvertisementDto createFromX28) {
-		if (createFromX28.getStellennummerEgov() != null) {
-			Optional<JobAdvertisementId> jobAdvertisementId = transactionTemplate.execute(status -> findByStellennummerEgov(createFromX28))
-					.map(JobAdvertisement::getId);
-			if (jobAdvertisementId.isPresent()) {
+	@Nullable
+	private JobAdvertisementId determineJobAdvertisementId(String stellennummerEgov, String stellennummerAvam) {
+
+		if (stellennummerEgov != null) {
+			JobAdvertisementId jobAdvertisementId = transactionTemplate.execute(status ->
+					jobAdvertisementRepository.findByStellennummerEgov(stellennummerEgov)
+							.map(JobAdvertisement::getId)
+							.orElse(null)
+			);
+
+			if (jobAdvertisementId != null) {
 				return jobAdvertisementId;
 			}
 		}
-		if (createFromX28.getStellennummerAvam() != null) {
-			return transactionTemplate.execute(status -> findByStellennummerAvam(createFromX28)
-					.map(JobAdvertisement::getId));
+
+		if (stellennummerAvam != null) {
+
+			return transactionTemplate.execute(status ->
+					jobAdvertisementRepository.findByStellennummerAvam(stellennummerAvam)
+							.map(JobAdvertisement::getId)
+							.orElse(null)
+			);
 		}
-		return Optional.empty();
+
+		return null;
 	}
 
-	private Optional<JobAdvertisement> findByStellennummerEgov(X28CreateJobAdvertisementDto createFromX28) {
-		return jobAdvertisementRepository.findByStellennummerEgov(createFromX28.getStellennummerEgov());
-	}
-
-	private Optional<JobAdvertisement> findByStellennummerAvam(X28CreateJobAdvertisementDto createFromX28) {
-		return jobAdvertisementRepository.findByStellennummerAvam(createFromX28.getStellennummerAvam());
+	@Nullable
+	private JobAdvertisementId findJobAdvertisementIdByFingerprint(String fingerprint) {
+		return transactionTemplate.execute(status -> jobAdvertisementRepository.findByFingerprint(fingerprint)
+				.map(JobAdvertisement::getId)
+				.orElse(null)
+		);
 	}
 
 	private long archiveExternalJobAds() {
