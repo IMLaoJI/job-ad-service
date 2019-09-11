@@ -61,7 +61,7 @@ public class DefaultLocationService implements LocationService {
     }
 
     private Optional<LocationResource> findLocationIfHasPostalCode(Location location) {
-        return hasText(location.getPostalCode()) ?
+        return (hasText(location.getPostalCode()) && hasText(location.getCity())) ?
                 locationApiClient.findLocationByPostalCodeAndCity(location.getPostalCode(), location.getCity())
                 : Optional.empty();
     }
