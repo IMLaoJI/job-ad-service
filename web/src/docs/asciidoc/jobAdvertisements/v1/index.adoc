@@ -39,7 +39,7 @@ Some markdown references you might find helpful:
 * http://html2markdown.bayn.es
 - **Company address**: While the <<Company>> address is not currently defined as mandatory, we strongly request that this data is included
 for jobs under reporting obligation. If the address is missing, this causes extra work for the public employment agent.
-- **Postal codes** must be valid. From beginning of September, postal codes will be validated and invalid data will be rejected.
+* The job location must have **valid postal code** and city data. Validation is based on the Swiss Post, refer to https://www.post.ch/en/pages/plz-suche.
 - **Phone number validation**: The minimum length of a phone number was reduced in order to accomodate Liechtenstein phone numbers.
 The format is [+][1-9][0-9]{7,18}.
 - You can find a list of language codes supported by Job-Room at link:Job-Room-Languages.xlsx[List of supported languages]
