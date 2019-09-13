@@ -175,7 +175,7 @@
 			<xs:element name="stellenantritt" nillable="true" type="xs:string"/>
 			<xs:element name="stellennummerAvam" nillable="true" type="xs:string"/>
 			<xs:element name="stellennummerEgov" nillable="true" type="xs:string"/>
-			<xs:element name="unbefristet" nillable="true" type="xs:boolean"/>
+			<xs:element name="fristTyp" nillable="false" type="xs:string"/>
 			<xs:element name="untHausNr" nillable="true" type="xs:string"/>
 			<xs:element name="untLand" nillable="false" type="xs:string"/>
 			<xs:element name="untName" nillable="false" type="xs:string"/>
@@ -206,13 +206,13 @@
 			<xs:element name="loginPublikation" nillable="false" type="xs:boolean"/>
 			<xs:element name="quelleCode" nillable="false" type="xs:string"/>
 			<xs:element name="meldepflicht" nillable="false" type="xs:boolean"/>
-			<xs:element name="kurzeinsatz" nillable="true" type="xs:boolean"/>
 			<xs:element name="sperrfrist" nillable="true" type="xs:string"/>
 			<xs:element name="kpFragenAnredeCode" nillable="true" type="xs:string"/>
 			<xs:element name="kpFragenName" nillable="true" type="xs:string"/>
 			<xs:element name="kpFragenVorname" nillable="true" type="xs:string"/>
 			<xs:element name="kpFragenEmail" nillable="true" type="xs:string"/>
 			<xs:element name="kpFragenTelefonNr" nillable="true" type="xs:string"/>
+            <xs:element name="event" nillable="false" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
 

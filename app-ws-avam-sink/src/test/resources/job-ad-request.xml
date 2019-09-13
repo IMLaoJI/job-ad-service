@@ -91,7 +91,7 @@
         <stellenantritt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
         <stellennummerAvam>stellennummerAvam</stellennummerAvam>
         <stellennummerEgov>100</stellennummerEgov>
-        <unbefristet>false</unbefristet>
+        <fristTyp>BEFR</fristTyp>
         <untHausNr xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
         <untLand>ch</untLand>
         <untName>companyName</untName>
@@ -121,7 +121,6 @@
         <loginPublikation>false</loginPublikation>
         <quelleCode>Job-Room</quelleCode>
         <meldepflicht>false</meldepflicht>
-        <kurzeinsatz>false</kurzeinsatz>
         <sperrfrist>2018-10-28-00.00.00.0</sperrfrist>
         <auftraggeber>false</auftraggeber>
         <auftraggeberName xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
