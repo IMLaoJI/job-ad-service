@@ -18,110 +18,119 @@ This date is only set after approval by the PES (RAV), in case that the ad falls
 [source,json]
 ----
 {
-    "id": "string",
-    "status": "string",
-    "sourceSystem": "string",
-    "stellennummerEgov": "string",
-    "stellennummerAvam": "string",
-    "externalReference": "string",
-    "fingerprint": "string",
-    "jobCenterCode": "string",
-    "reportToAvam": true,
-    "reportingObligation": true,
-    "reportingObligationEndDate": "string",
-    "approvalDate": "string",
-    "rejectionCode": "string",
-    "rejectionDate": "string",
-    "rejectionReason": "string",
-    "cancellationCode": "string",
-    "cancellationDate": "string",
-    "jobContent": {
-        "externalUrl": "string",
-        "jobDescriptions": [
-            {
-                "languageIsoCode": "string",
-                "title": "string",
-                "description": "string"
-            }
-        ],
-        "company": {
-            "name": "string",
-            "street": "string",
-            "houseNumber": "string",
-            "postOfficeBoxNumber": "string",
-            "postOfficeBoxPostalCode": "string",
-            "postOfficeBoxCity": "string",
-            "postalCode": "string",
-            "city": "string",
-            "countryIsoCode": "string",
-            "website": "string",
-            "phone": "string",
-            "email": "string",
-            "surrogate": true
-        },
-        "employment": {
-            "startDate": "string",
-            "endDate": "string",
-            "shortEmployment": true,
-            "immediately": true,
-            "permanent": true,
-            "workloadPercentageMax": 0,
-            "workloadPercentageMin": 0,
-            "workForms": [
-                "string"
-            ]
-        },
-        "location": {
-            "remarks": "string",
-            "postalCode": "string",
-            "city": "string",
-            "communalCode": "string",
-            "regionCode": "string",
-            "cantonCode": "string",
-            "countryIsoCode": "string",
-            "coordinates": {
-                "latitude": 0,
-                "longitude": 0
-            }
-        },
-        "occupations": [
-            {
-                "avamOccupationCode": "string",
-                "workExperience": "string",
-                "educationCode": "string"
-            }
-        ],
-        "languageSkills": [
-            {
-                "languageIsoCode": "string",
-                "spokenLevel": "string",
-                "writtenLevel": "string"
-            }
-        ],
-        "applyChannel": {
-            "mailAddress": "string",
-            "emailAddress": "string",
-            "phoneNumber": "string",
-            "formUrl": "string",
-            "additionalInfo": "string"
-        },
-        "publicContact": {
-            "salutation": "string",
-            "firstName": "string",
-            "lastName": "string",
-            "phone": "string",
-            "email": "string"
-        }
+  "id": "4feae516-d62c-11e9-ab5e-005056ac3479",
+  "status": "INSPECTING",
+  "sourceSystem": "API",
+  "externalReference": "1234",
+  "stellennummerEgov": "300002290",
+  "stellennummerAvam": null,
+  "fingerprint": null,
+  "reportingObligation": true,
+  "reportingObligationEndDate": null,
+  "reportToAvam": false,
+  "jobCenterCode": "BEAF0",
+  "approvalDate": null,
+  "rejectionDate": null,
+  "rejectionCode": null,
+  "rejectionReason": null,
+  "cancellationDate": null,
+  "cancellationCode": null,
+  "jobContent": {
+    "externalUrl": "https://jobs.admin.ch/offene-stellen/Bauarbeiter-1234",
+    "numberOfJobs": "1",
+    "jobDescriptions": [
+      {
+        "languageIsoCode": "de",
+        "title": "Bauarbeiter",
+        "description":
+         "# Anforderungen
+         - Zwingende Baustellenkenntnisse im Hoch- und Tiefbau
+         - Kenntnisse in den Schalungssystemen Doka, Peri, Meva und Noe
+         - Sicherheitsschulung von Vorteil
+         - Handwerkliches Geschick
+
+         # Aufgaben
+         - Betonieren
+         - Ein- und Ausschalen
+         - Aufräumen der Baustelle
+         - Allgemeine Mithilfe auf Hoch- und Tiefbau Baustellen"
+      }
+    ],
+    "company": {
+      "name": "Muster AG",
+      "street": "Münsterstrasse",
+      "houseNumber": "9",
+      "postalCode": "3007",
+      "city": "Bern",
+      "countryIsoCode": "CH",
+      "postOfficeBoxNumber": null,
+      "postOfficeBoxPostalCode": null,
+      "postOfficeBoxCity": null,
+      "phone": "+41 32 123 45 67",
+      "email": "info@musterag.ch",
+      "website": "https://www.musterag.ch",
+      "surrogate": true
     },
-    "publication": {
-        "startDate": "string",
-        "endDate": "string",
-        "euresDisplay": true,
-        "euresAnonymous": true,
-        "publicDisplay": true,
-        "restrictedDisplay": true,
-        "companyAnonymous": true
+    "employment": {
+      "startDate": "2020-01-20",
+      "endDate": null,
+      "shortEmployment": false,
+      "immediately": false,
+      "permanent": true,
+      "workloadPercentageMin": "100",
+      "workloadPercentageMax": "100",
+      "workForms": [
+        "NIGHT_WORK"
+      ]
+    },
+    "location": {
+      "remarks": null,
+      "city": "Bern",
+      "postalCode": "3003",
+      "communalCode": "351",
+      "regionCode": "BE01",
+      "cantonCode": "BE",
+      "countryIsoCode": "CH",
+      "coordinates": null
+    },
+    "occupations": [
+      {
+        "avamOccupationCode": "52502",
+        "workExperience": "LESS_THAN_1_YEAR",
+        "educationCode": "132"
+      }
+    ],
+    "languageSkills": [
+      {
+        "languageIsoCode": "de",
+        "spokenLevel": "PROFICIENT",
+        "writtenLevel": "INTERMEDIATE"
+      }
+    ],
+    "applyChannel": {
+      "mailAddress": null,
+      "emailAddress": "bewerbungen@musterag.ch",
+      "phoneNumber": "+41 31 123 45 67",
+      "formUrl": null,
+      "additionalInfo": null
+    },
+    "publicContact": {
+      "salutation": "MR",
+      "firstName": "Max",
+      "lastName": "Muster",
+      "phone": "+41 31 123 45 67",
+      "email": "max.muster@musterag.ch"
     }
+  },
+  "publication": {
+    "startDate": "2020-01-01",
+    "endDate": "2020-02-01",
+    "euresDisplay": true,
+    "euresAnonymous": false,
+    "publicDisplay": true,
+    "restrictedDisplay": true,
+    "companyAnonymous": false
+  }
 }
 ----
 
