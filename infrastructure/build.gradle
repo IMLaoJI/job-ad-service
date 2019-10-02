@@ -7,6 +7,7 @@ dependencies {
     compile "ch.admin.seco.alv:alv-spring-integration-leader-starter"
     compile 'ch.admin.seco.alv:alv-logger-starter'
     compile 'ch.admin.seco.alv:alv-feign-starter'
+    compile "org.springframework.boot:spring-boot-starter-actuator"
 
     compile 'com.overzealous:remark:1.0.0'
 

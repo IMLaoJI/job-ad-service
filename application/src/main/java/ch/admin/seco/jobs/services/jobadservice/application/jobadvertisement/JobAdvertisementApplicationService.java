@@ -74,6 +74,8 @@ public class JobAdvertisementApplicationService {
 
 	private final BusinessLogger businessLogger;
 
+    private final ExternalJobAdvertisementArchiverService externalJobAdvertisementService;
+
 	@Autowired
 	public JobAdvertisementApplicationService(CurrentUserContext currentUserContext,
 											  JobAdvertisementRepository jobAdvertisementRepository,
@@ -81,8 +83,10 @@ public class JobAdvertisementApplicationService {
 											  ReportingObligationService reportingObligationService,
 											  LocationService locationService,
 											  ProfessionService professionService,
-											  JobCenterService jobCenterService, TransactionTemplate transactionTemplate,
-											  BusinessLogger businessLogger) {
+                                              JobCenterService jobCenterService,
+                                              TransactionTemplate transactionTemplate,
+                                              BusinessLogger businessLogger,
+                                              ExternalJobAdvertisementArchiverService externalJobAdvertisementSerivce) {
 		this.currentUserContext = currentUserContext;
 		this.jobAdvertisementRepository = jobAdvertisementRepository;
 		this.jobAdvertisementFactory = jobAdvertisementFactory;
@@ -92,6 +96,7 @@ public class JobAdvertisementApplicationService {
 		this.jobCenterService = jobCenterService;
 		this.transactionTemplate = transactionTemplate;
 		this.businessLogger = businessLogger;
+        this.externalJobAdvertisementService = externalJobAdvertisementSerivce;
 	}
 
 	public JobAdvertisementId createFromWebForm(CreateJobAdvertisementDto createJobAdvertisementDto) {
@@ -539,6 +544,10 @@ public class JobAdvertisementApplicationService {
 		JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
 		jobAdvertisement.archive();
 	}
+
+    public void archiveExternalJobAdvertisements() {
+        this.externalJobAdvertisementService.archiveExternalJobAdvertisements();
+    }
 
 	public void checkPublicationStarts() {
 		this.jobAdvertisementRepository

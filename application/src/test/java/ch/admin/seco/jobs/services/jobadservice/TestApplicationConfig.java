@@ -6,6 +6,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.MailSenderService;
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ExternalJobAdvertisementArchiverService;
 import ch.admin.seco.jobs.services.jobadservice.application.security.TestingCurrentUserContext;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -35,6 +36,9 @@ public class TestApplicationConfig {
 
     @MockBean
     private JobCenterService jobCenterService;
+
+    @MockBean
+    private ExternalJobAdvertisementArchiverService externalJobAdvertisementArchiverService;
 
     @Bean
     public TestingCurrentUserContext testingCurrentUserContext() {

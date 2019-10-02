@@ -8,7 +8,6 @@ dependencies {
     optional 'org.springframework.boot:spring-boot-configuration-processor'
 
     compile 'ch.admin.seco.alv:alv-spring-integration-starter'
-    compile "ch.admin.seco.alv:alv-spring-integration-leader-starter"
 
     // is defined as test compile because we only need to fetch the messages.properties
     testCompile project(':infrastructure')

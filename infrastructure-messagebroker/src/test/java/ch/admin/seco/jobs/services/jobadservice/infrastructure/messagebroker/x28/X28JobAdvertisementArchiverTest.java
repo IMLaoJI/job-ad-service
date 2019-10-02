@@ -1,33 +1,27 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.x28;
 
+import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEvent;
+import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.support.TransactionTemplate;
+
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.CREATED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_PUBLISH_EXPIRED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job02;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job03;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.testJobAdvertisementWithExternalSourceSystemAndStatus;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.support.TransactionTemplate;
-
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
-import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEvent;
-import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
-
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class X28AdapterSchedulerTest {
+public class X28JobAdvertisementArchiverTest {
     private static final String FINGERPRINT_1 = "fingerprint1";
     private static final String FINGERPRINT_2 = "fingerprint2";
     private static final String FINGERPRINT_3 = "fingerprint3";
@@ -43,14 +37,11 @@ public class X28AdapterSchedulerTest {
 
     private DomainEventMockUtils domainEventMockUtils;
 
-    @MockBean
-    private JobAdvertisementApplicationService jobAdvertisementApplicationService;
-
-    private X28Adapter sut; //System Under Test
+    private X28JobAdvertisementArchiverService sut; //System Under Test
 
     @Before
     public void setUp() {
-        this.sut = new X28Adapter(jobAdvertisementApplicationService, jobAdvertisementRepository, transactionTemplate, x28MessageLogRepository);
+        this.sut = new X28JobAdvertisementArchiverService(jobAdvertisementRepository, transactionTemplate, x28MessageLogRepository);
         domainEventMockUtils = new DomainEventMockUtils();
     }
 
@@ -64,7 +55,7 @@ public class X28AdapterSchedulerTest {
         x28MessageLogRepository.save(new X28MessageLog(FINGERPRINT_3, now()));
 
         // when
-        this.sut.scheduledArchiveExternalJobAds();
+        this.sut.archiveExternalJobAdvertisements();
 
         // then
         DomainEvent domainEvent = domainEventMockUtils.assertSingleDomainEventPublished(JOB_ADVERTISEMENT_PUBLISH_EXPIRED.getDomainEventType());
@@ -80,7 +71,7 @@ public class X28AdapterSchedulerTest {
         x28MessageLogRepository.save(new X28MessageLog(FINGERPRINT_2, now().minusDays(1)));
 
         // when
-        this.sut.scheduledArchiveExternalJobAds();
+        this.sut.archiveExternalJobAdvertisements();
 
         // then
         domainEventMockUtils.verifyNoEventsPublished();
