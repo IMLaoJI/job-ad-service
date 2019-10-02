@@ -266,10 +266,25 @@ public class JobAdvertisementApplicationServiceTest {
     }
 
     @Test
-    public void shouldNotRepublish() {
+    public void shouldNotRepublishIfExternalJobAdReactivationExceeded() {
         // given
         useFixedClockAt(LocalDateTime.now().minusDays(EXTERN_JOB_AD_REACTIVATION_DAY_NUM + 1));
         jobAdvertisementRepository.save(testJobAdvertisementWithStatusAndPublicationEndDate(job01.id(), ARCHIVED, null));
+        reset();
+
+        // when
+        sut.republishIfArchived(job01.id());
+
+        // then
+        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.findById(job01.id()).get();
+        assertThat(jobAdvertisement.getStatus()).isEqualTo(ARCHIVED);
+    }
+
+    @Test
+    public void shouldNotRepublishIfPublicationEndDateExceeded() {
+        // given
+        useFixedClockAt(LocalDateTime.now().minusDays(EXTERN_JOB_AD_REACTIVATION_DAY_NUM));
+        jobAdvertisementRepository.save(testJobAdvertisementWithStatusAndPublicationEndDate(job01.id(), ARCHIVED, now().minusDays(1)));
         reset();
 
         // when

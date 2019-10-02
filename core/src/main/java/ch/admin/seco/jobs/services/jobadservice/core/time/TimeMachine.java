@@ -42,11 +42,19 @@ public class TimeMachine {
         return date.isAfter(now().toLocalDate());
     }
 
+    public static boolean isNotAfterToday(LocalDate date) {
+        return !isAfterToday(date);
+    }
+
     public static boolean isAfterToday(LocalDateTime dateTime) {
         if (dateTime == null) {
             return false;
         }
         return dateTime.isAfter(now());
+    }
+
+    public static boolean isNotAfterToday(LocalDateTime dateTime) {
+        return !isAfterToday(dateTime);
     }
 
     public static boolean isBeforeToday(LocalDate date) {
@@ -56,10 +64,18 @@ public class TimeMachine {
         return date.isBefore(now().toLocalDate());
     }
 
+    public static boolean isNotBeforeToday(LocalDate date) {
+        return !isBeforeToday(date);
+    }
+
     public static boolean isBeforeToday(LocalDateTime dateTime) {
         if (dateTime == null) {
             return false;
         }
         return dateTime.isBefore(now());
+    }
+
+    public static boolean isNotBeforeToday(LocalDateTime dateTime) {
+        return !isBeforeToday(dateTime);
     }
 }

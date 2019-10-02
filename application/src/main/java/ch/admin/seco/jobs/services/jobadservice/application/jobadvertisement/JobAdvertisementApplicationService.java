@@ -503,25 +503,24 @@ public class JobAdvertisementApplicationService {
 		publish(jobAdvertisement);
 	}
 
-	public void  republishIfArchived(JobAdvertisementId jobAdvertisementId) {
-		Condition.notNull(jobAdvertisementId, "JobAdvertisementId can't be null");
+    public void republishIfArchived(JobAdvertisementId jobAdvertisementId) {
+        Condition.notNull(jobAdvertisementId, "JobAdvertisementId can't be null");
 
-		JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
+        JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
 
-		LocalDate lastUpdateDate = jobAdvertisement.getUpdatedTime() != null
-				? jobAdvertisement.getUpdatedTime().toLocalDate()
-				: null;
+        LocalDate lastUpdateDate = jobAdvertisement.getUpdatedTime().toLocalDate();
+        LocalDate publicationEndDate = jobAdvertisement.getPublication().getEndDate();
 
-		LocalDate lastDateToRepublish = TimeMachine.now().toLocalDate().minusDays(EXTERN_JOB_AD_REACTIVATION_DAY_NUM);
-		boolean republishAllowed = lastUpdateDate != null && (lastUpdateDate.isAfter(lastDateToRepublish) || lastUpdateDate.isEqual(lastDateToRepublish));
+        LocalDate lastDateToRepublish = TimeMachine.now().toLocalDate().minusDays(EXTERN_JOB_AD_REACTIVATION_DAY_NUM);
+        boolean republishAllowed = !lastDateToRepublish.isAfter(lastUpdateDate) && TimeMachine.isNotBeforeToday(publicationEndDate);
 
-		if (JobAdvertisementStatus.ARCHIVED.equals(jobAdvertisement.getStatus()) && republishAllowed) {
-			jobAdvertisement.republish();
-		} else {
-			LOG.debug("Republish is not allowed for jobAdvertisement with id: '{}' in status: '{}', with last update date: '{}'",
-					jobAdvertisement.getId(), jobAdvertisement.getStatus(), lastUpdateDate);
-		}
-	}
+        if (JobAdvertisementStatus.ARCHIVED.equals(jobAdvertisement.getStatus()) && republishAllowed) {
+            jobAdvertisement.republish();
+        } else {
+            LOG.debug("Republish is not allowed for jobAdvertisement with id: '{}' in status: '{}', with last update date: '{}' and publicationEndDate: {}",
+                    jobAdvertisement.getId(), jobAdvertisement.getStatus(), lastUpdateDate, publicationEndDate);
+        }
+    }
 
 	private void publish(JobAdvertisement jobAdvertisement) {
 		Condition.notNull(jobAdvertisement, "JobAdvertisement can't be null");
