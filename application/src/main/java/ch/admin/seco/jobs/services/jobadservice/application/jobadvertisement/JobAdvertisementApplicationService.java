@@ -39,8 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.INSPECTING;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REFINING;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.*;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -374,7 +373,7 @@ public class JobAdvertisementApplicationService {
 	public void approve(ApprovalDto approvalDto) {
 		Condition.notNull(approvalDto.getStellennummerEgov(), "StellennummerEgov can't be null");
 		JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerEgov(approvalDto.getStellennummerEgov());
-		if (jobAdvertisement.getStatus().equals(INSPECTING)) {
+		if (jobAdvertisement.getStatus().equals(INSPECTING) || jobAdvertisement.getStatus().equals(REJECTED)) {
 			LOG.debug("Starting approve for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
 			jobAdvertisement.approve(approvalDto.getStellennummerAvam(), approvalDto.getDate(), approvalDto.isReportingObligation(),
 					approvalDto.getReportingObligationEndDate(), approvalDto.getJobCenterCode());
