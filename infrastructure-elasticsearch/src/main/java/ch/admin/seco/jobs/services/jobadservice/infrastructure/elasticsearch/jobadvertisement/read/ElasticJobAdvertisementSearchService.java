@@ -606,7 +606,7 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 	}
 
 	private boolean canViewRestrictedJobAds() {
-		return this.currentUserContext.hasAnyRoles(Role.JOBSEEKER_CLIENT, Role.SYSADMIN);
+		return this.currentUserContext.hasAnyRoles(Role.JOBSEEKER_CLIENT, Role.SYSADMIN, Role.ADMIN);
 	}
 
 	private FunctionScoreQueryBuilder prepareRadiusQuery(RadiusSearchRequest radiusSearchRequest) {
