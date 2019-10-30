@@ -85,16 +85,13 @@ public class JobAdvertisementAuthorizationService {
 	}
 
 	private boolean internalCanViewJob(JobAdvertisement jobAdvertisement) {
-		if (this.currentUserContext.hasRole(Role.SYSADMIN)) {
-			return true;
-		}
 		if (jobAdvertisement.getStatus() != JobAdvertisementStatus.PUBLISHED_RESTRICTED) {
 			return true;
 		}
-		if (isOwner(jobAdvertisement, this.currentUserContext.getCurrentUser())) {
+		if (this.currentUserContext.hasAnyRoles(Role.SYSADMIN, Role.ADMIN, Role.JOBSEEKER_CLIENT)) {
 			return true;
 		}
-		return this.currentUserContext.getCurrentUser() != null
-				&& this.currentUserContext.hasAnyRoles(Role.JOBSEEKER_CLIENT);
+		
+		return isOwner(jobAdvertisement, this.currentUserContext.getCurrentUser()) ;
 	}
 }
