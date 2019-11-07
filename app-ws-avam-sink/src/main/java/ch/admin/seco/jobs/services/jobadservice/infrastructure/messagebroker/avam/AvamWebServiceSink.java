@@ -30,9 +30,6 @@ public class AvamWebServiceSink {
     }
 
     private boolean mustSendDeregistratonNotification(JobAdvertisement jobAdvertisement) {
-        // send deregistration message only for JobAds registered by JOBROOM or API.
-        return (jobAdvertisement.getStellennummerAvam() != null) &&
-                (SourceSystem.JOBROOM.equals(jobAdvertisement.getSourceSystem())
-                        || SourceSystem.API.equals(jobAdvertisement.getSourceSystem()));
+        return jobAdvertisement.getStellennummerAvam() != null;
     }
 }
