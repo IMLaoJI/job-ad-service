@@ -6,8 +6,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.SubscribableChannel;
 
 public interface MessageBrokerChannels {
-    String CREATE_FROM_X28_CONDITION = "headers['action']=='CREATE_FROM_X28'";
-    String UPDATE_FROM_X28_CONDITION = "headers['action']=='UPDATE_FROM_X28'";
+    String CREATE_FROM_EXTERNAL_CONDITION = "headers['action']=='CREATE_FROM_EXTERNAL'";
     String APPROVE_CONDITION = "headers['action']=='APPROVE'";
     String REJECT_CONDITION = "headers['action']=='REJECT'";
     String CANCEL_CONDITION = "headers['action']=='CANCEL'";

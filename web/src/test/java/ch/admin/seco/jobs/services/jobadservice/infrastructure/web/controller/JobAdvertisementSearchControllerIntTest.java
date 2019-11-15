@@ -82,7 +82,7 @@ public class JobAdvertisementSearchControllerIntTest {
 
     private static final GeoPointDto SION_GEO_POINT = new GeoPointDto().setLat(46.234).setLon(7.359);
 
-    private static final String X28_CODE_KOCH = "11000411";
+    private static final String EXTERNAL_CODE_KOCH = "11000411";
 
     @Value("${alv.feature.toggle.isGaussDecayEnabled}")
     boolean isGaussDecayEnabled;
@@ -366,7 +366,7 @@ public class JobAdvertisementSearchControllerIntTest {
         // WHEN
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
         jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE});
-        jobAdvertisementSearchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, X28_CODE_KOCH)});
+        jobAdvertisementSearchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, EXTERNAL_CODE_KOCH)});
 
         jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(30));
 
@@ -387,7 +387,7 @@ public class JobAdvertisementSearchControllerIntTest {
         index(testJobAdvertisementWithContentAndLocation(job05.id(),
                 testJobContent()
                         .setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build()))
-                        .setX28OccupationCodes(X28_CODE_KOCH)
+                        .setX28OccupationCodes(EXTERNAL_CODE_KOCH)
                         .setLocation(
                                 testLocation()
                                         .setCity("Ausland")
@@ -400,7 +400,7 @@ public class JobAdvertisementSearchControllerIntTest {
         // WHEN
         JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
         jobAdvertisementSearchRequest.setCommunalCodes(new String[]{ABROAD_COMMUNAL_CODE});
-        jobAdvertisementSearchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, X28_CODE_KOCH)});
+        jobAdvertisementSearchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, EXTERNAL_CODE_KOCH)});
 
         // THEN
         post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -420,7 +420,7 @@ public class JobAdvertisementSearchControllerIntTest {
                                 .setTitle("Koch")
                                 .setDescription("keyword1, keyword3")
                                 .build()))
-                        .setX28OccupationCodes(X28_CODE_KOCH)
+                        .setX28OccupationCodes(EXTERNAL_CODE_KOCH)
                         .setLocation(
                                 testLocation()
                                         .setCity("Lausanne")
@@ -436,7 +436,7 @@ public class JobAdvertisementSearchControllerIntTest {
                         .setJobDescriptions(singletonList(testJobDescription()
                                 .setTitle("Koch")
                                 .setDescription("keyword1, keyword2, keyword3").build()))
-                        .setX28OccupationCodes(X28_CODE_KOCH)
+                        .setX28OccupationCodes(EXTERNAL_CODE_KOCH)
                         .setLocation(
                                 testLocation()
                                         .setCity("Bern")
@@ -474,7 +474,7 @@ public class JobAdvertisementSearchControllerIntTest {
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
         searchRequest.setCantonCodes(new String[]{"BE"});
-        searchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, X28_CODE_KOCH)});
+        searchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, EXTERNAL_CODE_KOCH)});
 
         // THEN
         post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -599,13 +599,13 @@ public class JobAdvertisementSearchControllerIntTest {
     }
 
     @Test
-    public void shouldSearchByOccupation_X28() throws Exception {
+    public void shouldSearchByOccupation_External() throws Exception {
 
         // GIVEN
-        index(createJobWithX28Code(job01.id(), "1111,2222"));
-        index(createJobWithX28Code(job02.id(), "1111"));
-        index(createJobWithX28Code(job03.id(), "3333"));
-        index(createJobWithX28Code(job04.id(), "4444"));
+        index(createJobWithExternalCode(job01.id(), "1111,2222"));
+        index(createJobWithExternalCode(job02.id(), "1111"));
+        index(createJobWithExternalCode(job03.id(), "3333"));
+        index(createJobWithExternalCode(job04.id(), "4444"));
 
         // WHEN
         JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();

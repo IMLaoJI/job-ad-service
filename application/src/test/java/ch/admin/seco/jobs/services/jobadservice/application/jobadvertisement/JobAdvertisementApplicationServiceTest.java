@@ -217,7 +217,7 @@ public class JobAdvertisementApplicationServiceTest {
         // then
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.findById(job01.id()).get();
         assertThat(jobAdvertisement.getStatus()).isEqualTo(REFINING);
-        // TODO: uncomment once we have x28-api
+        // TODO: uncomment once we have external-api
 //        domainEventMockUtils.assertSingleDomainEventPublished(JobAdvertisementEvents.JOB_ADVERTISEMENT_REFINING.getDomainEventType());
     }
 

@@ -328,7 +328,7 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
         this.status = status.validateTransitionTo(JobAdvertisementStatus.REFINING);
         this.updatedTime = TimeMachine.now();
         DomainEventPublisher.publish(new JobAdvertisementRefiningEvent(this));
-        // FIXME: shortcut, because the x28-api is not yet ready. to bee handel when api is implemented
+        // FIXME: shortcut, because the external-api is not yet ready. to bee handel when api is implemented
         DomainEventPublisher.publish(new JobAdvertisementRefinedEvent(this));
     }
 

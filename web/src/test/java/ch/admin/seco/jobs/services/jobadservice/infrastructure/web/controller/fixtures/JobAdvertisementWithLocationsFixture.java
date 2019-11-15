@@ -24,7 +24,7 @@ import static java.util.stream.Collectors.toList;
 
 public class JobAdvertisementWithLocationsFixture {
 
-	private static final String X28_CODE_KOCH = "11000411";
+	private static final String EXTERNAL_CODE_KOCH = "11000411";
 
     public static List<JobAdvertisement> listOfJobAdsForGeoDistanceTests() {
         return Stream.of(
@@ -179,7 +179,7 @@ public class JobAdvertisementWithLocationsFixture {
 				testJobAdvertisementWithContentAndLocation(job01.id(),
 				testJobContent()
 						.setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build()))
-						.setX28OccupationCodes(X28_CODE_KOCH)
+						.setX28OccupationCodes(EXTERNAL_CODE_KOCH)
 						.setLocation(
 								testLocation()
 										.setCity("Köniz")
@@ -193,7 +193,7 @@ public class JobAdvertisementWithLocationsFixture {
 		testJobAdvertisementWithContentAndLocation(job02.id(),
 				testJobContent()
 						.setJobDescriptions(singletonList(testJobDescription().setTitle("Koch").build()))
-						.setX28OccupationCodes(X28_CODE_KOCH)
+						.setX28OccupationCodes(EXTERNAL_CODE_KOCH)
 						.setLocation(
 								testLocation()
 										.setCity("Ostermundigen")
@@ -209,7 +209,7 @@ public class JobAdvertisementWithLocationsFixture {
 						.setJobDescriptions(singletonList(testJobDescription()
 								.setTitle("Koch")
 								.build()))
-						.setX28OccupationCodes(X28_CODE_KOCH)
+						.setX28OccupationCodes(EXTERNAL_CODE_KOCH)
 						.setLocation(
 								testLocation()
 										.setCity("Bern")

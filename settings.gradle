@@ -11,5 +11,5 @@ include 'web'
 
 include 'app-ws-avam-sink'
 include 'app-ws-avam-source'
-include 'app-x28-job-ad-import-task'
-include 'app-x28-job-ad-export-task'
+include 'app-external-job-ad-import-task'
+include 'app-external-job-ad-export-task'

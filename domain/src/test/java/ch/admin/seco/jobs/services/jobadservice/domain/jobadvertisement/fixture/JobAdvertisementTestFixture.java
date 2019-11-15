@@ -329,7 +329,7 @@ public class JobAdvertisementTestFixture {
                         .build());
     }
 
-    public static JobAdvertisement createJobWithX28Code(JobAdvertisementId jobAdvertisementId, String x28Codes) {
+    public static JobAdvertisement createJobWithExternalCode(JobAdvertisementId jobAdvertisementId, String x28Codes) {
         return testJobAdvertisementWithContent(jobAdvertisementId,
                 JobContentFixture.of(jobAdvertisementId)
                         .setX28OccupationCodes(x28Codes)
