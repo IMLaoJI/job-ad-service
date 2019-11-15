@@ -91,6 +91,8 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 	private static final String PATH_OCCUPATIONS_BFS_CODE = PATH_OCCUPATIONS + ".bfsCode";
 	private static final String PATH_OCCUPATIONS_SBN3_CODE = PATH_OCCUPATIONS + ".sbn3Code";
 	private static final String PATH_OCCUPATIONS_SBN5_CODE = PATH_OCCUPATIONS + ".sbn5Code";
+	private static final String PATH_OCCUPATIONS_CHISCO3_CODE = PATH_OCCUPATIONS + ".chIsco3Code";
+	private static final String PATH_OCCUPATIONS_CHISCO5_CODE = PATH_OCCUPATIONS + ".chIsco5Code";
 	private static final String PATH_X28_CODE = PATH_CTX + "jobContent.x28OccupationCodes";
 	private static final String PATH_PERMANENT = PATH_CTX + "jobContent.employment.permanent";
 	private static final String PATH_PUBLICATION_RESTRICTED_DISPLAY = PATH_CTX + "publication.restrictedDisplay";
@@ -356,6 +358,12 @@ public class ElasticJobAdvertisementSearchService implements JobAdvertisementSea
 				break;
 			case SBN5:
 				path = PATH_OCCUPATIONS_SBN5_CODE;
+				break;
+			case CHISCO3:
+				path = PATH_OCCUPATIONS_CHISCO3_CODE;
+				break;
+			case CHISCO5:
+				path = PATH_OCCUPATIONS_CHISCO5_CODE;
 				break;
 			case X28:
 				path = PATH_X28_CODE;

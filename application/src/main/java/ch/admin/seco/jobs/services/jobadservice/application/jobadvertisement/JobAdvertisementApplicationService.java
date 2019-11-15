@@ -73,19 +73,19 @@ public class JobAdvertisementApplicationService {
 
 	private final BusinessLogger businessLogger;
 
-    private final ExternalJobAdvertisementArchiverService externalJobAdvertisementService;
+	private final ExternalJobAdvertisementArchiverService externalJobAdvertisementService;
 
 	@Autowired
 	public JobAdvertisementApplicationService(CurrentUserContext currentUserContext,
-											  JobAdvertisementRepository jobAdvertisementRepository,
-											  JobAdvertisementFactory jobAdvertisementFactory,
-											  ReportingObligationService reportingObligationService,
-											  LocationService locationService,
-											  ProfessionService professionService,
-                                              JobCenterService jobCenterService,
-                                              TransactionTemplate transactionTemplate,
-                                              BusinessLogger businessLogger,
-                                              ExternalJobAdvertisementArchiverService externalJobAdvertisementSerivce) {
+	                                          JobAdvertisementRepository jobAdvertisementRepository,
+	                                          JobAdvertisementFactory jobAdvertisementFactory,
+	                                          ReportingObligationService reportingObligationService,
+	                                          LocationService locationService,
+	                                          ProfessionService professionService,
+	                                          JobCenterService jobCenterService,
+	                                          TransactionTemplate transactionTemplate,
+	                                          BusinessLogger businessLogger,
+	                                          ExternalJobAdvertisementArchiverService externalJobAdvertisementSerivce) {
 		this.currentUserContext = currentUserContext;
 		this.jobAdvertisementRepository = jobAdvertisementRepository;
 		this.jobAdvertisementFactory = jobAdvertisementFactory;
@@ -95,7 +95,7 @@ public class JobAdvertisementApplicationService {
 		this.jobCenterService = jobCenterService;
 		this.transactionTemplate = transactionTemplate;
 		this.businessLogger = businessLogger;
-        this.externalJobAdvertisementService = externalJobAdvertisementSerivce;
+		this.externalJobAdvertisementService = externalJobAdvertisementSerivce;
 	}
 
 	public JobAdvertisementId createFromWebForm(CreateJobAdvertisementDto createJobAdvertisementDto) {
@@ -502,24 +502,24 @@ public class JobAdvertisementApplicationService {
 		publish(jobAdvertisement);
 	}
 
-    public void republishIfArchived(JobAdvertisementId jobAdvertisementId) {
-        Condition.notNull(jobAdvertisementId, "JobAdvertisementId can't be null");
+	public void republishIfArchived(JobAdvertisementId jobAdvertisementId) {
+		Condition.notNull(jobAdvertisementId, "JobAdvertisementId can't be null");
 
-        JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
+		JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
 
-        LocalDate lastUpdateDate = jobAdvertisement.getUpdatedTime().toLocalDate();
-        LocalDate publicationEndDate = jobAdvertisement.getPublication().getEndDate();
+		LocalDate lastUpdateDate = jobAdvertisement.getUpdatedTime().toLocalDate();
+		LocalDate publicationEndDate = jobAdvertisement.getPublication().getEndDate();
 
-        LocalDate lastDateToRepublish = TimeMachine.now().toLocalDate().minusDays(EXTERN_JOB_AD_REACTIVATION_DAY_NUM);
-        boolean republishAllowed = !lastDateToRepublish.isAfter(lastUpdateDate) && TimeMachine.isNotBeforeToday(publicationEndDate);
+		LocalDate lastDateToRepublish = TimeMachine.now().toLocalDate().minusDays(EXTERN_JOB_AD_REACTIVATION_DAY_NUM);
+		boolean republishAllowed = !lastDateToRepublish.isAfter(lastUpdateDate) && TimeMachine.isNotBeforeToday(publicationEndDate);
 
-        if (JobAdvertisementStatus.ARCHIVED.equals(jobAdvertisement.getStatus()) && republishAllowed) {
-            jobAdvertisement.republish();
-        } else {
-            LOG.debug("Republish is not allowed for jobAdvertisement with id: '{}' in status: '{}', with last update date: '{}' and publicationEndDate: {}",
-                    jobAdvertisement.getId(), jobAdvertisement.getStatus(), lastUpdateDate, publicationEndDate);
-        }
-    }
+		if (JobAdvertisementStatus.ARCHIVED.equals(jobAdvertisement.getStatus()) && republishAllowed) {
+			jobAdvertisement.republish();
+		} else {
+			LOG.debug("Republish is not allowed for jobAdvertisement with id: '{}' in status: '{}', with last update date: '{}' and publicationEndDate: {}",
+					jobAdvertisement.getId(), jobAdvertisement.getStatus(), lastUpdateDate, publicationEndDate);
+		}
+	}
 
 	private void publish(JobAdvertisement jobAdvertisement) {
 		Condition.notNull(jobAdvertisement, "JobAdvertisement can't be null");
@@ -543,9 +543,9 @@ public class JobAdvertisementApplicationService {
 		jobAdvertisement.archive();
 	}
 
-    public void archiveExternalJobAdvertisements() {
-        this.externalJobAdvertisementService.archiveExternalJobAdvertisements();
-    }
+	public void archiveExternalJobAdvertisements() {
+		this.externalJobAdvertisementService.archiveExternalJobAdvertisements();
+	}
 
 	public void checkPublicationStarts() {
 		this.jobAdvertisementRepository
@@ -675,9 +675,12 @@ public class JobAdvertisementApplicationService {
 		Condition.notNull(occupation, "Occupation can't be null");
 		return professionService.findByAvamCode(occupation.getAvamOccupationCode())
 				.map(profession -> new Occupation.Builder()
-						.setAvamOccupationCode(occupation.getAvamOccupationCode())
+						.setAvamOccupationCode(profession.getAvamCode())
 						.setSbn3Code(profession.getSbn3Code())
 						.setSbn5Code(profession.getSbn5Code())
+						.setBfsCode(profession.getBfsCode())
+						.setChIsco3Code(profession.getChIsco3Code())
+						.setChIsco5Code(profession.getChIsco5Code())
 						.setBfsCode(profession.getBfsCode())
 						.setLabel(profession.getLabel())
 						.setWorkExperience(occupation.getWorkExperience())

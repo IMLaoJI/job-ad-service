@@ -34,7 +34,7 @@ public class DefaultProfessionService implements ProfessionService {
 
 	@Override
 	public boolean isKnownAvamCode(String avamCode) {
-		return occupationLabelApiClient.getOccupationMapping(ProfessionCodeType.AVAM.name(), avamCode).isPresent();
+		return occupationLabelApiClient.isKnownAvamCode(avamCode);
 	}
 
 	private ProfessionSuggestion toProfessionSuggestion(OccupationLabelSuggestionResource resource) {
@@ -42,7 +42,7 @@ public class DefaultProfessionService implements ProfessionService {
 			return null;
 		}
 		return new ProfessionSuggestion(
-				resource.getId().toString(),
+				resource.getId(),
 				resource.getCode(),
 				resource.getType(),
 				resource.getLanguage(),
@@ -51,15 +51,17 @@ public class DefaultProfessionService implements ProfessionService {
 		);
 	}
 
-	private Profession toProfession(OccupationLabelMappingResource resource){
-		return new Profession(
-				new ProfessionId(resource.getAvamCode()),
-				resource.getAvamCode(),
-				resource.getSbn3Code(),
-				resource.getSbn5Code(),
-				resource.getBfsCode(),
-				resource.getDescription()
-		);
+	private Profession toProfession(OccupationLabelMappingResource resource) {
+		return new Profession.Builder()
+				.setId(new ProfessionId(resource.getAvamCode()))
+				.setAvamCode(resource.getAvamCode())
+				.setSbn3Code(resource.getSbn3Code())
+				.setSbn5Code(resource.getSbn5Code())
+				.setChIsco3Code(resource.getChIsco3Code())
+				.setChIsco5Code(resource.getChIsco5Code())
+				.setBfsCode(resource.getBfsCode())
+				.setLabel(resource.getDescription())
+				.build();
 	}
 
 }

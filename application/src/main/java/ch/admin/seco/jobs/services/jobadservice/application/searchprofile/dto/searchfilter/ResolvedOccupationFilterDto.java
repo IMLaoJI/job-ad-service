@@ -93,10 +93,18 @@ public class ResolvedOccupationFilterDto {
 				.collect(Collectors.toList());
 	}
 
-	private static OccupationFilterType isClassification(ProfessionCodeType codeType) {
-		if (ProfessionCodeType.SBN3.equals(codeType) || ProfessionCodeType.SBN5.equals(codeType)) {
+	private static OccupationFilterType isClassification(final ProfessionCodeType codeType) {
+		if (isSBN(codeType) || isCHISCO(codeType) ) {
 			return OccupationFilterType.CLASSIFICATION;
 		}
 		return OccupationFilterType.OCCUPATION;
 	}
+
+    private static boolean isSBN(final ProfessionCodeType codeType) {
+        return ProfessionCodeType.SBN3.equals(codeType) || ProfessionCodeType.SBN5.equals(codeType);
+    }
+
+    private static boolean isCHISCO(final ProfessionCodeType codeType) {
+        return ProfessionCodeType.CHISCO3.equals(codeType) || ProfessionCodeType.CHISCO5.equals(codeType);
+    }
 }

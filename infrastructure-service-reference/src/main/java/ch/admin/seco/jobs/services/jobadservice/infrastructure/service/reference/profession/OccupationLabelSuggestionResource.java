@@ -4,11 +4,10 @@ import ch.admin.seco.jobs.services.jobadservice.domain.profession.Language;
 import ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType;
 
 import java.util.Map;
-import java.util.UUID;
 
 public class OccupationLabelSuggestionResource {
 
-    private UUID id;
+    private String id;
 
     private String code;
 
@@ -22,11 +21,11 @@ public class OccupationLabelSuggestionResource {
 
     private Map<ProfessionCodeType, String> mappings;
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 

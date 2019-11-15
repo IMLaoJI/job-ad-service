@@ -5,5 +5,7 @@ public enum ProfessionCodeType {
     SBN5,
     AVAM,
     BFS,
-    X28;
+    X28,
+    CHISCO5,
+    CHISCO3;
 }

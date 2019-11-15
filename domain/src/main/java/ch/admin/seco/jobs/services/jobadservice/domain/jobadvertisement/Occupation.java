@@ -1,16 +1,11 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement;
 
-import java.util.Objects;
-
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.ValueObject;
+
+import javax.persistence.*;
+import javax.validation.constraints.Size;
+import java.util.Objects;
 
 @Embeddable
 @Access(AccessType.FIELD)
@@ -26,6 +21,14 @@ public class Occupation implements ValueObject<Occupation> {
     // TODO @Size(max = 16)
     @Column(name = "SBN5_CODE")
     private String sbn5Code;
+
+    @Size(max= 3)
+    @Column(name = "CHISCO3_CODE")
+    private String chIsco3Code;
+
+    @Size(max= 5)
+    @Column(name = "CHISCO5_CODE")
+    private String chIsco5Code;
 
     // TODO @Size(max = 16)
     private String bfsCode;
@@ -49,6 +52,8 @@ public class Occupation implements ValueObject<Occupation> {
         this.avamOccupationCode = Condition.notBlank(builder.avamOccupationCode);
         this.sbn3Code = builder.sbn3Code;
         this.sbn5Code = builder.sbn5Code;
+        this.chIsco3Code = builder.chIsco3Code;
+        this.chIsco5Code = builder.chIsco5Code;
         this.bfsCode = builder.bfsCode;
         this.label = builder.label;
         this.workExperience = builder.workExperience;
@@ -70,6 +75,14 @@ public class Occupation implements ValueObject<Occupation> {
 
     public String getBfsCode() {
         return bfsCode;
+    }
+
+    public String getChIsco3Code() {
+        return chIsco3Code;
+    }
+
+    public String getChIsco5Code() {
+        return chIsco5Code;
     }
 
     public String getLabel() {
@@ -126,6 +139,8 @@ public class Occupation implements ValueObject<Occupation> {
         private String avamOccupationCode;
         private String sbn3Code;
         private String sbn5Code;
+        private String chIsco3Code;
+        private String chIsco5Code;
         private String bfsCode;
         private String label;
         private WorkExperience workExperience;
@@ -151,6 +166,16 @@ public class Occupation implements ValueObject<Occupation> {
 
         public Builder setSbn5Code(String sbn5Code) {
             this.sbn5Code = sbn5Code;
+            return this;
+        }
+
+        public Builder setChIsco3Code(String chIsco3Code) {
+            this.chIsco3Code = chIsco3Code;
+            return this;
+        }
+
+        public Builder setChIsco5Code(String chIsco5Code) {
+            this.chIsco5Code = chIsco5Code;
             return this;
         }
 

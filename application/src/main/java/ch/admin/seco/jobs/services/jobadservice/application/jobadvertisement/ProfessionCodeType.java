@@ -7,7 +7,9 @@ public enum ProfessionCodeType {
     X28,
     BFS,
     SBN3,
-    SBN5;
+    SBN5,
+    CHISCO5,
+    CHISCO3;
 
     @JsonCreator
     public static ProfessionCodeType fromString(String key) {

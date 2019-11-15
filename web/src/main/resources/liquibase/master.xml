@@ -43,5 +43,6 @@
     <include file="classpath:/liquibase/changelog/20190417090000_delete_task_tables.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20190503080000_added_job_search_profile_tables.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20190517080000_remove_geopoints_from_job_search_profile_table.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/liquibase/changelog/20190911080000_add_ch_isco_fields.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20191106180000_rename_to_external_job_advertisement_message_log_table.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
