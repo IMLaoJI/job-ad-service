@@ -1,19 +1,22 @@
 package ch.admin.seco.jobs.services.jobadservice.application;
 
-import static org.springframework.util.Assert.hasText;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
+import static org.springframework.util.Assert.hasText;
 
 public class BusinessLogEvent {
+	public static final String JOB_ADVERTISEMENT_FAVORITE_EVENT = "JOB_ADVERTISEMENT_FAVORITE";
+	public static final String JOB_ADVERTISEMENT_ACCESS = "JOB_ADVERTISEMENT_ACCESS";
+
+	public static final String JOB_ADVERTISEMENT = "JobAdvertisement";
+	public static final String OBJECT_TYPE_STATUS = "objectTypeStatus";
 
 	private String authorities;
 
 	private String eventType;
-
-	private String objectType;
 
 	private String objectId;
 
@@ -38,12 +41,7 @@ public class BusinessLogEvent {
 	}
 
 	public String getObjectType() {
-		return objectType;
-	}
-
-	public BusinessLogEvent withObjectType(String objectType) {
-		this.objectType = objectType;
-		return this;
+		return JOB_ADVERTISEMENT;
 	}
 
 	public BusinessLogEvent withObjectId(String objectId) {
@@ -62,11 +60,6 @@ public class BusinessLogEvent {
 		return this;
 	}
 
-	public BusinessLogEvent withAdditionalData(Map<String, Object> additionalData) {
-		additionalData.forEach(this::withAdditionalData);
-		return this;
-	}
-
 	public Map<String, Object> getAdditionalData() {
 		return additionalData;
 	}
@@ -75,7 +68,7 @@ public class BusinessLogEvent {
 	public String toString() {
 		return "BusinessLogEvent{" +
 				"eventType='" + eventType + '\'' +
-				", objectType='" + objectType + '\'' +
+				", objectType='" + getObjectType() + '\'' +
 				", objectId='" + objectId + '\'' +
 				", additionalData=" + additionalData +
 				'}';

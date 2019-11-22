@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEvent.JOB_ADVERTISEMENT_ACCESS;
+import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEvent.OBJECT_TYPE_STATUS;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.*;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.util.StringUtils.hasText;
@@ -53,7 +55,7 @@ public class JobAdvertisementApplicationService {
 
 	static final String COUNTRY_ISO_CODE_SWITZERLAND = "CH";
 
-	private static Logger LOG = LoggerFactory.getLogger(JobAdvertisementApplicationService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(JobAdvertisementApplicationService.class);
 
 	private final CurrentUserContext currentUserContext;
 
@@ -319,10 +321,9 @@ public class JobAdvertisementApplicationService {
 	@PreAuthorize("@jobAdvertisementAuthorizationService.canViewJob(#jobAdvertisementId)")
 	public JobAdvertisementDto getById(JobAdvertisementId jobAdvertisementId) throws AggregateNotFoundException {
 		JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
-		BusinessLogEvent logData = new BusinessLogEvent("JOB_ADVERTISEMENT_ACCESS")
-				.withObjectType("JobAdvertisement")
+		BusinessLogEvent logData = new BusinessLogEvent(JOB_ADVERTISEMENT_ACCESS)
 				.withObjectId(jobAdvertisementId.getValue())
-				.withAdditionalData("objectTypeStatus", jobAdvertisement.getStatus());
+				.withAdditionalData(OBJECT_TYPE_STATUS, jobAdvertisement.getStatus());
 		this.businessLogger.log(logData);
 
 		return JobAdvertisementDto.toDto(jobAdvertisement);

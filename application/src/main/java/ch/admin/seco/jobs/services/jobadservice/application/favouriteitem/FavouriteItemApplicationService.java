@@ -1,5 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.application.favouriteitem;
 
+import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEvent;
+import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogger;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.FavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.create.CreateFavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.update.UpdateFavouriteItemDto;
@@ -14,6 +16,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.events.Favo
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,19 +25,27 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEvent.JOB_ADVERTISEMENT_FAVORITE_EVENT;
+import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEvent.OBJECT_TYPE_STATUS;
+
 @Service
 @Transactional
 public class FavouriteItemApplicationService {
-
-    private static Logger LOG = LoggerFactory.getLogger(FavouriteItemApplicationService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FavouriteItemApplicationService.class);
 
     private final FavouriteItemRepository favouriteItemRepository;
 
     private final JobAdvertisementRepository jobAdvertisementRepository;
 
-    public FavouriteItemApplicationService(FavouriteItemRepository favouriteItemRepository, JobAdvertisementRepository jobAdvertisementRepository) {
+    private final BusinessLogger businessLogger;
+
+    public FavouriteItemApplicationService(
+            FavouriteItemRepository favouriteItemRepository,
+            JobAdvertisementRepository jobAdvertisementRepository,
+            BusinessLogger businessLogger) {
         this.favouriteItemRepository = favouriteItemRepository;
         this.jobAdvertisementRepository = jobAdvertisementRepository;
+        this.businessLogger = businessLogger;
     }
 
     @PreAuthorize("isAuthenticated() and @favouriteItemAuthorizationService.matchesCurrentUserId(#createFavouriteItemDto.ownerUserId)")
@@ -56,9 +67,22 @@ public class FavouriteItemApplicationService {
                 .setJobAdvertisementId(createFavouriteItemDto.getJobAdvertisementId()).build();
 
         FavouriteItem newFavouriteItem = this.favouriteItemRepository.save(favouriteItem);
-        LOG.debug("Favourite Item {} has been created for user {}.", newFavouriteItem.getId().getValue(), newFavouriteItem.getOwnerUserId());
+        String ownerUserId = newFavouriteItem.getOwnerUserId();
+        LOG.debug("Favourite Item {} has been created for user {}.", newFavouriteItem.getId().getValue(), ownerUserId);
+
+        createBusinessLogEntry(newFavouriteItem);
+
         DomainEventPublisher.publish(new FavouriteItemCreatedEvent(newFavouriteItem));
         return FavouriteItemDto.toDto(newFavouriteItem);
+    }
+
+    private void createBusinessLogEntry(FavouriteItem newFavouriteItem) {
+        JobAdvertisementId jobAdvertisementId = newFavouriteItem.getJobAdvertisementId();
+        JobAdvertisementStatus jobAdStatus = jobAdvertisementRepository.getOne(jobAdvertisementId).getStatus();
+        BusinessLogEvent logData = new BusinessLogEvent(JOB_ADVERTISEMENT_FAVORITE_EVENT)
+                .withObjectId(jobAdvertisementId.getValue())
+                .withAdditionalData(OBJECT_TYPE_STATUS, jobAdStatus);
+        this.businessLogger.log(logData);
     }
 
     @PreAuthorize("isAuthenticated() && @favouriteItemAuthorizationService.isCurrentUserOwner(#updateFavouriteItemDto.id)")
