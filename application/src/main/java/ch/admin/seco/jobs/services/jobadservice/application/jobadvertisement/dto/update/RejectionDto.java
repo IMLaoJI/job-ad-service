@@ -21,17 +21,20 @@ public class RejectionDto {
 
     private String jobCenterCode;
 
+    private String jobCenterUserId;
+
     protected RejectionDto() {
         // For reflection libs
     }
 
-    public RejectionDto(String stellennummerEgov, String stellennummerAvam, LocalDate date, String code, String reason, String jobCenterCode) {
+    public RejectionDto(String stellennummerEgov, String stellennummerAvam, LocalDate date, String code, String reason, String jobCenterCode, String jobCenterUserId) {
         this.stellennummerEgov = stellennummerEgov;
         this.stellennummerAvam = stellennummerAvam;
         this.date = date;
         this.code = code;
         this.reason = reason;
         this.jobCenterCode = jobCenterCode;
+        this.jobCenterUserId = jobCenterUserId;
     }
 
     public String getStellennummerEgov() {
@@ -80,5 +83,13 @@ public class RejectionDto {
 
     public void setJobCenterCode(String jobCenterCode) {
         this.jobCenterCode = jobCenterCode;
+    }
+
+    public String getJobCenterUserId() {
+        return jobCenterUserId;
+    }
+
+    public void setJobCenterUserId(String jobCenterUserId) {
+        this.jobCenterUserId = jobCenterUserId;
     }
 }

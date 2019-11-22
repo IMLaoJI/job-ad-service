@@ -16,7 +16,7 @@ public class JobAdvertisementUpdater {
     static final String SECTION_JOBDESCRIPTION = "SECTION_JOBDESCRIPTION";
     static final String SECTION_PUBLICATION = "SECTION_PUBLICATION";
     static final String SECTION_EMPLOYMENT = "SECTION_EMPLOYMENT";
-    static final String SECTION_JOB_CENTER_CODE = "SECTION_JOB_CENTER_CODE";
+    static final String SECTION_JOB_CENTER = "SECTION_JOB_CENTER";
     static final String SECTION_APPLY_CHANNEL = "SECTION_APPLY_CHANNEL";
     static final String SECTION_DISPLAY_APPLY_CHANNEL = "SECTION_DISPLAY_APPLY_CHANNEL";
     static final String SECTION_DISPLAY_COMPANY = "SECTION_DISPLAY_COMPANY";
@@ -48,6 +48,8 @@ public class JobAdvertisementUpdater {
     private Employment employment;
 
     private String jobCenterCode;
+
+    private String jobCenterUserId;
 
     private ApplyChannel displayApplyChannel;
 
@@ -81,6 +83,7 @@ public class JobAdvertisementUpdater {
         this.description = builder.description;
         this.employment = builder.employment;
         this.jobCenterCode = builder.jobCenterCode;
+        this.jobCenterUserId = builder.jobCenterUserId;
         this.applyChannel = builder.applyChannel;
         this.displayApplyChannel = builder.displayApplyChannel;
         this.displayCompany = builder.displayCompany;
@@ -137,6 +140,10 @@ public class JobAdvertisementUpdater {
         return jobCenterCode;
     }
 
+    public String getJobCenterUserId() {
+        return jobCenterUserId;
+    }
+
     public ApplyChannel getApplyChannel() {
         return applyChannel;
     }
@@ -190,6 +197,7 @@ public class JobAdvertisementUpdater {
         private String description;
         private Employment employment;
         private String jobCenterCode;
+        private String jobCenterUserId;
         private ApplyChannel applyChannel;
         private ApplyChannel displayApplyChannel;
         private Company displayCompany;
@@ -248,8 +256,14 @@ public class JobAdvertisementUpdater {
         }
 
         public Builder setJobCenterCode(String jobCenterCode) {
-            this.changedSections.add(SECTION_JOB_CENTER_CODE);
+            this.changedSections.add(SECTION_JOB_CENTER);
             this.jobCenterCode = jobCenterCode;
+            return this;
+        }
+
+        public Builder setJobCenterUserId(String jobCenterUserId) {
+            this.changedSections.add(SECTION_JOB_CENTER);
+            this.jobCenterUserId = jobCenterUserId;
             return this;
         }
 

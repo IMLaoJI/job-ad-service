@@ -31,6 +31,7 @@ public class JobAdvertisementFixture {
                 .setFingerprint("fingerprint")
                 .setReportingObligationEndDate(now().plusWeeks(4))
                 .setJobCenterCode("12345")
+                .setJobCenterUserId("14711")
                 .setApprovalDate(now().plusWeeks(3))
                 .setRejectionDate(now().plusWeeks(2))
                 .setRejectionCode("1234")

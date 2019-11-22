@@ -31,6 +31,7 @@ public class UpdateJobAdvertisementFromAvamDtoTestFixture {
                 jobAdvertisement.isReportingObligation(),
                 jobAdvertisement.getReportingObligationEndDate(),
                 jobAdvertisement.getJobCenterCode(),
+                jobAdvertisement.getJobCenterUserId(),
                 jobAdvertisement.getApprovalDate(),
                 EmploymentDto.toDto(jobContent.getEmployment()),
                 ApplyChannelDto.toDto(jobContent.getApplyChannel()), // This is only for test purpose. Generally only the displayApplyChannel is converted to ApplyChannelDto

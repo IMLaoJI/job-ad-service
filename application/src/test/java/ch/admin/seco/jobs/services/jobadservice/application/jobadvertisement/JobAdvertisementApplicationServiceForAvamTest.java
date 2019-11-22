@@ -182,6 +182,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         // then
         JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
         assertThat(repoJobAd.getJobCenterCode()).isEqualTo(createJobAdvertisementDto.getJobCenterCode());
+        assertThat(repoJobAd.getJobCenterUserId()).isEqualTo(createJobAdvertisementDto.getJobCenterUserId());
     }
 
     @Test
@@ -239,6 +240,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         assertThat(jobAdvertisement.isReportingObligation()).isEqualTo(approvalDto.isReportingObligation());
         assertThat(jobAdvertisement.getReportingObligationEndDate()).isEqualTo(approvalDto.getReportingObligationEndDate());
         assertThat(jobAdvertisement.getJobCenterCode()).isEqualTo(approvalDto.getJobCenterCode());
+        assertThat(jobAdvertisement.getJobCenterUserId()).isEqualTo(approvalDto.getJobCenterUserId());
         assertThat(jobAdvertisement.getStatus()).isEqualTo(APPROVED);
         domainEventMockUtils.assertSingleDomainEventPublished(JOB_ADVERTISEMENT_APPROVED.getDomainEventType());
     }
@@ -265,6 +267,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         assertThat(jobAdvertisement.isReportingObligation()).isEqualTo(approvalDto.isReportingObligation());
         assertThat(jobAdvertisement.getReportingObligationEndDate()).isEqualTo(approvalDto.getReportingObligationEndDate());
         assertThat(jobAdvertisement.getJobCenterCode()).isEqualTo(approvalDto.getJobCenterCode());
+        assertThat(jobAdvertisement.getJobCenterUserId()).isEqualTo(approvalDto.getJobCenterUserId());
         assertThat(jobAdvertisement.getStatus()).isEqualTo(APPROVED);
         assertThat(jobAdvertisement.getJobContent().getJobDescriptions().get(0).getDescription()).isEqualTo("OTHER VALUE");
         domainEventMockUtils.assertMultipleDomainEventPublished(2, JOB_ADVERTISEMENT_UPDATED.getDomainEventType());
@@ -290,6 +293,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         assertThat(repoJobAd.getRejectionCode()).isEqualTo("code");
         assertThat(repoJobAd.getRejectionReason()).isEqualTo("reason");
         assertThat(repoJobAd.getJobCenterCode()).isEqualTo("jobcenterid");
+        assertThat(repoJobAd.getJobCenterUserId()).isEqualTo("14711");
         assertThat(repoJobAd.getStatus()).isEqualTo(REJECTED);
         domainEventMockUtils.assertSingleDomainEventPublished(JOB_ADVERTISEMENT_REJECTED.getDomainEventType());
     }

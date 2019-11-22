@@ -28,6 +28,7 @@ public class ApprovalDtoTestFixture {
                 updateJobAdAvamDto.isReportingObligation(),
                 updateJobAdAvamDto.getReportingObligationEndDate(),
                 updateJobAdAvamDto.getJobCenterCode(),
+                updateJobAdAvamDto.getJobCenterUserId(),
                 updateJobAdAvamDto
         );
     }

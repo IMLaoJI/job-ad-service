@@ -15,6 +15,7 @@ public class JobAdvertisementCreator {
     private LocalDate reportingObligationEndDate;
     private boolean reportToAvam;
     private String jobCenterCode;
+    private String jobCenterUserId;
     private LocalDate approvalDate;
     private JobContent jobContent;
     private Contact contact;
@@ -30,6 +31,7 @@ public class JobAdvertisementCreator {
         this.reportingObligationEndDate = builder.reportingObligationEndDate;
         this.reportToAvam = builder.reportToAvam;
         this.jobCenterCode = builder.jobCenterCode;
+        this.jobCenterUserId = builder.jobCenterUserId;
         this.approvalDate = builder.approvalDate;
         this.jobContent = builder.jobContent;
         this.contact = builder.contact;
@@ -72,6 +74,10 @@ public class JobAdvertisementCreator {
         return jobCenterCode;
     }
 
+    public String getJobCenterUserId() {
+        return jobCenterUserId;
+    }
+
     public LocalDate getApprovalDate() {
         return approvalDate;
     }
@@ -98,6 +104,7 @@ public class JobAdvertisementCreator {
         private LocalDate reportingObligationEndDate;
         private boolean reportToAvam;
         private String jobCenterCode;
+        private String jobCenterUserId;
         private LocalDate approvalDate;
         private JobContent jobContent;
         private Contact contact;
@@ -151,6 +158,11 @@ public class JobAdvertisementCreator {
             return this;
         }
 
+        public Builder setJobCenterUserId(String jobCenterUserId) {
+            this.jobCenterUserId = jobCenterUserId;
+            return this;
+        }
+
         public Builder setApprovalDate(LocalDate approvalDate) {
             this.approvalDate = approvalDate;
             return this;
@@ -170,6 +182,7 @@ public class JobAdvertisementCreator {
             this.publication = publication;
             return this;
         }
+
     }
 
 }

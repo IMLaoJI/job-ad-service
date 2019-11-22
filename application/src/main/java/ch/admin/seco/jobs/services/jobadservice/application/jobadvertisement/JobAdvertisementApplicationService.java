@@ -173,6 +173,7 @@ public class JobAdvertisementApplicationService {
 				.setReportingObligation(createJobAdvertisementFromAvamDto.isReportingObligation())
 				.setReportingObligationEndDate(createJobAdvertisementFromAvamDto.getReportingObligationEndDate())
 				.setJobCenterCode(createJobAdvertisementFromAvamDto.getJobCenterCode())
+				.setJobCenterUserId(createJobAdvertisementFromAvamDto.getJobCenterUserId())
 				.setApprovalDate(createJobAdvertisementFromAvamDto.getApprovalDate())
 				.setJobContent(jobContent)
 				.setContact(toContact(createJobAdvertisementFromAvamDto.getContact()))
@@ -377,7 +378,7 @@ public class JobAdvertisementApplicationService {
 		if (jobAdvertisement.getStatus().equals(INSPECTING) || jobAdvertisement.getStatus().equals(REJECTED)) {
 			LOG.debug("Starting approve for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
 			jobAdvertisement.approve(approvalDto.getStellennummerAvam(), approvalDto.getDate(), approvalDto.isReportingObligation(),
-					approvalDto.getReportingObligationEndDate(), approvalDto.getJobCenterCode());
+					approvalDto.getReportingObligationEndDate(), approvalDto.getJobCenterCode(), approvalDto.getJobCenterUserId());
 		}
 		// FIXME This is a workaround when updating after approval, until AVAM add an actionType on there message.
 		LOG.debug("Starting UPDATE for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
@@ -392,7 +393,7 @@ public class JobAdvertisementApplicationService {
 
 	public void updateJobCenter(String code) {
 		JobCenter jobCenter = jobCenterService.findJobCenterByCode(code);
-		this.updateGivenJobCenter(jobCenter);
+        this.updateGivenJobCenter(jobCenter);
 	}
 
 	private void updateGivenJobCenter(JobCenter jobCenter) {
@@ -425,6 +426,7 @@ public class JobAdvertisementApplicationService {
 				.setJobDescription(createJobAdvertisement.getTitle(), createJobAdvertisement.getDescription())
 				.setReportingObligation(createJobAdvertisement.isReportingObligation(), createJobAdvertisement.getReportingObligationEndDate())
 				.setJobCenterCode(createJobAdvertisement.getJobCenterCode())
+				.setJobCenterUserId(createJobAdvertisement.getJobCenterUserId())
 				.setDisplayCompany(determineDisplayCompany(createJobAdvertisement))
 				.setCompany(company)
 				.setEmployment(toEmployment(createJobAdvertisement.getEmployment()))
@@ -453,6 +455,7 @@ public class JobAdvertisementApplicationService {
 				.setNumberOfJobs(updateJobAdvertisement.getNumberOfJobs())
 				.setJobDescription(updateJobAdvertisement.getTitle(), updateJobAdvertisement.getDescription())
 				.setJobCenterCode(updateJobAdvertisement.getJobCenterCode())
+				.setJobCenterUserId(updateJobAdvertisement.getJobCenterUserId())
 				.setDisplayCompany(determineDisplayCompany(updateJobAdvertisement))
 				.setCompany(company)
 				.setEmployment(toEmployment(updateJobAdvertisement.getEmployment()))
@@ -478,7 +481,8 @@ public class JobAdvertisementApplicationService {
 		Condition.notNull(rejectionDto.getStellennummerEgov(), "StellennummerEgov can't be null");
 		JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerEgov(rejectionDto.getStellennummerEgov());
 		LOG.debug("Starting reject for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
-		jobAdvertisement.reject(rejectionDto.getStellennummerAvam(), rejectionDto.getDate(), rejectionDto.getCode(), rejectionDto.getReason(), rejectionDto.getJobCenterCode());
+        jobAdvertisement.reject(rejectionDto.getStellennummerAvam(), rejectionDto.getDate(), rejectionDto.getCode(),
+                rejectionDto.getReason(), rejectionDto.getJobCenterCode(), rejectionDto.getJobCenterUserId());
 	}
 
 	// FIXME @PreAuthorize("@jobAdvertisementAuthorizationService.canCancel(jobAdvertisementId, token)")
