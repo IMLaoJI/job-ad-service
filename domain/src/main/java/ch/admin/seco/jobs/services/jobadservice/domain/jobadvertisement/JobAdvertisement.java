@@ -57,6 +57,8 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
 
     private String jobCenterCode;
 
+    private String jobCenterUserId;
+
     private LocalDate approvalDate;
 
     private LocalDate rejectionDate;
@@ -130,6 +132,7 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
         this.reportingObligationEndDate = builder.reportingObligationEndDate;
         this.reportToAvam = builder.reportToAvam;
         this.jobCenterCode = builder.jobCenterCode;
+        this.jobCenterUserId = builder.jobCenterUserId;
         this.approvalDate = builder.approvalDate;
         this.rejectionDate = builder.rejectionDate;
         this.rejectionCode = builder.rejectionCode;
@@ -193,6 +196,10 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
 
     public String getJobCenterCode() {
         return jobCenterCode;
+    }
+
+    public String getJobCenterUserId() {
+        return jobCenterUserId;
     }
 
     public LocalDate getApprovalDate() {
@@ -269,7 +276,8 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
         DomainEventPublisher.publish(new JobAdvertisementInspectingEvent(this));
     }
 
-    public void approve(String stellennummerAvam, LocalDate date, boolean reportingObligation, LocalDate reportingObligationEndDate, String jobCenterCode) {
+    public void approve(String stellennummerAvam, LocalDate date, boolean reportingObligation,
+                        LocalDate reportingObligationEndDate, String jobCenterCode, String jobCenterUserId) {
 
         if (reportingObligation) {
             Condition.notNull(reportingObligationEndDate, "Reporting obligation end date is missing");
@@ -283,7 +291,7 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
         this.cancellationCode = null;
         this.cancellationDate = null;
 
-        ChangeLog changeLog = applyApprove(reportingObligation, reportingObligationEndDate, jobCenterCode);
+        ChangeLog changeLog = applyApprove(reportingObligation, reportingObligationEndDate, jobCenterCode, jobCenterUserId);
         this.status = status.validateTransitionTo(JobAdvertisementStatus.APPROVED);
         this.updatedTime = TimeMachine.now();
 
@@ -303,12 +311,13 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
         DomainEventPublisher.publish(new JobAdvertisementPublishExpiredEvent(this));
     }
 
-    public void reject(String stellennummerAvam, LocalDate date, String code, String reason, String jobCenterCode) {
+    public void reject(String stellennummerAvam, LocalDate date, String code, String reason, String jobCenterCode, String jobCenterUserId) {
         this.stellennummerAvam = stellennummerAvam;
         this.rejectionDate = Condition.notNull(date);
         this.rejectionCode = Condition.notBlank(code);
         this.rejectionReason = reason;
         this.jobCenterCode = jobCenterCode;
+        this.jobCenterUserId = jobCenterUserId;
         this.status = status.validateTransitionTo(JobAdvertisementStatus.REJECTED);
         this.updatedTime = TimeMachine.now();
         DomainEventPublisher.publish(new JobAdvertisementRejectedEvent(this));
@@ -411,6 +420,7 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
                 ", reportingObligationEndDate=" + reportingObligationEndDate +
                 ", reportToAvam=" + reportToAvam +
                 ", jobCenterCode='" + jobCenterCode + '\'' +
+                ", jobCenterUserId='" + jobCenterUserId + '\'' +
                 ", approvalDate=" + approvalDate +
                 ", rejectionDate=" + rejectionDate +
                 ", rejectionCode='" + rejectionCode + '\'' +
@@ -462,7 +472,7 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
         Condition.isTrue(violations.isEmpty(), String.valueOf(violations.getMessages()));
     }
 
-    private ChangeLog applyApprove(boolean reportingObligation, LocalDate reportingObligationEndDate, String jobCenterCode) {
+    private ChangeLog applyApprove(boolean reportingObligation, LocalDate reportingObligationEndDate, String jobCenterCode, String jobCenterUserId) {
         ChangeLog changeLog = new ChangeLog();
 
         if (hasChanged(this.reportingObligation, reportingObligation)) {
@@ -476,6 +486,11 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
         if (hasChanged(this.jobCenterCode, jobCenterCode)) {
             changeLog.add("jobCenterCode", this.jobCenterCode, jobCenterCode);
             this.jobCenterCode = jobCenterCode;
+        }
+
+        if (hasChanged(this.jobCenterUserId, jobCenterUserId)) {
+            changeLog.add("jobCenterUserId", this.jobCenterUserId, jobCenterUserId);
+            this.jobCenterUserId = jobCenterUserId;
         }
 
         return changeLog;
@@ -494,7 +509,7 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
             getJobContent().setX28OccupationCodes(updater.getX28OccupationCodes());
         }
 
-        if (updater.hasAnyChangesIn(SECTION_NUMBER_OF_JOBS) && hasChanged(jobContent.getNumberOfJobs(), updater.getNumberOfJobs())) { // h
+        if (updater.hasAnyChangesIn(SECTION_NUMBER_OF_JOBS) && hasChanged(jobContent.getNumberOfJobs(), updater.getNumberOfJobs())) {
             changeLog.add("numberOfJobs", jobContent.getNumberOfJobs(), updater.getNumberOfJobs());
             jobContent.setNumberOfJobs(updater.getNumberOfJobs());
         }
@@ -519,12 +534,17 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
             }
         }
 
-        if (updater.hasAnyChangesIn(SECTION_JOB_CENTER_CODE) && hasChanged(jobCenterCode, updater.getJobCenterCode())) { //
+        if (updater.hasAnyChangesIn(SECTION_JOB_CENTER) && hasChanged(jobCenterCode, updater.getJobCenterCode())) {
             changeLog.add("jobCenterCode", jobCenterCode, updater.getJobCenterCode());
             jobCenterCode = updater.getJobCenterCode();
         }
 
-        if (updater.hasAnyChangesIn(SECTION_DISPLAY_COMPANY) && hasChanged(jobContent.getDisplayCompany(), updater.getDisplayCompany())) { //
+        if (updater.hasAnyChangesIn(SECTION_JOB_CENTER) && hasChanged(jobCenterUserId, updater.getJobCenterUserId())) {
+            changeLog.add("jobCenterUserId", jobCenterUserId, updater.getJobCenterUserId());
+            jobCenterUserId = updater.getJobCenterUserId();
+        }
+
+        if (updater.hasAnyChangesIn(SECTION_DISPLAY_COMPANY) && hasChanged(jobContent.getDisplayCompany(), updater.getDisplayCompany())) {
             changeLog.add("displayCompany", jobContent.getDisplayCompany(), updater.getDisplayCompany());
             jobContent.setDisplayCompany(updater.getDisplayCompany());
         }
@@ -607,6 +627,7 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
         private LocalDate reportingObligationEndDate;
         private boolean reportToAvam;
         private String jobCenterCode;
+        private String jobCenterUserId;
         private LocalDate approvalDate;
         private LocalDate rejectionDate;
         private String rejectionCode;
@@ -677,6 +698,11 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
 
         public Builder setJobCenterCode(String jobCenterCode) {
             this.jobCenterCode = jobCenterCode;
+            return this;
+        }
+
+        public Builder setJobCenterUserId(String jobCenterUserId) {
+            this.jobCenterUserId = jobCenterUserId;
             return this;
         }
 

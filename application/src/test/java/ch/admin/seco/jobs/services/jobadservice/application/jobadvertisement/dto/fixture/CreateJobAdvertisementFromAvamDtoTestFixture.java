@@ -39,7 +39,7 @@ public class CreateJobAdvertisementFromAvamDtoTestFixture {
                 null,
                 true,
                 LocalDate.of(2018, 1, 1),
-                "jobCenter",
+                "jobCenter", "14711",
                 now(),
                 new EmploymentDto()
                         .setStartDate(LocalDate.of(2018, 1, 1))

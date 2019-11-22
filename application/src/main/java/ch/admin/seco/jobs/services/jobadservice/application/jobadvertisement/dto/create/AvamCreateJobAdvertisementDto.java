@@ -39,6 +39,8 @@ public class AvamCreateJobAdvertisementDto {
 
     private String jobCenterCode;
 
+    private String jobCenterUserId;
+
     @NotNull
     private LocalDate approvalDate;
 
@@ -66,14 +68,16 @@ public class AvamCreateJobAdvertisementDto {
     @NotNull
     private PublicationDto publication;
 
+
     protected AvamCreateJobAdvertisementDto() {
         // For reflection libs
     }
 
     public AvamCreateJobAdvertisementDto(String stellennummerAvam, String title, String description, String languageIsoCode, String numberOfJobs,
-                                         boolean reportingObligation, LocalDate reportingObligationEndDate, String jobCenterCode, LocalDate approvalDate,
+                                         boolean reportingObligation, LocalDate reportingObligationEndDate, String jobCenterCode, String jobCenterUserId, LocalDate approvalDate,
                                          EmploymentDto employment, ApplyChannelDto applyChannel, CompanyDto company, ContactDto contact, CreateLocationDto location,
-                                         List<OccupationDto> occupations, List<LanguageSkillDto> languageSkills, PublicationDto publication, PublicContactDto publicContact) {
+                                         List<OccupationDto> occupations, List<LanguageSkillDto> languageSkills, PublicationDto publication, PublicContactDto publicContact
+    ) {
         this.stellennummerAvam = stellennummerAvam;
         this.title = title;
         this.description = description;
@@ -82,6 +86,7 @@ public class AvamCreateJobAdvertisementDto {
         this.reportingObligation = reportingObligation;
         this.reportingObligationEndDate = reportingObligationEndDate;
         this.jobCenterCode = jobCenterCode;
+        this.jobCenterUserId = jobCenterUserId;
         this.approvalDate = approvalDate;
         this.employment = employment;
         this.applyChannel = applyChannel;
@@ -92,6 +97,7 @@ public class AvamCreateJobAdvertisementDto {
         this.languageSkills = languageSkills;
         this.publication = publication;
         this.publicContact = publicContact;
+
     }
 
     public String getStellennummerAvam() {
@@ -140,6 +146,14 @@ public class AvamCreateJobAdvertisementDto {
 
     public void setJobCenterCode(String jobCenterCode) {
         this.jobCenterCode = jobCenterCode;
+    }
+
+    public String getJobCenterUserId() {
+        return jobCenterUserId;
+    }
+
+    public void setJobCenterUserId(String jobCenterUserId) {
+        this.jobCenterUserId = jobCenterUserId;
     }
 
     public LocalDate getApprovalDate() {
