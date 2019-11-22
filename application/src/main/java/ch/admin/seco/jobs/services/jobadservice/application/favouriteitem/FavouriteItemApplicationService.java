@@ -67,8 +67,7 @@ public class FavouriteItemApplicationService {
                 .setJobAdvertisementId(createFavouriteItemDto.getJobAdvertisementId()).build();
 
         FavouriteItem newFavouriteItem = this.favouriteItemRepository.save(favouriteItem);
-        String ownerUserId = newFavouriteItem.getOwnerUserId();
-        LOG.debug("Favourite Item {} has been created for user {}.", newFavouriteItem.getId().getValue(), ownerUserId);
+        LOG.debug("Favourite Item {} has been created for user {}.", newFavouriteItem.getId().getValue(), newFavouriteItem.getOwnerUserId());
 
         createBusinessLogEntry(newFavouriteItem);
 
