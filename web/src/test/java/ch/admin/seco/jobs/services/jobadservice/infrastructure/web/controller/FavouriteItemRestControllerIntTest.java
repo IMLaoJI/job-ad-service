@@ -32,7 +32,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Optional;
 
-import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEvent.*;
+import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogConstants.BUSINESS_LOG_TYPE;
+import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogConstants.STATUS_ADDITIONAL_DATA;
+import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEventType.JOB_ADVERTISEMENT_FAVORITE_EVENT;
 import static ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemIdFixture.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
@@ -40,7 +42,7 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
@@ -96,11 +98,11 @@ public class FavouriteItemRestControllerIntTest {
         verify(businessLogger).log(argumentCaptor.capture());
         BusinessLogData logData = argumentCaptor.getValue();
 
-        assertThat(logData.getEventType()).isEqualTo(JOB_ADVERTISEMENT_FAVORITE_EVENT);
-        assertThat(logData.getObjectType()).isEqualTo(JOB_ADVERTISEMENT);
+        assertThat(logData.getEventType()).isEqualTo(JOB_ADVERTISEMENT_FAVORITE_EVENT.name());
+        assertThat(logData.getObjectType()).isEqualTo(BUSINESS_LOG_TYPE);
         assertThat(logData.getObjectId()).isEqualTo(job01.id().getValue());
         assertThat(logData.getAuthorities()).isEqualTo(Role.JOBSEEKER_CLIENT.getValue());
-        assertThat(logData.getAdditionalData().get(OBJECT_TYPE_STATUS)).isEqualTo(JobAdvertisementStatus.PUBLISHED_PUBLIC);
+        assertThat(logData.getAdditionalData().get(STATUS_ADDITIONAL_DATA)).isEqualTo(JobAdvertisementStatus.PUBLISHED_PUBLIC);
 
         String contentAsString = post.andReturn().getResponse().getContentAsString();
         JSONArray ja = new JSONArray("[" + contentAsString + "]");
