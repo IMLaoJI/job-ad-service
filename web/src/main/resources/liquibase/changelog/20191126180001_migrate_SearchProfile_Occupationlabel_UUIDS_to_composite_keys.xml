@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+    <changeSet id="20191126180001-1" author="fago">
+        <createTable tableName="search_profiles_old_new_id_mapping">
+            <column name="label_id_old" type="varchar(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="label_id_new" type="varchar(36)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20191126180001-2" author="fago" runOnChange="true">
+        <validCheckSum>ANY</validCheckSum>
+        <delete tableName="search_profiles_old_new_id_mapping">
+        </delete>
+        <loadData file="liquibase/changelog/data/search_profiles_old_new_id_mapping.csv"
+                  tableName="search_profiles_old_new_id_mapping"/>
+    </changeSet>
+
+
+</databaseChangeLog>
