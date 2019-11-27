@@ -32,9 +32,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Optional;
 
-import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogConstants.BUSINESS_LOG_TYPE;
 import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogConstants.STATUS_ADDITIONAL_DATA;
 import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEventType.JOB_ADVERTISEMENT_FAVORITE_EVENT;
+import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogObjectType.JOB_ADVERTISEMENT_LOG;
 import static ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemIdFixture.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
@@ -98,8 +98,8 @@ public class FavouriteItemRestControllerIntTest {
         verify(businessLogger).log(argumentCaptor.capture());
         BusinessLogData logData = argumentCaptor.getValue();
 
-        assertThat(logData.getEventType()).isEqualTo(JOB_ADVERTISEMENT_FAVORITE_EVENT.name());
-        assertThat(logData.getObjectType()).isEqualTo(BUSINESS_LOG_TYPE);
+        assertThat(logData.getEventType()).isEqualTo(JOB_ADVERTISEMENT_FAVORITE_EVENT.getTypeName());
+        assertThat(logData.getObjectType()).isEqualTo(JOB_ADVERTISEMENT_LOG.getTypeName());
         assertThat(logData.getObjectId()).isEqualTo(job01.id().getValue());
         assertThat(logData.getAuthorities()).isEqualTo(Role.JOBSEEKER_CLIENT.getValue());
         assertThat(logData.getAdditionalData().get(STATUS_ADDITIONAL_DATA)).isEqualTo(JobAdvertisementStatus.PUBLISHED_PUBLIC);

@@ -1,6 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.application.favouriteitem;
 
-import ch.admin.seco.alv.shared.logger.business.BusinessLogData;
+import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEvent;
 import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogger;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.FavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.create.CreateFavouriteItemDto;
@@ -31,9 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogConstants.BUSINESS_LOG_TYPE;
 import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogConstants.STATUS_ADDITIONAL_DATA;
 import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEventType.JOB_ADVERTISEMENT_FAVORITE_EVENT;
+import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogObjectType.JOB_ADVERTISEMENT_LOG;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.FavouriteItemIdFixture.FAV_ID_5;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.FavouriteItemIdFixture.UNKNOWN;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
@@ -102,11 +102,11 @@ public class FavouriteItemApplicationServiceTest {
         assertThat(createdFavouriteItem.get().getNote()).isEqualTo(createFavouriteItemDto.getNote());
         domainEventMockUtils.assertSingleDomainEventPublished(FavouriteItemEvents.FAVOURITE_ITEM_CREATED.getDomainEventType());
 
-        ArgumentCaptor<BusinessLogData> argumentCaptor = ArgumentCaptor.forClass(BusinessLogData.class);
+        ArgumentCaptor<BusinessLogEvent> argumentCaptor = ArgumentCaptor.forClass(BusinessLogEvent.class);
         verify(businessLogger, times(1)).log(argumentCaptor.capture());
-        BusinessLogData businessLogEvent = argumentCaptor.getValue();
-        assertThat(businessLogEvent.getEventType()).isEqualTo(JOB_ADVERTISEMENT_FAVORITE_EVENT.name());
-        assertThat(businessLogEvent.getObjectType()).isEqualTo(BUSINESS_LOG_TYPE);
+        BusinessLogEvent businessLogEvent = argumentCaptor.getValue();
+        assertThat(businessLogEvent.getEventType()).isEqualTo(JOB_ADVERTISEMENT_FAVORITE_EVENT);
+        assertThat(businessLogEvent.getObjectType()).isEqualTo(JOB_ADVERTISEMENT_LOG);
         assertThat(businessLogEvent.getObjectId()).isEqualTo(jobAdId.getValue());
         assertThat(businessLogEvent.getAdditionalData().get(STATUS_ADDITIONAL_DATA)).isEqualTo(jobAdvertisement.getStatus());
         // Testing the user role is not straight forward:
