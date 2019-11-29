@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.application;
 
+import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -18,7 +19,7 @@ public class BusinessLogEvent {
 	private Map<String, Object> additionalData = new HashMap<>();
 
 	public BusinessLogEvent(BusinessLogEventType eventType) {
-		this.eventType = eventType;
+		this.eventType = Condition.notNull(eventType, "Event type must not be empty!");
 	}
 
 	public String getAuthorities() {
