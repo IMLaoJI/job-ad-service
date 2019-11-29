@@ -91,7 +91,7 @@ public class FavouriteItemApplicationServiceTest {
                                 .build()).build();
 
         when(jobAdvertisementRepository.existsById(any())).thenReturn(true);
-        when(jobAdvertisementRepository.getOne(any())).thenReturn(jobAdvertisement);
+        when(jobAdvertisementRepository.findById(eq(jobAdId))).thenReturn(Optional.of(jobAdvertisement));
 
         //when
         FavouriteItemDto favouriteItemDto = this.sut.create(createFavouriteItemDto);
