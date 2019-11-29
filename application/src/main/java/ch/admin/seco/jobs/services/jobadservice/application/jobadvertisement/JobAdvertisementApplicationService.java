@@ -323,7 +323,8 @@ public class JobAdvertisementApplicationService {
 	@PreAuthorize("@jobAdvertisementAuthorizationService.canViewJob(#jobAdvertisementId)")
 	public JobAdvertisementDto getById(JobAdvertisementId jobAdvertisementId) throws AggregateNotFoundException {
 		JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
-		BusinessLogEvent logData = new BusinessLogEvent(JOB_ADVERTISEMENT_ACCESS_EVENT)
+		BusinessLogEvent logData = new BusinessLogEvent()
+				.withEventType(JOB_ADVERTISEMENT_ACCESS_EVENT)
 				.withObjectId(jobAdvertisementId.getValue())
 				.withObjectType(JOB_ADVERTISEMENT_LOG)
 				.withAdditionalData(STATUS_ADDITIONAL_DATA, jobAdvertisement.getStatus());

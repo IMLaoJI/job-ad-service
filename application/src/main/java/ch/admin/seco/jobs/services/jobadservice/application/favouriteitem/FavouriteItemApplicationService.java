@@ -78,8 +78,9 @@ public class FavouriteItemApplicationService {
 
     private void createBusinessLogEntry(FavouriteItem newFavouriteItem) {
         JobAdvertisementId jobAdvertisementId = newFavouriteItem.getJobAdvertisementId();
-        JobAdvertisementStatus jobAdStatus = jobAdvertisementRepository.getOne(jobAdvertisementId).getStatus();
-        BusinessLogEvent logData = new BusinessLogEvent(JOB_ADVERTISEMENT_FAVORITE_EVENT)
+        JobAdvertisementStatus jobAdStatus = getJobAdvertisement(jobAdvertisementId).getStatus();
+        BusinessLogEvent logData = new BusinessLogEvent()
+                .withEventType(JOB_ADVERTISEMENT_FAVORITE_EVENT)
                 .withObjectId(jobAdvertisementId.getValue())
                 .withObjectType(JOB_ADVERTISEMENT_LOG)
                 .withAdditionalData(STATUS_ADDITIONAL_DATA, jobAdStatus);
@@ -122,4 +123,8 @@ public class FavouriteItemApplicationService {
                 .orElseThrow(() -> new FavoriteItemNotExitsException(id));
     }
 
+    private JobAdvertisement getJobAdvertisement(JobAdvertisementId jobAdvertisementId) {
+        Optional<JobAdvertisement> jobAdvertisement = jobAdvertisementRepository.findById(jobAdvertisementId);
+        return jobAdvertisement.orElseThrow(() -> new AggregateNotFoundException(JobAdvertisement.class, jobAdvertisementId.getValue()));
+    }
 }

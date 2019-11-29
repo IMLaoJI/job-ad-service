@@ -18,16 +18,17 @@ public class BusinessLogEvent {
 
 	private Map<String, Object> additionalData = new HashMap<>();
 
-	public BusinessLogEvent(BusinessLogEventType eventType) {
-		this.eventType = Condition.notNull(eventType, "Event type must not be empty!");
-	}
-
 	public String getAuthorities() {
 		return authorities;
 	}
 
 	public BusinessLogEvent withAuthorities(String authorities) {
 		this.authorities = authorities;
+		return this;
+	}
+
+	public BusinessLogEvent withEventType(BusinessLogEventType eventType) {
+		this.eventType = Condition.notNull(eventType, "Business log event type must not be empty!");
 		return this;
 	}
 
@@ -40,7 +41,7 @@ public class BusinessLogEvent {
 	}
 
 	public BusinessLogEvent withObjectType(BusinessLogObjectType objectType) {
-		this.objectType = objectType;
+		this.objectType = Condition.notNull(objectType, "Business log object type must not be empty!");
 		return this;
 	}
 

@@ -94,6 +94,11 @@ public class FavouriteItemRestControllerIntTest {
         ResultActions post = post(createFavouriteItemResource, URL);
         post.andExpect(status().isCreated());
 
+        String contentAsString = post.andReturn().getResponse().getContentAsString();
+        JSONArray ja = new JSONArray("[" + contentAsString + "]");
+        String id = ja.getJSONObject(0).getString("id");
+
+        // then
         ArgumentCaptor<BusinessLogData> argumentCaptor = ArgumentCaptor.forClass(BusinessLogData.class);
         verify(businessLogger).log(argumentCaptor.capture());
         BusinessLogData logData = argumentCaptor.getValue();
@@ -104,11 +109,6 @@ public class FavouriteItemRestControllerIntTest {
         assertThat(logData.getAuthorities()).isEqualTo(Role.JOBSEEKER_CLIENT.getValue());
         assertThat(logData.getAdditionalData().get(STATUS_ADDITIONAL_DATA)).isEqualTo(JobAdvertisementStatus.PUBLISHED_PUBLIC);
 
-        String contentAsString = post.andReturn().getResponse().getContentAsString();
-        JSONArray ja = new JSONArray("[" + contentAsString + "]");
-        String id = ja.getJSONObject(0).getString("id");
-
-        // then
         assertThat(this.favouriteItemRepository.findById(new FavouriteItemId(id))).isPresent();
         await().until(() -> favouriteItemElasticsearchRepository.findById(job01.id(), new FavouriteItemId(id)).isPresent());
     }
