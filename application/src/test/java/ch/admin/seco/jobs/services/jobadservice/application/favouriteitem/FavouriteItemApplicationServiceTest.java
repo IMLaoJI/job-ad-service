@@ -1,5 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.application.favouriteitem;
 
+import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEvent;
+import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogger;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.FavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.create.CreateFavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.update.UpdateFavouriteItemDto;
@@ -9,12 +11,18 @@ import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteIt
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.events.FavouriteItemEvents;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.FavouriteItemIdFixture;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -23,23 +31,25 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogConstants.STATUS_ADDITIONAL_DATA;
+import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEventType.JOB_ADVERTISEMENT_FAVORITE_EVENT;
+import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogObjectType.JOB_ADVERTISEMENT_LOG;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.FavouriteItemIdFixture.FAV_ID_5;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.FavouriteItemIdFixture.UNKNOWN;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
 @Transactional
 public class FavouriteItemApplicationServiceTest {
+    private final static String USER_ID = "USER-1";
 
-    private final JobAdvertisementId jobAdvertisementId = new JobAdvertisementId("JOB_AD_ID_1");
-
-    private final FavouriteItemId favouriteItemId = new FavouriteItemId("FAV_ID_1");
-
-    private final String userId = "USER-1";
-
-    private final String note = "My note";
+    private final static String NOTE = "My note";
 
     @Autowired
     private FavouriteItemApplicationService sut;
@@ -51,6 +61,8 @@ public class FavouriteItemApplicationServiceTest {
     private FavouriteItemRepository favouriteItemRepository;
 
     private DomainEventMockUtils domainEventMockUtils;
+    @Autowired
+    private BusinessLogger businessLogger;
 
     @Before
     public void setUp() {
@@ -66,12 +78,20 @@ public class FavouriteItemApplicationServiceTest {
     @Test
     public void testCreate() {
         // given
+        final JobAdvertisementId jobAdId = JobAdvertisementIdFixture.job01.id();
+
         CreateFavouriteItemDto createFavouriteItemDto = new CreateFavouriteItemDto();
-        createFavouriteItemDto.setJobAdvertisementId(jobAdvertisementId);
-        createFavouriteItemDto.setNote(note);
-        createFavouriteItemDto.setOwnerUserId(userId);
+        createFavouriteItemDto.setJobAdvertisementId(jobAdId);
+        createFavouriteItemDto.setNote(NOTE);
+        createFavouriteItemDto.setOwnerUserId(USER_ID);
+        JobAdvertisement jobAdvertisement = JobAdvertisementFixture.of(jobAdId)
+                .setJobContent(
+                        JobContentFixture.of(jobAdId)
+                                .setLocation(testLocation().setCity("ZurichA").build())
+                                .build()).build();
 
         when(jobAdvertisementRepository.existsById(any())).thenReturn(true);
+        when(jobAdvertisementRepository.findById(eq(jobAdId))).thenReturn(Optional.of(jobAdvertisement));
 
         //when
         FavouriteItemDto favouriteItemDto = this.sut.create(createFavouriteItemDto);
@@ -81,47 +101,62 @@ public class FavouriteItemApplicationServiceTest {
         assertThat(createdFavouriteItem).isPresent();
         assertThat(createdFavouriteItem.get().getNote()).isEqualTo(createFavouriteItemDto.getNote());
         domainEventMockUtils.assertSingleDomainEventPublished(FavouriteItemEvents.FAVOURITE_ITEM_CREATED.getDomainEventType());
+
+        ArgumentCaptor<BusinessLogEvent> argumentCaptor = ArgumentCaptor.forClass(BusinessLogEvent.class);
+        verify(businessLogger, times(1)).log(argumentCaptor.capture());
+        BusinessLogEvent businessLogEvent = argumentCaptor.getValue();
+        assertThat(businessLogEvent.getEventType()).isEqualTo(JOB_ADVERTISEMENT_FAVORITE_EVENT);
+        assertThat(businessLogEvent.getObjectType()).isEqualTo(JOB_ADVERTISEMENT_LOG);
+        assertThat(businessLogEvent.getObjectId()).isEqualTo(jobAdId.getValue());
+        assertThat(businessLogEvent.getAdditionalData().get(STATUS_ADDITIONAL_DATA)).isEqualTo(jobAdvertisement.getStatus());
+        // Testing the user role is not straight forward:
+        // the user role is inserted by the LogstashBusinessLogger, based on the Spring context.
+        // There's an integration test for this case, please see FavouriteItemRestControllerIntTest
     }
 
     @Test
     public void testCanNotCreateFavouriteWithNonExistingJobAdId() {
         // given
+        final JobAdvertisementId jobAdId = JobAdvertisementIdFixture.job02.id();
         CreateFavouriteItemDto createFavouriteItemDto = new CreateFavouriteItemDto();
-        createFavouriteItemDto.setJobAdvertisementId(jobAdvertisementId);
-        createFavouriteItemDto.setNote(note);
-        createFavouriteItemDto.setOwnerUserId(userId);
+        createFavouriteItemDto.setJobAdvertisementId(jobAdId);
+        createFavouriteItemDto.setNote(NOTE);
+        createFavouriteItemDto.setOwnerUserId(USER_ID);
 
         // when
-        when(jobAdvertisementRepository.existsById(jobAdvertisementId)).thenReturn(false);
+        when(jobAdvertisementRepository.existsById(jobAdId)).thenReturn(false);
 
         // then
         assertThatThrownBy(() -> this.sut.create(createFavouriteItemDto))
                 .isInstanceOf(AggregateNotFoundException.class)
-                .hasMessageContaining("Aggregate with ID " + jobAdvertisementId.getValue() +" not found");
+                .hasMessageContaining("Aggregate with ID " + jobAdId.getValue() +" not found");
     }
 
     @Test
     public void testCanNotCreateFavouriteThatAlreadyExists() {
         // given
+        final JobAdvertisementId jobAdId = JobAdvertisementIdFixture.job03.id();
         when(jobAdvertisementRepository.existsById(any())).thenReturn(true);
 
-        createAndSaveToDBFavouriteItem(favouriteItemId, jobAdvertisementId, note, userId);
+        createAndSaveToDBFavouriteItem(FavouriteItemIdFixture.FAV_ID_1.id(), jobAdId, NOTE, USER_ID);
 
         CreateFavouriteItemDto createFavouriteItemDto = new CreateFavouriteItemDto();
-        createFavouriteItemDto.setJobAdvertisementId(jobAdvertisementId);
+        createFavouriteItemDto.setJobAdvertisementId(jobAdId);
         createFavouriteItemDto.setNote("My other note");
-        createFavouriteItemDto.setOwnerUserId(userId);
+        createFavouriteItemDto.setOwnerUserId(USER_ID);
 
         // then
         assertThatThrownBy(() -> this.sut.create(createFavouriteItemDto))
                 .isInstanceOf(FavouriteItemAlreadyExists.class)
-                .hasMessageContaining("FavouriteItem couldn't be created. User: 'USER-1' already has a FavouriteItem: 'FAV_ID_1' for JobAdvertismentId: 'JOB_AD_ID_1'");
+                .hasMessageContaining("FavouriteItem couldn't be created. User: 'USER-1' already has a FavouriteItem: 'FAV_ID_1' for JobAdvertismentId: '"
+                        + jobAdId.getValue()+ "'");
     }
 
     @Test
     public void testFindExistingFavouriteItemFindById() {
         // given
-        createAndSaveToDBFavouriteItem(favouriteItemId, jobAdvertisementId, note, userId);
+        final FavouriteItemId favouriteItemId = FavouriteItemIdFixture.FAV_ID_2.id();
+        createAndSaveToDBFavouriteItem(favouriteItemId, JobAdvertisementIdFixture.job04.id(), NOTE, USER_ID);
 
         // when
         FavouriteItemDto favouriteItem = this.sut.findById(favouriteItemId);
@@ -133,18 +168,18 @@ public class FavouriteItemApplicationServiceTest {
     @Test
     public void testFindNonExistingFavouriteItemFindById() {
         // then
-        assertThatThrownBy(() -> this.sut.findById(favouriteItemId))
+        assertThatThrownBy(() -> this.sut.findById(UNKNOWN.id()))
                 .isInstanceOf(FavoriteItemNotExitsException.class)
-                .hasMessageContaining("Aggregate with ID " + favouriteItemId.getValue() +" not found");
+                .hasMessageContaining("Aggregate with ID " + UNKNOWN.id().getValue() +" not found");
     }
 
     @Test
     public void testUpdateExistingFavouriteItem() {
         // given
         String adjustedNote = "My new note";
+        final FavouriteItemId favouriteItemId = FavouriteItemIdFixture.FAV_ID_3.id();
 
-
-        createAndSaveToDBFavouriteItem(favouriteItemId, jobAdvertisementId, note, userId);
+        createAndSaveToDBFavouriteItem(favouriteItemId, JobAdvertisementIdFixture.job05.id(), NOTE, USER_ID);
         UpdateFavouriteItemDto updateFavouriteItemDto = new UpdateFavouriteItemDto(favouriteItemId, adjustedNote);
 
         // when
@@ -157,10 +192,12 @@ public class FavouriteItemApplicationServiceTest {
     @Test
     public void testDeleteExistingFavouriteItem() {
         // given
-        createAndSaveToDBFavouriteItem(favouriteItemId, jobAdvertisementId, note, userId);
+        final JobAdvertisementId jobAdId = JobAdvertisementIdFixture.job06.id();
+        final FavouriteItemId favouriteItemId = FavouriteItemIdFixture.FAV_ID_4.id();
+        createAndSaveToDBFavouriteItem(favouriteItemId, jobAdId, NOTE, USER_ID);
 
         // when
-        assertThat(this.sut.findById(favouriteItemId).getJobAdvertisementId()).isEqualTo(jobAdvertisementId.getValue());
+        assertThat(this.sut.findById(favouriteItemId).getJobAdvertisementId()).isEqualTo(jobAdId.getValue());
         this.sut.delete(favouriteItemId);
         // then
         assertThatThrownBy(() -> this.sut.findById(favouriteItemId))
@@ -171,10 +208,11 @@ public class FavouriteItemApplicationServiceTest {
     @Test
     public void testFindByJobAdvertisementIdAndOwnerId() {
         // given
-        createAndSaveToDBFavouriteItem(favouriteItemId, jobAdvertisementId, note, userId);
+        final JobAdvertisementId jobAdId = JobAdvertisementIdFixture.job07.id();
+        createAndSaveToDBFavouriteItem(FAV_ID_5.id(), jobAdId, NOTE, USER_ID);
 
         // when
-        Optional<FavouriteItemDto> optionalFavouriteItemDto = this.sut.findByJobAdvertisementIdAndUserId(jobAdvertisementId, userId);
+        Optional<FavouriteItemDto> optionalFavouriteItemDto = this.sut.findByJobAdvertisementIdAndUserId(jobAdId, USER_ID);
 
         // then
         assertThat(optionalFavouriteItemDto).isPresent();

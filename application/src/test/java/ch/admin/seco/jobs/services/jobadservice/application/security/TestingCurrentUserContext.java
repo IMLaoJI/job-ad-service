@@ -5,7 +5,6 @@ import ch.admin.seco.jobs.services.jobadservice.core.domain.events.AuditUser;
 import java.util.Collection;
 import java.util.Collections;
 
-// TODO we should move this class now to the test classes
 public class TestingCurrentUserContext implements CurrentUserContext {
 
     private final String userExternalId;

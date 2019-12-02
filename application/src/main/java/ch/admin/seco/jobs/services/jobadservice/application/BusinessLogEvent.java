@@ -1,27 +1,26 @@
 package ch.admin.seco.jobs.services.jobadservice.application;
 
-import static org.springframework.util.Assert.hasText;
+import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
 
 public class BusinessLogEvent {
 
 	private String authorities;
 
-	private String eventType;
+	private final BusinessLogEventType eventType;
 
-	private String objectType;
+	private final BusinessLogObjectType objectType;
 
 	private String objectId;
 
 	private Map<String, Object> additionalData = new HashMap<>();
 
-	public BusinessLogEvent(String eventType) {
-		hasText(eventType, "Event type must not be empty!");
-		this.eventType = eventType;
+	public BusinessLogEvent(BusinessLogEventType eventType, BusinessLogObjectType objectType) {
+		this.eventType = Condition.notNull(eventType, "Business log event type must not be empty!");
+		this.objectType = Condition.notNull(objectType, "Business log object type must not be empty!");
 	}
 
 	public String getAuthorities() {
@@ -33,17 +32,12 @@ public class BusinessLogEvent {
 		return this;
 	}
 
-	public String getEventType() {
+	public BusinessLogEventType getEventType() {
 		return eventType;
 	}
 
-	public String getObjectType() {
+	public BusinessLogObjectType getObjectType() {
 		return objectType;
-	}
-
-	public BusinessLogEvent withObjectType(String objectType) {
-		this.objectType = objectType;
-		return this;
 	}
 
 	public BusinessLogEvent withObjectId(String objectId) {

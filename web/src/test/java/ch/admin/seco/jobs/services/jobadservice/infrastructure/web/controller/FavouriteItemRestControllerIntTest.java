@@ -1,11 +1,14 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
+import ch.admin.seco.alv.shared.logger.business.BusinessLogData;
+import ch.admin.seco.jobs.services.jobadservice.application.security.Role;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItem;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.favouriteitem.write.FavouriteItemElasticsearchRepository;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
@@ -15,9 +18,11 @@ import org.codehaus.jettison.json.JSONArray;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -27,6 +32,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Optional;
 
+import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogConstants.STATUS_ADDITIONAL_DATA;
+import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEventType.JOB_ADVERTISEMENT_FAVORITE_EVENT;
+import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogObjectType.JOB_ADVERTISEMENT_LOG;
 import static ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemIdFixture.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
@@ -34,6 +42,7 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
@@ -58,6 +67,9 @@ public class FavouriteItemRestControllerIntTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @SpyBean
+    private ch.admin.seco.alv.shared.logger.business.BusinessLogger businessLogger;
 
     @Before
     public void setUp() {
@@ -87,6 +99,16 @@ public class FavouriteItemRestControllerIntTest {
         String id = ja.getJSONObject(0).getString("id");
 
         // then
+        ArgumentCaptor<BusinessLogData> argumentCaptor = ArgumentCaptor.forClass(BusinessLogData.class);
+        verify(businessLogger).log(argumentCaptor.capture());
+        BusinessLogData logData = argumentCaptor.getValue();
+
+        assertThat(logData.getEventType()).isEqualTo(JOB_ADVERTISEMENT_FAVORITE_EVENT.getTypeName());
+        assertThat(logData.getObjectType()).isEqualTo(JOB_ADVERTISEMENT_LOG.getTypeName());
+        assertThat(logData.getObjectId()).isEqualTo(job01.id().getValue());
+        assertThat(logData.getAuthorities()).isEqualTo(Role.JOBSEEKER_CLIENT.getValue());
+        assertThat(logData.getAdditionalData().get(STATUS_ADDITIONAL_DATA)).isEqualTo(JobAdvertisementStatus.PUBLISHED_PUBLIC);
+
         assertThat(this.favouriteItemRepository.findById(new FavouriteItemId(id))).isPresent();
         await().until(() -> favouriteItemElasticsearchRepository.findById(job01.id(), new FavouriteItemId(id)).isPresent());
     }
