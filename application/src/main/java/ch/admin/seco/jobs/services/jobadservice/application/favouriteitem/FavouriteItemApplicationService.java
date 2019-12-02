@@ -79,10 +79,8 @@ public class FavouriteItemApplicationService {
     private void createBusinessLogEntry(FavouriteItem newFavouriteItem) {
         JobAdvertisementId jobAdvertisementId = newFavouriteItem.getJobAdvertisementId();
         JobAdvertisementStatus jobAdStatus = getJobAdvertisement(jobAdvertisementId).getStatus();
-        BusinessLogEvent logData = new BusinessLogEvent()
-                .withEventType(JOB_ADVERTISEMENT_FAVORITE_EVENT)
+        BusinessLogEvent logData = new BusinessLogEvent(JOB_ADVERTISEMENT_FAVORITE_EVENT, JOB_ADVERTISEMENT_LOG)
                 .withObjectId(jobAdvertisementId.getValue())
-                .withObjectType(JOB_ADVERTISEMENT_LOG)
                 .withAdditionalData(STATUS_ADDITIONAL_DATA, jobAdStatus);
         this.businessLogger.log(logData);
     }
