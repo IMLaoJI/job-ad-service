@@ -409,6 +409,13 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
+                <xs:element name="bq1AvamBerufNrNew" minOccurs="0">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:maxLength value="255"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
                 <xs:element name="bq1QualifikationCode" minOccurs="0">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
@@ -438,6 +445,13 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
+                <xs:element name="bq2AvamBerufNrNew" minOccurs="0">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:maxLength value="255"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
                 <xs:element name="bq2QualifikationCode" minOccurs="0">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
@@ -461,6 +475,13 @@
                     </xs:simpleType>
                 </xs:element>
                 <xs:element name="bq3AvamBerufNr" minOccurs="0">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:maxLength value="255"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="bq3AvamBerufNrNew" minOccurs="0">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
                             <xs:maxLength value="255"/>

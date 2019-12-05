@@ -57,6 +57,11 @@ class ExternalJobAdvertisementAssembler {
     private static final EmailValidator EMAIL_VALIDATOR = new EmailValidator();
     private static final String DEFAULT_AVAM_OCCUPATION_CODE = "99999";
     private static final String COUNTRY_ISO_CODE_SWITZERLAND = "CH";
+    private final AlvJobroomFeatureToggleProperties alvJobroomFeatureToggleProperties;
+
+    public ExternalJobAdvertisementAssembler(AlvJobroomFeatureToggleProperties alvJobroomFeatureToggleProperties){
+        this.alvJobroomFeatureToggleProperties = alvJobroomFeatureToggleProperties;
+    }
 
     ExternalCreateJobAdvertisementDto createJobAdvertisementFromExternalDto(Oste externalJobAdvertisement) {
         LocalDate publicationStartDate = parseDate(externalJobAdvertisement.getAnmeldeDatum());
@@ -165,29 +170,56 @@ class ExternalJobAdvertisementAssembler {
 
     private List<ExternalOccupationDto> createOccupations(Oste externalJobAdvertisement) {
         List<ExternalOccupationDto> occupations = new ArrayList<>();
-        if (hasText(externalJobAdvertisement.getBq1AvamBerufNr())) {
-            occupations.add(new ExternalOccupationDto()
-                    .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(externalJobAdvertisement.getBq1AvamBerufNr()))
-                    .setWorkExperience(resolveExperience(externalJobAdvertisement.getBq1ErfahrungCode()))
-                    .setEducationCode(externalJobAdvertisement.getBq1AusbildungCode())
-                    .setQualificationCode(resolveQualification(externalJobAdvertisement.getBq1QualifikationCode()))
-            );
-        }
-        if (hasText(externalJobAdvertisement.getBq2AvamBerufNr())) {
-            occupations.add(new ExternalOccupationDto()
-                    .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(externalJobAdvertisement.getBq2AvamBerufNr()))
-                    .setWorkExperience(resolveExperience(externalJobAdvertisement.getBq2ErfahrungCode()))
-                    .setEducationCode(externalJobAdvertisement.getBq2AusbildungCode())
-                    .setQualificationCode(resolveQualification(externalJobAdvertisement.getBq2QualifikationCode()))
-            );
-        }
-        if (hasText(externalJobAdvertisement.getBq3AvamBerufNr())) {
-            occupations.add(new ExternalOccupationDto()
-                    .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(externalJobAdvertisement.getBq3AvamBerufNr()))
-                    .setWorkExperience(resolveExperience(externalJobAdvertisement.getBq3ErfahrungCode()))
-                    .setEducationCode(externalJobAdvertisement.getBq3AusbildungCode())
-                    .setQualificationCode(resolveQualification(externalJobAdvertisement.getBq3QualifikationCode()))
-            );
+        if(!alvJobroomFeatureToggleProperties.isNewAvamCodeEnabled()) {
+            if (hasText(externalJobAdvertisement.getBq1AvamBerufNr())) {
+                occupations.add(new ExternalOccupationDto()
+                        .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(externalJobAdvertisement.getBq1AvamBerufNr()))
+                        .setWorkExperience(resolveExperience(externalJobAdvertisement.getBq1ErfahrungCode()))
+                        .setEducationCode(externalJobAdvertisement.getBq1AusbildungCode())
+                        .setQualificationCode(resolveQualification(externalJobAdvertisement.getBq1QualifikationCode()))
+                );
+            }
+            if (hasText(externalJobAdvertisement.getBq2AvamBerufNr())) {
+                occupations.add(new ExternalOccupationDto()
+                        .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(externalJobAdvertisement.getBq2AvamBerufNr()))
+                        .setWorkExperience(resolveExperience(externalJobAdvertisement.getBq2ErfahrungCode()))
+                        .setEducationCode(externalJobAdvertisement.getBq2AusbildungCode())
+                        .setQualificationCode(resolveQualification(externalJobAdvertisement.getBq2QualifikationCode()))
+                );
+            }
+            if (hasText(externalJobAdvertisement.getBq3AvamBerufNr())) {
+                occupations.add(new ExternalOccupationDto()
+                        .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(externalJobAdvertisement.getBq3AvamBerufNr()))
+                        .setWorkExperience(resolveExperience(externalJobAdvertisement.getBq3ErfahrungCode()))
+                        .setEducationCode(externalJobAdvertisement.getBq3AusbildungCode())
+                        .setQualificationCode(resolveQualification(externalJobAdvertisement.getBq3QualifikationCode()))
+                );
+            }
+        }else {
+            if (hasText(externalJobAdvertisement.getBq1AvamBerufNrNew())) {
+                occupations.add(new ExternalOccupationDto()
+                        .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(externalJobAdvertisement.getBq1AvamBerufNrNew()))
+                        .setWorkExperience(resolveExperience(externalJobAdvertisement.getBq1ErfahrungCode()))
+                        .setEducationCode(externalJobAdvertisement.getBq1AusbildungCode())
+                        .setQualificationCode(resolveQualification(externalJobAdvertisement.getBq1QualifikationCode()))
+                );
+            }
+            if (hasText(externalJobAdvertisement.getBq2AvamBerufNrNew())) {
+                occupations.add(new ExternalOccupationDto()
+                        .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(externalJobAdvertisement.getBq2AvamBerufNrNew()))
+                        .setWorkExperience(resolveExperience(externalJobAdvertisement.getBq2ErfahrungCode()))
+                        .setEducationCode(externalJobAdvertisement.getBq2AusbildungCode())
+                        .setQualificationCode(resolveQualification(externalJobAdvertisement.getBq2QualifikationCode()))
+                );
+            }
+            if (hasText(externalJobAdvertisement.getBq3AvamBerufNrNew())) {
+                occupations.add(new ExternalOccupationDto()
+                        .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(externalJobAdvertisement.getBq3AvamBerufNrNew()))
+                        .setWorkExperience(resolveExperience(externalJobAdvertisement.getBq3ErfahrungCode()))
+                        .setEducationCode(externalJobAdvertisement.getBq3AusbildungCode())
+                        .setQualificationCode(resolveQualification(externalJobAdvertisement.getBq3QualifikationCode()))
+                );
+            }
         }
         if (occupations.isEmpty()) {
             occupations.add(new ExternalOccupationDto()

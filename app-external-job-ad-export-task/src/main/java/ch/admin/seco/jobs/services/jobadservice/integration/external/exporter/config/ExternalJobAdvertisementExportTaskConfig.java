@@ -55,17 +55,19 @@ public class ExternalJobAdvertisementExportTaskConfig {
     private final StepBuilderFactory stepBuilderFactory;
     private final SftpMessageHandler sftpMessageHandler;
     private final ExternalJobAdvertisementProperties externalJobAdvertisementProperties;
+    private final AlvJobroomFeatureToggleProperties alvJobroomFeatureToggleProperties;
 
     @Autowired
     public ExternalJobAdvertisementExportTaskConfig(
             JobBuilderFactory jobBuilderFactory,
             StepBuilderFactory stepBuilderFactory,
             SftpMessageHandler sftpMessageHandler,
-            ExternalJobAdvertisementProperties externalJobAdvertisementProperties) {
+            ExternalJobAdvertisementProperties externalJobAdvertisementProperties, AlvJobroomFeatureToggleProperties alvJobroomFeatureToggleProperties ) {
         this.jobBuilderFactory = jobBuilderFactory;
         this.stepBuilderFactory = stepBuilderFactory;
         this.sftpMessageHandler = sftpMessageHandler;
         this.externalJobAdvertisementProperties = externalJobAdvertisementProperties;
+        this.alvJobroomFeatureToggleProperties = alvJobroomFeatureToggleProperties;
     }
 
     @Bean
@@ -141,7 +143,7 @@ public class ExternalJobAdvertisementExportTaskConfig {
 
     @Bean
     ExternalJobAdvertisementTransformer externalJobAdvertisementTransformer() {
-        return new ExternalJobAdvertisementTransformer();
+        return new ExternalJobAdvertisementTransformer(alvJobroomFeatureToggleProperties);
     }
 
     @Bean

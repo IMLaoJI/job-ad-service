@@ -57,6 +57,7 @@ public class ExternalJobAdvertisementImportTaskConfig {
     private final MessageSource<File> externalJobAdvertisementDataFileMessageSource;
 
     private final Validator validator;
+    private final AlvJobroomFeatureToggleProperties alvJobroomFeatureToggleProperties;
 
     @Autowired
     public ExternalJobAdvertisementImportTaskConfig(
@@ -64,12 +65,13 @@ public class ExternalJobAdvertisementImportTaskConfig {
             StepBuilderFactory stepBuilderFactory,
             MessageSource<File> externalJobAdvertisementDataFileMessageSource,
             MessageChannel output,
-            Validator validator) {
+            Validator validator, AlvJobroomFeatureToggleProperties alvJobroomFeatureToggleProperties) {
         this.jobBuilderFactory = jobBuilderFactory;
         this.stepBuilderFactory = stepBuilderFactory;
         this.externalJobAdvertisementDataFileMessageSource = externalJobAdvertisementDataFileMessageSource;
         this.messageBrokerOutputChannel = output;
         this.validator = validator;
+        this.alvJobroomFeatureToggleProperties = alvJobroomFeatureToggleProperties;
     }
 
     @Bean
@@ -103,7 +105,7 @@ public class ExternalJobAdvertisementImportTaskConfig {
 
     @Bean
     public ExternalItemProcessor externalItemProcessor() {
-        return new ExternalItemProcessor(validator);
+        return new ExternalItemProcessor(validator, alvJobroomFeatureToggleProperties);
     }
 
     @Bean

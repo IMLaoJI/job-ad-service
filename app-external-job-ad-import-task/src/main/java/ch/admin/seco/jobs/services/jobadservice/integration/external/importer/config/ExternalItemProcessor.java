@@ -21,9 +21,10 @@ public class ExternalItemProcessor implements ItemProcessor<Oste, ExternalCreate
 
     private final Validator validator;
 
-    ExternalItemProcessor(Validator validator) {
+
+    ExternalItemProcessor(Validator validator, AlvJobroomFeatureToggleProperties alvJobroomFeatureToggleProperties) {
         this.validator = validator;
-        this.externalJobAdvertisementAssembler = new ExternalJobAdvertisementAssembler();
+        this.externalJobAdvertisementAssembler = new ExternalJobAdvertisementAssembler(alvJobroomFeatureToggleProperties);
     }
 
     @Override
