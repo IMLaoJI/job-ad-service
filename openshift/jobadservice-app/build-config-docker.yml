@@ -32,5 +32,5 @@ items:
           resources: {}
           strategy:
               dockerStrategy:
-                  dockerfilePath: ./openshift/jobad-app/Dockerfile
+                  dockerfilePath: ./openshift/jobadservice-app/Dockerfile
               type: Docker
