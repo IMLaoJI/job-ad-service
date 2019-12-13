@@ -1,0 +1,81 @@
+kind: List
+metadata: {}
+apiVersion: v1
+items:
+  - kind: DeploymentConfig
+    apiVersion: apps.openshift.io/v1
+    metadata:
+      labels:
+        app: jobad-service
+      name: jobad-service
+    spec:
+      replicas: 1
+      selector:
+        app: jobad-service
+        deploymentconfig: jobad-service
+      strategy:
+        resources: {}
+      template:
+        metadata:
+          labels:
+            app: jobad-service
+            deploymentconfig: jobad-service
+        spec:
+          containers:
+            - image: 'docker-jobad-service.default.svc:5000/development/jobad-service:latest'
+              name: jobad-service
+              ports:
+                - containerPort: 8080
+                  protocol: TCP
+              envFrom:
+                - configMapRef:
+                    name: seco-alvch
+      test: false
+      triggers:
+        - type: ConfigChange
+        - type: ImageChange
+          imageChangeParams:
+            automatic: true
+            containerNames:
+              - jobad-service
+            from:
+              kind: ImageStreamTag
+              name: 'jobad-service:latest'
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      labels:
+        app: jobad-service
+      name: jobad-service
+    spec:
+      ports:
+        - name: 8080-tcp
+          port: 8080
+          protocol: TCP
+          targetPort: 8080
+      selector:
+        app: jobad-service
+        deploymentconfig: jobad-service
+  - kind: Route
+    apiVersion: route.openshift.io/v1
+    metadata:
+      labels:
+        app: jobad-service
+      name: jobad-service
+    spec:
+      host: jobad-service-TARGET.apps.admin.arbeitslosenkasse.ch
+      port:
+        targetPort: 8080-tcp
+      to:
+        kind: Service
+        name: jobad-service
+        weight: 100
+      wildcardPolicy: None
+    status:
+      ingress:
+        - conditions:
+            - status: 'True'
+              type: Admitted
+          host: jobad-service-TARGET.apps.admin.arbeitslosenkasse.ch
+          routerName: router
+          wildcardPolicy: None
