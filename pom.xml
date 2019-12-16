@@ -4,6 +4,7 @@
     <groupId>ch.admin.seco.jobs.services.jobadservice</groupId>
     <artifactId>job-ad-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <dependencyManagement>
         <dependencies/>
     </dependencyManagement>
