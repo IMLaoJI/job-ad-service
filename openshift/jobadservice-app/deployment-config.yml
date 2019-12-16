@@ -60,7 +60,7 @@ items:
         app: jobad-service
       name: jobad-service
     spec:
-      host: jobad-service-TARGET.apps.admin.arbeitslosenkasse.ch
+      host: jobad-service-development.apps.admin.arbeitslosenkasse.ch
       port:
         targetPort: 8080-tcp
       to:
@@ -73,6 +73,6 @@ items:
         - conditions:
             - status: 'True'
               type: Admitted
-          host: jobad-service-TARGET.apps.admin.arbeitslosenkasse.ch
+          host: jobad-service-development.apps.admin.arbeitslosenkasse.ch
           routerName: router
           wildcardPolicy: None
