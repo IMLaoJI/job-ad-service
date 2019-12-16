@@ -24,6 +24,7 @@ plugins {
     id "org.asciidoctor.convert" version "1.5.2"
 }
 
+apply plugin: 'maven'
 apply from: "gradle/docker-compose.gradle"
 
 allprojects {

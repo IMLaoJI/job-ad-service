@@ -57,7 +57,7 @@ pipeline {
         stage('Exec Maven') {
             steps {
                 rtMavenRun(
-                    pom: 'web/pom.xml',
+                    pom: 'pom.xml',
                     goals: 'clean install package -DskipTests -DskipITs=true',
                     deployerId: "MAVEN_DEPLOYER",
                     resolverId: "MAVEN_RESOLVER"
@@ -68,7 +68,7 @@ pipeline {
         stage('SonarQube') {
             steps {
                 rtMavenRun(
-                    pom: 'web/pom.xml',
+                    pom: 'pom.xml',
                     goals: 'sonar:sonar -Dsonar.projectKey=ReferenceService -Dsonar.host.url="http://test-1.apps.admin.arbeitslosenkasse.ch" -Dsonar.login=d457dcaba72c92ec41bdd2ae6f60ce9e1623d094',
                     deployerId: "MAVEN_DEPLOYER",
                     resolverId: "MAVEN_RESOLVER"

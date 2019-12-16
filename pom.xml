@@ -7,4 +7,13 @@
     <dependencyManagement>
         <dependencies/>
     </dependencyManagement>
+
+    <modules>
+        <module>infrastructure</module>
+        <module>infrastructure-elasticsearch</module>
+        <module>infrastructure-messagebroker</module>
+        <module>infrastructure-messagebroker-shared</module>
+        <module>infrastructure-service-reference</module>
+        <module>web</module>
+    </modules>
 </project>
