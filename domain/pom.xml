@@ -16,7 +16,6 @@
       <groupId>ch.admin.seco.jobs.services.jobadservice</groupId>
       <artifactId>core</artifactId>
       <version>0.0.1-SNAPSHOT</version>
-      <scope>compile</scope>
       <exclusions>
         <exclusion>
           <artifactId>spring-boot-starter-tomcat</artifactId>
