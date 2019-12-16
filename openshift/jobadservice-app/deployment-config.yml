@@ -22,14 +22,11 @@ items:
             deploymentconfig: jobad-service
         spec:
           containers:
-            - image: 'docker-jobad-service.default.svc:5000/development/jobad-service:latest'
+            - image: 'docker-registry.default.svc:5000/development/jobad-service:latest'
               name: jobad-service
               ports:
                 - containerPort: 8080
                   protocol: TCP
-              envFrom:
-                - configMapRef:
-                    name: seco-alvch
       test: false
       triggers:
         - type: ConfigChange
