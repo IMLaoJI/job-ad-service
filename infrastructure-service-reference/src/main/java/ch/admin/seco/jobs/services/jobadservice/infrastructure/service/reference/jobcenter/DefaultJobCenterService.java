@@ -1,14 +1,15 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.service.reference.jobcenter;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-
 import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenterAddress;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenterUser;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 class DefaultJobCenterService implements JobCenterService {
@@ -47,6 +48,11 @@ class DefaultJobCenterService implements JobCenterService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Optional<JobCenterUser> findJobCenterUserByJobCenterUserId(String jobCenterUserId) {
+        return jobCenterApiClient.findJobCenterUserByJobCenterUseId(jobCenterUserId);
+    }
+
     private JobCenter toJobCenter(JobCenterResource jobCenterResource) {
         AddressResource jobCenterAddressResource = jobCenterResource.getAddress();
         return new JobCenter(
@@ -55,7 +61,7 @@ class DefaultJobCenterService implements JobCenterService {
                 jobCenterResource.getEmail(),
                 jobCenterResource.getPhone(),
                 jobCenterResource.getFax(),
-                jobCenterResource.isShowContactDetailsToPublic(),
+                jobCenterResource.getContactDisplayStyle(),
                 toJobCenterAddress(jobCenterAddressResource)
         );
     }

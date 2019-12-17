@@ -364,7 +364,7 @@ public class JobAdvertisementApplicationServiceTest {
                     testJobAdvertisementWithAnonymousCompany(new JobAdvertisementId("Job-Add-Test" + i), CREATED, JOB_CENTER_CODE)
             );
         }
-        JobCenter testRav = testJobCenter();
+        JobCenter testRav = testJobCenter("jobCenter-name");
         when(this.jobCenterService.findAllJobCenters()).thenReturn(singletonList(testRav));
 
         // when

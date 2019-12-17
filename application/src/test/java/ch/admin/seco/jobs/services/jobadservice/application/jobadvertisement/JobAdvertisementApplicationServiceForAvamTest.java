@@ -26,18 +26,18 @@ import org.springframework.transaction.annotation.Transactional;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.ApprovalDtoTestFixture.testApprovalDto;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementFromAvamDtoTestFixture.testCreateJobAdvertisementDto;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementFromAvamDtoTestFixture.testCreateJobAdvertisementDtoWithCompanyAnonymous;
+import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.PublicationDtoTestFixture.testPublicationDtoWithCompanyAnonymous;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.RejectionDtoTestFixture.testRejectionDto;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.ApplyChannelFixture.testApplyChannel;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.ApplyChannelFixture.testDisplayApplyChannel;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.CompanyFixture.testCompany;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.CompanyFixture.testDisplayCompany;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.CompanyFixture.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture.testJobAdvertisement;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublicationEmpty;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.fixture.JobCenterTestFixture.testJobCenter;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.fixture.JobCenterTestFixture.*;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -80,7 +80,8 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         domainEventMockUtils = new DomainEventMockUtils();
         when(locationService.enrichCodes(any())).thenReturn(testLocation().build());
         when(locationService.isLocationValid(any())).thenReturn(Boolean.TRUE);
-        when(jobCenterService.findJobCenterByCode(any())).thenReturn(testJobCenter());
+        when(jobCenterService.findJobCenterByCode(any())).thenReturn(testJobCenter("jobCenter-name"));
+
         when(egovNumberGenerator.nextStringValue()).thenReturn(TEST_STELLEN_NUMMER_EGOV);
     }
 
@@ -147,15 +148,36 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         assertThat(jobAdvertisement.getPublication().isCompanyAnonymous()).isTrue();
 
         assertThat(jobAdvertisement.isReportingObligation()).isTrue();
-        assertThat(jobAdvertisement.getJobContent().getDisplayCompany()).isEqualTo(testDisplayCompany(testJobCenter())
+        assertThat(jobAdvertisement.getJobContent().getDisplayCompany()).isEqualTo(testDisplayCompany(testJobCenter("jobCenter-name"))
                 .setSurrogate(true)
                 .build()
         );
-        assertThat(jobAdvertisement.getJobContent().getDisplayApplyChannel()).isEqualTo(testDisplayApplyChannel(testJobCenter())
+        assertThat(jobAdvertisement.getJobContent().getDisplayApplyChannel()).isEqualTo(testDisplayApplyChannel(testJobCenter("jobCenter-name"))
                 .build()
         );
 
         domainEventMockUtils.assertSingleDomainEventPublished(JOB_ADVERTISEMENT_APPROVED.getDomainEventType());
+    }
+
+    @Test
+    public void createFromAvamWithCompanyAnonymousAndVerifyDisplayCompany() {
+        when(jobCenterService.findJobCenterByCode(any())).thenReturn(testJobCenterWithUserDetail("jobCenter-name"));
+        when(jobCenterService.findJobCenterUserByJobCenterUserId(any())).thenReturn(createJobCenterUser());
+        String jobCenterUserName = "Markus Meier";
+        AvamCreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(testCompany().build(), testPublicationDtoWithCompanyAnonymous());
+
+        JobAdvertisementId jobAdvertisementId = sut.createFromAvam(createJobAdvertisementDto);
+
+        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(jobAdvertisementId);
+        assertThat(jobAdvertisement).isNotNull();
+        assertThat(jobAdvertisement.getStatus()).isEqualTo(APPROVED);
+        assertThat(jobAdvertisement.getSourceSystem()).isEqualTo(SourceSystem.RAV);
+        assertThat(jobAdvertisement.getStellennummerAvam()).isEqualTo(STELLENNUMMER_AVAM);
+        assertThat(jobAdvertisement.getPublication().isEuresAnonymous()).isFalse();
+        assertThat(jobAdvertisement.getPublication().isCompanyAnonymous()).isTrue();
+        assertThat(jobAdvertisement.isReportingObligation()).isTrue();
+        assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getName()).isEqualTo(testJobCenter(jobCenterUserName).getAddress().getName());
+
     }
 
     @Test

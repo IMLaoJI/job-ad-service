@@ -7,20 +7,21 @@ public class JobCenter {
     private String email;
     private String phone;
     private String fax;
-    private boolean showContactDetailsToPublic;
+    private ContactDisplayStyle contactDisplayStyle;
     private JobCenterAddress address;
 
     public JobCenter() {
         // For reflection libs
     }
 
-    public JobCenter(String id, String code, String email, String phone, String fax, boolean showContactDetailsToPublic, JobCenterAddress address) {
+    public JobCenter(String id, String code, String email, String phone, String fax, ContactDisplayStyle contactDisplayStyle,
+                     JobCenterAddress address) {
         this.id = id;
         this.code = code;
         this.email = email;
         this.phone = phone;
         this.fax = fax;
-        this.showContactDetailsToPublic = showContactDetailsToPublic;
+        this.contactDisplayStyle = contactDisplayStyle;
         this.address = address;
     }
 
@@ -69,13 +70,13 @@ public class JobCenter {
         return this;
     }
 
-    public boolean isShowContactDetailsToPublic() {
-        return showContactDetailsToPublic;
+    public JobCenter setContactDisplayStyle(ContactDisplayStyle contactDisplayStyle) {
+        this.contactDisplayStyle = contactDisplayStyle;
+        return this;
     }
 
-    public JobCenter setShowContactDetailsToPublic(boolean showContactDetailsToPublic) {
-        this.showContactDetailsToPublic = showContactDetailsToPublic;
-        return this;
+    public ContactDisplayStyle getContactDisplayStyle() {
+        return this.contactDisplayStyle;
     }
 
     public JobCenterAddress getAddress() {

@@ -1,5 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.service.reference.jobcenter;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.ContactDisplayStyle;
+
 public class JobCenterResource {
 
     private String id;
@@ -7,20 +9,21 @@ public class JobCenterResource {
     private String email;
     private String phone;
     private String fax;
-    private boolean showContactDetailsToPublic;
+    private ContactDisplayStyle contactDisplayStyle;
     private AddressResource address;
 
     protected JobCenterResource() {
         // For reflection libs
     }
 
-    public JobCenterResource(String id, String code, String email, String phone, String fax, boolean showContactDetailsToPublic, AddressResource address) {
+    public JobCenterResource(String id, String code, String email, String phone, String fax, ContactDisplayStyle contactDisplayStyle,
+                             AddressResource address) {
         this.id = id;
         this.code = code;
         this.email = email;
         this.phone = phone;
         this.fax = fax;
-        this.showContactDetailsToPublic = showContactDetailsToPublic;
+        this.contactDisplayStyle = contactDisplayStyle;
         this.address = address;
     }
 
@@ -64,12 +67,13 @@ public class JobCenterResource {
         this.fax = fax;
     }
 
-    public boolean isShowContactDetailsToPublic() {
-        return showContactDetailsToPublic;
+
+    public ContactDisplayStyle getContactDisplayStyle() {
+        return contactDisplayStyle;
     }
 
-    public void setShowContactDetailsToPublic(boolean showContactDetailsToPublic) {
-        this.showContactDetailsToPublic = showContactDetailsToPublic;
+    public void setContactDisplayStyle(ContactDisplayStyle contactDisplayStyle) {
+        this.contactDisplayStyle = contactDisplayStyle;
     }
 
     public AddressResource getAddress() {

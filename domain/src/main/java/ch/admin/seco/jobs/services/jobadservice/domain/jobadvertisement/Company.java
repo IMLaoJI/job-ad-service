@@ -2,6 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement;
 
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.ValueObject;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.ContactDisplayStyle;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenterAddress;
 
@@ -235,7 +236,7 @@ public class Company implements ValueObject<Company> {
                     .setCountryIsoCode("CH")
                     .setSurrogate(true);
 
-            if (jobCenter.isShowContactDetailsToPublic()) {
+            if (jobCenter.getContactDisplayStyle() == ContactDisplayStyle.DETAILED) {
                 this.setPhone(jobCenter.getPhone())
                         .setEmail(jobCenter.getEmail());
             }

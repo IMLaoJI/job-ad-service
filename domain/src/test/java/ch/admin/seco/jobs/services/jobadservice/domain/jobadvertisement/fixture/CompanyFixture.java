@@ -23,15 +23,7 @@ public class CompanyFixture {
                 .setStreet("street")
                 .setPostalCode("postalCode")
                 .setCity("city")
-                .setCountryIsoCode("CH")
-//                setHouseNumber("houseNumber").
-//                setPostOfficeBoxNumber("postOfficeBoxNumber").
-//                setPostOfficeBoxPostalCode("postOfficeBoxPostalCode").
-//                setPostOfficeBoxCity("postOfficeBoxCity").
-//                setPhone("phone").
-//                setEmail("email").
-//                setWebsite("website")
- ;
+                .setCountryIsoCode("CH");
     }
 
     public static Builder testDisplayCompany(JobCenter jobCenter) {

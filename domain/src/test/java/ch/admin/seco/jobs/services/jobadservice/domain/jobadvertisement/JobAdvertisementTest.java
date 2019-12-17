@@ -93,7 +93,7 @@ public class JobAdvertisementTest {
         JobAdvertisement jobAdvertisement = testJobAdvertisement()
                         .setJobCenterCode("jobCenterCode")
                         .build();
-        JobCenter jobCenter = testJobCenter();
+        JobCenter jobCenter = testJobCenter("jobCenter-name");
         jobAdvertisement.updateJobCenter(jobCenter);
 
         assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getName()).isEqualTo("jobCenter-name");
@@ -107,7 +107,7 @@ public class JobAdvertisementTest {
         JobAdvertisement jobAdvertisement = testJobAdvertisement()
                 .setJobCenterCode("jobCenterCodeOther")
                 .build();
-        JobCenter jobCenter = testJobCenter();
+        JobCenter jobCenter = testJobCenter("jobCenter-name");
 
         assertThatThrownBy(() -> jobAdvertisement.updateJobCenter(jobCenter))
                 .isInstanceOf(IllegalArgumentException.class)
