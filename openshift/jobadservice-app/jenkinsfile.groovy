@@ -69,7 +69,7 @@ pipeline {
             steps {
                 rtMavenRun(
                     pom: 'pom.xml',
-                    goals: 'sonar:sonar -Dsonar.projectKey=ReferenceService -Dsonar.host.url="http://test-1.apps.admin.arbeitslosenkasse.ch" -Dsonar.login=d457dcaba72c92ec41bdd2ae6f60ce9e1623d094',
+                    goals: 'sonar:sonar -Dsonar.projectKey=JobAdService -Dsonar.host.url="http://sonarqube-internal.apps.admin.arbeitslosenkasse.ch" -Dsonar.login=5355bf8cc81641fefe4a972f27ba38642c20c69d',
                     deployerId: "MAVEN_DEPLOYER",
                     resolverId: "MAVEN_RESOLVER"
                 )
@@ -85,4 +85,3 @@ pipeline {
         }
     }
 }
-
