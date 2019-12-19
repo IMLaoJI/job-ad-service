@@ -9,6 +9,7 @@ public class JobCenter {
     private String fax;
     private ContactDisplayStyle contactDisplayStyle;
     private JobCenterAddress address;
+    private boolean showContactDetailsToPublic;
 
     public JobCenter() {
         // For reflection libs
@@ -85,6 +86,15 @@ public class JobCenter {
 
     public JobCenter setAddress(JobCenterAddress address) {
         this.address = address;
+        return this;
+    }
+
+    public boolean isShowContactDetailsToPublic() {
+        return showContactDetailsToPublic;
+    }
+
+    public JobCenter setShowContactDetailsToPublic(boolean showContactDetailsToPublic) {
+        this.showContactDetailsToPublic = showContactDetailsToPublic;
         return this;
     }
 }
