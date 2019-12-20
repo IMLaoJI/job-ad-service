@@ -9,6 +9,7 @@ public class JobCenterResource {
     private String email;
     private String phone;
     private String fax;
+    private boolean showContactDetailsToPublic;
     private ContactDisplayStyle contactDisplayStyle;
     private AddressResource address;
 
@@ -67,6 +68,14 @@ public class JobCenterResource {
         this.fax = fax;
     }
 
+
+    public boolean isShowContactDetailsToPublic() {
+        return showContactDetailsToPublic;
+    }
+
+    public void setShowContactDetailsToPublic(boolean showContactDetailsToPublic) {
+        this.showContactDetailsToPublic = showContactDetailsToPublic;
+    }
 
     public ContactDisplayStyle getContactDisplayStyle() {
         return contactDisplayStyle;
