@@ -18,7 +18,7 @@ public class JobCenterUserResource {
 
     private String lastName;
 
-    private AddressResource addressResource;
+    private AddressResource address;
 
     public String getId() {
         return id;
@@ -84,11 +84,11 @@ public class JobCenterUserResource {
         this.lastName = lastName;
     }
 
-    public AddressResource getAddressResource() {
-        return addressResource;
+    public AddressResource getAddress() {
+        return address;
     }
 
-    public void setAddressResource(AddressResource addressResource) {
-        this.addressResource = addressResource;
+    public void setAddress(AddressResource address) {
+        this.address = address;
     }
 }

@@ -74,7 +74,7 @@ class DefaultJobCenterService implements JobCenterService {
                 .setExternalId(jobCenterUserResource.getExternalId())
                 .setFirstName(jobCenterUserResource.getFirstName())
                 .setLastName(jobCenterUserResource.getLastName())
-                .setAddress(toJobCenterAddress(jobCenterUserResource.getAddressResource()))
+                .setAddress(toJobCenterAddress(jobCenterUserResource.getAddress()))
                 .build();
     }
 
