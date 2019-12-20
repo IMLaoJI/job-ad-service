@@ -13,38 +13,37 @@ public class JobCenterTestFixture {
     public static final String JOB_CENTER_CODE = "jobCenterCode";
 
     public static JobCenter testJobCenter(String name) {
-        return new JobCenter(
-                "jobCenterId",
-                JOB_CENTER_CODE,
-                "email",
-                "phone",
-                "jobCenterFax",
-                ContactDisplayStyle.DETAILED,
-                testJobCenterAddress(name)
-        );
+        return JobCenter.builder()
+                .setCode(JOB_CENTER_CODE)
+                .setEmail("email")
+                .setPhone("phone")
+                .setFax("jobCenterFax")
+                .setContactDisplayStyle(ContactDisplayStyle.DETAILED)
+                .setAddress(testJobCenterAddress(name))
+                .build();
     }
 
     public static JobCenter testJobCenterWithUserDetail(String name) {
-        return new JobCenter(
-                "jobCenterId",
-                JOB_CENTER_CODE,
-                "email",
-                "phone",
-                "jobCenterFax",
-                ContactDisplayStyle.JOB_CENTER_USER_CONTACT_DATA,
-                testJobCenterAddress(name)
-        );
+        return JobCenter.builder()
+                .setCode(JOB_CENTER_CODE)
+                .setEmail("email")
+                .setPhone("phone")
+                .setFax("jobCenterFax")
+                .setContactDisplayStyle(ContactDisplayStyle.JOB_CENTER_USER_CONTACT_DATA)
+                .setAddress(testJobCenterAddress(name))
+                .build();
     }
 
     public static Optional<JobCenterUser> createJobCenterUser() {
-        return Optional.of(new JobCenterUser()
+        return Optional.of(JobCenterUser.builder()
                 .setAddress(testJobCenterAddress("Markus Meier"))
                 .setCode("code")
                 .setEmail("email")
                 .setExternalId("14711")
                 .setFirstName("Markus")
                 .setLastName("Meier")
-                .setPhone("phone"));
+                .setPhone("phone")
+                .build());
     }
 
 }

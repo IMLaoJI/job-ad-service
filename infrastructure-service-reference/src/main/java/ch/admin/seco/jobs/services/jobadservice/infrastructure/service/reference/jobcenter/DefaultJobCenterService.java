@@ -50,29 +50,41 @@ class DefaultJobCenterService implements JobCenterService {
 
     @Override
     public Optional<JobCenterUser> findJobCenterUserByJobCenterUserId(String jobCenterUserId) {
-        return jobCenterApiClient.findJobCenterUserByJobCenterUseId(jobCenterUserId);
+        return jobCenterApiClient.findJobCenterUserByJobCenterUseId(jobCenterUserId)
+                .map(this::toJobCenterUser);
     }
 
     private JobCenter toJobCenter(JobCenterResource jobCenterResource) {
-        AddressResource jobCenterAddressResource = jobCenterResource.getAddress();
-        return new JobCenter(
-                jobCenterResource.getId(),
-                jobCenterResource.getCode(),
-                jobCenterResource.getEmail(),
-                jobCenterResource.getPhone(),
-                jobCenterResource.getFax(),
-                jobCenterResource.getContactDisplayStyle(),
-                toJobCenterAddress(jobCenterAddressResource)
-        );
+        return JobCenter.builder()
+                .setCode(jobCenterResource.getCode())
+                .setEmail(jobCenterResource.getEmail())
+                .setPhone(jobCenterResource.getPhone())
+                .setFax(jobCenterResource.getFax())
+                .setContactDisplayStyle(jobCenterResource.getContactDisplayStyle())
+                .setAddress(toJobCenterAddress(jobCenterResource.getAddress()))
+                .build();
+    }
+
+    private JobCenterUser toJobCenterUser(JobCenterUserResource jobCenterUserResource) {
+        return JobCenterUser.builder()
+                .setCode(jobCenterUserResource.getCode())
+                .setEmail(jobCenterUserResource.getEmail())
+                .setPhone(jobCenterUserResource.getPhone())
+                .setFax(jobCenterUserResource.getFax())
+                .setExternalId(jobCenterUserResource.getExternalId())
+                .setFirstName(jobCenterUserResource.getFirstName())
+                .setLastName(jobCenterUserResource.getLastName())
+                .setAddress(toJobCenterAddress(jobCenterUserResource.getAddressResource()))
+                .build();
     }
 
     private JobCenterAddress toJobCenterAddress(AddressResource jobCenterAddressResource) {
-        return new JobCenterAddress(
-                jobCenterAddressResource.getName(),
-                jobCenterAddressResource.getCity(),
-                jobCenterAddressResource.getStreet(),
-                jobCenterAddressResource.getHouseNumber(),
-                jobCenterAddressResource.getZipCode()
-        );
+        return JobCenterAddress.builder()
+                .setName(jobCenterAddressResource.getName())
+                .setCity(jobCenterAddressResource.getCity())
+                .setStreet(jobCenterAddressResource.getStreet())
+                .setHouseNumber(jobCenterAddressResource.getHouseNumber())
+                .setZipCode(jobCenterAddressResource.getZipCode())
+                .build();
     }
 }

@@ -4,12 +4,13 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenterAddres
 
 public class JobCenterAddressFixture {
     public static JobCenterAddress testJobCenterAddress(String name) {
-        return new JobCenterAddress(
-                name,
-                "jobCenter-city",
-                "jobCenter-street",
-                "100",
-                "3000"
-        );
+        return JobCenterAddress.builder()
+                .setName(name)
+                .setCity("jobCenter-city")
+                .setStreet("jobCenter-street")
+                .setHouseNumber("100")
+                .setZipCode("3000")
+                .build();
+
     }
 }

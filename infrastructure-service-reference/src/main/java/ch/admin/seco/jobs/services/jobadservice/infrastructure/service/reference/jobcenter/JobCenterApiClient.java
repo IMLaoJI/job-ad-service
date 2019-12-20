@@ -25,5 +25,5 @@ interface JobCenterApiClient {
     List<JobCenterResource> findAllJobCenters();
 
     @GetMapping(value = "/job-center-users/{externalId}")
-    Optional<JobCenterUser> findJobCenterUserByJobCenterUseId(@PathVariable("externalId") String externalId);
+    Optional<JobCenterUserResource> findJobCenterUserByJobCenterUseId(@PathVariable("externalId") String externalId);
 }
