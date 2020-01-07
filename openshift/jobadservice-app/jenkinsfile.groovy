@@ -15,10 +15,6 @@ pipeline {
         MAVEN_HOME = "/opt/rh/rh-maven35/root/usr/share/xmvn"
     }
 
-    triggers {
-        pollSCM('H/15 * * * *')
-    }
-
     stages {
 
         stage('Initialize') {
