@@ -13,6 +13,8 @@ pipeline {
         CREDENTIALS = "artifactory-deploy"
         ARTIFACTORY_SERVER = "alv-ch"
         MAVEN_HOME = "/opt/rh/rh-maven35/root/usr/share/xmvn"
+        SONAR_LOGIN = credentials('SONAR_TOKEN')
+        SONAR_SERVER = "${env.SONAR_HOST_URL}"
     }
 
     stages {
@@ -65,8 +67,7 @@ pipeline {
             steps {
                 rtMavenRun(
                     pom: 'pom.xml',
-                    goals: 'sonar:sonar -Dsonar.projectKey=JobAdService -Dsonar.host.url="http://sonarqube-internal.apps.admin.arbeitslosenkasse.ch" -Dsonar.login=5355bf8cc81641fefe4a972f27ba38642c20c69d',
-                    deployerId: "MAVEN_DEPLOYER",
+                    goals: 'sonar:sonar -Dsonar.projectKey=ReferenceService -Dsonar.host.url="$SONAR_SERVER" -Dsonar.login=$SONAR_LOGIN',
                     resolverId: "MAVEN_RESOLVER"
                 )
             }
