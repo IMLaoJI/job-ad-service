@@ -140,6 +140,10 @@ public class ExternalJobAdvertisementExportTaskConfig {
     }
 
     @Bean
+    ExternalJobAdvertisementTransformer externalJobAdvertisementTransformer() {
+        return new ExternalJobAdvertisementTransformer();
+    }
+    @Bean
     @JobScope
     StaxEventItemWriter<Oste> xmlFileReader(@Value("#{jobExecutionContext['" + PARAMETER_XML_FILE_PATH + "']}") File xmlFile) {
         return new StaxEventItemWriterBuilder<Oste>()
