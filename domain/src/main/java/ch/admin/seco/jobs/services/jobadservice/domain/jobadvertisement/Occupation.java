@@ -93,6 +93,8 @@ public class Occupation implements ValueObject<Occupation> {
         return Objects.equals(avamOccupationCode, that.avamOccupationCode) &&
                 Objects.equals(bfsCode, that.bfsCode) &&
                 Objects.equals(label, that.label) &&
+                Objects.equals(chIsco3Code, that.chIsco3Code) &&
+                Objects.equals(chIsco5Code, that.chIsco5Code) &&
                 workExperience == that.workExperience &&
                 Objects.equals(educationCode, that.educationCode) &&
                 qualificationCode == that.qualificationCode;
@@ -100,7 +102,7 @@ public class Occupation implements ValueObject<Occupation> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(avamOccupationCode, bfsCode, label, workExperience, educationCode, qualificationCode);
+        return Objects.hash(avamOccupationCode, bfsCode, chIsco3Code, chIsco5Code, label, workExperience, educationCode, qualificationCode);
     }
 
     @Override
