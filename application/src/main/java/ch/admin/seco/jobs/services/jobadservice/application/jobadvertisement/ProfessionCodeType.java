@@ -6,8 +6,6 @@ public enum ProfessionCodeType {
     AVAM,
     X28,
     BFS,
-    SBN3,
-    SBN5,
     CHISCO5,
     CHISCO3;
 

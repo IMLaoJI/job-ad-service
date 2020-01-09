@@ -14,14 +14,6 @@ public class Occupation implements ValueObject<Occupation> {
     // TODO @Size(max = 16)
     private String avamOccupationCode;
 
-    // TODO @Size(max = 16)
-    @Column(name = "SBN3_CODE")
-    private String sbn3Code;
-
-    // TODO @Size(max = 16)
-    @Column(name = "SBN5_CODE")
-    private String sbn5Code;
-
     @Size(max= 3)
     @Column(name = "CHISCO3_CODE")
     private String chIsco3Code;
@@ -50,8 +42,6 @@ public class Occupation implements ValueObject<Occupation> {
 
     public Occupation(Builder builder) {
         this.avamOccupationCode = Condition.notBlank(builder.avamOccupationCode);
-        this.sbn3Code = builder.sbn3Code;
-        this.sbn5Code = builder.sbn5Code;
         this.chIsco3Code = builder.chIsco3Code;
         this.chIsco5Code = builder.chIsco5Code;
         this.bfsCode = builder.bfsCode;
@@ -65,13 +55,7 @@ public class Occupation implements ValueObject<Occupation> {
         return avamOccupationCode;
     }
 
-    public String getSbn3Code() {
-        return sbn3Code;
-    }
 
-    public String getSbn5Code() {
-        return sbn5Code;
-    }
 
     public String getBfsCode() {
         return bfsCode;
@@ -107,8 +91,6 @@ public class Occupation implements ValueObject<Occupation> {
         if (o == null || getClass() != o.getClass()) { return false; }
         Occupation that = (Occupation) o;
         return Objects.equals(avamOccupationCode, that.avamOccupationCode) &&
-                Objects.equals(sbn3Code, that.sbn3Code) &&
-                Objects.equals(sbn5Code, that.sbn5Code) &&
                 Objects.equals(bfsCode, that.bfsCode) &&
                 Objects.equals(label, that.label) &&
                 workExperience == that.workExperience &&
@@ -118,15 +100,15 @@ public class Occupation implements ValueObject<Occupation> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(avamOccupationCode, sbn3Code, sbn5Code, bfsCode, label, workExperience, educationCode, qualificationCode);
+        return Objects.hash(avamOccupationCode, bfsCode, label, workExperience, educationCode, qualificationCode);
     }
 
     @Override
     public String toString() {
         return "Occupation{" +
                 "avamOccupationCode='" + avamOccupationCode + '\'' +
-                ", sbn3Code='" + sbn3Code + '\'' +
-                ", sbn5Code='" + sbn5Code + '\'' +
+                ", chIsco3Code='" + chIsco3Code + '\'' +
+                ", chIsco5Code='" + chIsco5Code + '\'' +
                 ", bfsCode='" + bfsCode + '\'' +
                 ", label='" + label + '\'' +
                 ", workExperience=" + workExperience +
@@ -137,8 +119,6 @@ public class Occupation implements ValueObject<Occupation> {
 
     public static final class Builder {
         private String avamOccupationCode;
-        private String sbn3Code;
-        private String sbn5Code;
         private String chIsco3Code;
         private String chIsco5Code;
         private String bfsCode;
@@ -156,16 +136,6 @@ public class Occupation implements ValueObject<Occupation> {
 
         public Builder setAvamOccupationCode(String avamOccupationCode) {
             this.avamOccupationCode = avamOccupationCode;
-            return this;
-        }
-
-        public Builder setSbn3Code(String sbn3Code) {
-            this.sbn3Code = sbn3Code;
-            return this;
-        }
-
-        public Builder setSbn5Code(String sbn5Code) {
-            this.sbn5Code = sbn5Code;
             return this;
         }
 
