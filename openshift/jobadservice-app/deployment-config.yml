@@ -38,6 +38,7 @@ items:
             from:
               kind: ImageStreamTag
               name: 'jobad-service:latest'
+              namespace: development
   - kind: Service
     apiVersion: v1
     metadata:
