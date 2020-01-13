@@ -8,8 +8,6 @@ public class OccupationFixture {
     public static Builder testOccupation() {
         return testOccupationEmpty()
         .setAvamOccupationCode("9999")
-        .setSbn3Code("sbn3Code")
-        .setSbn5Code("sbn5Code")
         .setBfsCode("bfsCode")
         .setLabel("label")
         .setWorkExperience(LESS_THAN_1_YEAR)

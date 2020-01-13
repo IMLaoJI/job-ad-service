@@ -8,10 +8,6 @@ public class OccupationLabelMappingResource {
 
     private String avamCode;
 
-    private String sbn3Code;
-
-    private String sbn5Code;
-
     private String iscoCode;
 
     private String chIsco3Code;
@@ -42,22 +38,6 @@ public class OccupationLabelMappingResource {
 
     public void setAvamCode(String avamCode) {
         this.avamCode = avamCode;
-    }
-
-    public String getSbn3Code() {
-        return sbn3Code;
-    }
-
-    public void setSbn3Code(String sbn3Code) {
-        this.sbn3Code = sbn3Code;
-    }
-
-    public String getSbn5Code() {
-        return sbn5Code;
-    }
-
-    public void setSbn5Code(String sbn5Code) {
-        this.sbn5Code = sbn5Code;
     }
 
     public String getIscoCode() {

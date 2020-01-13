@@ -684,8 +684,6 @@ public class JobAdvertisementApplicationService {
         return professionService.findByAvamCode(occupation.getAvamOccupationCode())
                 .map(profession -> new Occupation.Builder()
                         .setAvamOccupationCode(profession.getAvamCode())
-                        .setSbn3Code(profession.getSbn3Code())
-                        .setSbn5Code(profession.getSbn5Code())
                         .setBfsCode(profession.getBfsCode())
                         .setChIsco3Code(profession.getChIsco3Code())
                         .setChIsco5Code(profession.getChIsco5Code())
