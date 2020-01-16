@@ -68,7 +68,7 @@ pipeline {
             }
         }
 
-        stage('SonarQube') {
+    /*    stage('SonarQube') {
             steps {
                 rtMavenRun(
                     pom: 'pom.xml',
@@ -76,7 +76,7 @@ pipeline {
                     resolverId: "MAVEN_RESOLVER"
                 )
             }
-        }
+        }*/
 
         stage('Publish build info') {
             steps {
