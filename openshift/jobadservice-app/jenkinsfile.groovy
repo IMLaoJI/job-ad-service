@@ -49,6 +49,13 @@ pipeline {
                     releaseRepo: "libs-releases-ocp",
                     snapshotRepo: "libs-snapshots"
                 )
+
+                rtMavenResolver(
+                        id: "MAVEN_RESOLVER",
+                        serverId: ARTIFACTORY_SERVER,
+                        releaseRepo: "plugin-releases-ocp",
+                        snapshotRepo: "plugins-snapshots"
+                )
             }
         }
 
@@ -68,7 +75,7 @@ pipeline {
             }
         }
 
-    /*    stage('SonarQube') {
+        stage('SonarQube') {
             steps {
                 rtMavenRun(
                     pom: 'pom.xml',
@@ -76,7 +83,7 @@ pipeline {
                     resolverId: "MAVEN_RESOLVER"
                 )
             }
-        }*/
+        }
 
         stage('Publish build info') {
             steps {
