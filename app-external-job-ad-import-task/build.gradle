@@ -2,6 +2,7 @@ apply plugin: 'org.springframework.boot'
 apply from: 'jaxb.gradle'
 apply from: "${rootProject.rootDir}/gradle/docker-compose.gradle"
 apply from: "${rootProject.rootDir}/gradle/maven-publish.gradle"
+apply plugin: 'maven'
 
 dependencies {
     compile project(':application')

@@ -25,6 +25,8 @@
         <module>infrastructure-messagebroker-shared</module>
         <module>infrastructure-service-reference</module>
         <module>web</module>
+        <module>app-external-job-ad-export-task</module>
+        <module>app-external-job-ad-import-task</module>
     </modules>
 
     <build>
