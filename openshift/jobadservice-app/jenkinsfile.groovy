@@ -63,12 +63,12 @@ pipeline {
             steps {
                 rtMavenRun(
                         pom: 'pom.xml',
-                        goals: 'initialize -DnewVersion=${BUILD_NUMBER}',
+                        goals: 'initialize -DnewVersion=${BUILD_NUMBER} -U',
                         resolverId: "MAVEN_RESOLVER"
                 )
                 rtMavenRun(
                     pom: 'pom.xml',
-                    goals: 'clean install package -DskipTests -DskipITs=true',
+                    goals: 'clean install package -DskipTests -DskipITs=true -U',
                     deployerId: "MAVEN_DEPLOYER",
                     resolverId: "MAVEN_RESOLVER"
                 )
