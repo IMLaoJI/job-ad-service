@@ -95,8 +95,10 @@ pipeline {
 
         stage('Build Docker'){
             steps {
-                openshift.withCluster() { // Use "default" cluster or fallback to OpenShift cluster detection
-                    echo "Hello from the project running Jenkins: ${openshift.project()}"
+                script {
+                    openshift.withCluster('default') { // Use "default" cluster or fallback to OpenShift cluster detection
+                        echo "Hello from the project running Jenkins: ${openshift.project()}"
+                    }
                 }
             }
         }
