@@ -1,7 +1,7 @@
 buildscript {
     repositories {
-        maven { url 'http://repo.spring.io/plugins-release' }
-        maven { url 'http://repo.spring.io/milestone' }
+        maven { url 'https://repo.spring.io/plugins-release' }
+        maven { url 'https://repo.spring.io/milestone' }
         maven { url 'https://plugins.gradle.org/m2/' }
         jcenter()
     }
@@ -49,7 +49,7 @@ subprojects {
     }
 
     repositories {
-        maven { url 'http://repo.spring.io/milestone' }
+        maven { url 'https://repo.spring.io/milestone' }
         jcenter()
         maven { url 'https://alvch.jfrog.io/alvch/libs-releases' }
 
