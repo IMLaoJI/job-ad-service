@@ -1,10 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture;
 
-import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.ExternalCompanyDtoFixture.testExternalCompanyDto;
-
-import java.time.LocalDate;
-import java.util.Collections;
-
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalCompanyDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalCreateJobAdvertisementDto;
@@ -15,6 +10,11 @@ import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Qualification;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience;
+
+import java.time.LocalDate;
+import java.util.Collections;
+
+import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.ExternalCompanyDtoFixture.testExternalCompanyDto;
 
 public class CreateJobAdvertisementFromExternalDtoTestFixture {
 
@@ -42,7 +42,7 @@ public class CreateJobAdvertisementFromExternalDtoTestFixture {
                 .setCompany(new ExternalCompanyDto("name", "street", "houseNumber", "postalCode", "city", "CH", null, null, null, "phone", "email", "website", false))
                 .setLocation(new ExternalLocationDto(null, "city", "postalCode", null))
                 .setOccupations(Collections.singletonList(new ExternalOccupationDto()
-                        .setAvamOccupationCode("avamCode")
+                        .setAvamOccupationCode("101970")
                         .setWorkExperience(WorkExperience.MORE_THAN_1_YEAR)
                         .setEducationCode( "educationCode")
                         .setQualificationCode(Qualification.SKILLED)))
