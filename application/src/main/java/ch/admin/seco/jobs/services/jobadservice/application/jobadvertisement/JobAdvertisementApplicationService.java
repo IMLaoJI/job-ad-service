@@ -1,6 +1,12 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
-import ch.admin.seco.jobs.services.jobadservice.application.*;
+import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEvent;
+import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogger;
+import ch.admin.seco.jobs.services.jobadservice.application.IsSysAdmin;
+import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
+import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
+import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
+import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
@@ -44,7 +50,9 @@ import java.util.Optional;
 import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogConstants.STATUS_ADDITIONAL_DATA;
 import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEventType.JOB_ADVERTISEMENT_ACCESS_EVENT;
 import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogObjectType.JOB_ADVERTISEMENT_LOG;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.INSPECTING;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REFINING;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REJECTED;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -59,6 +67,8 @@ public class JobAdvertisementApplicationService {
     static final String COUNTRY_ISO_CODE_SWITZERLAND = "CH";
 
     private static final Logger LOG = LoggerFactory.getLogger(JobAdvertisementApplicationService.class);
+
+    private static final int START_RANGE_OF_NEW_AVAMCODES = 101970;
 
     private final CurrentUserContext currentUserContext;
 
@@ -116,6 +126,9 @@ public class JobAdvertisementApplicationService {
         LOG.debug("Start creating new job ad from API");
         Condition.notNull(createJobAdvertisementDto, "CreateJobAdvertisementDto can't be null");
         String avamOccupationCode = createJobAdvertisementDto.getOccupation().getAvamOccupationCode();
+        if(isDeprecatedAvamCode(avamOccupationCode)) {
+            LOG.info("The ApiUser with the ID: '{}' and the E-Mail: '{}' is using a deprecated avam code '{}'", currentUserContext.getCurrentUser().getUserId(), currentUserContext.getCurrentUser().getEmail(), avamOccupationCode);
+        }
         Condition.isTrue(professionService.isKnownAvamCode(avamOccupationCode),
                 String.format("Unknown AVAM Occupation Code: %s", avamOccupationCode));
         LOG.debug("Create '{}'", createJobAdvertisementDto.getJobDescriptions().get(0).getTitle());
@@ -1037,5 +1050,11 @@ public class JobAdvertisementApplicationService {
         return REFINING.equals(jobAdvertisement.getStatus())
                 && jobAdvertisement.isReportingObligation()
                 && ((jobAdvertisement.getReportingObligationEndDate() == null) || TimeMachine.isAfterToday(jobAdvertisement.getReportingObligationEndDate()));
+    }
+
+    private boolean isDeprecatedAvamCode(String avamOccupationCode) {
+        CurrentUser currentUser = currentUserContext.getCurrentUser();
+        return Integer.parseInt(avamOccupationCode) < START_RANGE_OF_NEW_AVAMCODES
+                && currentUser.getDisplayName() != null && currentUser.getUserId() != null;
     }
 }
