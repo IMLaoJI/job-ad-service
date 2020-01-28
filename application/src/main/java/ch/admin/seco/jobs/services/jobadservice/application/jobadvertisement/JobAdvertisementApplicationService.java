@@ -68,7 +68,7 @@ public class JobAdvertisementApplicationService {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobAdvertisementApplicationService.class);
 
-    private static final int START_RANGE_OF_NEW_AVAMCODES = 101970;
+    private static final int START_RANGE_OF_NEW_AVAMCODES = 101001;
 
     private final CurrentUserContext currentUserContext;
 
