@@ -17,7 +17,11 @@ public class ExternalJobAdvertisementTransformer implements ItemProcessor<JobAdv
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(ORACLE_DATE_FORMAT);
 
 
-
+    /**
+     *
+     * @param jobAdvertisement Comes from DB and is read from DB in ExternalJobAdvertisementExportTaskConfig.jpaPagingItemReader
+     * @return Oste
+     */
     @Override
     public Oste process(JobAdvertisement jobAdvertisement) {
         JobContent jobContent = jobAdvertisement.getJobContent();
@@ -28,6 +32,7 @@ public class ExternalJobAdvertisementTransformer implements ItemProcessor<JobAdv
         externalJobAdvertisement.setFingerprint(jobAdvertisement.getFingerprint());
         externalJobAdvertisement.setArbeitsamtbereich(jobAdvertisement.getJobCenterCode());
         externalJobAdvertisement.setGleicheOste(jobContent.getNumberOfJobs());
+        externalJobAdvertisement.setSourceSystem(jobAdvertisement.getSourceSystem().name());
 
         mapTitleAndDescription(jobContent.getJobDescriptions(), externalJobAdvertisement);
         mapOccupation(jobContent.getOccupations(), externalJobAdvertisement);
