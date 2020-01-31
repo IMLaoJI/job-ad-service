@@ -57,7 +57,6 @@ public class ExternalJobAdvertisementImportTaskConfig {
     private final MessageSource<File> externalJobAdvertisementDataFileMessageSource;
 
     private final Validator validator;
-    private final AlvJobroomFeatureToggleProperties alvJobroomFeatureToggleProperties;
 
     @Autowired
     public ExternalJobAdvertisementImportTaskConfig(
@@ -65,17 +64,17 @@ public class ExternalJobAdvertisementImportTaskConfig {
             StepBuilderFactory stepBuilderFactory,
             MessageSource<File> externalJobAdvertisementDataFileMessageSource,
             MessageChannel output,
-            Validator validator, AlvJobroomFeatureToggleProperties alvJobroomFeatureToggleProperties) {
+            Validator validator) {
         this.jobBuilderFactory = jobBuilderFactory;
         this.stepBuilderFactory = stepBuilderFactory;
         this.externalJobAdvertisementDataFileMessageSource = externalJobAdvertisementDataFileMessageSource;
         this.messageBrokerOutputChannel = output;
         this.validator = validator;
-        this.alvJobroomFeatureToggleProperties = alvJobroomFeatureToggleProperties;
     }
 
     @Bean
-    public Job externalImportJob(StaxEventItemReader<Oste> xmlFileReader, ExternalJobAdvertisementWriter externalJobAdvertisementWriter, ExternalJobAdvertisementProperties externalJobAdvertisementProperties) {
+    public Job externalImportJob(StaxEventItemReader<Oste> xmlFileReader, ExternalJobAdvertisementWriter externalJobAdvertisementWriter,
+                                 ExternalJobAdvertisementProperties externalJobAdvertisementProperties) {
         return jobBuilderFactory.get("external-jobad-xml-import")
                 .incrementer(new RunIdIncrementer())
                 .listener(new CleanupXmlFileJobExecutionListener())
@@ -105,7 +104,7 @@ public class ExternalJobAdvertisementImportTaskConfig {
 
     @Bean
     public ExternalItemProcessor externalItemProcessor() {
-        return new ExternalItemProcessor(validator, alvJobroomFeatureToggleProperties);
+        return new ExternalItemProcessor(validator);
     }
 
     @Bean

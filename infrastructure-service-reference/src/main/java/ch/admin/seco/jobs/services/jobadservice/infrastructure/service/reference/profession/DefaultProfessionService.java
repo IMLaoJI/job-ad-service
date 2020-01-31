@@ -55,8 +55,6 @@ public class DefaultProfessionService implements ProfessionService {
 		return new Profession.Builder()
 				.setId(new ProfessionId(resource.getAvamCode()))
 				.setAvamCode(resource.getAvamCode())
-				.setSbn3Code(resource.getSbn3Code())
-				.setSbn5Code(resource.getSbn5Code())
 				.setChIsco3Code(resource.getChIsco3Code())
 				.setChIsco5Code(resource.getChIsco5Code())
 				.setBfsCode(resource.getBfsCode())

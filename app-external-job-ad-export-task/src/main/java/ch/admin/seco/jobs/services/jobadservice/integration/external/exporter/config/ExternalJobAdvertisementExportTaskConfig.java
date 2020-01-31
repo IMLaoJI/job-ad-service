@@ -55,19 +55,17 @@ public class ExternalJobAdvertisementExportTaskConfig {
     private final StepBuilderFactory stepBuilderFactory;
     private final SftpMessageHandler sftpMessageHandler;
     private final ExternalJobAdvertisementProperties externalJobAdvertisementProperties;
-    private final AlvJobroomFeatureToggleProperties alvJobroomFeatureToggleProperties;
 
     @Autowired
     public ExternalJobAdvertisementExportTaskConfig(
             JobBuilderFactory jobBuilderFactory,
             StepBuilderFactory stepBuilderFactory,
             SftpMessageHandler sftpMessageHandler,
-            ExternalJobAdvertisementProperties externalJobAdvertisementProperties, AlvJobroomFeatureToggleProperties alvJobroomFeatureToggleProperties ) {
+            ExternalJobAdvertisementProperties externalJobAdvertisementProperties ) {
         this.jobBuilderFactory = jobBuilderFactory;
         this.stepBuilderFactory = stepBuilderFactory;
         this.sftpMessageHandler = sftpMessageHandler;
         this.externalJobAdvertisementProperties = externalJobAdvertisementProperties;
-        this.alvJobroomFeatureToggleProperties = alvJobroomFeatureToggleProperties;
     }
 
     @Bean
@@ -143,9 +141,8 @@ public class ExternalJobAdvertisementExportTaskConfig {
 
     @Bean
     ExternalJobAdvertisementTransformer externalJobAdvertisementTransformer() {
-        return new ExternalJobAdvertisementTransformer(alvJobroomFeatureToggleProperties);
+        return new ExternalJobAdvertisementTransformer();
     }
-
     @Bean
     @JobScope
     StaxEventItemWriter<Oste> xmlFileReader(@Value("#{jobExecutionContext['" + PARAMETER_XML_FILE_PATH + "']}") File xmlFile) {

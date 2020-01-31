@@ -1,5 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.service.reference.jobcenter;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.profession.Language;
+
 public class AddressResource {
 
     private String name;
@@ -7,6 +9,7 @@ public class AddressResource {
     private String street;
     private String houseNumber;
     private String zipCode;
+    private Language language;
 
     protected AddressResource() {
         // For reflection libs
@@ -58,5 +61,13 @@ public class AddressResource {
 
     public void setZipCode(String zipCode) {
         this.zipCode = zipCode;
+    }
+
+    public Language getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(Language language) {
+        this.language = language;
     }
 }

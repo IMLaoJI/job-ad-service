@@ -311,12 +311,6 @@
                   "avamOccupationCode": {
                     "type": "keyword"
                   },
-                  "sbn3Code": {
-                    "type": "keyword"
-                  },
-                  "sbn5Code": {
-                    "type": "keyword"
-                  },
                   "chIsco3Code": {
                     "type": "keyword"
                   },

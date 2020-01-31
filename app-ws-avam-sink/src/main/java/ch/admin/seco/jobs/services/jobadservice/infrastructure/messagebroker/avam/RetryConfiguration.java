@@ -1,5 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.classify.BinaryExceptionClassifier;
 import org.springframework.cloud.stream.annotation.StreamRetryTemplate;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +17,10 @@ import java.util.Arrays;
 
 @Configuration
 public class RetryConfiguration {
+
     private final AvamProperties avamProperties;
+
+    private static Logger LOG = LoggerFactory.getLogger(RetryConfiguration.class);
 
     public RetryConfiguration(AvamProperties avamProperties) {
         this.avamProperties = avamProperties;
@@ -41,7 +46,13 @@ public class RetryConfiguration {
         final AlwaysRetryPolicy alwaysRetryPolicy = new AlwaysRetryPolicy();
 
         ExceptionClassifierRetryPolicy retryPolicy = new ExceptionClassifierRetryPolicy();
-        retryPolicy.setExceptionClassifier(classifiable -> keepRetryingClassifier.classify(classifiable) ? alwaysRetryPolicy : simpleRetryPolicy);
+        retryPolicy.setExceptionClassifier(classifiable -> {
+            if (keepRetryingClassifier.classify(classifiable)) {
+                LOG.info("using alwaysRetryPolicy for: " + classifiable.getMessage());
+                return alwaysRetryPolicy;
+            }
+            return simpleRetryPolicy;
+        });
 
         return retryPolicy;
     }

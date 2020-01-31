@@ -8,10 +8,6 @@ public class Profession {
 
     private String avamCode;
 
-    private String sbn3Code;
-
-    private String sbn5Code;
-
     private String chIsco3Code;
 
     private String chIsco5Code;
@@ -27,8 +23,6 @@ public class Profession {
     private Profession(Builder builder){
         this.id = Condition.notNull(builder.id);
         this.avamCode = builder.avamCode;
-        this.sbn3Code = builder.sbn3Code;
-        this.sbn5Code = builder.sbn5Code;
         this.chIsco3Code = builder.chIsco3Code;
         this.chIsco5Code = builder.chIsco5Code;
         this.bfsCode = builder.bfsCode;
@@ -41,14 +35,6 @@ public class Profession {
 
     public String getAvamCode() {
         return avamCode;
-    }
-
-    public String getSbn3Code() {
-        return sbn3Code;
-    }
-
-    public String getSbn5Code() {
-        return sbn5Code;
     }
 
     public String getChIsco3Code() {
@@ -72,10 +58,6 @@ public class Profession {
 
         private String avamCode;
 
-        private String sbn3Code;
-
-        private String sbn5Code;
-
         private String chIsco3Code;
 
         private String chIsco5Code;
@@ -91,16 +73,6 @@ public class Profession {
 
         public Builder setAvamCode(String avamCode) {
             this.avamCode = avamCode;
-            return this;
-        }
-
-        public Builder setSbn3Code(String sbn3Code) {
-            this.sbn3Code = sbn3Code;
-            return this;
-        }
-
-        public Builder setSbn5Code(String sbn5Code) {
-            this.sbn5Code = sbn5Code;
             return this;
         }
 
@@ -129,5 +101,4 @@ public class Profession {
         }
 
     }
-
 }

@@ -1,6 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobcenter;
 
-public class JobCenter {
+public class JobCenterUser {
 
     private String code;
 
@@ -10,9 +10,14 @@ public class JobCenter {
 
     private String fax;
 
-    private ContactDisplayStyle contactDisplayStyle;
+    private String externalId;
+
+    private String firstName;
+
+    private String lastName;
 
     private JobCenterAddress address;
+
 
     public String getCode() {
         return code;
@@ -30,8 +35,16 @@ public class JobCenter {
         return fax;
     }
 
-    public ContactDisplayStyle getContactDisplayStyle() {
-        return contactDisplayStyle;
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 
     public JobCenterAddress getAddress() {
@@ -47,7 +60,9 @@ public class JobCenter {
         private String email;
         private String phone;
         private String fax;
-        private ContactDisplayStyle contactDisplayStyle;
+        private String externalId;
+        private String firstName;
+        private String lastName;
         private JobCenterAddress address;
 
         private Builder() {
@@ -73,8 +88,18 @@ public class JobCenter {
             return this;
         }
 
-        public Builder setContactDisplayStyle(ContactDisplayStyle contactDisplayStyle) {
-            this.contactDisplayStyle = contactDisplayStyle;
+        public Builder setExternalId(String externalId) {
+            this.externalId = externalId;
+            return this;
+        }
+
+        public Builder setFirstName(String firstName) {
+            this.firstName = firstName;
+            return this;
+        }
+
+        public Builder setLastName(String lastName) {
+            this.lastName = lastName;
             return this;
         }
 
@@ -83,15 +108,17 @@ public class JobCenter {
             return this;
         }
 
-        public JobCenter build() {
-            JobCenter jobCenter = new JobCenter();
-            jobCenter.code = this.code;
-            jobCenter.phone = this.phone;
-            jobCenter.fax = this.fax;
-            jobCenter.contactDisplayStyle = this.contactDisplayStyle;
-            jobCenter.email = this.email;
-            jobCenter.address = this.address;
-            return jobCenter;
+        public JobCenterUser build() {
+            JobCenterUser jobCenterUser = new JobCenterUser();
+            jobCenterUser.externalId = this.externalId;
+            jobCenterUser.email = this.email;
+            jobCenterUser.code = this.code;
+            jobCenterUser.phone = this.phone;
+            jobCenterUser.firstName = this.firstName;
+            jobCenterUser.address = this.address;
+            jobCenterUser.lastName = this.lastName;
+            jobCenterUser.fax = this.fax;
+            return jobCenterUser;
         }
     }
 }

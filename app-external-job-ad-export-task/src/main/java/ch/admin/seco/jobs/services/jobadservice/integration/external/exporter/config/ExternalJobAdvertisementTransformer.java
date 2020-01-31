@@ -16,11 +16,6 @@ public class ExternalJobAdvertisementTransformer implements ItemProcessor<JobAdv
     private static final String ORACLE_DATE_FORMAT = "yyyy-MM-dd-HH.mm.ss.SSSSSS";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(ORACLE_DATE_FORMAT);
 
-    private final AlvJobroomFeatureToggleProperties alvJobroomFeatureToggleProperties;
-
-    ExternalJobAdvertisementTransformer(AlvJobroomFeatureToggleProperties alvJobroomFeatureToggleProperties) {
-        this.alvJobroomFeatureToggleProperties = alvJobroomFeatureToggleProperties;
-    }
 
 
     @Override
@@ -164,48 +159,26 @@ public class ExternalJobAdvertisementTransformer implements ItemProcessor<JobAdv
 
     private void mapOccupation(List<Occupation> occupations, Oste externalJobAdvertisement) {
         if (!isEmpty(occupations)) {
-            if (!alvJobroomFeatureToggleProperties.isNewAvamCodeEnabled()) {
-                if (occupations.size() >= 1) {
-                    Occupation occupation = occupations.get(0);
-                    externalJobAdvertisement.setBq1AvamBerufNr(occupation.getAvamOccupationCode());
-                    externalJobAdvertisement.setBq1AusbildungCode(occupation.getEducationCode());
-                    externalJobAdvertisement.setBq1ErfahrungCode(safeString(occupation.getWorkExperience()));
-                }
 
-                if (occupations.size() >= 2) {
-                    Occupation occupation = occupations.get(1);
-                    externalJobAdvertisement.setBq2AvamBerufNr(occupation.getAvamOccupationCode());
-                    externalJobAdvertisement.setBq2AusbildungCode(occupation.getEducationCode());
-                    externalJobAdvertisement.setBq2ErfahrungCode(safeString(occupation.getWorkExperience()));
-                }
+            if (occupations.size() >= 1) {
+                Occupation occupation = occupations.get(0);
+                externalJobAdvertisement.setBq1AvamBerufNrNew(occupation.getAvamOccupationCode());
+                externalJobAdvertisement.setBq1AusbildungCode(occupation.getEducationCode());
+                externalJobAdvertisement.setBq1ErfahrungCode(safeString(occupation.getWorkExperience()));
+            }
 
-                if (occupations.size() >= 3) {
-                    Occupation occupation = occupations.get(2);
-                    externalJobAdvertisement.setBq3AvamBerufNr(occupation.getAvamOccupationCode());
-                    externalJobAdvertisement.setBq3AusbildungCode(occupation.getEducationCode());
-                    externalJobAdvertisement.setBq3ErfahrungCode(safeString(occupation.getWorkExperience()));
-                }
-            } else {
-                if (occupations.size() >= 1) {
-                    Occupation occupation = occupations.get(0);
-                    externalJobAdvertisement.setBq1AvamBerufNrNew(occupation.getAvamOccupationCode());
-                    externalJobAdvertisement.setBq1AusbildungCode(occupation.getEducationCode());
-                    externalJobAdvertisement.setBq1ErfahrungCode(safeString(occupation.getWorkExperience()));
-                }
+            if (occupations.size() >= 2) {
+                Occupation occupation = occupations.get(1);
+                externalJobAdvertisement.setBq2AvamBerufNrNew(occupation.getAvamOccupationCode());
+                externalJobAdvertisement.setBq2AusbildungCode(occupation.getEducationCode());
+                externalJobAdvertisement.setBq2ErfahrungCode(safeString(occupation.getWorkExperience()));
+            }
 
-                if (occupations.size() >= 2) {
-                    Occupation occupation = occupations.get(1);
-                    externalJobAdvertisement.setBq2AvamBerufNrNew(occupation.getAvamOccupationCode());
-                    externalJobAdvertisement.setBq2AusbildungCode(occupation.getEducationCode());
-                    externalJobAdvertisement.setBq2ErfahrungCode(safeString(occupation.getWorkExperience()));
-                }
-
-                if (occupations.size() >= 3) {
-                    Occupation occupation = occupations.get(2);
-                    externalJobAdvertisement.setBq3AvamBerufNrNew(occupation.getAvamOccupationCode());
-                    externalJobAdvertisement.setBq3AusbildungCode(occupation.getEducationCode());
-                    externalJobAdvertisement.setBq3ErfahrungCode(safeString(occupation.getWorkExperience()));
-                }
+            if (occupations.size() >= 3) {
+                Occupation occupation = occupations.get(2);
+                externalJobAdvertisement.setBq3AvamBerufNrNew(occupation.getAvamOccupationCode());
+                externalJobAdvertisement.setBq3AusbildungCode(occupation.getEducationCode());
+                externalJobAdvertisement.setBq3ErfahrungCode(safeString(occupation.getWorkExperience()));
             }
         }
     }
