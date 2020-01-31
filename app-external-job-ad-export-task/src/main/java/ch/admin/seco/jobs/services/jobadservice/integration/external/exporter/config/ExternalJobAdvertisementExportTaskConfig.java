@@ -124,7 +124,7 @@ public class ExternalJobAdvertisementExportTaskConfig {
         // FIXME Workaround because Eures interface only gets job ads from External
         jpaPagingItemReader.setQueryString("select j from JobAdvertisement j " +
                 "where j.status = 'PUBLISHED_PUBLIC' and " +
-                "j.sourceSystem in ('API', 'JOBROOM', 'RAV', 'EXTERN') and " +
+                "j.sourceSystem in ('API', 'JOBROOM', 'RAV') and " +
                 "(j.publication.publicDisplay is TRUE OR j.publication.euresDisplay is TRUE)" +
                 "order by j.id");
         jpaPagingItemReader.setEntityManagerFactory(jobAdServiceEntityManagerFactory);
