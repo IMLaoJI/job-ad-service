@@ -22,11 +22,18 @@ items:
             deploymentconfig: jobad-service
         spec:
           containers:
-            - image: 'docker-registry.default.svc:5000/development/jobad-service:latest'
+            - image: 'docker-registry.default.svc:5000/jobroom-dev/jobad-service:latest'
               name: jobad-service
               ports:
                 - containerPort: 8080
                   protocol: TCP
+              resources:
+                requests:
+                  cpu: 202m
+                  memory: 1Gi
+                limits:
+                  cpu: 4
+                  memory: 4Gi
       test: false
       triggers:
         - type: ConfigChange
@@ -38,7 +45,7 @@ items:
             from:
               kind: ImageStreamTag
               name: 'jobad-service:latest'
-              namespace: development
+              namespace: jobroom-dev
   - kind: Service
     apiVersion: v1
     metadata:
@@ -61,7 +68,7 @@ items:
         app: jobad-service
       name: jobad-service
     spec:
-      host: jobad-service-development.apps.admin.arbeitslosenkasse.ch
+      host: jobad-service-TARGET.apps.admin.arbeitslosenkasse.ch
       port:
         targetPort: 8080-tcp
       to:
@@ -74,6 +81,6 @@ items:
         - conditions:
             - status: 'True'
               type: Admitted
-          host: jobad-service-development.apps.admin.arbeitslosenkasse.ch
+          host: jobad-service-TARGET.apps.admin.arbeitslosenkasse.ch
           routerName: router
           wildcardPolicy: None

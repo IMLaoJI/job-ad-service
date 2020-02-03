@@ -15,6 +15,9 @@ pipeline {
         MAVEN_HOME = "/opt/rh/rh-maven35/root/usr/share/xmvn"
         SONAR_LOGIN = credentials('SONAR_TOKEN')
         SONAR_SERVER = "${env.SONAR_HOST_URL}"
+        JR_DEV = "jobroom-dev"
+        DOCKER_BUILD_NAME = "jobad-service-docker"
+        DEPLOYMENT_CONFIG = "jobad-service"
     }
 
     stages {
@@ -51,24 +54,25 @@ pipeline {
                 )
 
                 rtMavenResolver(
-                        id: "MAVEN_RESOLVER",
-                        serverId: ARTIFACTORY_SERVER,
-                        releaseRepo: "plugin-releases-ocp",
-                        snapshotRepo: "plugins-snapshots"
+                    id: "MAVEN_RESOLVER",
+                    serverId: ARTIFACTORY_SERVER,
+                    releaseRepo: "plugin-releases-ocp",
+                    snapshotRepo: "plugins-snapshots"
                 )
             }
         }
 
         stage('Exec Maven') {
             steps {
+                // TODO apply release number concept DF-2094
                 rtMavenRun(
-                        pom: 'pom.xml',
-                        goals: 'initialize -DnewVersion=${BUILD_NUMBER}',
-                        resolverId: "MAVEN_RESOLVER"
+                    pom: 'pom.xml',
+                    goals: 'initialize -DnewVersion=${BUILD_NUMBER}',
+                    resolverId: "MAVEN_RESOLVER"
                 )
                 rtMavenRun(
                     pom: 'pom.xml',
-                    goals: 'clean install package -DskipTests -DskipITs=true',
+                    goals: 'package -Popenshift -DskipTests -DskipITs=true',
                     deployerId: "MAVEN_DEPLOYER",
                     resolverId: "MAVEN_RESOLVER"
                 )
@@ -79,7 +83,7 @@ pipeline {
             steps {
                 rtMavenRun(
                     pom: 'pom.xml',
-                    goals: 'sonar:sonar -Dsonar.projectKey=ReferenceService -Dsonar.host.url="$SONAR_SERVER" -Dsonar.login=$SONAR_LOGIN',
+                    goals: 'sonar:sonar -Dsonar.projectKey=JobadService -Dsonar.host.url="$SONAR_SERVER" -Dsonar.login=$SONAR_LOGIN',
                     resolverId: "MAVEN_RESOLVER"
                 )
             }
@@ -93,13 +97,28 @@ pipeline {
             }
         }
 
-        stage('Build Docker'){
+        stage('Docker Build in dev') {
             steps {
-                script {
-                    openshift.withCluster() { // Use "default" cluster or fallback to OpenShift cluster detection
-                        echo "Hello from the project running Jenkins: ${openshift.project()}"
-                    }
-                }
+                sh '''
+                    oc start-build -F $DOCKER_BUILD_NAME --from-dir . -n $JR_DEV
+                '''
+            }
+        }
+
+        stage('Deploy to jobroom-dev') {
+            steps {
+                openshiftDeploy(
+                        namespace: '$JR_DEV',
+                        depCfg: '$DEPLOYMENT_CONFIG',
+                        waitTime: '300000'
+                )
+
+                openshiftVerifyDeployment(
+                        namespace: '$JR_DEV',
+                        depCfg: '$DEPLOYMENT_CONFIG',
+                        replicaCount: '1',
+                        verifyReplicaCount: 'true',
+                        waitTime: '300000')
             }
         }
     }

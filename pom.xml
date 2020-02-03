@@ -5,9 +5,6 @@
     <artifactId>job-ad-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <dependencyManagement>
-        <dependencies/>
-    </dependencyManagement>
 
     <properties>
         <java.version>1.8</java.version>
@@ -32,6 +29,18 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>build-info</id>
+                        <goals>
+                            <goal>build-info</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
@@ -42,6 +51,10 @@
             </plugin>
         </plugins>
     </build>
+
+    <dependencyManagement>
+        <dependencies/>
+    </dependencyManagement>
 
     <profiles>
         <profile>

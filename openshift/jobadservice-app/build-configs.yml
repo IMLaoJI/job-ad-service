@@ -1,0 +1,63 @@
+kind: List
+apiVersion: v1
+items:
+    - kind: BuildConfig
+      apiVersion: v1
+      metadata:
+          name: jobad-service
+          namespace: cicd
+          labels:
+              build: jobad-service
+              app: jobad-service
+      spec:
+          runPolicy: Serial
+          triggers: []
+          source:
+              git:
+                  ref: feature/openshift-improvements
+                  uri: https://github.com/alv-ch/job-ad-service.git
+              type: Git
+              sourceSecret:
+                  name: alvchbot-at-github
+          nodeSelector: {}
+          output: {}
+          postCommit: {}
+          resources: {}
+          successfulBuildsHistoryLimit: 5
+          failedBuildsHistoryLimit: 5
+          strategy:
+              type: JenkinsPipeline
+              jenkinsPipelineStrategy:
+                  jenkinsfilePath: openshift/jobadservice-app/jenkinsfile.groovy
+
+    - kind: ImageStream
+      apiVersion: image.openshift.io/v1
+      metadata:
+          name: jobad-service
+          namespace: jobroom-dev
+          labels:
+              build: jobad-service
+              app: jobad-service
+
+    - kind: BuildConfig
+      apiVersion: build.openshift.io/v1
+      metadata:
+          name: jobad-service-docker
+          namespace: jobroom-dev
+          labels:
+              build: jobad-service
+              app: jobad-service
+      spec:
+          source:
+              binary: {}
+          output:
+              to:
+                  kind: ImageStreamTag
+                  name: jobad-service:latest
+                  namespace: jobroom-dev
+          postCommit: {}
+          resources: {}
+          strategy:
+              dockerStrategy:
+                  dockerfilePath: ./openshift/jobadservice-app/Dockerfile
+              type: Docker
