@@ -130,12 +130,20 @@ pipeline {
                 script {
                     openshift.withCluster() {
                         openshift.withProject('jobroom-dev') {
+                            def templateParameters = [
+                                    "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service",
+                                    "-p", "APPLICATION_NAME={->paramApplicationName}",
+                                    "-p", "NAMESPACE=jobroom-dev",
+                            ]
                             def microserviceAppBuildConfigDockerTemplate = openshift.selector("template", "microservice-app-build-config-docker-template").object()
-                            openshift.apply(openshift.process(microserviceAppBuildConfigDockerTemplate, "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service APPLICATION_NAME=app-job-ad-service NAMESPACE=jobroom-dev"))
+                            paramApplicationName = "app-job-ad-service"
+                            openshift.apply(openshift.process(microserviceAppBuildConfigDockerTemplate, "-p", templateParameters))
 
                             def batchAppBuildConfigDockerTemplate = openshift.selector("template", "batch-app-build-config-docker-template").object()
-                            openshift.apply(openshift.process(batchAppBuildConfigDockerTemplate, "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service APPLICATION_NAME=app-external-job-ad-export-task NAMESPACE=jobroom-dev"))
-                            openshift.apply(openshift.process(batchAppBuildConfigDockerTemplate, "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service APPLICATION_NAME=app-external-job-ad-import-task NAMESPACE=jobroom-dev"))
+                            paramApplicationName = "app-external-job-ad-export-task"
+                            openshift.apply(openshift.process(batchAppBuildConfigDockerTemplate, "-p", templateParameters))
+                            paramApplicationName = "app-external-job-ad-import-task"
+                            openshift.apply(openshift.process(batchAppBuildConfigDockerTemplate, "-p", templateParameters))
 
                             openshift.selector('bc', 'app-job-ad-service-docker').startBuild("--from-dir .")
                             openshift.selector('bc', 'app-external-job-ad-export-task-docker').startBuild("--from-dir .")
