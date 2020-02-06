@@ -1,0 +1,39 @@
+kind: List
+metadata: {}
+apiVersion: v1
+items:
+  - kind: DeploymentConfig
+    apiVersion: apps.openshift.io/v1
+    metadata:
+      labels:
+        app: app-job-ad-service
+      name: app-job-ad-service
+    spec:
+      replicas: 1
+      selector:
+        app: app-job-ad-service
+        deploymentconfig: app-job-ad-service
+      strategy:
+        resources: {}
+      template:
+        metadata:
+          labels:
+            app: app-job-ad-service
+            deploymentconfig: app-job-ad-service
+        spec:
+          containers:
+            - image: 'docker-registry.default.svc:5000/jobroom-dev/app-job-ad-service:latest'
+              name: app-job-ad-service
+              ports:
+                - containerPort: 8080
+                  protocol: TCP
+              resources:
+                requests:
+                  cpu: 202m
+                  memory: 1Gi
+                limits:
+                  cpu: 4
+                  memory: 4Gi
+      test: false
+      triggers:
+        - type: ConfigChange

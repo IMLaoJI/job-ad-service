@@ -4,12 +4,6 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>ch.admin.seco.jobs.services.jobadservice</groupId>
-        <artifactId>job-ad-service</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </parent>
-
     <artifactId>web</artifactId>
 
     <dependencies>
@@ -1180,45 +1174,48 @@
         </dependencies>
     </dependencyManagement>
 
+<!--
+Non Generated code starts
+-->
+    <parent>
+        <groupId>ch.admin.seco.jobs.services.jobadservice</groupId>
+        <artifactId>job-ad-service</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.2.4.RELEASE</version>
-                <configuration>
-                    <mainClass>ch.admin.seco.jobs.services.jobadservice.Application</mainClass>
-                </configuration>
                 <executions>
                     <execution>
+                        <id>build-info</id>
                         <goals>
-                            <goal>repackage</goal>
+                            <goal>build-info</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <finalName>app-job-ad-service</finalName>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.6.0.1398</version>
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <!-- When built in OpenShift the 'openshift' profile will be used when invoking mvn. -->
-            <!-- Use this profile for any OpenShift specific customization your app will need. -->
-            <!-- By default that is to put the resulting archive into the 'deployments' folder. -->
-            <!-- http://maven.apache.org/guides/mini/guide-building-for-different-environments.html -->
-            <id>openshift</id>
-            <build>
-                <finalName>jobad-service</finalName>
-                <plugins>
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <configuration>
-                            <finalName>jobad-service</finalName>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+    <!--
+    Non Generated code ends
+    -->
 </project>

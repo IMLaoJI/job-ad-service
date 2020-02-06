@@ -1,0 +1,27 @@
+---
+kind: BuildConfig
+apiVersion: v1
+metadata:
+  name: jobad-service
+spec:
+  runPolicy: Serial
+  triggers: []
+  source:
+    git:
+      ref: feature/openshift-refactor
+      uri: https://github.com/alv-ch/job-ad-service.git
+    type: Git
+    # source secret already exists
+    sourceSecret:
+      name: alvchbot-at-github
+  nodeSelector: {}
+  output: {}
+  postCommit: {}
+  resources: {}
+  successfulBuildsHistoryLimit: 5
+  failedBuildsHistoryLimit: 5
+  strategy:
+    type: JenkinsPipeline
+    jenkinsPipelineStrategy:
+      jenkinsfilePath: openshift/job-ad-service/jenkinsfile.groovy
+

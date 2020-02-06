@@ -8,9 +8,9 @@ if ! whoami &> /dev/null; then
   fi
 fi
 
-java $JAVA_OPTS -server -jar /srv/jobroom/jobad-service.jar \
+java $JAVA_OPTS -server -jar /srv/jobroom/app-job-ad-service.jar \
   --spring.profiles.active=development,swagger \
-  --spring.cloud.config.uri="http://admin:admin@registry-development.apps.admin.arbeitslosenkasse.ch/config" \
+  --spring.cloud.config.uri="http://admin:admin@${ALVCH_JHIPSTER_REGISTRY_SERVICE_HOST}:${ALVCH_JHIPSTER_REGISTRY_SERVICE_PORT}/config" \
   --jhipster.registry.password=admin \
   --spring.cloud.config.label=openshift \
   --server.port=8080
