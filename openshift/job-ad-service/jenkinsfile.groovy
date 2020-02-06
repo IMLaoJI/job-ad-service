@@ -132,18 +132,18 @@ pipeline {
                         openshift.withProject('jobroom-dev') {
                             def templateParameters = [
                                     "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service",
-                                    "-p", "APPLICATION_NAME={->paramApplicationName}",
+                                    "-p", "APPLICATION_NAME=${->paramApplicationName}",
                                     "-p", "NAMESPACE=jobroom-dev",
                             ]
                             def microserviceAppBuildConfigDockerTemplate = openshift.selector("template", "microservice-app-build-config-docker-template").object()
                             paramApplicationName = "app-job-ad-service"
-                            openshift.apply(openshift.process(microserviceAppBuildConfigDockerTemplate, "-p", templateParameters))
+                            openshift.apply(openshift.process(microserviceAppBuildConfigDockerTemplate, templateParameters))
 
                             def batchAppBuildConfigDockerTemplate = openshift.selector("template", "batch-app-build-config-docker-template").object()
                             paramApplicationName = "app-external-job-ad-export-task"
-                            openshift.apply(openshift.process(batchAppBuildConfigDockerTemplate, "-p", templateParameters))
+                            openshift.apply(openshift.process(batchAppBuildConfigDockerTemplate, templateParameters))
                             paramApplicationName = "app-external-job-ad-import-task"
-                            openshift.apply(openshift.process(batchAppBuildConfigDockerTemplate, "-p", templateParameters))
+                            openshift.apply(openshift.process(batchAppBuildConfigDockerTemplate, templateParameters))
 
                             openshift.selector('bc', 'app-job-ad-service-docker').startBuild("--from-dir .")
                             openshift.selector('bc', 'app-external-job-ad-export-task-docker').startBuild("--from-dir .")
