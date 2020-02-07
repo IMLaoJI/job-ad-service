@@ -25,6 +25,13 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
+                <xs:element name="sourceSystem" minOccurs="0">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:maxLength value="16"></xs:maxLength>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
                 <xs:element name="stellennummerAvam" minOccurs="0">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
