@@ -14,5 +14,4 @@ java $JAVA_OPTS -server -jar /srv/jobroom/app-external-job-ad-import-task.jar \
   --jhipster.registry.password=admin \
   --spring.cloud.config.label=openshift \
   --server.port=8080 \
-  --spring.cloud.config.name=app-prisme-job-ad-import \
-  -Dhttp.proxyHost=l98fppx1.admin.arbeitslosenkasse.ch -Dhttp.proxyPort=8080 -Dhttps.proxyHost=l98fppx1.admin.arbeitslosenkasse.ch -Dhttps.proxyPort=8080 -Dhttp.nonProxyHosts="*.admin.arbeitslosenkasse.ch|172.27.97.10|172.27.97.11|172.27.97.12|172.30.0.1"
+  --spring.cloud.config.name=app-prisme-job-ad-import
