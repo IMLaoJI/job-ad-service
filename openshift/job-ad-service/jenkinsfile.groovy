@@ -125,7 +125,7 @@ pipeline {
             }
         }
 
-        stage('Docker Build in jobroom-dev') {
+        stage('Docker Build job-ad-service in jobroom-dev') {
             steps {
                 script {
                     openshift.withCluster() {
@@ -137,6 +137,25 @@ pipeline {
                                     "-p", "NAMESPACE=jobroom-dev",
                             ]))
 
+                            def build = openshift.selector('bc', 'app-job-ad-service-docker').startBuild("--from-dir .")
+                            result = build.logs('-f')
+
+                            if(result.status == 0) {
+                                return true
+                            }
+
+                            return false
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Docker Build app-external-job-ad-export-task in jobroom-dev') {
+            steps {
+                script {
+                    openshift.withCluster() {
+                        openshift.withProject('jobroom-dev') {
                             def batchAppBuildConfigDockerTemplate = openshift.selector("template", "batch-app-build-config-docker-template").object()
                             openshift.apply(openshift.process(batchAppBuildConfigDockerTemplate, [
                                     "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service",
@@ -144,15 +163,40 @@ pipeline {
                                     "-p", "NAMESPACE=jobroom-dev",
                             ]))
 
+                            def build = openshift.selector('bc', 'app-external-job-ad-export-task-docker').startBuild("--from-dir .")
+                            result = build.logs('-f')
+
+                            if(result.status == 0) {
+                                return true
+                            }
+
+                            return false
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Docker Build app-external-job-ad-import-task in jobroom-dev') {
+            steps {
+                script {
+                    openshift.withCluster() {
+                        openshift.withProject('jobroom-dev') {
+                            def batchAppBuildConfigDockerTemplate = openshift.selector("template", "batch-app-build-config-docker-template").object()
                             openshift.apply(openshift.process(batchAppBuildConfigDockerTemplate, [
                                     "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service",
                                     "-p", "APPLICATION_NAME=app-external-job-ad-import-task",
                                     "-p", "NAMESPACE=jobroom-dev",
                             ]))
 
-                            openshift.selector('bc', 'app-job-ad-service-docker').startBuild("--from-dir .")
-                            openshift.selector('bc', 'app-external-job-ad-export-task-docker').startBuild("--from-dir .")
-                            openshift.selector('bc', 'app-external-job-ad-import-task-docker').startBuild("--from-dir .")
+                            def build = openshift.selector('bc', 'app-external-job-ad-import-task-docker').startBuild("--from-dir .")
+                            result = build.logs('-f')
+
+                            if(result.status == 0) {
+                                return true
+                            }
+
+                            return false
                         }
                     }
                 }
