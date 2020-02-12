@@ -31,6 +31,10 @@ public class ExternalJobAdvertisementProperties {
     @NotBlank
     private String fileNamePattern;
 
+    private String proxyHost;
+
+    private Integer proxyPort;
+
     public Boolean getAllowUnknownKeys() {
         return allowUnknownKeys;
     }
@@ -93,5 +97,21 @@ public class ExternalJobAdvertisementProperties {
 
     public void setFileNamePattern(String fileNamePattern) {
         this.fileNamePattern = fileNamePattern;
+    }
+
+    public String getProxyHost() {
+        return proxyHost;
+    }
+
+    public void setProxyHost(String proxyHost) {
+        this.proxyHost = proxyHost;
+    }
+
+    public Integer getProxyPort() {
+        return proxyPort;
+    }
+
+    public void setProxyPort(Integer proxyPort) {
+        this.proxyPort = proxyPort;
     }
 }

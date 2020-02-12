@@ -1,9 +1,12 @@
 package ch.admin.seco.jobs.services.jobadservice.integration.external.importer.config;
 
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.io.File;
 import java.util.Properties;
+
+import com.jcraft.jsch.ProxyHTTP;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +24,11 @@ public class SftpConfig {
         factory.setHost(externalJobAdvertisementProperties.getHost());
         if (nonNull(externalJobAdvertisementProperties.getPort())) {
             factory.setPort(externalJobAdvertisementProperties.getPort());
+        }
+        if (nonNull(externalJobAdvertisementProperties.getProxyHost())) {
+            int proxyPort = defaultIfNull(externalJobAdvertisementProperties.getPort(), 80);
+            ProxyHTTP proxyHTTP = new ProxyHTTP(externalJobAdvertisementProperties.getProxyHost(), proxyPort);
+            factory.setProxy(proxyHTTP);
         }
         factory.setUser(externalJobAdvertisementProperties.getUsername());
         factory.setPassword(externalJobAdvertisementProperties.getPassword());
