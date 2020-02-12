@@ -60,11 +60,11 @@ public class ExternalJobAdvertisementImportTaskConfig {
 
     @Autowired
     public ExternalJobAdvertisementImportTaskConfig(
-            JobBuilderFactory jobBuilderFactory,
-            StepBuilderFactory stepBuilderFactory,
-            MessageSource<File> externalJobAdvertisementDataFileMessageSource,
-            MessageChannel output,
-            Validator validator) {
+        JobBuilderFactory jobBuilderFactory,
+        StepBuilderFactory stepBuilderFactory,
+        MessageSource<File> externalJobAdvertisementDataFileMessageSource,
+        MessageChannel output,
+        Validator validator) {
         this.jobBuilderFactory = jobBuilderFactory;
         this.stepBuilderFactory = stepBuilderFactory;
         this.externalJobAdvertisementDataFileMessageSource = externalJobAdvertisementDataFileMessageSource;
@@ -74,27 +74,27 @@ public class ExternalJobAdvertisementImportTaskConfig {
 
     @Bean
     public Job externalImportJob(StaxEventItemReader<Oste> xmlFileReader, ExternalJobAdvertisementWriter externalJobAdvertisementWriter,
-                                 ExternalJobAdvertisementProperties externalJobAdvertisementProperties) {
+        ExternalJobAdvertisementProperties externalJobAdvertisementProperties) {
         return jobBuilderFactory.get("external-jobad-xml-import")
-                .incrementer(new RunIdIncrementer())
-                .listener(new CleanupXmlFileJobExecutionListener())
-                .start(stepBuilderFactory
-                        .get("download-from-sftp")
-                        .allowStartIfComplete(true)
-                        .tasklet(downloadFromSftpServer(externalJobAdvertisementProperties))
-                        .build())
-                .on("NO_FILE").end()
-                .on("*")
-                .to(stepBuilderFactory
-                        .get("send-to-job-ad-service")
-                        .listener(itemLoggerListener())
-                        .<Oste, ExternalCreateJobAdvertisementDto>chunk(10)
-                        .reader(xmlFileReader)
-                        .processor(externalItemProcessor())
-                        .writer(externalJobAdvertisementWriter)
-                        .build())
-                .build()
-                .build();
+            .incrementer(new RunIdIncrementer())
+            .listener(new CleanupXmlFileJobExecutionListener())
+            .start(stepBuilderFactory
+                .get("download-from-sftp")
+                .allowStartIfComplete(true)
+                .tasklet(downloadFromSftpServer(externalJobAdvertisementProperties))
+                .build())
+            .on("NO_FILE").end()
+            .on("*")
+            .to(stepBuilderFactory
+                .get("send-to-job-ad-service")
+                .listener(itemLoggerListener())
+                .<Oste, ExternalCreateJobAdvertisementDto>chunk(10)
+                .reader(xmlFileReader)
+                .processor(externalItemProcessor())
+                .writer(externalJobAdvertisementWriter)
+                .build())
+            .build()
+            .build();
     }
 
     @Bean
@@ -111,9 +111,16 @@ public class ExternalJobAdvertisementImportTaskConfig {
     public Tasklet downloadFromSftpServer(ExternalJobAdvertisementProperties externalJobAdvertisementProperties) {
         return (contribution, chunkContext) -> {
             LOG.info("Downloading from SFTP Server ('{}:{}/{}')",
-                    externalJobAdvertisementProperties.getHost(),
-                    externalJobAdvertisementProperties.getPort(),
-                    externalJobAdvertisementProperties.getRemoteDirectory());
+                externalJobAdvertisementProperties.getHost(),
+                externalJobAdvertisementProperties.getPort(),
+                externalJobAdvertisementProperties.getRemoteDirectory());
+
+            if (externalJobAdvertisementProperties.getProxyHost() != null) {
+                LOG.info("Using http proxy {}:{}",
+                    externalJobAdvertisementProperties.getProxyHost(),
+                    externalJobAdvertisementProperties.getProxyPort()
+                );
+            }
 
             Message<File> externalJobAdDataFileMessage = externalJobAdvertisementDataFileMessageSource.receive();
             if ((externalJobAdDataFileMessage == null) || (externalJobAdDataFileMessage.getPayload() == null)) {
@@ -150,12 +157,12 @@ public class ExternalJobAdvertisementImportTaskConfig {
     @JobScope
     public StaxEventItemReader<Oste> xmlFileReader(@Value("#{jobExecutionContext['" + PARAMETER_XML_FILE_PATH + "']}") File xmlFile) {
         return new StaxEventItemReaderBuilder<Oste>()
-                .resource(new PathResource(xmlFile.toPath()))
-                .unmarshaller(ExternalMarshaller())
-                .strict(false)
-                .saveState(false)
-                .addFragmentRootElements("oste")
-                .build();
+            .resource(new PathResource(xmlFile.toPath()))
+            .unmarshaller(ExternalMarshaller())
+            .strict(false)
+            .saveState(false)
+            .addFragmentRootElements("oste")
+            .build();
     }
 
     @Bean
