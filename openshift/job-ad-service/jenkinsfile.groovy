@@ -161,6 +161,7 @@ pipeline {
                                     "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service",
                                     "-p", "APPLICATION_NAME=app-external-job-ad-export-task",
                                     "-p", "NAMESPACE=jobroom-dev",
+                                    "-p", "IMAGE_LABEL=${ARTIFACT_VERSION}"
                             ]))
 
                             def build = openshift.selector('bc', 'app-external-job-ad-export-task-docker').startBuild("--from-dir .")
@@ -187,6 +188,7 @@ pipeline {
                                     "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service",
                                     "-p", "APPLICATION_NAME=app-external-job-ad-import-task",
                                     "-p", "NAMESPACE=jobroom-dev",
+                                    "-p", "IMAGE_LABEL=${ARTIFACT_VERSION}"
                             ]))
 
                             def build = openshift.selector('bc', 'app-external-job-ad-import-task-docker').startBuild("--from-dir .")
