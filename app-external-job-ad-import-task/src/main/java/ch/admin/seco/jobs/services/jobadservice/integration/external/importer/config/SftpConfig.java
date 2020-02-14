@@ -26,7 +26,7 @@ public class SftpConfig {
             factory.setPort(externalJobAdvertisementProperties.getPort());
         }
         if (nonNull(externalJobAdvertisementProperties.getProxyHost())) {
-            int proxyPort = defaultIfNull(externalJobAdvertisementProperties.getPort(), 80);
+            int proxyPort = defaultIfNull(externalJobAdvertisementProperties.getProxyPort(), 80);
             ProxyHTTP proxyHTTP = new ProxyHTTP(externalJobAdvertisementProperties.getProxyHost(), proxyPort);
             factory.setProxy(proxyHTTP);
         }
