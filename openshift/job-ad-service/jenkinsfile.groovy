@@ -76,21 +76,7 @@ pipeline {
                         deployerId: "MAVEN_DEPLOYER",
                         resolverId: "MAVEN_RESOLVER"
                 )
-            }
-        }
 
-        stage('SonarQube') {
-            steps {
-                rtMavenRun(
-                        pom: 'pom.xml',
-                        goals: 'sonar:sonar -Dsonar.projectKey=ReferenceService -Dsonar.host.url="$SONAR_SERVER" -Dsonar.login=$SONAR_LOGIN',
-                        resolverId: "MAVEN_RESOLVER"
-                )
-            }
-        }
-
-        stage('Publish build info') {
-            steps {
                 rtPublishBuildInfo(
                         serverId: ARTIFACTORY_SERVER
                 )
@@ -125,80 +111,111 @@ pipeline {
             }
         }
 
-        stage('Docker Build job-ad-service in jobroom-dev') {
+        stage('SonarQube') {
+            // our SonarQube has only master
+            when {
+                branch 'master'
+            }
+
             steps {
-                script {
-                    openshift.withCluster() {
-                        openshift.withProject('jobroom-dev') {
-                            def microserviceAppBuildConfigDockerTemplate = openshift.selector("template", "microservice-app-build-config-docker-template").object()
-                            openshift.apply(openshift.process(microserviceAppBuildConfigDockerTemplate, [
-                                    "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service",
-                                    "-p", "APPLICATION_NAME=app-job-ad-service",
-                                    "-p", "NAMESPACE=jobroom-dev",
-                            ]))
-
-                            def build = openshift.selector('bc', 'app-job-ad-service-docker').startBuild("--from-dir .")
-                            result = build.logs('-f')
-
-                            if(result.status == 0) {
-                                return true
-                            }
-
-                            return false
-                        }
-                    }
-                }
+                rtMavenRun(
+                        pom: 'pom.xml',
+                        goals: 'sonar:sonar -Dsonar.projectKey=job-ad-service -Dsonar.host.url="$SONAR_SERVER" -Dsonar.login=$SONAR_LOGIN',
+                        resolverId: "MAVEN_RESOLVER"
+                )
             }
         }
 
-        stage('Docker Build app-external-job-ad-export-task in jobroom-dev') {
-            steps {
-                script {
-                    openshift.withCluster() {
-                        openshift.withProject('jobroom-dev') {
-                            def batchAppBuildConfigDockerTemplate = openshift.selector("template", "batch-app-build-config-docker-template").object()
-                            openshift.apply(openshift.process(batchAppBuildConfigDockerTemplate, [
-                                    "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service",
-                                    "-p", "APPLICATION_NAME=app-external-job-ad-export-task",
-                                    "-p", "NAMESPACE=jobroom-dev",
-                                    "-p", "IMAGE_LABEL=${ARTIFACT_VERSION}"
-                            ]))
+        stage('Docker Builds') {
+            parallel {
+                stage('Docker Build job-ad-service in jobroom-dev') {
+                    when {
+                        branch 'feature/openshift'
+                    }
 
-                            def build = openshift.selector('bc', 'app-external-job-ad-export-task-docker').startBuild("--from-dir .")
-                            result = build.logs('-f')
+                    steps {
+                        script {
+                            openshift.withCluster() {
+                                openshift.withProject('jobroom-dev') {
+                                    def microserviceAppBuildConfigDockerTemplate = openshift.selector("template", "microservice-app-build-config-docker-template").object()
+                                    openshift.apply(openshift.process(microserviceAppBuildConfigDockerTemplate, [
+                                            "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service",
+                                            "-p", "APPLICATION_NAME=app-job-ad-service",
+                                            "-p", "NAMESPACE=jobroom-dev",
+                                    ]))
 
-                            if(result.status == 0) {
-                                return true
+                                    def build = openshift.selector('bc', 'app-job-ad-service-docker').startBuild("--from-dir .")
+                                    result = build.logs('-f')
+
+                                    if (result.status == 0) {
+                                        return true
+                                    }
+
+                                    return false
+                                }
                             }
-
-                            return false
                         }
                     }
                 }
-            }
-        }
 
-        stage('Docker Build app-external-job-ad-import-task in jobroom-dev') {
-            steps {
-                script {
-                    openshift.withCluster() {
-                        openshift.withProject('jobroom-dev') {
-                            def batchAppBuildConfigDockerTemplate = openshift.selector("template", "batch-app-build-config-docker-template").object()
-                            openshift.apply(openshift.process(batchAppBuildConfigDockerTemplate, [
-                                    "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service",
-                                    "-p", "APPLICATION_NAME=app-external-job-ad-import-task",
-                                    "-p", "NAMESPACE=jobroom-dev",
-                                    "-p", "IMAGE_LABEL=${ARTIFACT_VERSION}"
-                            ]))
+                stage('Docker Build app-external-job-ad-export-task in jobroom-dev') {
+                    when {
+                        branch 'feature/openshift'
+                    }
 
-                            def build = openshift.selector('bc', 'app-external-job-ad-import-task-docker').startBuild("--from-dir .")
-                            result = build.logs('-f')
+                    steps {
+                        script {
+                            openshift.withCluster() {
+                                openshift.withProject('jobroom-dev') {
+                                    def batchAppBuildConfigDockerTemplate = openshift.selector("template", "batch-app-build-config-docker-template").object()
+                                    openshift.apply(openshift.process(batchAppBuildConfigDockerTemplate, [
+                                            "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service",
+                                            "-p", "APPLICATION_NAME=app-external-job-ad-export-task",
+                                            "-p", "NAMESPACE=jobroom-dev",
+                                            "-p", "IMAGE_LABEL=${ARTIFACT_VERSION}"
+                                    ]))
 
-                            if(result.status == 0) {
-                                return true
+                                    def build = openshift.selector('bc', 'app-external-job-ad-export-task-docker').startBuild("--from-dir .")
+                                    result = build.logs('-f')
+
+                                    if (result.status == 0) {
+                                        return true
+                                    }
+
+                                    return false
+                                }
                             }
+                        }
+                    }
+                }
 
-                            return false
+                stage('Docker Build app-external-job-ad-import-task in jobroom-dev') {
+                    when {
+                        branch 'feature/openshift'
+                    }
+
+                    steps {
+                        script {
+                            openshift.withCluster() {
+                                openshift.withProject('jobroom-dev') {
+                                    def batchAppBuildConfigDockerTemplate = openshift.selector("template", "batch-app-build-config-docker-template").object()
+                                    openshift.apply(openshift.process(batchAppBuildConfigDockerTemplate, [
+                                            "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service",
+                                            "-p", "APPLICATION_NAME=app-external-job-ad-import-task",
+                                            "-p", "NAMESPACE=jobroom-dev",
+                                            "-p", "IMAGE_LABEL=${ARTIFACT_VERSION}"
+                                    ]))
+
+                                    def build = openshift.selector('bc', 'app-external-job-ad-import-task-docker').startBuild("--from-dir .")
+                                    result = build.logs('-f')
+
+                                    if (result.status == 0) {
+                                        return true
+                                    }
+
+                                    return false
+                                }
+                            }
                         }
                     }
                 }
@@ -206,6 +223,11 @@ pipeline {
         }
 
         stage('Deploy to jobroom-dev') {
+
+            when {
+                branch 'feature/openshift'
+            }
+
             steps {
                 script {
                     openshift.withCluster() {
