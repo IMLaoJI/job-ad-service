@@ -138,9 +138,9 @@ pipeline {
             // TODO only on specific branch
             parallel {
                 stage('Docker Build job-ad-service in jobroom-dev') {
-//                    when {
-//                        branch 'feature/openshift'
-//                    }
+                    when {
+                        branch 'feature/openshift'
+                    }
 
                     steps {
                         script {
@@ -168,9 +168,9 @@ pipeline {
                 }
 
                 stage('Docker Build app-external-job-ad-export-task in jobroom-dev') {
-//                    when {
-//                        branch 'feature/openshift'
-//                    }
+                    when {
+                        branch 'feature/openshift'
+                    }
 
                     steps {
                         script {
@@ -199,9 +199,9 @@ pipeline {
                 }
 
                 stage('Docker Build app-external-job-ad-import-task in jobroom-dev') {
-//                    when {
-//                        branch 'feature/openshift'
-//                    }
+                    when {
+                        branch 'feature/openshift'
+                    }
 
                     steps {
                         script {
