@@ -6,7 +6,7 @@ USER root
 
 RUN mkdir -p /srv/jobroom/
 
-COPY web/target/app-job-ad-service.jar /srv/jobroom/app-job-ad-service.jar
+COPY app-job-ad-service.jar /srv/jobroom/app-job-ad-service.jar
 
 WORKDIR /
 

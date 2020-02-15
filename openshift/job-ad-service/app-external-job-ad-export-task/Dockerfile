@@ -6,7 +6,7 @@ USER root
 
 RUN mkdir -p /srv/jobroom/
 
-COPY app-external-job-ad-export-task/target/app-external-job-ad-export-task.jar /srv/jobroom/app-external-job-ad-export-task.jar
+COPY app-external-job-ad-export-task.jar /srv/jobroom/app-external-job-ad-export-task.jar
 
 WORKDIR /
 
