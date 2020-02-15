@@ -10,7 +10,7 @@ COPY app-job-ad-service.jar /srv/jobroom/app-job-ad-service.jar
 
 WORKDIR /
 
-ADD openshift/job-ad-service/app-job-ad-service/bootstrap.sh /
+ADD bootstrap.sh /
 RUN chmod 755 /bootstrap.sh && chmod g=u /etc/passwd && chown -R 1001:0 /srv/jobroom
 
 EXPOSE 8080

@@ -10,7 +10,7 @@ COPY app-external-job-ad-export-task.jar /srv/jobroom/app-external-job-ad-export
 
 WORKDIR /
 
-ADD openshift/job-ad-service/app-external-job-ad-export-task/bootstrap.sh /
+ADD bootstrap.sh /
 RUN chmod 755 /bootstrap.sh && chmod g=u /etc/passwd && chown -R 1001:0 /srv/jobroom
 
 EXPOSE 8080
