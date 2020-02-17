@@ -62,7 +62,7 @@ public class AvamWebServiceClient {
 
     void handleResponse(JobAdvertisementId jobAdvertisementId, AvamAction action, DeliverOsteResponse response) {
         String returnCode = StringUtils.trim(response.getDeliverOsteReturn());
-        LOG.info("Action " + action.name() + " for jobAdvertisement id=" +  jobAdvertisementId + " received AVAM response: " + StringUtils.left(returnCode, 150));
+        LOG.info("Action {} for jobAdvertisement id={} receives AVAM response: {}", action.name(), jobAdvertisementId, StringUtils.left(returnCode, 150));
         if (!AVAM_RESPONSE_OK.equals(returnCode)) {
             throw new AvamException(jobAdvertisementId, action.name(), returnCode);
         }
