@@ -1,7 +1,7 @@
 # exclude
 branches:
   except:
-    - openshift
+    - feature/openshift
 
 os:
 - linux
