@@ -5,19 +5,16 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
-import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
-import ch.admin.seco.jobs.services.jobadservice.core.conditions.ConditionException;
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.CancellationResource;
-import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.Phonenumber;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PhonNumberUtil.sanitizePhoneNumber;
 import static org.springframework.util.StringUtils.hasText;
 
 @Component
@@ -63,7 +60,7 @@ public class JobAdvertisementFromApiAssembler {
                 .setSalutation(apiContact.getSalutation())
                 .setFirstName(trimOrNull(apiContact.getFirstName()))
                 .setLastName(trimOrNull(apiContact.getLastName()))
-                .setPhone(sanitizePhoneNumber(apiContact.getPhone()))
+                .setPhone(sanitizePhoneNumber(apiContact.getPhone(), PhoneNumberUtil.PhoneNumberFormat.E164))
                 .setEmail(trimOrNull(apiContact.getEmail()))
                 .setLanguageIsoCode(trimOrNull(apiContact.getLanguageIsoCode()));
     }
@@ -110,7 +107,7 @@ public class JobAdvertisementFromApiAssembler {
                 .setPostOfficeBoxNumber(trimOrNull(apiCompany.getPostOfficeBoxNumber()))
                 .setPostOfficeBoxPostalCode(trimOrNull(apiCompany.getPostOfficeBoxPostalCode()))
                 .setPostOfficeBoxCity(trimOrNull(apiCompany.getPostOfficeBoxCity()))
-                .setPhone(sanitizePhoneNumber(trimOrNull(apiCompany.getPhone())))
+                .setPhone(sanitizePhoneNumber(trimOrNull(apiCompany.getPhone()), PhoneNumberUtil.PhoneNumberFormat.E164))
                 .setEmail(trimOrNull(apiCompany.getEmail()))
                 .setWebsite(trimOrNull(apiCompany.getWebsite()))
                 .setSurrogate(apiCompany.isSurrogate());
@@ -185,7 +182,7 @@ public class JobAdvertisementFromApiAssembler {
                 .setRawPostAddress(trimOrNull(apiApplyChannel.getMailAddress()))
                 .setPostAddress(AddressParser.parse(trimOrNull(apiApplyChannel.getMailAddress()), trimOrNull(apiCreateDto.getCompany().getName())))
                 .setEmailAddress(trimOrNull(apiApplyChannel.getEmailAddress()))
-                .setPhoneNumber(sanitizePhoneNumber(trimOrNull(apiApplyChannel.getPhoneNumber())))
+                .setPhoneNumber(sanitizePhoneNumber(trimOrNull(apiApplyChannel.getPhoneNumber()),PhoneNumberUtil.PhoneNumberFormat.E164))
                 .setFormUrl(trimOrNull(apiApplyChannel.getFormUrl()))
                 .setAdditionalInfo(trimOrNull(apiApplyChannel.getAdditionalInfo()));
     }
@@ -198,31 +195,8 @@ public class JobAdvertisementFromApiAssembler {
                 .setSalutation(apiPublicContact.getSalutation())
                 .setFirstName(trimOrNull(apiPublicContact.getFirstName()))
                 .setLastName(trimOrNull(apiPublicContact.getLastName()))
-                .setPhone(sanitizePhoneNumber(trimOrNull(apiPublicContact.getPhone())))
+                .setPhone(sanitizePhoneNumber(trimOrNull(apiPublicContact.getPhone()),PhoneNumberUtil.PhoneNumberFormat.E164))
                 .setEmail(trimOrNull(apiPublicContact.getEmail()));
-    }
-
-    /*
-     * Check for a valid phone number and format as international number (with spaces)
-     * example: +41 79 555 12 34
-     */
-    String sanitizePhoneNumber(String phone) {
-        if (hasText(phone)) {
-            try {
-                Phonenumber.PhoneNumber phoneNumber = PhoneNumberUtil.getInstance().parse(phone, "CH");
-                validatePhoneNumber(phone, phoneNumber);
-                return PhoneNumberUtil.getInstance().format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
-            } catch (NumberParseException e) {
-                throw new ConditionException("Failed to parse phone number %s .", phone);
-            }
-        }
-        return null;
-    }
-
-    private void validatePhoneNumber(String phone, Phonenumber.PhoneNumber phoneNumber) {
-        String validationMessage = String.format("Failed to parse phone number %s .", phone);
-
-        Condition.isTrue(PhoneNumberUtil.getInstance().isValidNumber(phoneNumber), validationMessage);
     }
 
     private static String trimOrNull(String value) {
