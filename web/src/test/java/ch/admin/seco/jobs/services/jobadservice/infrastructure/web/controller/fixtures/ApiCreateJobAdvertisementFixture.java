@@ -17,8 +17,7 @@ import java.util.List;
 
 public class ApiCreateJobAdvertisementFixture {
 
-    public static final String phoneFormatted = "+41588444444";
-    private static final String phoneUnformatted = "+41588444444";
+    public static final String phoneUnformatted = "+41588444444";
 
     public static ApiCreateJobAdvertisementDto createJobAdvertisementDto() {
         ApiCreateJobAdvertisementDto apiCreateJobAdvertisementDto = new ApiCreateJobAdvertisementDto();

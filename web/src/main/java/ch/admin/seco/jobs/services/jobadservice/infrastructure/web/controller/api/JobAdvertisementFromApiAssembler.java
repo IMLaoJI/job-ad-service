@@ -182,7 +182,7 @@ public class JobAdvertisementFromApiAssembler {
                 .setRawPostAddress(trimOrNull(apiApplyChannel.getMailAddress()))
                 .setPostAddress(AddressParser.parse(trimOrNull(apiApplyChannel.getMailAddress()), trimOrNull(apiCreateDto.getCompany().getName())))
                 .setEmailAddress(trimOrNull(apiApplyChannel.getEmailAddress()))
-                .setPhoneNumber(sanitizePhoneNumber(trimOrNull(apiApplyChannel.getPhoneNumber()),PhoneNumberUtil.PhoneNumberFormat.E164))
+                .setPhoneNumber(sanitizePhoneNumber(trimOrNull(apiApplyChannel.getPhoneNumber()), PhoneNumberUtil.PhoneNumberFormat.E164))
                 .setFormUrl(trimOrNull(apiApplyChannel.getFormUrl()))
                 .setAdditionalInfo(trimOrNull(apiApplyChannel.getAdditionalInfo()));
     }

@@ -37,9 +37,9 @@ public class JobAdvertisementFromApiAssemblerTest {
         CreateJobAdvertisementDto createJobAdvertisementDto = jobAdvertisementFromApiAssembler.convert(apiCreateJobAdvertisementDto);
 
         // then
-        assertThat(createJobAdvertisementDto.getCompany().getPhone()).isEqualTo(phoneFormatted);
-        assertThat(createJobAdvertisementDto.getApplyChannel().getPhoneNumber()).isEqualTo(phoneFormatted);
-        assertThat(createJobAdvertisementDto.getContact().getPhone()).isEqualTo(phoneFormatted);
+        assertThat(createJobAdvertisementDto.getCompany().getPhone()).isEqualTo(phoneUnformatted);
+        assertThat(createJobAdvertisementDto.getApplyChannel().getPhoneNumber()).isEqualTo(phoneUnformatted);
+        assertThat(createJobAdvertisementDto.getContact().getPhone()).isEqualTo(phoneUnformatted);
     }
 
     @Test

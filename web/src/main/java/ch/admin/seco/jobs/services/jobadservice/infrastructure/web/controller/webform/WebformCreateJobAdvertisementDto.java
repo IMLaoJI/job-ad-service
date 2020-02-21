@@ -187,6 +187,7 @@ public class WebformCreateJobAdvertisementDto {
     }
 
     public WebformCreateJobAdvertisementDto setApplyChannel(WebformCreateApplyChannelDto applyChannel) {
+        applyChannel.setPhoneNumber(sanitizePhoneNumber(applyChannel.getPhoneNumber(), PhoneNumberUtil.PhoneNumberFormat.E164));
         this.applyChannel = applyChannel;
         return this;
     }
@@ -196,6 +197,7 @@ public class WebformCreateJobAdvertisementDto {
     }
 
     public WebformCreateJobAdvertisementDto setPublicContact(PublicContactDto publicContact) {
+        publicContact.setPhone(sanitizePhoneNumber(publicContact.getPhone(), PhoneNumberUtil.PhoneNumberFormat.E164));
         this.publicContact = publicContact;
         return this;
     }
