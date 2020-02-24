@@ -228,7 +228,7 @@ class ExternalJobAdvertisementAssembler {
                 externalJobAdvertisement.getUntPostfach(),
                 externalJobAdvertisement.getUntPostfachPlz(),
                 externalJobAdvertisement.getUntPostfachOrt(),
-                sanitizePhoneNumber(externalJobAdvertisement.getUntTelefon(), externalJobAdvertisement),
+                sanitizePhoneNumber(externalJobAdvertisement.getUntTelefon(), externalJobAdvertisement.getFingerprint()),
                 externalJobAdvertisement.getUntEMail(),
                 externalJobAdvertisement.getUntUrl(),
                 false
@@ -245,7 +245,7 @@ class ExternalJobAdvertisementAssembler {
                     resolveSalutation(externalJobAdvertisement.getKpAnredeCode()),
                     externalJobAdvertisement.getKpVorname(),
                     externalJobAdvertisement.getKpName(),
-                    sanitizePhoneNumber(externalJobAdvertisement.getKpTelefonNr(), externalJobAdvertisement),
+                    sanitizePhoneNumber(externalJobAdvertisement.getKpTelefonNr(), externalJobAdvertisement.getFingerprint()),
                     sanitizeEmail(externalJobAdvertisement.getKpEMail(), externalJobAdvertisement.getFingerprint()),
                     "de" // Not defined in this AVAM version
             );
@@ -321,7 +321,7 @@ class ExternalJobAdvertisementAssembler {
     /*
      * Check for a valid phone number and remove remarks.
      */
-    private String sanitizePhoneNumber(String phone, Oste externalJobAdvertisement) {
+    private String sanitizePhoneNumber(String phone, String fingerPrint) {
         if (hasText(phone)) {
             try {
                 Phonenumber.PhoneNumber phoneNumber = PhoneNumberUtil.getInstance().parse(phone, "CH");
@@ -329,10 +329,10 @@ class ExternalJobAdvertisementAssembler {
                     return PhoneNumberUtil.getInstance().format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.E164);
                 }
             } catch (NumberParseException e) {
-                LOGGER.warn("JobAd fingerprint: {} has invalid phone number: {}", externalJobAdvertisement.getFingerprint(), phone);
+                LOGGER.warn("JobAd fingerprint: {} has invalid phone number: {}", fingerPrint, phone);
                 String[] phoneParts = phone.split("[^\\d\\(\\)\\+ ]");
                 if (phoneParts.length > 1) {
-                    return sanitizePhoneNumber(phoneParts[0], externalJobAdvertisement);
+                    return sanitizePhoneNumber(phoneParts[0], fingerPrint);
                 }
             }
         }
