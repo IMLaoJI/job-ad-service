@@ -246,7 +246,7 @@ class ExternalJobAdvertisementAssembler {
                     externalJobAdvertisement.getKpVorname(),
                     externalJobAdvertisement.getKpName(),
                     sanitizePhoneNumber(externalJobAdvertisement.getKpTelefonNr(), externalJobAdvertisement),
-                    sanitizeEmail(externalJobAdvertisement.getKpEMail(), externalJobAdvertisement),
+                    sanitizeEmail(externalJobAdvertisement.getKpEMail(), externalJobAdvertisement.getFingerprint()),
                     "de" // Not defined in this AVAM version
             );
         }
@@ -339,13 +339,13 @@ class ExternalJobAdvertisementAssembler {
         return null;
     }
 
-    private String sanitizeEmail(String testObject, Oste externalJobAdvertisement) {
+    private String sanitizeEmail(String testObject, String fingerPrint) {
         if (hasText(testObject)) {
             String email = trimAllWhitespace(testObject).replace("'", "");
             if (EMAIL_VALIDATOR.isValid(email, null)) {
                 return email;
             } else {
-                LOGGER.warn("JobAd fingerprint: {} has invalid email: {}", externalJobAdvertisement.getFingerprint(), testObject);
+                LOGGER.warn("JobAd fingerprint: {} has invalid email: {}", fingerPrint, testObject);
             }
         }
         return null;

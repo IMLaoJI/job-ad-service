@@ -217,7 +217,7 @@ public class JobAdvertisementToAvamAssembler {
         avamJobAdvertisement.setKpFragenAnredeCode(AvamCodeResolver.SALUTATIONS.getLeft(contact.getSalutation()));
         avamJobAdvertisement.setKpFragenVorname(contact.getFirstName());
         avamJobAdvertisement.setKpFragenName(contact.getLastName());
-        avamJobAdvertisement.setKpFragenTelefonNr(contact.getPhone());
+        avamJobAdvertisement.setKpFragenTelefonNr(sanitizePhoneNumber(contact.getPhone()));
         avamJobAdvertisement.setKpFragenEmail(fetchFirstEmail(contact.getEmail()));
     }
 

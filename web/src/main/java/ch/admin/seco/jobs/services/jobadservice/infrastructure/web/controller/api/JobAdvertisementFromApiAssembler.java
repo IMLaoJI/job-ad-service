@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PhonNumberUtil.sanitizePhoneNumber;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PhoneNumberUtil.sanitizePhoneNumber;
 import static org.springframework.util.StringUtils.hasText;
 
 @Component

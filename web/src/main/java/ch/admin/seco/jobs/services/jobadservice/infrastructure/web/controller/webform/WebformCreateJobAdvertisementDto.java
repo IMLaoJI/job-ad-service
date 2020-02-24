@@ -2,14 +2,12 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.w
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PhonNumberUtil.sanitizePhoneNumber;
 
 public class WebformCreateJobAdvertisementDto {
 
@@ -96,7 +94,6 @@ public class WebformCreateJobAdvertisementDto {
     }
 
     public WebformCreateJobAdvertisementDto setContact(ContactDto contact) {
-        contact.setPhone(sanitizePhoneNumber(contact.getPhone(), PhoneNumberUtil.PhoneNumberFormat.E164));
         this.contact = contact;
         return this;
     }
@@ -187,7 +184,6 @@ public class WebformCreateJobAdvertisementDto {
     }
 
     public WebformCreateJobAdvertisementDto setApplyChannel(WebformCreateApplyChannelDto applyChannel) {
-        applyChannel.setPhoneNumber(sanitizePhoneNumber(applyChannel.getPhoneNumber(), PhoneNumberUtil.PhoneNumberFormat.E164));
         this.applyChannel = applyChannel;
         return this;
     }
@@ -197,7 +193,6 @@ public class WebformCreateJobAdvertisementDto {
     }
 
     public WebformCreateJobAdvertisementDto setPublicContact(PublicContactDto publicContact) {
-        publicContact.setPhone(sanitizePhoneNumber(publicContact.getPhone(), PhoneNumberUtil.PhoneNumberFormat.E164));
         this.publicContact = publicContact;
         return this;
     }
