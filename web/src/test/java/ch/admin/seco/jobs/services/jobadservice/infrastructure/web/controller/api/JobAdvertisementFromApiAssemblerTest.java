@@ -3,6 +3,7 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.a
 import ch.admin.seco.jobs.services.jobadservice.application.HtmlToMarkdownConverter;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.ConditionException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.ApiCreateJobAdvertisementFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PhoneNumberUtil.sanitizePhoneNumber;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JobAdvertisementFromApiAssembler.class)
@@ -21,6 +24,7 @@ public class JobAdvertisementFromApiAssemblerTest {
     @Autowired
     private JobAdvertisementFromApiAssembler jobAdvertisementFromApiAssembler;
 
+    //needed for test injection, even if it is not used in this class
     @MockBean
     private HtmlToMarkdownConverter mockHtmlToMarkdownConverter;
 
@@ -33,9 +37,9 @@ public class JobAdvertisementFromApiAssemblerTest {
         CreateJobAdvertisementDto createJobAdvertisementDto = jobAdvertisementFromApiAssembler.convert(apiCreateJobAdvertisementDto);
 
         // then
-        assertThat(createJobAdvertisementDto.getCompany().getPhone()).isEqualTo(phoneFormatted);
-        assertThat(createJobAdvertisementDto.getApplyChannel().getPhoneNumber()).isEqualTo(phoneFormatted);
-        assertThat(createJobAdvertisementDto.getContact().getPhone()).isEqualTo(phoneFormatted);
+        assertThat(createJobAdvertisementDto.getCompany().getPhone()).isEqualTo(phoneUnformatted);
+        assertThat(createJobAdvertisementDto.getApplyChannel().getPhoneNumber()).isEqualTo(phoneUnformatted);
+        assertThat(createJobAdvertisementDto.getContact().getPhone()).isEqualTo(phoneUnformatted);
     }
 
     @Test
@@ -46,7 +50,7 @@ public class JobAdvertisementFromApiAssemblerTest {
 
         // then
         assertThatExceptionOfType(ConditionException.class)
-                .isThrownBy(() -> jobAdvertisementFromApiAssembler.sanitizePhoneNumber(phone));
+                .isThrownBy(() -> sanitizePhoneNumber(phone, PhoneNumberUtil.PhoneNumberFormat.E164));
     }
 
     @Test
@@ -57,7 +61,7 @@ public class JobAdvertisementFromApiAssemblerTest {
 
         // then
         assertThatExceptionOfType(ConditionException.class)
-                .isThrownBy(() -> jobAdvertisementFromApiAssembler.sanitizePhoneNumber(phone));
+                .isThrownBy(() -> sanitizePhoneNumber(phone, PhoneNumberUtil.PhoneNumberFormat.E164));
     }
 
     @Test
@@ -68,7 +72,7 @@ public class JobAdvertisementFromApiAssemblerTest {
 
         // then
         assertThatExceptionOfType(ConditionException.class)
-                .isThrownBy(() -> jobAdvertisementFromApiAssembler.sanitizePhoneNumber(phone));
+                .isThrownBy(() -> sanitizePhoneNumber(phone, PhoneNumberUtil.PhoneNumberFormat.E164));
     }
 
     @Test
@@ -78,7 +82,7 @@ public class JobAdvertisementFromApiAssemblerTest {
 
         // then
         assertThatExceptionOfType(ConditionException.class)
-                .isThrownBy(() -> jobAdvertisementFromApiAssembler.sanitizePhoneNumber(phone));
+                .isThrownBy(() -> sanitizePhoneNumber(phone, PhoneNumberUtil.PhoneNumberFormat.E164));
     }
 
 }

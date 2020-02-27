@@ -31,8 +31,7 @@ import org.zalando.problem.spring.web.advice.MediaTypes;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.ApiCreateJobAdvertisementFixture.createJobAdvertisementDto;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.ApiCreateJobAdvertisementFixture.phoneFormatted;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.ApiCreateJobAdvertisementFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -213,8 +212,8 @@ public class JobAdvertisementApiRestControllerIntTest {
         post(apiCreateJobAdvertisementDto, URL)
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.jobContent.applyChannel.phoneNumber").value(equalTo(phoneFormatted)))
-                .andExpect(jsonPath("$.jobContent.company.phone").value(equalTo(phoneFormatted)));
+                .andExpect(jsonPath("$.jobContent.applyChannel.phoneNumber").value(equalTo(phoneUnformatted)))
+                .andExpect(jsonPath("$.jobContent.company.phone").value(equalTo(phoneUnformatted)));
     }
 
     @Test
