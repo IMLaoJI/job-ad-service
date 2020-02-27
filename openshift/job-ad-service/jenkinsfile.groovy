@@ -154,7 +154,7 @@ pipeline {
                                     "-p", "NAMESPACE=jobroom-dev",
                             ]))
 
-                            def build = openshift.selector('bc', 'app-job-ad-service-docker').startBuild("--from-dir ./openshift/app-job-ad-service")
+                            def build = openshift.selector('bc', 'app-job-ad-service-docker').startBuild("--from-dir ./openshift/job-ad-service/app-job-ad-service")
                             result = build.logs('-f')
 
                             if (result.status == 0) {
@@ -190,7 +190,7 @@ pipeline {
                                     "-p", "IMAGE_LABEL=${ARTIFACT_VERSION}"
                             ]))
 
-                            def build = openshift.selector('bc', 'app-external-job-ad-export-task-docker').startBuild("--from-dir ./openshift/app-external-job-ad-export-task")
+                            def build = openshift.selector('bc', 'app-external-job-ad-export-task-docker').startBuild("--from-dir ./openshift/job-ad-service/app-external-job-ad-export-task")
                             result = build.logs('-f')
 
                             if (result.status == 0) {
@@ -226,7 +226,7 @@ pipeline {
                                     "-p", "IMAGE_LABEL=${ARTIFACT_VERSION}"
                             ]))
 
-                            def build = openshift.selector('bc', 'app-external-job-ad-import-task-docker').startBuild("--from-dir ./openshift/app-external-job-ad-import-task")
+                            def build = openshift.selector('bc', 'app-external-job-ad-import-task-docker').startBuild("--from-dir ./openshift/job-ad-service/app-external-job-ad-import-task")
                             result = build.logs('-f')
 
                             if (result.status == 0) {
