@@ -174,6 +174,11 @@ pipeline {
             }
 
             steps {
+                // copy resources for docker build
+                sh '''
+                    cp "${WORKSPACE}/app-external-job-ad-export-task/target/app-external-job-ad-export-task.jar" "${WORKSPACE}/openshift/job-ad-service/app-external-job-ad-export-task/"
+                '''
+
                 script {
                     openshift.withCluster() {
                         openshift.withProject('jobroom-dev') {
@@ -205,6 +210,11 @@ pipeline {
             }
 
             steps {
+                // copy resources for docker build
+                sh '''
+                    cp "${WORKSPACE}/app-external-job-ad-import-task/target/app-external-job-ad-import-task.jar" "${WORKSPACE}/openshift/job-ad-service/app-external-job-ad-import-task/"
+                '''
+
                 script {
                     openshift.withCluster() {
                         openshift.withProject('jobroom-dev') {
