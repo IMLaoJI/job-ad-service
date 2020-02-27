@@ -80,6 +80,11 @@ pipeline {
                 rtPublishBuildInfo(
                         serverId: ARTIFACTORY_SERVER
                 )
+
+                // copy resources for docker build
+                sh '''
+                    cp "${WORKSPACE}/web/target/app-job-ad-service.jar" "${WORKSPACE}/openshift/job-ad-service/app-job-ad-service/"
+                '''
             }
         }
 
