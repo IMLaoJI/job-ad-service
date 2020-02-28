@@ -136,12 +136,11 @@ pipeline {
 
             parallel {
                 stage('Docker Build job-ad-service in jobroom-dev') {
-                    // copy resources for docker build
-                        sh '''
-                        cp "${WORKSPACE}/web/target/app-job-ad-service.jar" "${WORKSPACE}/openshift/job-ad-service/app-job-ad-service/"
-                    '''
-
                     steps {
+                        // copy resources for docker build
+                            sh '''
+                            cp "${WORKSPACE}/web/target/app-job-ad-service.jar" "${WORKSPACE}/openshift/job-ad-service/app-job-ad-service/"
+                        '''
                         script {
                             openshift.withCluster() {
                                 openshift.withProject('jobroom-dev') {
