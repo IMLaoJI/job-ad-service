@@ -126,24 +126,15 @@ pipeline {
             }
         }
 
-//       TODO fix source problem
-//        stage('Docker Builds') {
-//            parallel {
-//
-//            }
-//        }
 
-        stage('Docker Build job-ad-service in jobroom-dev') {
+        stage('Docker Builds') {
             when {
                 branch 'feature/openshift'
             }
 
+            parallel {
+                stage('Docker Build job-ad-service in jobroom-dev') {
             steps {
-                // copy resources for docker build
-                sh '''
-                    cp "${WORKSPACE}/web/target/app-job-ad-service.jar" "${WORKSPACE}/openshift/job-ad-service/app-job-ad-service/"
-                '''
-
                 script {
                     openshift.withCluster() {
                         openshift.withProject('jobroom-dev') {
@@ -154,7 +145,7 @@ pipeline {
                                     "-p", "NAMESPACE=jobroom-dev",
                             ]))
 
-                            def build = openshift.selector('bc', 'app-job-ad-service-docker').startBuild("--from-dir ./openshift/job-ad-service/app-job-ad-service")
+                            def build = openshift.selector('bc', 'app-job-ad-service-docker').startBuild("--from-dir .")
                             result = build.logs('-f')
 
                             if (result.status == 0) {
@@ -169,16 +160,7 @@ pipeline {
         }
 
         stage('Docker Build app-external-job-ad-export-task in jobroom-dev') {
-            when {
-                branch 'feature/openshift'
-            }
-
             steps {
-                // copy resources for docker build
-                sh '''
-                    cp "${WORKSPACE}/app-external-job-ad-export-task/target/app-external-job-ad-export-task.jar" "${WORKSPACE}/openshift/job-ad-service/app-external-job-ad-export-task/"
-                '''
-
                 script {
                     openshift.withCluster() {
                         openshift.withProject('jobroom-dev') {
@@ -190,7 +172,7 @@ pipeline {
                                     "-p", "IMAGE_LABEL=${ARTIFACT_VERSION}"
                             ]))
 
-                            def build = openshift.selector('bc', 'app-external-job-ad-export-task-docker').startBuild("--from-dir ./openshift/job-ad-service/app-external-job-ad-export-task")
+                            def build = openshift.selector('bc', 'app-external-job-ad-export-task-docker').startBuild("--from-dir .")
                             result = build.logs('-f')
 
                             if (result.status == 0) {
@@ -205,16 +187,8 @@ pipeline {
         }
 
         stage('Docker Build app-external-job-ad-import-task in jobroom-dev') {
-            when {
-                branch 'feature/openshift'
-            }
 
             steps {
-                // copy resources for docker build
-                sh '''
-                    cp "${WORKSPACE}/app-external-job-ad-import-task/target/app-external-job-ad-import-task.jar" "${WORKSPACE}/openshift/job-ad-service/app-external-job-ad-import-task/"
-                '''
-
                 script {
                     openshift.withCluster() {
                         openshift.withProject('jobroom-dev') {
@@ -226,7 +200,7 @@ pipeline {
                                     "-p", "IMAGE_LABEL=${ARTIFACT_VERSION}"
                             ]))
 
-                            def build = openshift.selector('bc', 'app-external-job-ad-import-task-docker').startBuild("--from-dir ./openshift/job-ad-service/app-external-job-ad-import-task")
+                            def build = openshift.selector('bc', 'app-external-job-ad-import-task-docker').startBuild("--from-dir .")
                             result = build.logs('-f')
 
                             if (result.status == 0) {
@@ -238,6 +212,7 @@ pipeline {
                     }
                 }
             }
+        }
         }
 
         stage('Deploy to jobroom-dev') {
