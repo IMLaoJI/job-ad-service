@@ -233,7 +233,7 @@ pipeline {
                 script {
                     openshift.withCluster() {
                         openshift.withProject("${NAMESPACE_NAME}") {
-                            def appJobAdServiceDC = openshift.selector('dc', "${PROJECT_NAME}")
+                            def appJobAdServiceDC = openshift.selector('dc', 'app-job-ad-service')
                             appJobAdServiceDC.rollout().latest()
                             appJobAdServiceDC.rollout().status()
                         }
