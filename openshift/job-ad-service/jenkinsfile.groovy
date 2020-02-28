@@ -15,6 +15,8 @@ pipeline {
         MAVEN_HOME = "/opt/rh/rh-maven35/root/usr/share/xmvn"
         SONAR_LOGIN = credentials('SONAR_TOKEN')
         SONAR_SERVER = "${env.SONAR_HOST_URL}"
+        NAMESPACE_NAME = "jobroom-dev"
+        PROJECT_NAME = "job-ad-service"
         ARTIFACT_VERSION = "${new Date().format("YYYY-MM-dd")}.${BUILD_NUMBER}"
     }
 
@@ -140,9 +142,9 @@ pipeline {
                                 openshift.withProject('jobroom-dev') {
                                     def microserviceAppBuildConfigDockerTemplate = openshift.selector("template", "microservice-app-build-config-docker-template").object()
                                     openshift.apply(openshift.process(microserviceAppBuildConfigDockerTemplate, [
-                                            "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service",
+                                            "-p", "NAMESPACE=${NAMESPACE_NAME}",
+                                            "-p", "MICROSERVICE_PROJECT_NAME=${PROJECT_NAME}",
                                             "-p", "APPLICATION_NAME=app-job-ad-service",
-                                            "-p", "NAMESPACE=jobroom-dev",
                                     ]))
 
                                     def build = openshift.selector('bc', 'app-job-ad-service-docker').startBuild("--from-dir .")
@@ -166,9 +168,9 @@ pipeline {
                                 openshift.withProject('jobroom-dev') {
                                     def batchAppBuildConfigDockerTemplate = openshift.selector("template", "batch-app-build-config-docker-template").object()
                                     openshift.apply(openshift.process(batchAppBuildConfigDockerTemplate, [
-                                            "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service",
+                                            "-p", "NAMESPACE=${NAMESPACE_NAME}",
+                                            "-p", "MICROSERVICE_PROJECT_NAME=${PROJECT_NAME}",
                                             "-p", "APPLICATION_NAME=app-external-job-ad-export-task",
-                                            "-p", "NAMESPACE=jobroom-dev",
                                             "-p", "IMAGE_LABEL=${ARTIFACT_VERSION}"
                                     ]))
 
@@ -194,9 +196,9 @@ pipeline {
                                 openshift.withProject('jobroom-dev') {
                                     def batchAppBuildConfigDockerTemplate = openshift.selector("template", "batch-app-build-config-docker-template").object()
                                     openshift.apply(openshift.process(batchAppBuildConfigDockerTemplate, [
-                                            "-p", "MICROSERVICE_PROJECT_NAME=job-ad-service",
+                                            "-p", "NAMESPACE=${NAMESPACE_NAME}",
+                                            "-p", "MICROSERVICE_PROJECT_NAME=${PROJECT_NAME}",
                                             "-p", "APPLICATION_NAME=app-external-job-ad-import-task",
-                                            "-p", "NAMESPACE=jobroom-dev",
                                             "-p", "IMAGE_LABEL=${ARTIFACT_VERSION}"
                                     ]))
 
