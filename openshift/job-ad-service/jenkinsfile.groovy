@@ -225,7 +225,6 @@ pipeline {
         }
 
         stage('Deploy to jobroom-dev') {
-
             when {
                 branch 'feature/openshift'
             }
@@ -233,8 +232,8 @@ pipeline {
             steps {
                 script {
                     openshift.withCluster() {
-                        openshift.withProject('jobroom-dev') {
-                            def appJobAdServiceDC = openshift.selector('dc', 'app-job-ad-service')
+                        openshift.withProject("${NAMESPACE_NAME}") {
+                            def appJobAdServiceDC = openshift.selector('dc', "${PROJECT_NAME}")
                             appJobAdServiceDC.rollout().latest()
                             appJobAdServiceDC.rollout().status()
                         }
