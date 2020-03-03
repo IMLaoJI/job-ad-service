@@ -35,3 +35,8 @@ The payload scripts can be found under ```/src/test-data```. Be aware of already
 ## Spring Cloud Data Flow
 In OpenShift there's installed an instance of Spring Cloud Data Flow. This has a feature that let's you create applications, tasks, jobs, etc. I had an issue when I've created an application for the Job Ad Exporter task: I've created an application using the SCDF's dashboard and afterwards tried to create the task for it. Unfortunatelly this didn't work: "application not found" was the error message.
 The trick is to use SCDF API to create your application, afterwards you can create the associated task for it.
+Here is an example:
+```
+ curl 'http://spring-cloud-dataflow-development.apps.admin.arbeitslosenkasse.ch/apps/task/app-external-job-ad-export' \
+ -d 'force=true&uri=docker://docker-registry.default.svc:5000/jobroom-dev/app-external-job-ad-export-task'
+ ```
