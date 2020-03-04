@@ -4,3 +4,10 @@ curl 'http://spring-cloud-dataflow-development.apps.admin.arbeitslosenkasse.ch/a
 # Create the task associated to the application
 curl 'http://spring-cloud-dataflow-development.apps.admin.arbeitslosenkasse.ch/tasks/definitions' \
  -d 'name=app-external-job-ad-export-task&definition=app-external-job-ad-export'
+ 
+ # Schedule task to run every day at 18:40
+ # Be aware that scheduler's name will be concatendated, i.e. resulting to 'schedule-scdf-app-external-job-ad-export-task'
+ # IF THE SCHEDULER'S NAME IS LONGER THAN 52 CHARACTERS, YOU WILL NOT BE ABLE TO CREATE THE SCHEDULE AT ALL BECAUSE OF
+ # 2020-03-03 13:18:41.456  WARN 1 --- [p-nio-80-exec-1] o.s.c.d.s.c.RestControllerAdvice         : Caught exception while handling a request: Failed to create schedule Failed to create schedule job-ad-export-schedule-scdf-app-external-job-ad-export-task
+curl 'http://spring-cloud-dataflow-development.apps.admin.arbeitslosenkasse.ch/tasks/schedules' \
+	-d 'scheduleName=schedule&taskDefinitionName=app-external-job-ad-export-task&properties=scheduler.cron.expression%3D40+18+%3F+%2A+%2A'
