@@ -40,3 +40,39 @@ Here is an example:
  curl 'http://spring-cloud-dataflow-development.apps.admin.arbeitslosenkasse.ch/apps/task/app-external-job-ad-export' \
  -d 'force=true&uri=docker://docker-registry.default.svc:5000/jobroom-dev/app-external-job-ad-export-task'
  ```
+ ### Error Messages
+Sometimes SCDF shows error messages that are not easy to read. Basicall, it's very difficult to find out the roor cause of the problem. Here is an example, when I've tried to create a schedule for a task:
+```
+2020-03-03 13:18:41.456  WARN 1 --- [p-nio-80-exec-1] o.s.c.d.s.c.RestControllerAdvice         : Caught exception while handling a request: Failed to create schedule Failed to create schedule job-ad-export-schedule-scdf-app-external-job-ad-export-task
+```
+There's no way to tell from this message why the operation failed. So you need to increase the log verbosity. Luckily enough, there's a SCDF API for loggers, that uses Spring Actuator, so you can see which loggers are available and play with them a little.
+In my case, I've just called
+```
+curl 'http://spring-cloud-dataflow-development.apps.admin.arbeitslosenkasse.ch/management/loggers'
+```
+You will see a huge list that contains the loggers, but that won't help you much. You have figure out where the error is generated. In my case was ``RestControllerAdvice`` as you can easily imagine. So, I've changed the log level to ``TRACE``:
+```
+curl 'http://spring-cloud-dataflow-development.apps.admin.arbeitslosenkasse.ch/management/loggers/org.springframework.cloud.dataflow.server.controller' \
+   -d '{"configuredLevel": "TRACE"}' \
+   -H 'Content-Type: application/json'
+```
+You can verify that the log level is the one you wanted:
+```
+curl 'http://spring-cloud-dataflow-development.apps.admin.arbeitslosenkasse.ch/management/loggers/org.springframework.cloud.dataflow.server.controller'
+```
+The result was: ```{"configuredLevel":"TRACE","effectiveLevel":"TRACE"}```
+Urah..... Now, the error message looks different:
+````
+Caused by: io.fabric8.kubernetes.client.KubernetesClientException: Failure executing: POST at: https://172.30.0.1/apis/batch/v1beta1/namespaces/jobroom-dev/cronjobs . Message: CronJob.batch "job-ad-export-schedule-scdf-app-external-job-ad-export-task" is invalid: metadata.name: Invalid value: "job-ad-export-schedule-scdf-app-external-job-ad-export-task": must be no more than 52 characters. Received status: Status(apiVersion=v1, code=422, details=StatusDetails(causes=[StatusCause(field=metadata.name, message=Invalid value: "job-ad-export-schedule-scdf-app-external-job-ad-export-task": must be no more than 52 characters, reason=FieldValueInvalid, additionalProperties={})], group=batch, kind=CronJob, name=job-ad-export-schedule-scdf-app-external-job-ad-export-task, retryAfterSeconds=null, uid=null, additionalProperties={}), kind=Status, message=CronJob.batch "job-ad-export-schedule-scdf-app-external-job-ad-export-task" is invalid: metadata.name: Invalid value: "job-ad-export-schedule-scdf-app-external-job-ad-export-task": must be no more than 52 characters, metadata=ListMeta(_continue=null, resourceVersion=null, selfLink=null, additionalProperties={}), reason=Invalid, status=Failure, additionalProperties={}).
+	at io.fabric8.kubernetes.client.dsl.base.OperationSupport.requestFailure(OperationSupport.java:476)
+	at io.fabric8.kubernetes.client.dsl.base.OperationSupport.assertResponseCode(OperationSupport.java:415)
+	at io.fabric8.kubernetes.client.dsl.base.OperationSupport.handleResponse(OperationSupport.java:381)
+	at io.fabric8.kubernetes.client.dsl.base.OperationSupport.handleResponse(OperationSupport.java:344)
+	at io.fabric8.kubernetes.client.dsl.base.OperationSupport.handleCreate(OperationSupport.java:227)
+	at io.fabric8.kubernetes.client.dsl.base.BaseOperation.handleCreate(BaseOperation.java:780)
+	at io.fabric8.kubernetes.client.dsl.base.BaseOperation.create(BaseOperation.java:349)
+	at org.springframework.cloud.deployer.spi.scheduler.kubernetes.KubernetesScheduler.createCronJob(KubernetesScheduler.java:163)
+	at org.springframework.cloud.deployer.spi.scheduler.kubernetes.KubernetesScheduler.schedule(KubernetesScheduler.java:76)
+	... 60 common frames omitted
+````
+Now you can easily identify where the problem comes from.
