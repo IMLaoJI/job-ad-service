@@ -8,7 +8,7 @@ if ! whoami &> /dev/null; then
   fi
 fi
 
-java $JAVA_OPTS -server -jar /srv/jobroom/app-external-job-ad-import-task.jar \
+java $JAVA_OPTS -server -jar /srv/jobroom/app-external-job-ad-import-task.jar $* \
   --spring.profiles.active=development,swagger \
   --spring.cloud.config.uri="http://admin:admin@${ALVCH_JHIPSTER_REGISTRY_SERVICE_HOST}:${ALVCH_JHIPSTER_REGISTRY_SERVICE_PORT}/config" \
   --jhipster.registry.password=admin \
