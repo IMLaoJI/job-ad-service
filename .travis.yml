@@ -2,6 +2,7 @@
 branches:
   except:
     - feature/openshift
+    - feature/DF-2004-gradle2mvn
 
 os:
 - linux
