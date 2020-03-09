@@ -11,7 +11,7 @@ function usage() {
             --version | -v Application version
             --cron    | -c Cron expression
     Example execution
-            ./create-task.sh --name test-name --version 1.1.0 --cron '0_2_*_*_*'\n"
+            ./create-task.sh --name test-name-task --version 1.1.0 --cron '0_2_*_*_*'\n"
     exit 1
 }
 
@@ -62,15 +62,15 @@ curl -k -f -X POST "${SCDF_BASE_URL}/apps/task/${NAME}" \
 # Create the task associated to the application
 curl -k -f -X POST "${SCDF_BASE_URL}/tasks/definitions" \
  --data-urlencode "force=true" \
- --data-urlencode "name=${NAME}-task" \
+ --data-urlencode "name=${NAME}" \
  --data-urlencode "definition=${NAME}"
 
 # Delete the existing schedule
-curl -k -f -X DELETE "${SCDF_BASE_URL}/tasks/schedules/schedule-scdf-${NAME}-task"
+curl -k -f -X DELETE "${SCDF_BASE_URL}/tasks/schedules/schedule-scdf-${NAME}"
 
 # Create new schedule
 curl -k -f -X POST "${SCDF_BASE_URL}/tasks/schedules" \
     --data-urlencode "force=true" \
 	--data-urlencode "scheduleName=schedule" \
-	--data-urlencode "taskDefinitionName=${NAME}-task"  \
+	--data-urlencode "taskDefinitionName=${NAME}"  \
 	--data-urlencode "properties=scheduler.cron.expression=${CRON//_/ }"
