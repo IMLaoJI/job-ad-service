@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 @Service
 public class ElasticsearchIndexService {
 
-    private static final int BUFFER_SIZE = 100;
+    private static final int BUFFER_SIZE = 10000;
     public static final String INDEX_NAME_JOB_ADVERTISEMENT = "job-advertisements";
     public static final String INDEX_NAME_API_USER = "api-users";
     public static final String TYPE_DOC = "doc";
