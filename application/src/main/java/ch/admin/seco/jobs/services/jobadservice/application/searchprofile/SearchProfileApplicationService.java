@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.application.searchprofile;
 
+import ch.admin.seco.jobs.services.jobadservice.application.IsSysAdmin;
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LocationDto;
@@ -31,6 +32,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Order.desc;
+import static org.springframework.util.Assert.notNull;
 
 @Service
 @Transactional
@@ -111,6 +113,16 @@ public class SearchProfileApplicationService {
 		List<SearchProfileResultDto> result = toSearchProfileResults(searchProfiles.getContent());
 
 		return new PageImpl<>(result, pageable, searchProfiles.getTotalElements());
+	}
+
+	@IsSysAdmin
+	public void handleUserUnregisteredEvent(String ownerUserId) {
+		notNull(ownerUserId, "OwnerUserId can't be null");
+		List<SearchProfile> searchProfiles = this.searchProfileRepository.findAllByOwnerUserId(ownerUserId);
+		searchProfiles.forEach(searchProfile -> {
+			this.searchProfileRepository.delete(searchProfile);
+			DomainEventPublisher.publish(new SearchProfileDeletedEvent(searchProfile));
+		});
 	}
 
 	private List<SearchProfileResultDto> toSearchProfileResults(List<SearchProfile> searchProfileList) {

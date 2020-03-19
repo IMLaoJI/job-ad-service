@@ -18,6 +18,11 @@ public interface MessageBrokerChannels {
 
     String JOB_AD_INT_EVENT_CHANNEL = "job-ad-int-event";
 
+    String USER_EVENT_CHANNEL = "user-event";
+
+    @Input(USER_EVENT_CHANNEL)
+    SubscribableChannel userEventChannel();
+
     @Input(JOB_AD_INT_ACTION_CHANNEL)
     SubscribableChannel jobAdIntActionChannel();
 

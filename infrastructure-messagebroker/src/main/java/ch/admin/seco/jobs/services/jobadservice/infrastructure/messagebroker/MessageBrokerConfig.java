@@ -26,8 +26,14 @@ public class MessageBrokerConfig {
         @Bean
         MessageBrokerChannels messageBrokerChannels() {
             return new MessageBrokerChannels() {
+
                 @Override
                 public SubscribableChannel jobAdIntActionChannel() {
+                    return new DirectChannel();
+                }
+
+                @Override
+                public SubscribableChannel userEventChannel() {
                     return new DirectChannel();
                 }
 

@@ -2,6 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.application.favouriteitem;
 
 import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEvent;
 import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogger;
+import ch.admin.seco.jobs.services.jobadservice.application.IsSysAdmin;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.FavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.create.CreateFavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.update.UpdateFavouriteItemDto;
@@ -23,11 +24,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogConstants.STATUS_ADDITIONAL_DATA;
 import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEventType.JOB_ADVERTISEMENT_FAVORITE_EVENT;
 import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogObjectType.JOB_ADVERTISEMENT_LOG;
+import static org.springframework.util.Assert.notNull;
 
 @Service
 @Transactional
@@ -114,6 +117,16 @@ public class FavouriteItemApplicationService {
         Condition.notNull(favouriteItemId, "FavouriteItemId can't be null");
         return this.favouriteItemRepository.findById(favouriteItemId).map(FavouriteItemDto::toDto)
                 .orElseThrow(() -> new FavoriteItemNotExitsException(favouriteItemId));
+    }
+
+    @IsSysAdmin
+    public void handleUserUnregisteredEvent(String ownerUserId) {
+        notNull(ownerUserId, "OwnerUserId can't be null");
+        List<FavouriteItem> favouriteItems = this.favouriteItemRepository.findByOwnerUserId(ownerUserId);
+        favouriteItems.forEach(favouriteItem -> {
+            this.favouriteItemRepository.delete(favouriteItem);
+            DomainEventPublisher.publish(new FavouriteItemDeletedEvent(favouriteItem));
+        });
     }
 
     private FavouriteItem getFavouriteItem(FavouriteItemId id) {
