@@ -2,7 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.us
 
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.FavouriteItemApplicationService;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.SearchProfileApplicationService;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.LoginAsTechnicalUser;
+import ch.admin.seco.jobs.services.jobadservice.application.LoginAsTechnicalUser;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +29,8 @@ public class UserEventReceiverGateway {
     @LoginAsTechnicalUser
     public void handleUnregisteredEvent(UserEventDto event) {
         LOGGER.info("Received UserUnregisteredEvent for User: '{}' with Role: '{}'.", event.getUserInfoId(), event.getUserInfoRole());
-        this.searchProfileApplicationService.handleUserUnregisteredEvent(event.getUserInfoId());
-        this.favouriteItemApplicationService.handleUserUnregisteredEvent(event.getUserInfoId());
+        this.searchProfileApplicationService.deleteUserSearchProfiles(event.getUserInfoId());
+        this.favouriteItemApplicationService.deleteUserFavouriteItems(event.getUserInfoId());
     }
 
 }

@@ -30,7 +30,7 @@ public interface FavouriteItemRepository extends JpaRepository<FavouriteItem, Fa
 
     @Transactional(propagation = Propagation.SUPPORTS)
     @Query("select i from FavouriteItem i where i.ownerUserId = :ownerUserId")
-    List<FavouriteItem> findByOwnerUserId(@Param("ownerUserId") String ownerUserId);
+    List<FavouriteItem> findAllByOwnerUserId(@Param("ownerUserId") String ownerUserId);
 
     @QueryHints({
             @QueryHint(name = HINT_FETCH_SIZE, value = "1000"),

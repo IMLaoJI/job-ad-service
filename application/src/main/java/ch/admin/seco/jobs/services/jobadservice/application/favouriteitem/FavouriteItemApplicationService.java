@@ -30,7 +30,6 @@ import java.util.Optional;
 import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogConstants.STATUS_ADDITIONAL_DATA;
 import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEventType.JOB_ADVERTISEMENT_FAVORITE_EVENT;
 import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogObjectType.JOB_ADVERTISEMENT_LOG;
-import static org.springframework.util.Assert.notNull;
 
 @Service
 @Transactional
@@ -120,9 +119,9 @@ public class FavouriteItemApplicationService {
     }
 
     @IsSysAdmin
-    public void handleUserUnregisteredEvent(String ownerUserId) {
-        notNull(ownerUserId, "OwnerUserId can't be null");
-        List<FavouriteItem> favouriteItems = this.favouriteItemRepository.findByOwnerUserId(ownerUserId);
+    public void deleteUserFavouriteItems(String ownerUserId) {
+        Condition.notNull(ownerUserId, "OwnerUserId can't be null");
+        List<FavouriteItem> favouriteItems = this.favouriteItemRepository.findAllByOwnerUserId(ownerUserId);
         favouriteItems.forEach(favouriteItem -> {
             this.favouriteItemRepository.delete(favouriteItem);
             DomainEventPublisher.publish(new FavouriteItemDeletedEvent(favouriteItem));

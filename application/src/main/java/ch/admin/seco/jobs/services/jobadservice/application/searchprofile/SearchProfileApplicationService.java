@@ -32,7 +32,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Order.desc;
-import static org.springframework.util.Assert.notNull;
 
 @Service
 @Transactional
@@ -116,8 +115,8 @@ public class SearchProfileApplicationService {
 	}
 
 	@IsSysAdmin
-	public void handleUserUnregisteredEvent(String ownerUserId) {
-		notNull(ownerUserId, "OwnerUserId can't be null");
+	public void deleteUserSearchProfiles(String ownerUserId) {
+		Condition.notNull(ownerUserId, "OwnerUserId can't be null");
 		List<SearchProfile> searchProfiles = this.searchProfileRepository.findAllByOwnerUserId(ownerUserId);
 		searchProfiles.forEach(searchProfile -> {
 			this.searchProfileRepository.delete(searchProfile);
