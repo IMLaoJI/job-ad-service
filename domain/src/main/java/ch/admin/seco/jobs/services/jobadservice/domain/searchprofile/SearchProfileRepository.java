@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Transactional(propagation = Propagation.MANDATORY)
@@ -20,4 +21,9 @@ public interface SearchProfileRepository extends JpaRepository<SearchProfile, Se
     @Transactional(propagation = Propagation.SUPPORTS)
     @Query("select sp from SearchProfile sp where sp.ownerUserId = :ownerUserId")
     Page<SearchProfile> findAllByOwnerUserId(@Param("ownerUserId") String ownerUserId, Pageable pageable);
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Query("select sp from SearchProfile sp where sp.ownerUserId = :ownerUserId")
+    List<SearchProfile> findAllByOwnerUserId(@Param("ownerUserId") String ownerUserId);
+
 }

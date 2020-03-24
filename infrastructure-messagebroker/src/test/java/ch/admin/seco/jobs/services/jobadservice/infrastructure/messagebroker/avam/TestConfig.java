@@ -1,5 +1,10 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
+import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
+import ch.admin.seco.jobs.services.jobadservice.application.MailSenderService;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
@@ -7,12 +12,6 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.NullChannel;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.SubscribableChannel;
-
-import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
-import ch.admin.seco.jobs.services.jobadservice.application.MailSenderService;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels;
 
 @SpringBootApplication
 public class TestConfig {
@@ -32,8 +31,14 @@ public class TestConfig {
 	@Bean
 	MessageBrokerChannels messageBrokerChannels() {
 		return new MessageBrokerChannels() {
+
 			@Override
 			public SubscribableChannel jobAdIntActionChannel() {
+				return new DirectChannel();
+			}
+
+			@Override
+			public SubscribableChannel userEventChannel() {
 				return new DirectChannel();
 			}
 
