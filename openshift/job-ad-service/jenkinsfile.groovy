@@ -16,10 +16,8 @@ node('maven') {
                 appJobAdService           : {
                     microserviceDockerBuild([project: 'job-ad-service', application: 'app-job-ad-service', applicationFolderOverride: 'web'])
                 },
-                appExternalJobAdExportTask: {
+                appExternalJobAdExportImportTask: {
                     batchApplicationDockerBuild([project: 'job-ad-service', application: 'app-external-job-ad-export-task'])
-                },
-                appExternalJobAdImportTask: {
                     batchApplicationDockerBuild([project: 'job-ad-service', application: 'app-external-job-ad-import-task'])
                 }
         ])
