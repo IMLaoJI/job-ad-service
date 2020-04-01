@@ -26,6 +26,12 @@
         <axiom.version>1.2.20</axiom.version>
         <guava.version>28.0-jre</guava.version>
         <hibernate.javax.persistence.version>1.0.2.Final</hibernate.javax.persistence.version>
+        <liquibase.slf4j.version>2.0.0</liquibase.slf4j.version>
+        <hibernate.validator.version>6.0.7.Final</hibernate.validator.version>
+        <org.jsoup.version>1.11.2</org.jsoup.version>
+        <org.zeroturnaround.version>1.12</org.zeroturnaround.version>
+        <org.zalando.version>0.22.1</org.zalando.version>
+        <org.apache.commons.version>1.4</org.apache.commons.version>
     </properties>
 
     <modules>
@@ -171,27 +177,37 @@
             <dependency>
                 <groupId>com.mattbertolini</groupId>
                 <artifactId>liquibase-slf4j</artifactId>
-                <version>2.0.0</version>
+                <version>${liquibase.slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.validator</groupId>
                 <artifactId>hibernate-validator</artifactId>
-                <version>6.0.7.Final</version>
+                <version>${hibernate.validator.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-text</artifactId>
-                <version>1.4</version>
+                <version>${org.apache.commons.version}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.12</version>
+                <version>${junit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.zalando</groupId>
                 <artifactId>problem-spring-web</artifactId>
-                <version>0.22.1</version>
+                <version>${org.zalando.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.zeroturnaround</groupId>
+                <artifactId>zt-zip</artifactId>
+                <version>${org.zeroturnaround.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${org.jsoup.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
