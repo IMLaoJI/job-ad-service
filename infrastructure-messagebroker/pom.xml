@@ -19,6 +19,7 @@
     <dependency>
       <groupId>ch.admin.seco.jobs.services.jobadservice</groupId>
       <artifactId>infrastructure-messagebroker-shared</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
