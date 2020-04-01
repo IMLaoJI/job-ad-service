@@ -13,8 +13,13 @@ node('maven') {
         updateOpenshiftTemplates()
 
         parallel([
-                appJobAdService           : {
-                    microserviceDockerBuild([project: 'job-ad-service', application: 'app-job-ad-service', applicationFolderOverride: 'web'])
+                appJobAdService                 : {
+                    microserviceDockerBuild([
+                            project            : 'job-ad-service',
+                            application        : 'app-job-ad-service',
+                            buildSourceOverride: [
+                                    "${WORKSPACE}/web/target/app-job-ad-service.jar"
+                            ]])
                 },
                 appExternalJobAdExportImportTask: {
                     batchApplicationDockerBuild([project: 'job-ad-service', application: 'app-external-job-ad-export-task'])
