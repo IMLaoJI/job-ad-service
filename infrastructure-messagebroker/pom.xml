@@ -47,6 +47,7 @@
     <dependency>
       <groupId>ch.admin.seco.jobs.services.jobadservice</groupId>
       <artifactId>infrastructure</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
 
