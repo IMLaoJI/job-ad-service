@@ -14,14 +14,15 @@
     <dependency>
       <groupId>ch.admin.seco.jobs.services.jobadservice</groupId>
       <artifactId>application</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
-      <scope>compile</scope>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>ch.admin.seco.alv</groupId>
       <artifactId>alv-feign-starter</artifactId>
-      <scope>compile</scope>
     </dependency>
+
+
+    <!-- TEST -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
