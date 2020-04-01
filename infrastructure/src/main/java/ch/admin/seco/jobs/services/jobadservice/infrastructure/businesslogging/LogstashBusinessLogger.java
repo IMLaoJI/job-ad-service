@@ -32,6 +32,6 @@ public class LogstashBusinessLogger implements BusinessLogger {
 	}
 
 	private String extractAuthorities(CurrentUser currentUser) {
-		return currentUser != null ? String.join(", ", currentUser.getAuthorities()) : Strings.EMPTY;
+		return currentUser != null ? String.join(" ", currentUser.getAuthorities()) : Strings.EMPTY;
 	}
 }
