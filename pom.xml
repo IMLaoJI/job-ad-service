@@ -98,32 +98,32 @@
             <dependency>
                 <groupId>ch.admin.seco.alv</groupId>
                 <artifactId>alv-jwt-starter</artifactId>
-                <version>${alv-shared-library-version}</version>
+                <version>${alv.shared.library.version}</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.seco.alv</groupId>
                 <artifactId>alv-logger-starter</artifactId>
-                <version>${alv-shared-library-version}</version>
+                <version>${alv.shared.library.version}</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.seco.alv</groupId>
                 <artifactId>alv-mail-sending-starter</artifactId>
-                <version>${alv-shared-library-version}</version>
+                <version>${alv.shared.library.version}</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.seco.alv</groupId>
                 <artifactId>alv-spring-integration-starter</artifactId>
-                <version>${alv-shared-library-version}</version>
+                <version>${alv.shared.library.version}</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.seco.alv</groupId>
                 <artifactId>alv-spring-integration-leader-starter</artifactId>
-                <version>${alv-shared-library-version}</version>
+                <version>${alv.shared.library.version}</version>
             </dependency>
             <dependency>
                 <groupId>ch.admin.seco.alv</groupId>
                 <artifactId>alv-feign-starter</artifactId>
-                <version>${alv-shared-library-version}</version>
+                <version>${alv.shared.library.version}</version>
             </dependency>
 
             <!-- MISC -->
