@@ -17,7 +17,7 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <overzealous.version>1.1.0</overzealous.version>
+        <remark.lib.version>1.2.0</remark.lib.version>
         <springfox.swagger.version>2.9.2</springfox.swagger.version>
         <alv.shared.library.version>0.0.1-build-193</alv.shared.library.version>
         <lib.phonenumber.version>8.9.2</lib.phonenumber.version>
@@ -51,9 +51,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.overzealous</groupId>
+                <groupId>com.kotcrab.remark</groupId>
                 <artifactId>remark</artifactId>
-                <version>${overzealous.version}</version>
+                <version>${remark.lib.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>

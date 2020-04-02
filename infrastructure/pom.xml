@@ -57,7 +57,7 @@
 
     <!-- MISC -->
     <dependency>
-      <groupId>com.overzealous</groupId>
+      <groupId>com.kotcrab.remark</groupId>
       <artifactId>remark</artifactId>
     </dependency>
 
