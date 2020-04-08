@@ -27,12 +27,13 @@ public class LogstashBusinessLogger implements BusinessLogger {
 
 	@Override
 	public void log(BusinessLogEvent businessLogEvent) {
+		CurrentUser currentUser = currentUserContext.getCurrentUser();
 		BusinessLogData businessLogData = new BusinessLogData(businessLogEvent.getEventType().getTypeName())
-				.withAdditionalData(USER_LOGIN_ID_KEY, getCurrentUserId(currentUserContext.getCurrentUser()))
 				.withObjectId(businessLogEvent.getObjectId())
-				.withAuthorities(extractAuthorities(currentUserContext.getCurrentUser()))
+				.withAuthorities(extractAuthorities(currentUser))
 				.withObjectType(businessLogEvent.getObjectType().getTypeName())
-				.withAdditionalData(businessLogEvent.getAdditionalData());
+				.withAdditionalData(businessLogEvent.getAdditionalData())
+				.withAdditionalData(USER_LOGIN_ID_KEY, getCurrentUserId(currentUser));
 		businessLogger.log(businessLogData);
 	}
 	
