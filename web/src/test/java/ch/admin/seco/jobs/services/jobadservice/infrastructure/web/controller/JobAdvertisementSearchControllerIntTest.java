@@ -3,10 +3,20 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.FavouriteItemApplicationService;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.FavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.create.CreateFavouriteItemDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.*;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ManagedJobAdSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCode;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCodeType;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.RadiusSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.GeoPointDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.search.JobAdvertisementSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.GeoPoint;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageSkill;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Location;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
@@ -34,7 +44,9 @@ import reactor.util.function.Tuples;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REJECTED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.API;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.EXTERN;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture.testJobAdvertisement;
@@ -44,15 +56,24 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobDescriptionFixture.testJobDescription;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublication;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.*;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForAbroadSearchTests;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForCloseRangeDistanceTests;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForDecayingScoreSearchTests;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures.JobAdvertisementWithLocationsFixture.listOfJobAdsForGeoDistanceTests;
 import static java.time.LocalDate.now;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.CombinableMatcher.both;
 import static org.junit.Assume.assumeTrue;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -134,9 +155,9 @@ public class JobAdvertisementSearchControllerIntTest {
         index(listOfJobAdsForCloseRangeDistanceTests());
 
         // WHEN
-        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{"355"});
-        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(KÖNIZ_GEO_POINT).setDistance(30));
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest()
+        .setCommunalCodes(new String[]{"355"})
+        .setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(KÖNIZ_GEO_POINT).setDistance(30));
 
         post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -162,8 +183,8 @@ public class JobAdvertisementSearchControllerIntTest {
         index(listOfJobAdsForGeoDistanceTests());
 
         // WHEN
-        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setRadiusSearchRequest(null);
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest()
+        .setRadiusSearchRequest(null);
 
         // THEN
         this.post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search")
@@ -186,8 +207,8 @@ public class JobAdvertisementSearchControllerIntTest {
                         .build()));
 
         // WHEN
-        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(BERN_GEO_POINT).setDistance(150));
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest()
+        .setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(BERN_GEO_POINT).setDistance(150));
 
         // THEN
         post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search")
@@ -219,9 +240,9 @@ public class JobAdvertisementSearchControllerIntTest {
         // GIVEN
         index(listOfJobAdsForGeoDistanceTests());
 
-        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE});
-        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(20));
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest()
+        .setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE})
+        .setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(20));
 
         // THEN
         post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -237,9 +258,9 @@ public class JobAdvertisementSearchControllerIntTest {
         index(listOfJobAdsForGeoDistanceTests());
 
 
-        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{SION_COMMUNAL_CODE});
-        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(SION_GEO_POINT).setDistance(80));
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest()
+        .setCommunalCodes(new String[]{SION_COMMUNAL_CODE})
+        .setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(SION_GEO_POINT).setDistance(80));
 
         // THEN
         post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -253,8 +274,8 @@ public class JobAdvertisementSearchControllerIntTest {
         index(listOfJobAdsForAbroadSearchTests());
 
         // WHEN
-        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{ABROAD_COMMUNAL_CODE, BERN_COMMUNAL_CODE});
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest()
+        .setCommunalCodes(new String[]{ABROAD_COMMUNAL_CODE, BERN_COMMUNAL_CODE});
 
         // THEN
         post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -276,8 +297,8 @@ public class JobAdvertisementSearchControllerIntTest {
         index(listOfJobAdsForAbroadSearchTests());
 
         // WHEN
-        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE, BERN_COMMUNAL_CODE});
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest()
+        .setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE, BERN_COMMUNAL_CODE});
 
         // THEN
         post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -303,9 +324,9 @@ public class JobAdvertisementSearchControllerIntTest {
         index(listOfJobAdsForGeoDistanceTests());
 
         // WHEN
-        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{BERN_COMMUNAL_CODE});
-        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(BERN_GEO_POINT).setDistance(100));
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest()
+                .setCommunalCodes(new String[]{BERN_COMMUNAL_CODE})
+                .setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(BERN_GEO_POINT).setDistance(100));
 
         // THEN
         post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -335,10 +356,10 @@ public class JobAdvertisementSearchControllerIntTest {
         index(listOfJobAdsForDecayingScoreSearchTests());
         assumeTrue(isGaussDecayEnabled);
         // WHEN
-        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE});
-        jobAdvertisementSearchRequest.setKeywords(new String[]{"Koch"});
-        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(150));
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest().
+                setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE})
+                .setKeywords(new String[]{"Koch"})
+                .setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(150));
 
         // THEN
         post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -364,11 +385,10 @@ public class JobAdvertisementSearchControllerIntTest {
         index(listOfJobAdsForDecayingScoreSearchTests());
 
         // WHEN
-        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE});
-        jobAdvertisementSearchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, EXTERNAL_CODE_KOCH)});
-
-        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(30));
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest()
+        .setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE})
+        .setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, EXTERNAL_CODE_KOCH)})
+        .setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(30));
 
         // THEN
         post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -398,9 +418,9 @@ public class JobAdvertisementSearchControllerIntTest {
                                         .setCountryIsoCode("FR")
                                         .build()).build()));
         // WHEN
-        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{ABROAD_COMMUNAL_CODE});
-        jobAdvertisementSearchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, EXTERNAL_CODE_KOCH)});
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest()
+        .setCommunalCodes(new String[]{ABROAD_COMMUNAL_CODE})
+        .setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, EXTERNAL_CODE_KOCH)});
 
         // THEN
         post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -448,10 +468,10 @@ public class JobAdvertisementSearchControllerIntTest {
                                         .setCoordinates(new GeoPoint(7.441, 46.948))
                                         .build()).build()));
         // WHEN
-        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest();
-        jobAdvertisementSearchRequest.setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE});
-        jobAdvertisementSearchRequest.setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(100));
-        jobAdvertisementSearchRequest.setKeywords(new String[]{"keyword1", "keyword2", "keyword3"});
+        JobAdvertisementSearchRequest jobAdvertisementSearchRequest = new JobAdvertisementSearchRequest()
+        .setCommunalCodes(new String[]{LAUSANNE_COMMUNAL_CODE})
+        .setRadiusSearchRequest(new RadiusSearchRequest().setGeoPoint(LAUSANNE_GEO_POINT).setDistance(100))
+        .setKeywords(new String[]{"keyword1", "keyword2", "keyword3"});
 
         // THEN
         post(jobAdvertisementSearchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -472,9 +492,9 @@ public class JobAdvertisementSearchControllerIntTest {
         index(listOfJobAdsForDecayingScoreSearchTests());
 
         // WHEN
-        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setCantonCodes(new String[]{"BE"});
-        searchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, EXTERNAL_CODE_KOCH)});
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest()
+        .setCantonCodes(new String[]{"BE"})
+        .setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.X28, EXTERNAL_CODE_KOCH)});
 
         // THEN
         post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -492,9 +512,9 @@ public class JobAdvertisementSearchControllerIntTest {
         index(listOfJobAdsForAbroadSearchTests());
 
         // WHEN
-        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setCantonCodes(new String[]{"BE"});
-        searchRequest.setCommunalCodes(new String[]{ABROAD_COMMUNAL_CODE});
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest()
+        .setCantonCodes(new String[]{"BE"})
+        .setCommunalCodes(new String[]{ABROAD_COMMUNAL_CODE});
 
         // THEN
         post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -511,8 +531,8 @@ public class JobAdvertisementSearchControllerIntTest {
         index(createJobWithDescription(job03.id(), "php programmierer", "php programierer"));
 
         // WHEN
-        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setKeywords(new String[]{"entwickler", "java"});
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest()
+        .setKeywords(new String[]{"entwickler", "java"});
 
         // THEN
         post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -536,8 +556,8 @@ public class JobAdvertisementSearchControllerIntTest {
         index(createJobWithDescription(job02.id(), "java & javascript developer", "jee entwickler", API, OwnerFixture.of(job02.id()).build()));
 
         // WHEN
-        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setKeywords(new String[]{"*extern"});
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest()
+        .setKeywords(new String[]{"*extern"});
 
         // THEN
         post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -560,8 +580,8 @@ public class JobAdvertisementSearchControllerIntTest {
         index(createJobWithLanguageSkills(job02.id(), "java & javascript developer", "jee entwickler", API, en));
 
         // WHEN
-        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setKeywords(new String[]{"dänisch"});
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest()
+        .setKeywords(new String[]{"dänisch"});
 
         // THEN
         post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -585,8 +605,8 @@ public class JobAdvertisementSearchControllerIntTest {
         index(createJobWithOccupation(job04.id(), occupation4));
 
         // WHEN
-        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.BFS, DEFAULT_BFS_CODE)});
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest()
+        .setProfessionCodes(new ProfessionCode[]{new ProfessionCode(ProfessionCodeType.BFS, DEFAULT_BFS_CODE)});
 
         // THEN
         post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -608,8 +628,8 @@ public class JobAdvertisementSearchControllerIntTest {
         index(createJobWithExternalCode(job04.id(), "4444"));
 
         // WHEN
-        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setProfessionCodes(new ProfessionCode[]{
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest()
+        .setProfessionCodes(new ProfessionCode[]{
                 new ProfessionCode(ProfessionCodeType.X28, "1111"),
                 new ProfessionCode(ProfessionCodeType.X28, "44")
         });
@@ -641,8 +661,8 @@ public class JobAdvertisementSearchControllerIntTest {
         index(createJobWithLocation(job03.id(), location3));
 
         // WHEN
-        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setCantonCodes(new String[]{"BE"});
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest()
+        .setCantonCodes(new String[]{"BE"});
 
         // THEN
         post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -662,9 +682,9 @@ public class JobAdvertisementSearchControllerIntTest {
         index(createJobWithWorkload(job03.id(), 50, 50));
 
         // WHEN
-        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setWorkloadPercentageMin(60);
-        searchRequest.setWorkloadPercentageMax(80);
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest()
+        .setWorkloadPercentageMin(60)
+        .setWorkloadPercentageMax(80);
 
         // THEN
         post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -685,8 +705,8 @@ public class JobAdvertisementSearchControllerIntTest {
         index(createJobWithCompanyName(job04.id(), "AG Gösser Zurich"));
 
         // WHEN
-        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setCompanyName("goes");
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest()
+        .setCompanyName("goes");
 
         // THEN
         post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -706,8 +726,8 @@ public class JobAdvertisementSearchControllerIntTest {
         index(createJob(job03.id()));
 
         // WHEN
-        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setPermanent(true);
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest()
+        .setPermanent(true);
 
         // THEN
         post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -727,8 +747,8 @@ public class JobAdvertisementSearchControllerIntTest {
         index(createJob(job03.id()));
 
         // WHEN
-        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setDisplayRestricted(true);
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest()
+        .setDisplayRestricted(true);
 
         // THEN
         post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -862,8 +882,8 @@ public class JobAdvertisementSearchControllerIntTest {
                 );
 
         // WHEN
-        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setEuresDisplay(true);
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest()
+        .setEuresDisplay(true);
 
         // THEN
         post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )
@@ -914,8 +934,8 @@ public class JobAdvertisementSearchControllerIntTest {
                 );
 
         // WHEN
-        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest();
-        searchRequest.setEuresDisplay(false);
+        JobAdvertisementSearchRequest searchRequest = new JobAdvertisementSearchRequest()
+        .setEuresDisplay(false);
 
         // THEN
         post(searchRequest, API_JOB_ADVERTISEMENTS + "/_search" )

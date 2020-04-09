@@ -4,17 +4,23 @@ import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteIt
 import ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.common.ElasticsearchIndexService;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementDocument;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write.JobAdvertisementElasticsearchRepository;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.searchprofile.JobAlertPercolatorEventListener;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static ch.admin.seco.jobs.services.jobadservice.domain.favouriteitem.FavouriteItemIdFixture.*;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job02;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job03;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job04;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.createJob;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +35,12 @@ public class FavouriteItemElasticsearchRepositoryTest {
 
     @Autowired
     private JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository;
+
+    @MockBean
+    private JobAlertPercolatorEventListener jobAlertPercolatorEventListener;
+
+    @MockBean
+    private ElasticsearchIndexService elasticsearchIndexService;
 
     @Before
     public void setUp() {

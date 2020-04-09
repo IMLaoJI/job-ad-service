@@ -59,6 +59,7 @@ public class MicroserviceSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/complaint").permitAll()
+                .antMatchers("/api/searchProfiles/jobalert/_action/unsubscribe/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/jobAdvertisements/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/jobAdvertisements", "/api/jobAdvertisements/_search", "/api/jobAdvertisements/_count").permitAll()
                 .antMatchers(HttpMethod.PATCH, "/api/jobAdvertisements/{id}/cancel").permitAll()

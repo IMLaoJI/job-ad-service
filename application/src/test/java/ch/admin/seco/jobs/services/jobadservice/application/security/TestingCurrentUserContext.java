@@ -27,7 +27,7 @@ public class TestingCurrentUserContext implements CurrentUserContext {
     @Override
     public CurrentUser getCurrentUser() {
         return new CurrentUser(
-                "userId",
+                "junitest-1",
                 userExternalId,
                 "companyId",
                 "Junit",

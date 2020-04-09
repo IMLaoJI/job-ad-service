@@ -1,34 +1,8 @@
 package ch.admin.seco.jobs.services.jobadservice.application.searchprofile;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_01;
-import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_02;
-import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_03;
-import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_04;
-import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_05;
-import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_06;
-import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_07;
-import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_08;
-import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_09;
-import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.search_profile_10;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
-
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.CreateSearchProfileDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.JobAlertDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.JobAlertMaxAmountReachedException;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.ResolvedSearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.SearchProfileResultDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.UpdateSearchProfileDto;
@@ -40,7 +14,26 @@ import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfi
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileEvents;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileFixture;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.jobalert.Interval;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.CantonFilter;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -197,12 +190,104 @@ public class SearchProfileApplicationServiceTest {
 				.hasMessageContaining("Aggregate with ID " + searchProfileId.getValue() + " not found");
 	}
 
+	@Test
+	public void testSubscribeToJobAlert() {
+		//given
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfile(search_profile_01.id()));
+		// when
+		searchProfileApplicationService.subscribeToJobAlert(search_profile_01.id(),
+				new JobAlertDto()
+				.setInterval(Interval.INT_1DAY)
+				.setEmail("test@example.org"));
+
+		// then
+		SearchProfile searchProfile = this.searchProfileRepository.findById(search_profile_01.id()).get();
+		assertThat(searchProfile.getJobAlert()).isNotNull();
+		assertThat(searchProfile.getJobAlert().getCreatedAt()).isNotNull();
+		assertThat(searchProfile.getJobAlert().getNextReleaseAt()).isNotNull();
+		assertThat(searchProfile.getJobAlert().getUpdatedAt()).isNotNull();
+		assertThat(searchProfile.getJobAlert().getInterval()).isEqualTo(Interval.INT_1DAY);
+		assertThat(searchProfile.getJobAlert().getMatchedJobAdvertisementIds()).isEqualTo(Collections.emptySet());
+		assertThat(searchProfile.getJobAlert().getEmail()).isEqualTo("test@example.org");
+		assertThat(searchProfile.getJobAlert().getLanguage()).isEqualTo("en");
+		domainEventMockUtils.assertSingleDomainEventPublished(SearchProfileEvents.JOBALERT_SUBSCRIBED_EVENT.getDomainEventType());
+	}
+
+
+	@Test
+	public void testJobAlertsLimitedTo5() {
+
+		//given
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(search_profile_01.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(search_profile_02.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(search_profile_03.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(search_profile_04.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(search_profile_05.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(search_profile_06.id()));
+
+		// when
+		final JobAlertDto jobAlertDto = new JobAlertDto()
+				.setInterval(Interval.INT_1DAY)
+				.setEmail("test@example.org");
+		searchProfileApplicationService.subscribeToJobAlert(search_profile_01.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(search_profile_02.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(search_profile_03.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(search_profile_04.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(search_profile_05.id(), jobAlertDto);
+
+		// then
+		assertThatThrownBy(() -> searchProfileApplicationService.subscribeToJobAlert(search_profile_06.id(), jobAlertDto))
+				.isInstanceOf(JobAlertMaxAmountReachedException.class)
+				.hasMessageContaining("Maximum Amount of JobAlerts reached!");
+	}
+
+	@Test
+	public void testReleaseJobAlerts() {
+		//given
+		// nextReleaseDate in the Past - Should be released
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlertToBeReleased(search_profile_01.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlertToBeReleased(search_profile_02.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlertToBeReleased(search_profile_03.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlertToBeReleased(search_profile_04.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlertToBeReleased(search_profile_05.id()));
+
+		// nextReleaseDate in the Future - Should not be released
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_06.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_07.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_08.id()));
+
+
+		// when
+		searchProfileApplicationService.releaseJobAlerts();
+
+		// then
+		domainEventMockUtils.assertMultipleDomainEventPublished(5, SearchProfileEvents.JOBALERT_RELEASED_EVENT.getDomainEventType());
+	}
+
+	@Test
+	public void testUnsubscribeJobAlert() {
+		// given
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_01.id()));
+
+		// when
+		searchProfileApplicationService.unsubscribeFromJobAlert(search_profile_01.id(), null);
+
+		// then
+		SearchProfile searchProfile = this.searchProfileRepository.findById(search_profile_01.id()).get();
+		assertThat(searchProfile.getJobAlert().getMatchedJobAdvertisementIds()).isEmpty();
+		assertThat(searchProfile.getJobAlert().getInterval()).isNull();
+		assertThat(searchProfile.getJobAlert().getUpdatedAt()).isNull();
+		assertThat(searchProfile.getJobAlert().getNextReleaseAt()).isNull();
+		assertThat(searchProfile.getJobAlert().getCreatedAt()).isNull();
+		assertThat(searchProfile.getJobAlert().getQuery()).isNull();
+		domainEventMockUtils.assertSingleDomainEventPublished(SearchProfileEvents.JOBALERT_UNSUBSCRIBED_EVENT.getDomainEventType());
+	}
+
 	private CreateSearchProfileDto getCreateSearchProfileDto(SearchProfileId searchProfileId) {
 		SearchProfile searchProfile = SearchProfileFixture.testSearchProfile(searchProfileId);
 		return new CreateSearchProfileDto(
 				searchProfile.getName()
 				, searchProfile.getOwnerUserId()
 				, SearchFilterDto.toDto(searchProfile.getSearchFilter()));
-
 	}
 }

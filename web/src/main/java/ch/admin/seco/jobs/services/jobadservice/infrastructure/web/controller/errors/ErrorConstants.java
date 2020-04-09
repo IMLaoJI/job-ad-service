@@ -24,6 +24,8 @@ public final class ErrorConstants {
 
     public static final URI SEARCH_PROFILE_EXISTS = URI.create(PROBLEM_BASE_URL + "/search-profile/already-exists");
 
+    public static final URI JOB_ALERT_MAX_AMOUNT_REACHED = URI.create(PROBLEM_BASE_URL + "/job-alert/max-amount-reached");
+
     private ErrorConstants() {
     }
 }

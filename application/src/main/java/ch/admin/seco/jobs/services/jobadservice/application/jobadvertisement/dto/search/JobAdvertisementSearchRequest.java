@@ -1,5 +1,8 @@
-package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
+package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.search;
 
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ProfessionCode;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.RadiusSearchRequest;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ValidWorkingTimeRange;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.Valid;
@@ -46,104 +49,117 @@ public class JobAdvertisementSearchRequest {
         return language;
     }
 
-    public void setLanguage(String language) {
+    public JobAdvertisementSearchRequest setLanguage(String language) {
         this.language = language;
+        return this;
     }
 
     public ProfessionCode[] getProfessionCodes() {
         return professionCodes;
     }
 
-    public void setProfessionCodes(ProfessionCode[] professionCodes) {
+    public JobAdvertisementSearchRequest setProfessionCodes(ProfessionCode[] professionCodes) {
         this.professionCodes = professionCodes;
+        return this;
     }
 
     public String[] getKeywords() {
         return keywords;
     }
 
-    public void setKeywords(String[] keywords) {
+    public JobAdvertisementSearchRequest setKeywords(String[] keywords) {
         this.keywords = keywords;
+        return this;
     }
 
     public String[] getCommunalCodes() {
         return communalCodes;
     }
 
-    public void setCommunalCodes(String[] communalCodes) {
+    public JobAdvertisementSearchRequest setCommunalCodes(String[] communalCodes) {
         this.communalCodes = communalCodes;
+        return this;
     }
 
     public String[] getCantonCodes() {
         return cantonCodes;
     }
 
-    public void setCantonCodes(String[] cantonCodes) {
+    public JobAdvertisementSearchRequest setCantonCodes(String[] cantonCodes) {
         this.cantonCodes = cantonCodes;
-    }
-
-    public Integer getWorkloadPercentageMin() {
-        return workloadPercentageMin;
-    }
-
-    public void setWorkloadPercentageMin(Integer workloadPercentageMin) {
-        this.workloadPercentageMin = workloadPercentageMin;
-    }
-
-    public Integer getWorkloadPercentageMax() {
-        return workloadPercentageMax;
-    }
-
-    public void setWorkloadPercentageMax(Integer workloadPercentageMax) {
-        this.workloadPercentageMax = workloadPercentageMax;
-    }
-
-    public Boolean isPermanent() {
-        return permanent;
-    }
-
-    public void setPermanent(Boolean permanent) {
-        this.permanent = permanent;
-    }
-
-    public String getCompanyName() {
-        return companyName;
-    }
-
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
-
-    public Integer getOnlineSince() {
-        return onlineSince;
-    }
-
-    public void setOnlineSince(Integer onlineSince) {
-        this.onlineSince = onlineSince;
-    }
-
-    public Boolean getDisplayRestricted() {
-        return displayRestricted;
-    }
-
-    public void setDisplayRestricted(Boolean displayRestricted) {
-        this.displayRestricted = displayRestricted;
-    }
-
-    public Boolean getEuresDisplay() {
-        return euresDisplay;
-    }
-
-    public void setEuresDisplay(Boolean euresDisplay) {
-        this.euresDisplay = euresDisplay;
+        return this;
     }
 
     public RadiusSearchRequest getRadiusSearchRequest() {
         return radiusSearchRequest;
     }
 
-    public void setRadiusSearchRequest(RadiusSearchRequest radiusSearchRequest) {
+    public JobAdvertisementSearchRequest setRadiusSearchRequest(RadiusSearchRequest radiusSearchRequest) {
         this.radiusSearchRequest = radiusSearchRequest;
+        return this;
+    }
+
+    public Integer getWorkloadPercentageMin() {
+        return workloadPercentageMin;
+    }
+
+    public JobAdvertisementSearchRequest setWorkloadPercentageMin(Integer workloadPercentageMin) {
+        this.workloadPercentageMin = workloadPercentageMin;
+        return this;
+    }
+
+    public Integer getWorkloadPercentageMax() {
+        return workloadPercentageMax;
+    }
+
+    public JobAdvertisementSearchRequest setWorkloadPercentageMax(Integer workloadPercentageMax) {
+        this.workloadPercentageMax = workloadPercentageMax;
+        return this;
+    }
+
+    public Boolean isPermanent() {
+        return permanent;
+    }
+
+    public JobAdvertisementSearchRequest setPermanent(Boolean permanent) {
+        this.permanent = permanent;
+        return this;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public JobAdvertisementSearchRequest setCompanyName(String companyName) {
+        this.companyName = companyName;
+        return this;
+    }
+
+    public Integer getOnlineSince() {
+        return onlineSince;
+    }
+
+    public JobAdvertisementSearchRequest setOnlineSince(Integer onlineSince) {
+        this.onlineSince = onlineSince;
+        return this;
+    }
+
+    public Boolean getDisplayRestricted() {
+        return displayRestricted;
+    }
+
+    public JobAdvertisementSearchRequest setDisplayRestricted(Boolean displayRestricted) {
+        this.displayRestricted = displayRestricted;
+        return this;
+    }
+
+    public Boolean getEuresDisplay() {
+        return euresDisplay;
+    }
+
+    public JobAdvertisementSearchRequest setEuresDisplay(Boolean euresDisplay) {
+        this.euresDisplay = euresDisplay;
+        return this;
     }
 
     @Override
