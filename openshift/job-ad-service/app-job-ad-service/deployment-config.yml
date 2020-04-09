@@ -34,6 +34,22 @@ items:
                 limits:
                   cpu: 4
                   memory: 4Gi
+              livenessProbe:
+                tcpSocket:
+                  port: 8080
+                initialDelaySeconds: 15
+                periodSeconds: 20
+                timeoutSeconds: 2
+                failureThreshold: 1
+                successThreshold: 1
+              readinessProbe:
+                httpGet:
+                  path: /management/health
+                  port: 8080
+                initialDelaySeconds: 30
+                timeoutSeconds: 2
+                periodSeconds: 10
+                failureThreshold: 2
       test: false
       triggers:
         - type: ConfigChange
