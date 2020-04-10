@@ -17,6 +17,21 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <remark.lib.version>1.2.0</remark.lib.version>
+        <springfox.swagger.version>2.9.2</springfox.swagger.version>
+        <alv.shared.library.version>0.0.1-build-193</alv.shared.library.version>
+        <lib.phonenumber.version>8.9.2</lib.phonenumber.version>
+        <awaitility.version>3.1.2</awaitility.version>
+        <java.xml.stream.version>1.0-2</java.xml.stream.version>
+        <axiom.version>1.2.20</axiom.version>
+        <guava.version>28.0-jre</guava.version>
+        <hibernate.javax.persistence.version>1.0.2.Final</hibernate.javax.persistence.version>
+        <liquibase.slf4j.version>2.0.0</liquibase.slf4j.version>
+        <hibernate.validator.version>6.0.7.Final</hibernate.validator.version>
+        <org.jsoup.version>1.11.2</org.jsoup.version>
+        <org.zeroturnaround.version>1.12</org.zeroturnaround.version>
+        <org.zalando.version>0.22.1</org.zalando.version>
+        <org.apache.commons.version>1.4</org.apache.commons.version>
     </properties>
 
     <modules>
@@ -32,6 +47,221 @@
         <module>app-external-job-ad-export-task</module>
         <module>app-external-job-ad-import-task</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.kotcrab.remark</groupId>
+                <artifactId>remark</artifactId>
+                <version>${remark.lib.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Greenwich.SR1</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>2.1.3.RELEASE</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-core-asl</artifactId>
+                <version>1.9.13</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-bean-validators</artifactId>
+                <version>2.8.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <version>2.4.0-b180830.0438</version>
+            </dependency>
+
+            <!-- SWAGGER -->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${springfox.swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${springfox.swagger.version}</version>
+            </dependency>
+
+            <!-- ALV SHARED LIBRARIES -->
+            <dependency>
+                <groupId>ch.admin.seco.alv</groupId>
+                <artifactId>alv-jwt-starter</artifactId>
+                <version>${alv.shared.library.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.admin.seco.alv</groupId>
+                <artifactId>alv-logger-starter</artifactId>
+                <version>${alv.shared.library.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.admin.seco.alv</groupId>
+                <artifactId>alv-mail-sending-starter</artifactId>
+                <version>${alv.shared.library.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.admin.seco.alv</groupId>
+                <artifactId>alv-spring-integration-starter</artifactId>
+                <version>${alv.shared.library.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.admin.seco.alv</groupId>
+                <artifactId>alv-spring-integration-leader-starter</artifactId>
+                <version>${alv.shared.library.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.admin.seco.alv</groupId>
+                <artifactId>alv-feign-starter</artifactId>
+                <version>${alv.shared.library.version}</version>
+            </dependency>
+
+            <!-- MISC -->
+            <dependency>
+                <groupId>com.googlecode.libphonenumber</groupId>
+                <artifactId>libphonenumber</artifactId>
+                <version>${lib.phonenumber.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.xml.stream</groupId>
+                <artifactId>stax-api</artifactId>
+                <version>${java.xml.stream.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom</groupId>
+                <artifactId>axiom-impl</artifactId>
+                <version>${axiom.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom</groupId>
+                <artifactId>axiom-api</artifactId>
+                <version>${axiom.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.javax.persistence</groupId>
+                <artifactId>hibernate-jpa-2.1-api</artifactId>
+                <version>${hibernate.javax.persistence.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.uuid</groupId>
+                <artifactId>java-uuid-generator</artifactId>
+                <version>3.1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.mattbertolini</groupId>
+                <artifactId>liquibase-slf4j</artifactId>
+                <version>${liquibase.slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.validator</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${hibernate.validator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>${org.apache.commons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.zalando</groupId>
+                <artifactId>problem-spring-web</artifactId>
+                <version>${org.zalando.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.zeroturnaround</groupId>
+                <artifactId>zt-zip</artifactId>
+                <version>${org.zeroturnaround.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${org.jsoup.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>central</id>
+            <name>libs-releases-local</name>
+            <url>https://alvch.jfrog.io/alvch/libs-releases-local</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>libs-snapshots-local</name>
+            <url>https://alvch.jfrog.io/alvch/libs-snapshots-local</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>libs-releases</name>
+            <url>https://alvch.jfrog.io/alvch/libs-releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>snapshots</id>
+            <name>libs-snapshots</name>
+            <url>https://alvch.jfrog.io/alvch/libs-snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>central</id>
+            <name>plugins-releases</name>
+            <url>https://alvch.jfrog.io/alvch/plugins-releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>snapshots</id>
+            <name>plugins-snapshots</name>
+            <url>https://alvch.jfrog.io/alvch/plugins-snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 
     <build>
         <plugins>
