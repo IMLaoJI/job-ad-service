@@ -60,6 +60,11 @@ public class SearchProfileRestController {
 		this.searchProfileApplicationService.manualReleaseJobAlert(id);
 	}
 
+	@GetMapping("/jobalert/is-enabled")
+	@Timed
+	public boolean isJobAlertEnabled() {
+		return this.searchProfileApplicationService.isJobAlertEnabled();
+	}
 
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)

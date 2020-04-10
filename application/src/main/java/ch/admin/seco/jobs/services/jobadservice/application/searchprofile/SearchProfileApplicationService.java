@@ -34,6 +34,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilte
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.SearchFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -64,6 +65,9 @@ public class SearchProfileApplicationService {
 	private final LanguageProvider languageProvider;
 
 	private static final int MAX_AMOUNT_JOB_ALERTS = 5;
+
+	@Value("${alv.feature.toggle.isJobAlertEnabled}")
+	boolean isJobAlertEnabled;
 
 	public SearchProfileApplicationService(SearchProfileRepository searchProfileRepository,
 	                                       LocationService locationService,
@@ -157,6 +161,10 @@ public class SearchProfileApplicationService {
         List<SearchProfile> searchProfiles = this.searchProfileRepository.findAllByOwnerUserId(ownerUserId);
         searchProfiles.forEach(this::delete);
     }
+
+	public boolean isJobAlertEnabled() {
+		return this.isJobAlertEnabled;
+	}
 
 	//	manually trigger jobalerts for testing purposes
 	@IsSysAdmin
