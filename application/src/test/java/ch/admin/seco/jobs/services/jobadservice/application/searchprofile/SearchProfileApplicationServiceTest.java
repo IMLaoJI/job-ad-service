@@ -9,6 +9,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.Up
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.CantonFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.SearchFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
+import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileId;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileRepository;
@@ -34,6 +35,7 @@ import java.util.Optional;
 import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assert.assertEquals;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -270,7 +272,7 @@ public class SearchProfileApplicationServiceTest {
 		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_01.id()));
 
 		// when
-		searchProfileApplicationService.unsubscribeFromJobAlert(search_profile_01.id(), null);
+		searchProfileApplicationService.unsubscribeFromJobAlert(search_profile_01.id());
 
 		// then
 		SearchProfile searchProfile = this.searchProfileRepository.findById(search_profile_01.id()).get();
@@ -289,5 +291,36 @@ public class SearchProfileApplicationServiceTest {
 				searchProfile.getName()
 				, searchProfile.getOwnerUserId()
 				, SearchFilterDto.toDto(searchProfile.getSearchFilter()));
+	}
+
+	@Test
+	public void testJobAlertHousekeeping() {
+
+		//given
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_01.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_02.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_03.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_04.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_05.id()));
+
+		// when
+		final JobAlertDto jobAlertDto = new JobAlertDto()
+				.setInterval(Interval.INT_1DAY)
+				.setEmail("test@example.org");
+		searchProfileApplicationService.subscribeToJobAlert(search_profile_01.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(search_profile_02.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(search_profile_03.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(search_profile_04.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(search_profile_05.id(), jobAlertDto);
+
+		// then
+
+		assertEquals(this.searchProfileRepository.countAllWithJobAlerts(), Integer.valueOf(5));
+
+		searchProfileApplicationService.jobAlertHousekeeping(TimeMachine.now().minusDays(1L));
+		assertEquals(this.searchProfileRepository.countAllWithJobAlerts(), Integer.valueOf(5));
+
+		searchProfileApplicationService.jobAlertHousekeeping(TimeMachine.now());
+		assertEquals(this.searchProfileRepository.countAllWithJobAlerts(), Integer.valueOf(0));
 	}
 }

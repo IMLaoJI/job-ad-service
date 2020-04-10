@@ -44,6 +44,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -133,7 +134,7 @@ public class SearchProfileApplicationService {
 		return toResolvedSearchProfileDto(searchProfile);
 	}
 
-	public void unsubscribeFromJobAlert(SearchProfileId searchProfileId, String token) {
+	public void unsubscribeFromJobAlert(SearchProfileId searchProfileId) {
 		Condition.notNull(searchProfileId, "searchProfileId can't be null");
 		SearchProfile searchProfile = getById(searchProfileId);
 		searchProfile.unsubscribeFromJobAlert();
@@ -155,12 +156,12 @@ public class SearchProfileApplicationService {
 		return new PageImpl<>(result, pageable, searchProfiles.getTotalElements());
 	}
 
-    @IsSysAdmin
-    public void deleteUserSearchProfiles(String ownerUserId) {
-        Condition.notNull(ownerUserId, "OwnerUserId can't be null");
-        List<SearchProfile> searchProfiles = this.searchProfileRepository.findAllByOwnerUserId(ownerUserId);
-        searchProfiles.forEach(this::delete);
-    }
+	@IsSysAdmin
+	public void deleteUserSearchProfiles(String ownerUserId) {
+		Condition.notNull(ownerUserId, "OwnerUserId can't be null");
+		List<SearchProfile> searchProfiles = this.searchProfileRepository.findAllByOwnerUserId(ownerUserId);
+		searchProfiles.forEach(this::delete);
+	}
 
 	public boolean isJobAlertEnabled() {
 		return this.isJobAlertEnabled;
@@ -172,6 +173,14 @@ public class SearchProfileApplicationService {
 	public void manualReleaseJobAlert(SearchProfileId searchProfileId) {
 		SearchProfile searchProfile = this.getById(searchProfileId);
 		searchProfile.release();
+	}
+
+	@IsSysAdmin
+	public void jobAlertHousekeeping(LocalDateTime localDateTime) {
+		final List<SearchProfile> jobAlertsCreatedBefore = this.searchProfileRepository.findJobAlertsCreatedBefore(localDateTime);
+		jobAlertsCreatedBefore.forEach(jobAlert -> {
+			this.unsubscribeFromJobAlert(jobAlert.getId());
+		});
 	}
 
 	public void releaseJobAlerts() {
@@ -210,13 +219,13 @@ public class SearchProfileApplicationService {
 	}
 
 	private void delete(SearchProfile searchProfile) {
-        if (searchProfile.getJobAlert() != null) {
-            this.unsubscribeFromJobAlert(searchProfile.getId(), null);
-        }
-        this.searchProfileRepository.delete(searchProfile);
+		if (searchProfile.getJobAlert() != null) {
+			this.unsubscribeFromJobAlert(searchProfile.getId());
+		}
+		this.searchProfileRepository.delete(searchProfile);
 		DomainEventPublisher.publish(new SearchProfileDeletedEvent(searchProfile));
-        LOG.debug("SearchProfile {} has been deleted for user {}.", searchProfile.getId().getValue(), searchProfile.getOwnerUserId());
-    }
+		LOG.debug("SearchProfile {} has been deleted for user {}.", searchProfile.getId().getValue(), searchProfile.getOwnerUserId());
+	}
 
 	private List<SearchProfileResultDto> toSearchProfileResults(List<SearchProfile> searchProfileList) {
 		return searchProfileList.stream()

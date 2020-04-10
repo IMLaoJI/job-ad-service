@@ -51,10 +51,13 @@ public interface SearchProfileRepository extends JpaRepository<SearchProfile, Se
             @QueryHint(name = HINT_CACHEABLE, value = "false"),
             @QueryHint(name = READ_ONLY, value = "true")
     })
-    @Query("select sp from SearchProfile sp where job_alert_query is not null")
+    @Query("select sp from SearchProfile sp where sp.jobAlert is not null")
     Stream<SearchProfile> streamAllSearchProfilesWithJobAlerts();
 
-    @Query("Select count(sp) from SearchProfile sp where job_alert_query is not null")
+    @Query("Select count(sp) from SearchProfile sp where sp.jobAlert is not null")
     Integer countAllWithJobAlerts();
+
+    @Query("select sp from SearchProfile sp where sp.createdTime < :localDateTime")
+    List<SearchProfile> findJobAlertsCreatedBefore(LocalDateTime localDateTime);
 
 }

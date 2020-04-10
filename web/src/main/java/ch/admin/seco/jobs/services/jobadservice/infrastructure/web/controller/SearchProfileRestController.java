@@ -18,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -51,7 +52,7 @@ public class SearchProfileRestController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@PreAuthorize("@searchProfileAuthorizationService.canUnsubscribeFromJobAlert(#id, #token)")
 	public void unsubscribeFromJobAlert(@PathVariable SearchProfileId id, @RequestParam(required = false) String token) {
-		this.searchProfileApplicationService.unsubscribeFromJobAlert(id, token);
+		this.searchProfileApplicationService.unsubscribeFromJobAlert(id);
 	}
 
 	@GetMapping("/jobalert/_action/release/{id}")
@@ -64,6 +65,13 @@ public class SearchProfileRestController {
 	@Timed
 	public boolean isJobAlertEnabled() {
 		return this.searchProfileApplicationService.isJobAlertEnabled();
+	}
+
+	@GetMapping("/jobalert/housekeeping")
+	@Timed
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void jobAlertHousekeeping(@RequestParam LocalDateTime beforeDateTime) {
+		this.searchProfileApplicationService.jobAlertHousekeeping(beforeDateTime);
 	}
 
 	@DeleteMapping("/{id}")
