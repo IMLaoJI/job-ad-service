@@ -171,8 +171,9 @@ public class SearchProfileApplicationService {
 	@IsSysAdmin
 	public void jobAlertHousekeeping(LocalDateTime localDateTime) {
 		final List<SearchProfile> jobAlertsCreatedBefore = this.searchProfileRepository.findJobAlertsCreatedBefore(localDateTime);
-		jobAlertsCreatedBefore.forEach(jobAlert -> {
-			this.unsubscribeFromJobAlert(jobAlert.getId());
+		jobAlertsCreatedBefore.forEach(searchProfile -> {
+			LOG.info("Unsubscribing JobAlert from SearchProfile with id: '{}'", searchProfile.getId());
+			this.unsubscribeFromJobAlert(searchProfile.getId());
 		});
 	}
 

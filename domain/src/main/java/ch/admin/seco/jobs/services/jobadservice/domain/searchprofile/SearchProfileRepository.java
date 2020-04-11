@@ -57,7 +57,7 @@ public interface SearchProfileRepository extends JpaRepository<SearchProfile, Se
     @Query("Select count(sp) from SearchProfile sp where sp.jobAlert is not null")
     Integer countAllWithJobAlerts();
 
-    @Query("select sp from SearchProfile sp where sp.createdTime < :localDateTime")
+    @Query("select sp from SearchProfile sp where job_alert_created_at < :localDateTime")
     List<SearchProfile> findJobAlertsCreatedBefore(LocalDateTime localDateTime);
 
 }
