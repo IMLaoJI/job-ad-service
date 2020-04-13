@@ -156,6 +156,8 @@ public class ElasticsearchIndexService {
 		);
 	}
 
+	@Async
+	@Transactional(readOnly = true)
 	public void reindexPercolatorIndex() throws IOException {
 		elasticsearchTemplate.deleteIndex(JOB_ALERT_PERCOLATOR);
 		jobAlertPercolatorEventListener.createIndex(jobAlertPercolatorEventListener.getMapping(), jobAlertPercolatorEventListener.buildSettings());
