@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -87,10 +88,11 @@ public class JobAdvertisementSearchRequestAssembler {
 		ArrayList<ProfessionCode> professionCodes = new ArrayList<>();
 		for (ResolvedOccupationFilterDto resolvedOccupationFilterDto : occupations) {
 			professionCodes.add(new ProfessionCode(extractProfessionCodeType(resolvedOccupationFilterDto), resolvedOccupationFilterDto.getCode()));
-			if (resolvedOccupationFilterDto.getMappings() == null || resolvedOccupationFilterDto.getMappings().isEmpty()) {
+			final Map<ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType, String> mappings = resolvedOccupationFilterDto.getMappings();
+			if (mappings == null || mappings.isEmpty()) {
 				continue;
 			}
-			resolvedOccupationFilterDto.getMappings()
+			mappings
 					.forEach((key, value) -> professionCodes.add(new ProfessionCode(ProfessionCodeType.fromString(key.toString()), value)));
 		}
 		return professionCodes.toArray(new ProfessionCode[0]);
