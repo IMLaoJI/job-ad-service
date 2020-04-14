@@ -318,7 +318,7 @@ public class JobAdvertisementSearchQueryBuilder extends SearchQueryBuilder {
 	}
 
 	private boolean isRadiusNeeded(JobAdvertisementSearchRequest jobSearchRequest) {
-		return jobSearchRequest.getRadiusSearchRequest() != null;
+		return jobSearchRequest.getRadiusSearchRequest() != null && jobSearchRequest.getRadiusSearchRequest().getDistance() != null;
 	}
 
 	private boolean isMultipleLocationSearch(String[] communalCodes) {
