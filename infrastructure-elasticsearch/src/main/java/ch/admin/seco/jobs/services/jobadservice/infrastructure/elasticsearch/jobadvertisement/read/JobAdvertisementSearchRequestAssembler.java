@@ -87,7 +87,7 @@ public class JobAdvertisementSearchRequestAssembler {
 		ArrayList<ProfessionCode> professionCodes = new ArrayList<>();
 		for (ResolvedOccupationFilterDto resolvedOccupationFilterDto : occupations) {
 			professionCodes.add(new ProfessionCode(extractProfessionCodeType(resolvedOccupationFilterDto), resolvedOccupationFilterDto.getCode()));
-			if (resolvedOccupationFilterDto.getMappings().isEmpty()) {
+			if (resolvedOccupationFilterDto.getMappings() == null || resolvedOccupationFilterDto.getMappings().isEmpty()) {
 				continue;
 			}
 			resolvedOccupationFilterDto.getMappings()
