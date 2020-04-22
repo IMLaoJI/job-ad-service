@@ -99,7 +99,7 @@ public class SearchProfileApplicationService {
 				.build();
 
 		SearchProfile newSearchProfile = this.searchProfileRepository.save(searchProfile);
-		LOG.debug("SearchProfile {} has been created for user {}.", newSearchProfile.getId().getValue(), newSearchProfile.getOwnerUserId());
+		LOG.info("SearchProfile {} has been created for user {}.", newSearchProfile.getId().getValue(), newSearchProfile.getOwnerUserId());
 		DomainEventPublisher.publish(new SearchProfileCreatedEvent(newSearchProfile));
 
 		return toResolvedSearchProfileDto(searchProfile);
@@ -126,7 +126,7 @@ public class SearchProfileApplicationService {
 			throw new JobAlertMaxAmountReachedException();
 		}
 		searchProfile.subscribeToJobAlert(jobAlertDto.getInterval(), jobAlertDto.getEmail(), this.languageProvider.getSupportedLocale().toString());
-		LOG.debug("JobAlert has been subscribed to for SearchProfile with ID: {}, for User: {}", searchProfile.getId().getValue(), searchProfile.getOwnerUserId());
+		LOG.info("JobAlert has been subscribed to for SearchProfile with ID: {}, for User: {}", searchProfile.getId().getValue(), searchProfile.getOwnerUserId());
 		return toResolvedSearchProfileDto(searchProfile);
 	}
 
@@ -134,7 +134,7 @@ public class SearchProfileApplicationService {
 		Condition.notNull(searchProfileId, "searchProfileId can't be null");
 		SearchProfile searchProfile = getById(searchProfileId);
 		searchProfile.unsubscribeFromJobAlert();
-		LOG.debug("JobAlert has been unsubscribed from for SearchProfile with ID: {}, for User: {}", searchProfile.getId().getValue(), searchProfile.getOwnerUserId());
+		LOG.info("JobAlert has been unsubscribed from for SearchProfile with ID: {}, for User: {}", searchProfile.getId().getValue(), searchProfile.getOwnerUserId());
 	}
 
 	@PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(#searchProfileId)")
@@ -218,7 +218,7 @@ public class SearchProfileApplicationService {
 		}
 		this.searchProfileRepository.delete(searchProfile);
 		DomainEventPublisher.publish(new SearchProfileDeletedEvent(searchProfile));
-		LOG.debug("SearchProfile {} has been deleted for user {}.", searchProfile.getId().getValue(), searchProfile.getOwnerUserId());
+		LOG.info("SearchProfile {} has been deleted for user {}.", searchProfile.getId().getValue(), searchProfile.getOwnerUserId());
 	}
 
 	private List<SearchProfileResultDto> toSearchProfileResults(List<SearchProfile> searchProfileList) {
