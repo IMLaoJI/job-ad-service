@@ -99,7 +99,7 @@ public class SearchProfileApplicationService {
 				.build();
 
 		SearchProfile newSearchProfile = this.searchProfileRepository.save(searchProfile);
-		LOG.info("SearchProfile {} has been created for user {}.", newSearchProfile.getId().getValue(), newSearchProfile.getOwnerUserId());
+		LOG.info("Job SearchProfile {} has been created for user {}.", newSearchProfile.getId().getValue(), newSearchProfile.getOwnerUserId());
 		DomainEventPublisher.publish(new SearchProfileCreatedEvent(newSearchProfile));
 
 		return toResolvedSearchProfileDto(searchProfile);
@@ -218,7 +218,7 @@ public class SearchProfileApplicationService {
 		}
 		this.searchProfileRepository.delete(searchProfile);
 		DomainEventPublisher.publish(new SearchProfileDeletedEvent(searchProfile));
-		LOG.info("SearchProfile {} has been deleted for user {}.", searchProfile.getId().getValue(), searchProfile.getOwnerUserId());
+		LOG.info("Job SearchProfile {} has been deleted for user {}.", searchProfile.getId().getValue(), searchProfile.getOwnerUserId());
 	}
 
 	private List<SearchProfileResultDto> toSearchProfileResults(List<SearchProfile> searchProfileList) {
