@@ -60,8 +60,8 @@ public class JobAdvertisementFromAvamAssembler {
     private static final EmailValidator emailValidator = new EmailValidator();
     private static final Set<String> LANGUAGE_CODES_TO_IGNORE = new HashSet<>(Arrays.asList("99", "98"));
 
-    private static boolean safeBoolean(Boolean value, boolean defaultValue) {
-        return (value != null) ? value.booleanValue() : defaultValue;
+    private static boolean safeBoolean(Boolean value) {
+        return (value != null) && value;
     }
 
     private static String safeTrimOrNull(String value) {
@@ -197,16 +197,16 @@ public class JobAdvertisementFromAvamAssembler {
         return new EmploymentDto()
                 .setStartDate(parseToLocalDate(avamJobAdvertisement.getStellenantritt()))
                 .setEndDate(getEmploymentEndDate(avamJobAdvertisement))
-                .setShortEmployment(avamJobAdvertisement.getFristTyp().equals(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.SHORT_TERM)))
-                .setImmediately(safeBoolean(avamJobAdvertisement.isAbSofort(), avamJobAdvertisement.getStellenantritt() == null))
-                .setPermanent(avamJobAdvertisement.getFristTyp().equals(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.PERMANENT)))
+                .setShortEmployment(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.SHORT_TERM).equals(avamJobAdvertisement.getFristTyp()))
+                .setImmediately(safeBoolean(avamJobAdvertisement.isAbSofort()))
+                .setPermanent(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.PERMANENT).equals(avamJobAdvertisement.getFristTyp()))
                 .setWorkloadPercentageMin(workingTimePercentage.getMin())
                 .setWorkloadPercentageMax(workingTimePercentage.getMax())
                 .setWorkForms(createWorkForms(avamJobAdvertisement));
     }
 
     private LocalDate getEmploymentEndDate(WSOsteEgov avamJobAdvertisement) {
-        return (avamJobAdvertisement.getFristTyp().equals(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.FIXED_TERM))) ? parseToLocalDate(avamJobAdvertisement.getVertragsdauer()) : null;
+        return (AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.FIXED_TERM).equals(avamJobAdvertisement.getFristTyp())) ? parseToLocalDate(avamJobAdvertisement.getVertragsdauer()) : null;
     }
 
     private CreateLocationDto createCreateLocationDto(WSOsteEgov avamJobAdvertisement) {
@@ -237,10 +237,10 @@ public class JobAdvertisementFromAvamAssembler {
 
     private ApplyChannelDto createApplyChannelDto(WSOsteEgov avamJobAdvertisement) {
         return new ApplyChannelDto()
-                .setPostAddress(avamJobAdvertisement.isBewerSchriftlich() ? createApplyChannelPostAddress(avamJobAdvertisement) : null)
-                .setEmailAddress(avamJobAdvertisement.isBewerElektronisch() ? sanitizeEmail(safeTrimOrNull(avamJobAdvertisement.getBewerUntEmail()), avamJobAdvertisement) : null)
-                .setPhoneNumber(avamJobAdvertisement.isBewerTelefonisch() ? sanitizePhoneNumber(safeTrimOrNull(avamJobAdvertisement.getBewerUntTelefon()), avamJobAdvertisement) : null)
-                .setFormUrl(avamJobAdvertisement.isBewerElektronisch() ? sanitizeUrl(safeTrimOrNull(avamJobAdvertisement.getBewerUntUrl()), avamJobAdvertisement) : null)
+                .setPostAddress(Boolean.TRUE.equals(avamJobAdvertisement.isBewerSchriftlich()) ?  createApplyChannelPostAddress(avamJobAdvertisement) : null)
+                .setEmailAddress(Boolean.TRUE.equals(avamJobAdvertisement.isBewerElektronisch()) ? sanitizeEmail(safeTrimOrNull(avamJobAdvertisement.getBewerUntEmail()), avamJobAdvertisement) : null)
+                .setPhoneNumber(Boolean.TRUE.equals(avamJobAdvertisement.isBewerTelefonisch()) ? sanitizePhoneNumber(safeTrimOrNull(avamJobAdvertisement.getBewerUntTelefon()), avamJobAdvertisement) : null)
+                .setFormUrl(Boolean.TRUE.equals(avamJobAdvertisement.isBewerElektronisch()) ? sanitizeUrl(safeTrimOrNull(avamJobAdvertisement.getBewerUntUrl()), avamJobAdvertisement) : null)
                 .setAdditionalInfo(safeTrimOrNull(avamJobAdvertisement.getBewerAngaben()));
     }
 
@@ -300,8 +300,8 @@ public class JobAdvertisementFromAvamAssembler {
         return new PublicationDto()
                 .setStartDate(parseToLocalDate(avamJobAdvertisement.getAnmeldeDatum()))
                 .setEndDate(parseToLocalDate(avamJobAdvertisement.getGueltigkeit()))
-                .setEuresDisplay(avamJobAdvertisement.isEures())
-                .setEuresAnonymous(avamJobAdvertisement.isEuresAnonym())
+                .setEuresDisplay(Boolean.TRUE.equals(avamJobAdvertisement.isEures()))
+                .setEuresAnonymous(Boolean.TRUE.equals(avamJobAdvertisement.isEuresAnonym()))
                 .setPublicDisplay(avamJobAdvertisement.isPublikation())
                 .setRestrictedDisplay(avamJobAdvertisement.isLoginPublikation())
                 .setCompanyAnonymous(avamJobAdvertisement.isAnonym() || avamJobAdvertisement.isLoginAnonym());
