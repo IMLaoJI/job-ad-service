@@ -5,7 +5,10 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
     <changeSet id="20200107-5" author="haso">
-        <dropColumn schemaName="public" tableName="JOB_ADVERTISEMENT_OCCUPATION">
+        <preConditions onFail="CONTINUE">
+            <sqlCheck expectedResult="1">select count(*) from information_schema.columns where table_name = 'occupation_label_mapping' and column_name = 'SBN3_CODE'</sqlCheck>
+        </preConditions>
+        <dropColumn tableName="JOB_ADVERTISEMENT_OCCUPATION">
             <column name="SBN3_CODE" type="VARCHAR(16)"/>
             <column name="SBN5_CODE" type="VARCHAR(16)"/>
         </dropColumn>

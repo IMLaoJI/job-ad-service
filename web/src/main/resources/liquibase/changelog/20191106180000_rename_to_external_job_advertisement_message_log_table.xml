@@ -4,10 +4,13 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
     <changeSet author="haso" id="20191106-10">
-        <renameTable
+        <preConditions onFail="CONTINUE">
+            <sqlCheck expectedResult="1">select count(*) from information_schema.columns where table_name = 'X28MESSAGE_LOG'</sqlCheck>
+        </preConditions>
+        <renameTable>
                 newTableName="external_job_advertisement_message_log"
                 oldTableName="X28MESSAGE_LOG"
-                schemaName="public"/>
+        </renameTable>
     </changeSet>
 
 </databaseChangeLog>
