@@ -8,7 +8,7 @@
             <sqlCheck expectedResult="1">select count(*) from information_schema.columns where table_name = 'dlq_item'</sqlCheck>
         </preConditions>
         <dropTable>
-                tableName="dlq_item"/>
+                tableName="dlq_item"
         </dropTable>
     </changeSet>
 
