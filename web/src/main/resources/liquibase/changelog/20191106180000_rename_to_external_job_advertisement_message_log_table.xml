@@ -7,10 +7,9 @@
         <preConditions onFail="CONTINUE">
             <sqlCheck expectedResult="1">select count(*) from information_schema.columns where table_name = 'X28MESSAGE_LOG'</sqlCheck>
         </preConditions>
-        <renameTable>
+        <renameTable 
                 newTableName="external_job_advertisement_message_log"
-                oldTableName="X28MESSAGE_LOG"
-        </renameTable>
+                oldTableName="X28MESSAGE_LOG"/>
     </changeSet>
 
 </databaseChangeLog>
