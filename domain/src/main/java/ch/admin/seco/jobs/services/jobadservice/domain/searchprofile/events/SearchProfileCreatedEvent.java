@@ -6,7 +6,8 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.even
 
 public class SearchProfileCreatedEvent extends SearchProfileEvent {
 
-    public SearchProfileCreatedEvent(SearchProfile searchProfile) {
-        super(SEARCH_PROFILE_CREATED, searchProfile);
-    }
+	public SearchProfileCreatedEvent(SearchProfile searchProfile) {
+		super(SEARCH_PROFILE_CREATED, searchProfile);
+	}
+
 }

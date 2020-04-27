@@ -1,17 +1,17 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.webform;
 
 import ch.admin.seco.jobs.services.jobadservice.application.HtmlToMarkdownConverter;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.AddressDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.CancellationResource;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import org.springframework.stereotype.Component;
 
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PhoneNumberUtil.sanitizePhoneNumber;
 import static org.springframework.util.StringUtils.hasText;
 import static org.springframework.util.StringUtils.trimWhitespace;
 
@@ -31,7 +31,7 @@ public class JobAdvertisementFromWebAssembler {
                 .setReportToAvam(true)
                 .setApplyChannel(convertApplyChannel(createJobAdvertisementFromWebDto.getApplyChannel()))
                 .setCompany(convertCompany(createJobAdvertisementFromWebDto.getCompany()))
-                .setContact(createJobAdvertisementFromWebDto.getContact())
+                .setContact(sanitizeContactPhone(createJobAdvertisementFromWebDto.getContact()))
                 .setEmployer(createJobAdvertisementFromWebDto.getEmployer())
                 .setExternalReference(createJobAdvertisementFromWebDto.getExternalReference())
                 .setLanguageSkills(createJobAdvertisementFromWebDto.getLanguageSkills())
@@ -41,9 +41,26 @@ public class JobAdvertisementFromWebAssembler {
                 .setPublication(createJobAdvertisementFromWebDto.getPublication())
                 .setReportToAvam(createJobAdvertisementFromWebDto.isReportToAvam())
                 .setExternalUrl(createJobAdvertisementFromWebDto.getExternalUrl())
-                .setPublicContact(createJobAdvertisementFromWebDto.getPublicContact())
+                .setPublicContact(sanitizePublicPhone(createJobAdvertisementFromWebDto.getPublicContact()))
                 .setLocation(createJobAdvertisementFromWebDto.getLocation())
                 .setOccupation(createJobAdvertisementFromWebDto.getOccupation());
+    }
+
+    private PublicContactDto sanitizePublicPhone(PublicContactDto publicContact) {
+        if (publicContact == null) {
+            return null;
+        }
+        publicContact.setPhone(sanitizePhoneNumber(publicContact.getPhone(), PhoneNumberUtil.PhoneNumberFormat.E164));
+        return publicContact;
+    }
+
+    private ContactDto sanitizeContactPhone(ContactDto contact) {
+        if (contact == null) {
+            return null;
+        }
+        contact.setPhone(sanitizePhoneNumber(contact.getPhone(), PhoneNumberUtil.PhoneNumberFormat.E164));
+        return contact;
+
     }
 
     CancellationDto convert(CancellationResource cancellation) {
@@ -63,7 +80,7 @@ public class JobAdvertisementFromWebAssembler {
         return new ApplyChannelDto()
                 .setPostAddress(convertPostAddress(createApplyChannelDto.getPostAddress()))
                 .setEmailAddress(trimOrNull(createApplyChannelDto.getEmailAddress()))
-                .setPhoneNumber(trimOrNull(createApplyChannelDto.getPhoneNumber()))
+                .setPhoneNumber(sanitizePhoneNumber(createApplyChannelDto.getPhoneNumber(), PhoneNumberUtil.PhoneNumberFormat.E164))
                 .setFormUrl(trimOrNull(createApplyChannelDto.getFormUrl()))
                 .setAdditionalInfo(trimOrNull(createApplyChannelDto.getAdditionalInfo()));
     }

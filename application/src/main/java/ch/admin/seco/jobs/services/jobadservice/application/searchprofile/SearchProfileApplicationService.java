@@ -1,31 +1,49 @@
 package ch.admin.seco.jobs.services.jobadservice.application.searchprofile;
 
+import ch.admin.seco.jobs.services.jobadservice.application.IsAdmin;
+import ch.admin.seco.jobs.services.jobadservice.application.IsSysAdmin;
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.CreateSearchProfileDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.JobAlertDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.JobAlertMaxAmountReachedException;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.ResolvedSearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.SearchProfileResultDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.UpdateSearchProfileDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.*;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.CantonFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.LocalityFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.OccupationFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.ResolvedOccupationFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.ResolvedSearchFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.SearchFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPublisher;
+import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
+import ch.admin.seco.jobs.services.jobadservice.domain.LanguageProvider;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileId;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileCreatedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileDeletedEvent;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.jobalert.Interval;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.jobalert.JobAlert;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.CantonFilter;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.LocalityFilter;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.OccupationFilter;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.SearchFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,10 +62,17 @@ public class SearchProfileApplicationService {
 
 	private final ProfessionService professionService;
 
-	public SearchProfileApplicationService(SearchProfileRepository searchProfileRepository, LocationService locationService, ProfessionService professionService) {
+	private final LanguageProvider languageProvider;
+
+	private static final int MAX_AMOUNT_JOB_ALERTS = 5;
+
+	public SearchProfileApplicationService(SearchProfileRepository searchProfileRepository,
+	                                       LocationService locationService,
+	                                       ProfessionService professionService, LanguageProvider languageProvider) {
 		this.searchProfileRepository = searchProfileRepository;
 		this.locationService = locationService;
 		this.professionService = professionService;
+		this.languageProvider = languageProvider;
 	}
 
 	@PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(#searchProfileId)")
@@ -74,7 +99,7 @@ public class SearchProfileApplicationService {
 				.build();
 
 		SearchProfile newSearchProfile = this.searchProfileRepository.save(searchProfile);
-		LOG.debug("SearchProfile {} has been created for user {}.", newSearchProfile.getId().getValue(), newSearchProfile.getOwnerUserId());
+		LOG.info("Job SearchProfile {} has been created for user {}.", newSearchProfile.getId().getValue(), newSearchProfile.getOwnerUserId());
 		DomainEventPublisher.publish(new SearchProfileCreatedEvent(newSearchProfile));
 
 		return toResolvedSearchProfileDto(searchProfile);
@@ -95,12 +120,27 @@ public class SearchProfileApplicationService {
 	}
 
 	@PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(#searchProfileId)")
+	public ResolvedSearchProfileDto subscribeToJobAlert(SearchProfileId searchProfileId, JobAlertDto jobAlertDto) {
+		SearchProfile searchProfile = getById(searchProfileId);
+		if (this.isMaximumAmountOfJobAlertsReached(searchProfile.getId(), searchProfile.getOwnerUserId())) {
+			throw new JobAlertMaxAmountReachedException();
+		}
+		searchProfile.subscribeToJobAlert(jobAlertDto.getInterval(), jobAlertDto.getEmail(), this.languageProvider.getSupportedLocale().toString());
+		LOG.info("JobAlert has been subscribed to for SearchProfile with ID: {}, for User: {}", searchProfile.getId().getValue(), searchProfile.getOwnerUserId());
+		return toResolvedSearchProfileDto(searchProfile);
+	}
+
+	public void unsubscribeFromJobAlert(SearchProfileId searchProfileId) {
+		Condition.notNull(searchProfileId, "searchProfileId can't be null");
+		SearchProfile searchProfile = getById(searchProfileId);
+		searchProfile.unsubscribeFromJobAlert();
+		LOG.info("JobAlert has been unsubscribed from for SearchProfile with ID: {}, for User: {}", searchProfile.getId().getValue(), searchProfile.getOwnerUserId());
+	}
+
+	@PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.isCurrentUserOwner(#searchProfileId)")
 	public void deleteSearchProfile(SearchProfileId searchProfileId) {
 		Condition.notNull(searchProfileId, "SearchProfileId can't be null");
-		SearchProfile searchProfile = getById(searchProfileId);
-		DomainEventPublisher.publish(new SearchProfileDeletedEvent(searchProfile));
-		this.searchProfileRepository.delete(searchProfile);
-		LOG.debug("SearchProfile {} has been deleted for user {}.", searchProfile.getId().getValue(), searchProfile.getOwnerUserId());
+		delete(getById(searchProfileId));
 	}
 
 	@PreAuthorize("isAuthenticated() and @searchProfileAuthorizationService.matchesCurrentUserId(#ownerUserId)")
@@ -109,25 +149,45 @@ public class SearchProfileApplicationService {
 		Pageable pageable = PageRequest.of(page, size, Sort.by(desc("updatedTime"), desc("createdTime")));
 		Page<SearchProfile> searchProfiles = this.searchProfileRepository.findAllByOwnerUserId(ownerUserId, pageable);
 		List<SearchProfileResultDto> result = toSearchProfileResults(searchProfiles.getContent());
-
 		return new PageImpl<>(result, pageable, searchProfiles.getTotalElements());
 	}
 
-	private List<SearchProfileResultDto> toSearchProfileResults(List<SearchProfile> searchProfileList) {
-		return searchProfileList.stream()
-				.map(this::toSearchProfileResultDto)
-				.collect(Collectors.toList());
+	@IsSysAdmin
+	public void deleteUserSearchProfiles(String ownerUserId) {
+		Condition.notNull(ownerUserId, "OwnerUserId can't be null");
+		List<SearchProfile> searchProfiles = this.searchProfileRepository.findAllByOwnerUserId(ownerUserId);
+		searchProfiles.forEach(this::delete);
 	}
 
-	private SearchProfileResultDto toSearchProfileResultDto(SearchProfile searchProfile) {
-		return new SearchProfileResultDto()
-				.setName(searchProfile.getName())
-				.setId(searchProfile.getId().getValue())
-				.setCreatedTime(searchProfile.getCreatedTime())
-				.setOwnerUserId(searchProfile.getOwnerUserId());
+
+	//	manually trigger jobalerts for testing purposes
+	@IsSysAdmin
+	@IsAdmin
+	public void manualReleaseJobAlert(SearchProfileId searchProfileId) {
+		SearchProfile searchProfile = this.getById(searchProfileId);
+		searchProfile.release();
 	}
 
-	private ResolvedSearchProfileDto toResolvedSearchProfileDto(SearchProfile searchProfile) {
+	@IsSysAdmin
+	public void jobAlertHousekeeping(LocalDateTime localDateTime) {
+		final List<SearchProfile> jobAlertsCreatedBefore = this.searchProfileRepository.findJobAlertsCreatedBefore(localDateTime);
+		jobAlertsCreatedBefore.forEach(searchProfile -> {
+			LOG.info("Unsubscribing JobAlert from SearchProfile with id: '{}'", searchProfile.getId());
+			this.unsubscribeFromJobAlert(searchProfile.getId());
+		});
+	}
+
+	public void releaseJobAlerts() {
+		List<SearchProfile> searchProfiles = this.searchProfileRepository.findJobAlertsByNextReleaseAtBefore(TimeMachine.now());
+		searchProfiles.forEach(SearchProfile::release);
+	}
+
+
+	public SearchProfile getById(SearchProfileId id) {
+		return this.searchProfileRepository.findById(id).orElseThrow(() -> new SearchProfileNotExitsException(id));
+	}
+
+	public ResolvedSearchProfileDto toResolvedSearchProfileDto(SearchProfile searchProfile) {
 		SearchFilter searchFilter = searchProfile.getSearchFilter();
 
 		List<LocationDto> locations = searchFilter.getLocalityFilters().stream()
@@ -148,7 +208,32 @@ public class SearchProfileApplicationService {
 				.setCreatedTime(searchProfile.getCreatedTime())
 				.setName(searchProfile.getName())
 				.setOwnerUserId(searchProfile.getOwnerUserId())
-				.setSearchFilter(toResolvedSearchFilterDto(searchFilter, locations, occupations));
+				.setSearchFilter(toResolvedSearchFilterDto(searchFilter, locations, occupations))
+				.setInterval(extractInterval(searchProfile.getJobAlert()));
+	}
+
+	private void delete(SearchProfile searchProfile) {
+		if (searchProfile.getJobAlert() != null) {
+			this.unsubscribeFromJobAlert(searchProfile.getId());
+		}
+		this.searchProfileRepository.delete(searchProfile);
+		DomainEventPublisher.publish(new SearchProfileDeletedEvent(searchProfile));
+		LOG.info("Job SearchProfile {} has been deleted for user {}.", searchProfile.getId().getValue(), searchProfile.getOwnerUserId());
+	}
+
+	private List<SearchProfileResultDto> toSearchProfileResults(List<SearchProfile> searchProfileList) {
+		return searchProfileList.stream()
+				.map(this::toSearchProfileResultDto)
+				.collect(Collectors.toList());
+	}
+
+	private SearchProfileResultDto toSearchProfileResultDto(SearchProfile searchProfile) {
+		return new SearchProfileResultDto()
+				.setName(searchProfile.getName())
+				.setId(searchProfile.getId().getValue())
+				.setCreatedTime(searchProfile.getCreatedTime())
+				.setOwnerUserId(searchProfile.getOwnerUserId())
+				.setInterval(extractInterval(searchProfile.getJobAlert()));
 	}
 
 	private ResolvedSearchFilterDto toResolvedSearchFilterDto(SearchFilter searchFilter, List<LocationDto> locations, List<ResolvedOccupationFilterDto> occupationSuggestions) {
@@ -166,10 +251,6 @@ public class SearchProfileApplicationService {
 				.setDistance(searchFilter.getDistance())
 				.setOccupations(occupationSuggestions)
 				.setLocations(locations);
-	}
-
-	private SearchProfile getById(SearchProfileId id) {
-		return this.searchProfileRepository.findById(id).orElseThrow(() -> new SearchProfileNotExitsException(id));
 	}
 
 	private SearchFilter toSearchFilter(SearchFilterDto searchFilterDto) {
@@ -206,6 +287,21 @@ public class SearchProfileApplicationService {
 		return cantonFilterDtos.stream()
 				.map(cantonFilterDto -> new CantonFilter(cantonFilterDto.getName(), cantonFilterDto.getCode()))
 				.collect(Collectors.toList());
+	}
+
+	private boolean isMaximumAmountOfJobAlertsReached(SearchProfileId searchProfileId, String ownerUserId) {
+		final List<SearchProfile> searchProfiles = this.searchProfileRepository.findSearchProfilesWithJobAlertByOwner(ownerUserId);
+		final List<SearchProfileId> searchProfileIds = searchProfiles.stream()
+				.filter(searchProfile -> !searchProfile.getId().equals(searchProfileId))
+				.map(SearchProfile::getId).collect(Collectors.toList());
+		return searchProfileIds.size() >= MAX_AMOUNT_JOB_ALERTS;
+	}
+
+	private Interval extractInterval(JobAlert jobAlert) {
+		if (jobAlert == null) {
+			return null;
+		}
+		return jobAlert.getInterval();
 	}
 
 }

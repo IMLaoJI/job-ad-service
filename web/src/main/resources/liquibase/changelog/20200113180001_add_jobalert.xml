@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="fago" id="20200113180001-1">
+        <addColumn tableName="SEARCH_PROFILE">
+            <column name="JOB_ALERT_INTERVAL" type="VARCHAR(255)"/>
+            <column name="JOB_ALERT_QUERY" type="VARCHAR"/>
+            <column name="JOB_ALERT_CREATED_AT" type="TIMESTAMP"/>
+            <column name="JOB_ALERT_UPDATED_AT" type="TIMESTAMP"/>
+            <column name="JOB_ALERT_NEXT_RELEASE_AT" type="TIMESTAMP"/>
+            <column name="JOB_ALERT_EMAIL" type="VARCHAR(255)"/>
+            <column name="JOB_ALERT_ACCESS_TOKEN" type="VARCHAR(255)"/>
+            <column name="JOB_ALERT_CONTACT_LANGUAGE_ISO_CODE" type="VARCHAR(5)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="20200113180001-2" author="fago">
+        <createTable tableName="SEARCH_PROFILE_MATCHED_ID">
+            <column name="SEARCH_PROFILE_ID" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="JOB_ADVERTISEMENT_ID" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="20200113180001-3" author="fago">
+        <addForeignKeyConstraint baseColumnNames="SEARCH_PROFILE_ID"
+                                 baseTableName="SEARCH_PROFILE_MATCHED_ID"
+                                 constraintName="FK_SEARCH_PROFILE_MATCHED_ID"
+                                 deferrable="false" initiallyDeferred="false"
+                                 onDelete="RESTRICT"
+                                 referencedColumnNames="ID"
+                                 referencedTableName="SEARCH_PROFILE"/>
+    </changeSet>
+</databaseChangeLog>

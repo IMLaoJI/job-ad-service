@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker;
 
+import ch.admin.seco.jobs.services.jobadservice.application.ProfileRegistry;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,8 +9,6 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.NullChannel;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.SubscribableChannel;
-
-import ch.admin.seco.jobs.services.jobadservice.application.ProfileRegistry;
 
 @Configuration
 public class MessageBrokerConfig {
@@ -26,8 +25,14 @@ public class MessageBrokerConfig {
         @Bean
         MessageBrokerChannels messageBrokerChannels() {
             return new MessageBrokerChannels() {
+
                 @Override
                 public SubscribableChannel jobAdIntActionChannel() {
+                    return new DirectChannel();
+                }
+
+                @Override
+                public SubscribableChannel userEventChannel() {
                     return new DirectChannel();
                 }
 

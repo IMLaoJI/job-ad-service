@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api/elasticsearch")
 public class ElasticsearchIndexRestController {
@@ -30,5 +32,13 @@ public class ElasticsearchIndexRestController {
         return ResponseEntity.accepted()
                 .headers(HeaderUtil.createAlert("elasticsearch.reindex.jobservice.accepted", ""))
                 .build();
+    }
+
+    @PostMapping(value = "/index-job-alert-percolator-index", produces = MediaType.TEXT_PLAIN_VALUE)
+    @Timed
+    @IsSysAdmin
+    public ResponseEntity<Void> reindexJobAlertPercolatorIndex() throws IOException {
+        elasticsearchIndexService.reindexPercolatorIndex();
+        return ResponseEntity.accepted().build();
     }
 }

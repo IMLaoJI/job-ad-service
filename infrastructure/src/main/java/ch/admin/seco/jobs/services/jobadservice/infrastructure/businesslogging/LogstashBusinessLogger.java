@@ -11,6 +11,10 @@ import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUser
 
 @Component
 public class LogstashBusinessLogger implements BusinessLogger {
+	
+	private static final String ANONYMOUS_USER = "anonymousUser";
+
+	private static final String USER_LOGIN_ID_KEY = "userLoginId";
 
 	private final CurrentUserContext currentUserContext;
 
@@ -23,15 +27,21 @@ public class LogstashBusinessLogger implements BusinessLogger {
 
 	@Override
 	public void log(BusinessLogEvent businessLogEvent) {
+		CurrentUser currentUser = currentUserContext.getCurrentUser();
 		BusinessLogData businessLogData = new BusinessLogData(businessLogEvent.getEventType().getTypeName())
 				.withObjectId(businessLogEvent.getObjectId())
-				.withAuthorities(extractAuthorities(currentUserContext.getCurrentUser()))
+				.withAuthorities(extractAuthorities(currentUser))
 				.withObjectType(businessLogEvent.getObjectType().getTypeName())
-				.withAdditionalData(businessLogEvent.getAdditionalData());
+				.withAdditionalData(businessLogEvent.getAdditionalData())
+				.withAdditionalData(USER_LOGIN_ID_KEY, getCurrentUserId(currentUser));
 		businessLogger.log(businessLogData);
 	}
-
+	
+	private String getCurrentUserId(CurrentUser currentUser) {
+		return currentUser != null ? currentUser.getUserId() :  ANONYMOUS_USER;
+	}
+	
 	private String extractAuthorities(CurrentUser currentUser) {
-		return currentUser != null ? String.join(", ", currentUser.getAuthorities()) : Strings.EMPTY;
+		return currentUser != null ? String.join(" ", currentUser.getAuthorities()) : Strings.EMPTY;
 	}
 }
