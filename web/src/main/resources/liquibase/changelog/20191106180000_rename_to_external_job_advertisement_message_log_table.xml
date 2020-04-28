@@ -5,7 +5,7 @@
 
     <changeSet author="haso" id="20191106-10">
         <preConditions onFail="CONTINUE">
-            <sqlCheck expectedResult="1">select count(*) from information_schema.columns where table_name = 'x28message_log'</sqlCheck>
+            <sqlCheck expectedResult="1">select count(*) from information_schema.tables where table_name = 'x28message_log'</sqlCheck>
         </preConditions>
         <renameTable 
                 newTableName="external_job_advertisement_message_log"
