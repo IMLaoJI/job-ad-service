@@ -2,6 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.jobalert;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.jobalert.JobAlert;
 import org.junit.Test;
 
 import java.util.Arrays;

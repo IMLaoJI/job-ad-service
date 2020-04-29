@@ -1,5 +1,8 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.apiuser;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.apiuser.ApiUser;
+import ch.admin.seco.jobs.services.jobadservice.domain.apiuser.ApiUserId;
+
 public class ApiUserTestFixture {
 
     public static ApiUser createApiUser01() {

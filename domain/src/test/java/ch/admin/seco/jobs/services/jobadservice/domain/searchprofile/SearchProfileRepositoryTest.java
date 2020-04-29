@@ -1,5 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.searchprofile;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileFixture;
 import org.junit.Test;
 import org.junit.runner.RunWith;

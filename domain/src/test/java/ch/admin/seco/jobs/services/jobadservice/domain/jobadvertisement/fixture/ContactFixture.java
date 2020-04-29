@@ -1,11 +1,11 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Contact.Builder;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
+
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation.MR;
 import static java.lang.String.format;
 import static java.util.Locale.GERMAN;
-
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Contact.Builder;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 
 public class ContactFixture {
 

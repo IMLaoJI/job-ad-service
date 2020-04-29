@@ -1,19 +1,17 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils;
 
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Set;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageSkill;
+import org.junit.Before;
+import org.junit.Test;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageSkill;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class SupportedLanguageIsoCodeValidatorTest {
 

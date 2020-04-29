@@ -1,5 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.IllegalJobAdvertisementStatusTransitionException;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -1,17 +1,17 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCodeValidator.*;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Set;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCode;
+import org.junit.Before;
+import org.junit.Test;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedEducationCodeValidator.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class SupportedEducationCodeValidatorTest {
 

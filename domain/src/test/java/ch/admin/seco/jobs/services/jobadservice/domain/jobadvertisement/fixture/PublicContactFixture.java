@@ -1,9 +1,9 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
+
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.PublicContact.Builder;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation.MR;
-
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 
 public class PublicContactFixture {
 

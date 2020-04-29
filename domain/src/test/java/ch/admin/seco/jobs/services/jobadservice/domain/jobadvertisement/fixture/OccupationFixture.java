@@ -1,8 +1,8 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience.LESS_THAN_1_YEAR;
-
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation.Builder;
+
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience.LESS_THAN_1_YEAR;
 
 public class OccupationFixture {
     public static Builder testOccupation() {

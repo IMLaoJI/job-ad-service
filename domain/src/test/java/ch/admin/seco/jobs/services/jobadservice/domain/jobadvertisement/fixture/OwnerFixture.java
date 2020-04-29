@@ -1,9 +1,9 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture;
 
-import static java.lang.String.format;
-
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Owner.Builder;
+
+import static java.lang.String.format;
 
 public class OwnerFixture {
 
