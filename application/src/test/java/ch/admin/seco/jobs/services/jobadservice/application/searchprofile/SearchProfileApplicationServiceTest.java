@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.application.searchprofile;
 
+import ch.admin.seco.jobs.services.jobadservice.application.DomainEventMockUtils;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.CreateSearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.JobAlertDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.JobAlertMaxAmountReachedException;
@@ -8,13 +9,13 @@ import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.Se
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.UpdateSearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.CantonFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.SearchFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.fixture.SearchProfileFixture;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.fixture.SearchProfileIdFixture;
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
-import ch.admin.seco.jobs.services.jobadservice.domain.DomainEventMockUtils;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileId;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileEvents;
-import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.jobalert.Interval;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.CantonFilter;
 import org.junit.After;
@@ -32,7 +33,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
@@ -64,7 +64,7 @@ public class SearchProfileApplicationServiceTest {
 	@Test
 	public void testGetSearchProfile() {
 		// given
-		ResolvedSearchProfileDto createdResolvedSearchProfileDto = searchProfileApplicationService.createSearchProfile(getCreateSearchProfileDto(search_profile_01.id()));
+		ResolvedSearchProfileDto createdResolvedSearchProfileDto = searchProfileApplicationService.createSearchProfile(getCreateSearchProfileDto(SearchProfileIdFixture.search_profile_01.id()));
 
 		// when
 		SearchProfileId searchProfileId = new SearchProfileId(createdResolvedSearchProfileDto.getId());
@@ -77,16 +77,16 @@ public class SearchProfileApplicationServiceTest {
 	@Test
 	public void testGetSearchProfiles() {
 		// given
-		CreateSearchProfileDto createSearchProfileDto1 = getCreateSearchProfileDto(search_profile_01.id());
-		CreateSearchProfileDto createSearchProfileDto2 = getCreateSearchProfileDto(search_profile_02.id());
-		CreateSearchProfileDto createSearchProfileDto3 = getCreateSearchProfileDto(search_profile_03.id());
-		CreateSearchProfileDto createSearchProfileDto4 = getCreateSearchProfileDto(search_profile_04.id());
-		CreateSearchProfileDto createSearchProfileDto5 = getCreateSearchProfileDto(search_profile_05.id());
-		CreateSearchProfileDto createSearchProfileDto6 = getCreateSearchProfileDto(search_profile_06.id());
-		CreateSearchProfileDto createSearchProfileDto7 = getCreateSearchProfileDto(search_profile_07.id());
-		CreateSearchProfileDto createSearchProfileDto8 = getCreateSearchProfileDto(search_profile_08.id());
-		CreateSearchProfileDto createSearchProfileDto9 = getCreateSearchProfileDto(search_profile_09.id());
-		CreateSearchProfileDto createSearchProfileDto10 = getCreateSearchProfileDto(search_profile_10.id());
+		CreateSearchProfileDto createSearchProfileDto1 = getCreateSearchProfileDto(SearchProfileIdFixture.search_profile_01.id());
+		CreateSearchProfileDto createSearchProfileDto2 = getCreateSearchProfileDto(SearchProfileIdFixture.search_profile_02.id());
+		CreateSearchProfileDto createSearchProfileDto3 = getCreateSearchProfileDto(SearchProfileIdFixture.search_profile_03.id());
+		CreateSearchProfileDto createSearchProfileDto4 = getCreateSearchProfileDto(SearchProfileIdFixture.search_profile_04.id());
+		CreateSearchProfileDto createSearchProfileDto5 = getCreateSearchProfileDto(SearchProfileIdFixture.search_profile_05.id());
+		CreateSearchProfileDto createSearchProfileDto6 = getCreateSearchProfileDto(SearchProfileIdFixture.search_profile_06.id());
+		CreateSearchProfileDto createSearchProfileDto7 = getCreateSearchProfileDto(SearchProfileIdFixture.search_profile_07.id());
+		CreateSearchProfileDto createSearchProfileDto8 = getCreateSearchProfileDto(SearchProfileIdFixture.search_profile_08.id());
+		CreateSearchProfileDto createSearchProfileDto9 = getCreateSearchProfileDto(SearchProfileIdFixture.search_profile_09.id());
+		CreateSearchProfileDto createSearchProfileDto10 = getCreateSearchProfileDto(SearchProfileIdFixture.search_profile_10.id());
 
 		ResolvedSearchProfileDto createdResolvedSearchProfileDto1 = searchProfileApplicationService.createSearchProfile(createSearchProfileDto1);
 		ResolvedSearchProfileDto createdResolvedSearchProfileDto2 = searchProfileApplicationService.createSearchProfile(createSearchProfileDto2);
@@ -124,7 +124,7 @@ public class SearchProfileApplicationServiceTest {
 	@Test
 	public void testCreate() {
 		// given
-		CreateSearchProfileDto createSearchProfileDto = getCreateSearchProfileDto(search_profile_01.id());
+		CreateSearchProfileDto createSearchProfileDto = getCreateSearchProfileDto(SearchProfileIdFixture.search_profile_01.id());
 
 		// when
 		ResolvedSearchProfileDto createdResolvedSearchProfileDto = searchProfileApplicationService.createSearchProfile(createSearchProfileDto);
@@ -139,8 +139,8 @@ public class SearchProfileApplicationServiceTest {
 	@Test
 	public void testCreateWithExistingName() {
 		// given
-		CreateSearchProfileDto createSearchProfileDto1 = getCreateSearchProfileDto(search_profile_01.id());
-		CreateSearchProfileDto createSearchProfileDto2 = getCreateSearchProfileDto(search_profile_01.id());
+		CreateSearchProfileDto createSearchProfileDto1 = getCreateSearchProfileDto(SearchProfileIdFixture.search_profile_01.id());
+		CreateSearchProfileDto createSearchProfileDto2 = getCreateSearchProfileDto(SearchProfileIdFixture.search_profile_01.id());
 
 		// when
 		searchProfileApplicationService.createSearchProfile(createSearchProfileDto1);
@@ -155,7 +155,7 @@ public class SearchProfileApplicationServiceTest {
 	@Test
 	public void testUpdateSearchProfile() {
 		// given
-		CreateSearchProfileDto createSearchProfileDto = getCreateSearchProfileDto(search_profile_01.id());
+		CreateSearchProfileDto createSearchProfileDto = getCreateSearchProfileDto(SearchProfileIdFixture.search_profile_01.id());
 		ResolvedSearchProfileDto createdResolvedSearchProfileDto = searchProfileApplicationService.createSearchProfile(createSearchProfileDto);
 		domainEventMockUtils.assertSingleDomainEventPublished(SearchProfileEvents.SEARCH_PROFILE_CREATED.getDomainEventType());
 
@@ -179,7 +179,7 @@ public class SearchProfileApplicationServiceTest {
 	@Test
 	public void testDeleteSearchProfile() {
 		// given
-		ResolvedSearchProfileDto createdResolvedSearchProfileDto = searchProfileApplicationService.createSearchProfile(getCreateSearchProfileDto(search_profile_01.id()));
+		ResolvedSearchProfileDto createdResolvedSearchProfileDto = searchProfileApplicationService.createSearchProfile(getCreateSearchProfileDto(SearchProfileIdFixture.search_profile_01.id()));
 		SearchProfileId searchProfileId = new SearchProfileId(createdResolvedSearchProfileDto.getId());
 
 		// when
@@ -195,15 +195,15 @@ public class SearchProfileApplicationServiceTest {
 	@Test
 	public void testSubscribeToJobAlert() {
 		//given
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfile(search_profile_01.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfile(SearchProfileIdFixture.search_profile_01.id()));
 		// when
-		searchProfileApplicationService.subscribeToJobAlert(search_profile_01.id(),
+		searchProfileApplicationService.subscribeToJobAlert(SearchProfileIdFixture.search_profile_01.id(),
 				new JobAlertDto()
 				.setInterval(Interval.INT_1DAY)
 				.setEmail("test@example.org"));
 
 		// then
-		SearchProfile searchProfile = this.searchProfileRepository.findById(search_profile_01.id()).get();
+		SearchProfile searchProfile = this.searchProfileRepository.findById(SearchProfileIdFixture.search_profile_01.id()).get();
 		assertThat(searchProfile.getJobAlert()).isNotNull();
 		assertThat(searchProfile.getJobAlert().getCreatedAt()).isNotNull();
 		assertThat(searchProfile.getJobAlert().getNextReleaseAt()).isNotNull();
@@ -220,25 +220,25 @@ public class SearchProfileApplicationServiceTest {
 	public void testJobAlertsLimitedTo5() {
 
 		//given
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(search_profile_01.id()));
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(search_profile_02.id()));
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(search_profile_03.id()));
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(search_profile_04.id()));
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(search_profile_05.id()));
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(search_profile_06.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(SearchProfileIdFixture.search_profile_01.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(SearchProfileIdFixture.search_profile_02.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(SearchProfileIdFixture.search_profile_03.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(SearchProfileIdFixture.search_profile_04.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(SearchProfileIdFixture.search_profile_05.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJunitOwner(SearchProfileIdFixture.search_profile_06.id()));
 
 		// when
 		final JobAlertDto jobAlertDto = new JobAlertDto()
 				.setInterval(Interval.INT_1DAY)
 				.setEmail("test@example.org");
-		searchProfileApplicationService.subscribeToJobAlert(search_profile_01.id(), jobAlertDto);
-		searchProfileApplicationService.subscribeToJobAlert(search_profile_02.id(), jobAlertDto);
-		searchProfileApplicationService.subscribeToJobAlert(search_profile_03.id(), jobAlertDto);
-		searchProfileApplicationService.subscribeToJobAlert(search_profile_04.id(), jobAlertDto);
-		searchProfileApplicationService.subscribeToJobAlert(search_profile_05.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(SearchProfileIdFixture.search_profile_01.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(SearchProfileIdFixture.search_profile_02.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(SearchProfileIdFixture.search_profile_03.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(SearchProfileIdFixture.search_profile_04.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(SearchProfileIdFixture.search_profile_05.id(), jobAlertDto);
 
 		// then
-		assertThatThrownBy(() -> searchProfileApplicationService.subscribeToJobAlert(search_profile_06.id(), jobAlertDto))
+		assertThatThrownBy(() -> searchProfileApplicationService.subscribeToJobAlert(SearchProfileIdFixture.search_profile_06.id(), jobAlertDto))
 				.isInstanceOf(JobAlertMaxAmountReachedException.class)
 				.hasMessageContaining("Maximum Amount of JobAlerts reached!");
 	}
@@ -247,16 +247,16 @@ public class SearchProfileApplicationServiceTest {
 	public void testReleaseJobAlerts() {
 		//given
 		// nextReleaseDate in the Past - Should be released
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlertToBeReleased(search_profile_01.id()));
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlertToBeReleased(search_profile_02.id()));
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlertToBeReleased(search_profile_03.id()));
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlertToBeReleased(search_profile_04.id()));
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlertToBeReleased(search_profile_05.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlertToBeReleased(SearchProfileIdFixture.search_profile_01.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlertToBeReleased(SearchProfileIdFixture.search_profile_02.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlertToBeReleased(SearchProfileIdFixture.search_profile_03.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlertToBeReleased(SearchProfileIdFixture.search_profile_04.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlertToBeReleased(SearchProfileIdFixture.search_profile_05.id()));
 
 		// nextReleaseDate in the Future - Should not be released
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_06.id()));
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_07.id()));
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_08.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(SearchProfileIdFixture.search_profile_06.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(SearchProfileIdFixture.search_profile_07.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(SearchProfileIdFixture.search_profile_08.id()));
 
 
 		// when
@@ -269,13 +269,13 @@ public class SearchProfileApplicationServiceTest {
 	@Test
 	public void testUnsubscribeJobAlert() {
 		// given
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_01.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(SearchProfileIdFixture.search_profile_01.id()));
 
 		// when
-		searchProfileApplicationService.unsubscribeFromJobAlert(search_profile_01.id());
+		searchProfileApplicationService.unsubscribeFromJobAlert(SearchProfileIdFixture.search_profile_01.id());
 
 		// then
-		SearchProfile searchProfile = this.searchProfileRepository.findById(search_profile_01.id()).get();
+		SearchProfile searchProfile = this.searchProfileRepository.findById(SearchProfileIdFixture.search_profile_01.id()).get();
 		assertThat(searchProfile.getJobAlert().getMatchedJobAdvertisementIds()).isEmpty();
 		assertThat(searchProfile.getJobAlert().getInterval()).isNull();
 		assertThat(searchProfile.getJobAlert().getUpdatedAt()).isNull();
@@ -297,21 +297,21 @@ public class SearchProfileApplicationServiceTest {
 	public void testJobAlertHousekeeping() {
 
 		//given
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_01.id()));
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_02.id()));
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_03.id()));
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_04.id()));
-		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(search_profile_05.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(SearchProfileIdFixture.search_profile_01.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(SearchProfileIdFixture.search_profile_02.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(SearchProfileIdFixture.search_profile_03.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(SearchProfileIdFixture.search_profile_04.id()));
+		searchProfileRepository.save(SearchProfileFixture.testSearchProfileWithJobAlert(SearchProfileIdFixture.search_profile_05.id()));
 
 		// when
 		final JobAlertDto jobAlertDto = new JobAlertDto()
 				.setInterval(Interval.INT_1DAY)
 				.setEmail("test@example.org");
-		searchProfileApplicationService.subscribeToJobAlert(search_profile_01.id(), jobAlertDto);
-		searchProfileApplicationService.subscribeToJobAlert(search_profile_02.id(), jobAlertDto);
-		searchProfileApplicationService.subscribeToJobAlert(search_profile_03.id(), jobAlertDto);
-		searchProfileApplicationService.subscribeToJobAlert(search_profile_04.id(), jobAlertDto);
-		searchProfileApplicationService.subscribeToJobAlert(search_profile_05.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(SearchProfileIdFixture.search_profile_01.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(SearchProfileIdFixture.search_profile_02.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(SearchProfileIdFixture.search_profile_03.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(SearchProfileIdFixture.search_profile_04.id(), jobAlertDto);
+		searchProfileApplicationService.subscribeToJobAlert(SearchProfileIdFixture.search_profile_05.id(), jobAlertDto);
 
 		// then
 
