@@ -9,13 +9,13 @@ import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.Se
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.UpdateSearchProfileDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.CantonFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.SearchFilterDto;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.fixture.SearchProfileFixture;
-import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.fixture.SearchProfileIdFixture;
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfile;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileId;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.SearchProfileRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileEvents;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileFixture;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.fixture.SearchProfileIdFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.jobalert.Interval;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.CantonFilter;
 import org.junit.After;
