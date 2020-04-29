@@ -1,4 +1,4 @@
-package web.controller.errors;
+package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors;
 
 import ch.admin.seco.jobs.services.jobadservice.Application;
 import org.junit.Before;

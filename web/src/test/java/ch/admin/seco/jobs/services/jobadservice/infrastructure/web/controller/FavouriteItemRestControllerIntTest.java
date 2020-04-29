@@ -1,4 +1,4 @@
-package web.controller;
+package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
 import ch.admin.seco.alv.shared.logger.business.BusinessLogData;
 import ch.admin.seco.jobs.services.jobadservice.application.security.Role;

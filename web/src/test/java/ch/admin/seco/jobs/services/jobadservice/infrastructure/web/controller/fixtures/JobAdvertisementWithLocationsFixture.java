@@ -1,4 +1,4 @@
-package web.controller.fixtures;
+package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.fixtures;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.GeoPoint;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;

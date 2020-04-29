@@ -1,4 +1,4 @@
-package web.controller;
+package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller;
 
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.SearchProfileApplicationService;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.CreateSearchProfileDto;

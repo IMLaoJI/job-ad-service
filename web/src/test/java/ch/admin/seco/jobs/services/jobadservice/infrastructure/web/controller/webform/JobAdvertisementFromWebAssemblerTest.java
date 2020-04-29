@@ -1,4 +1,4 @@
-package web.controller.webform;
+package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.webform;
 
 import ch.admin.seco.jobs.services.jobadservice.application.HtmlToMarkdownConverter;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.AddressDto;
