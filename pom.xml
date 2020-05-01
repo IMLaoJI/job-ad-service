@@ -31,7 +31,8 @@
         <org.jsoup.version>1.11.2</org.jsoup.version>
         <org.zeroturnaround.version>1.12</org.zeroturnaround.version>
         <org.zalando.version>0.22.1</org.zalando.version>
-        <org.apache.commons.version>1.4</org.apache.commons.version>
+        <org.apache.commons-text.version>1.4</org.apache.commons-text.version>
+        <org.apache.commons-io.version>1.3.2</org.apache.commons-io.version>
     </properties>
 
     <modules>
@@ -187,7 +188,12 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-text</artifactId>
-                <version>${org.apache.commons.version}</version>
+                <version>${org.apache.commons-text.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${org.apache.commons-io.version}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>

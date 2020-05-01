@@ -1,11 +1,25 @@
 package ch.admin.seco.jobs.services.jobadservice.integration.external.importer.config;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.LANGUAGES;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.LANGUAGE_LEVEL;
-import static java.util.stream.Collectors.toList;
-import static org.springframework.util.StringUtils.hasText;
-import static org.springframework.util.StringUtils.isEmpty;
-import static org.springframework.util.StringUtils.trimAllWhitespace;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.*;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Qualification;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.WorkingTimePercentage;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver;
+import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadimport.Oste;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
+import org.apache.commons.lang3.EnumUtils;
+import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.safety.Whitelist;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -17,33 +31,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.google.i18n.phonenumbers.NumberParseException;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.Phonenumber;
-import org.apache.commons.lang3.EnumUtils;
-import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.safety.Whitelist;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.util.StringUtils;
-
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalCompanyDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalCreateJobAdvertisementDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalLanguageSkillDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalLocationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalOccupationDto;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Qualification;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.WorkingTimePercentage;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver;
-import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadimport.Oste;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.LANGUAGES;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.LANGUAGE_LEVEL;
+import static java.util.stream.Collectors.toList;
+import static org.springframework.util.StringUtils.*;
 
 class ExternalJobAdvertisementAssembler {
 
@@ -58,7 +49,7 @@ class ExternalJobAdvertisementAssembler {
     private static final String DEFAULT_AVAM_OCCUPATION_CODE = "99999";
     private static final String COUNTRY_ISO_CODE_SWITZERLAND = "CH";
 
-    public ExternalJobAdvertisementAssembler(){
+    public ExternalJobAdvertisementAssembler() {
     }
 
     ExternalCreateJobAdvertisementDto createJobAdvertisementFromExternalDto(Oste externalJobAdvertisement) {
@@ -168,30 +159,30 @@ class ExternalJobAdvertisementAssembler {
 
     private List<ExternalOccupationDto> createOccupations(Oste externalJobAdvertisement) {
         List<ExternalOccupationDto> occupations = new ArrayList<>();
-            if (hasText(externalJobAdvertisement.getBq1AvamBerufNrNew())) {
-                occupations.add(new ExternalOccupationDto()
-                        .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(externalJobAdvertisement.getBq1AvamBerufNrNew()))
-                        .setWorkExperience(resolveExperience(externalJobAdvertisement.getBq1ErfahrungCode()))
-                        .setEducationCode(externalJobAdvertisement.getBq1AusbildungCode())
-                        .setQualificationCode(resolveQualification(externalJobAdvertisement.getBq1QualifikationCode()))
-                );
-            }
-            if (hasText(externalJobAdvertisement.getBq2AvamBerufNrNew())) {
-                occupations.add(new ExternalOccupationDto()
-                        .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(externalJobAdvertisement.getBq2AvamBerufNrNew()))
-                        .setWorkExperience(resolveExperience(externalJobAdvertisement.getBq2ErfahrungCode()))
-                        .setEducationCode(externalJobAdvertisement.getBq2AusbildungCode())
-                        .setQualificationCode(resolveQualification(externalJobAdvertisement.getBq2QualifikationCode()))
-                );
-            }
-            if (hasText(externalJobAdvertisement.getBq3AvamBerufNrNew())) {
-                occupations.add(new ExternalOccupationDto()
-                        .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(externalJobAdvertisement.getBq3AvamBerufNrNew()))
-                        .setWorkExperience(resolveExperience(externalJobAdvertisement.getBq3ErfahrungCode()))
-                        .setEducationCode(externalJobAdvertisement.getBq3AusbildungCode())
-                        .setQualificationCode(resolveQualification(externalJobAdvertisement.getBq3QualifikationCode()))
-                );
-            }
+        if (hasText(externalJobAdvertisement.getBq1AvamBerufNrNew())) {
+            occupations.add(new ExternalOccupationDto()
+                    .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(externalJobAdvertisement.getBq1AvamBerufNrNew()))
+                    .setWorkExperience(resolveExperience(externalJobAdvertisement.getBq1ErfahrungCode()))
+                    .setEducationCode(externalJobAdvertisement.getBq1AusbildungCode())
+                    .setQualificationCode(resolveQualification(externalJobAdvertisement.getBq1QualifikationCode()))
+            );
+        }
+        if (hasText(externalJobAdvertisement.getBq2AvamBerufNrNew())) {
+            occupations.add(new ExternalOccupationDto()
+                    .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(externalJobAdvertisement.getBq2AvamBerufNrNew()))
+                    .setWorkExperience(resolveExperience(externalJobAdvertisement.getBq2ErfahrungCode()))
+                    .setEducationCode(externalJobAdvertisement.getBq2AusbildungCode())
+                    .setQualificationCode(resolveQualification(externalJobAdvertisement.getBq2QualifikationCode()))
+            );
+        }
+        if (hasText(externalJobAdvertisement.getBq3AvamBerufNrNew())) {
+            occupations.add(new ExternalOccupationDto()
+                    .setAvamOccupationCode(fallbackAwareAvamOccuptionCode(externalJobAdvertisement.getBq3AvamBerufNrNew()))
+                    .setWorkExperience(resolveExperience(externalJobAdvertisement.getBq3ErfahrungCode()))
+                    .setEducationCode(externalJobAdvertisement.getBq3AusbildungCode())
+                    .setQualificationCode(resolveQualification(externalJobAdvertisement.getBq3QualifikationCode()))
+            );
+        }
         if (occupations.isEmpty()) {
             occupations.add(new ExternalOccupationDto()
                     .setAvamOccupationCode(DEFAULT_AVAM_OCCUPATION_CODE)
@@ -237,7 +228,7 @@ class ExternalJobAdvertisementAssembler {
                 externalJobAdvertisement.getUntPostfach(),
                 externalJobAdvertisement.getUntPostfachPlz(),
                 externalJobAdvertisement.getUntPostfachOrt(),
-                externalJobAdvertisement.getUntTelefon(),
+                sanitizePhoneNumber(externalJobAdvertisement.getUntTelefon(), externalJobAdvertisement.getFingerprint()),
                 externalJobAdvertisement.getUntEMail(),
                 externalJobAdvertisement.getUntUrl(),
                 false
@@ -254,8 +245,8 @@ class ExternalJobAdvertisementAssembler {
                     resolveSalutation(externalJobAdvertisement.getKpAnredeCode()),
                     externalJobAdvertisement.getKpVorname(),
                     externalJobAdvertisement.getKpName(),
-                    sanitizePhoneNumber(externalJobAdvertisement.getKpTelefonNr(), externalJobAdvertisement),
-                    sanitizeEmail(externalJobAdvertisement.getKpEMail(), externalJobAdvertisement),
+                    sanitizePhoneNumber(externalJobAdvertisement.getKpTelefonNr(), externalJobAdvertisement.getFingerprint()),
+                    sanitizeEmail(externalJobAdvertisement.getKpEMail(), externalJobAdvertisement.getFingerprint()),
                     "de" // Not defined in this AVAM version
             );
         }
@@ -330,7 +321,7 @@ class ExternalJobAdvertisementAssembler {
     /*
      * Check for a valid phone number and remove remarks.
      */
-    private String sanitizePhoneNumber(String phone, Oste externalJobAdvertisement) {
+    private String sanitizePhoneNumber(String phone, String fingerPrint) {
         if (hasText(phone)) {
             try {
                 Phonenumber.PhoneNumber phoneNumber = PhoneNumberUtil.getInstance().parse(phone, "CH");
@@ -338,23 +329,23 @@ class ExternalJobAdvertisementAssembler {
                     return PhoneNumberUtil.getInstance().format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.E164);
                 }
             } catch (NumberParseException e) {
-                LOGGER.warn("JobAd fingerprint: {} has invalid phone number: {}", externalJobAdvertisement.getFingerprint(), phone);
+                LOGGER.warn("JobAd fingerprint: {} has invalid phone number: {}", fingerPrint, phone);
                 String[] phoneParts = phone.split("[^\\d\\(\\)\\+ ]");
                 if (phoneParts.length > 1) {
-                    return sanitizePhoneNumber(phoneParts[0], externalJobAdvertisement);
+                    return sanitizePhoneNumber(phoneParts[0], fingerPrint);
                 }
             }
         }
         return null;
     }
 
-    private String sanitizeEmail(String testObject, Oste externalJobAdvertisement) {
+    private String sanitizeEmail(String testObject, String fingerPrint) {
         if (hasText(testObject)) {
             String email = trimAllWhitespace(testObject).replace("'", "");
             if (EMAIL_VALIDATOR.isValid(email, null)) {
                 return email;
             } else {
-                LOGGER.warn("JobAd fingerprint: {} has invalid email: {}", externalJobAdvertisement.getFingerprint(), testObject);
+                LOGGER.warn("JobAd fingerprint: {} has invalid email: {}", fingerPrint, testObject);
             }
         }
         return null;

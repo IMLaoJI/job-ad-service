@@ -1,11 +1,14 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.elasticsearch.jobadvertisement.write;
 
+import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPublisher;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.Optional;
@@ -26,6 +29,7 @@ public class IndexerEventListener {
     }
 
     @TransactionalEventListener
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handle(JobAdvertisementEvent event) {
         indexJobAdvertisement(event);
     }
@@ -34,6 +38,7 @@ public class IndexerEventListener {
         Optional<JobAdvertisement> jobAdvertisementOptional = this.jobAdvertisementJpaRepository.findById(event.getAggregateId());
         if (jobAdvertisementOptional.isPresent()) {
             this.jobAdvertisementElasticsearchRepository.save(new JobAdvertisementDocument(jobAdvertisementOptional.get()));
+            DomainEventPublisher.publish(new JobAdvertisementDocumentIndexedEvent(event));
         } else {
             LOG.warn("JobAdvertisement not found for the given id: {}", event.getAggregateId());
         }

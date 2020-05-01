@@ -1,10 +1,10 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Company.Builder;
-import static java.lang.String.format;
-
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
+
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Company.Builder;
+import static java.lang.String.format;
 
 public class CompanyFixture {
 

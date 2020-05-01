@@ -4,7 +4,14 @@ import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.Aggregate;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPublisher;
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.AccessTokenGenerator;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.JobAlertReleasedEvent;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.JobAlertSubscribedEvent;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.JobAlertUnsubscribedEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.events.SearchProfileUpdatedEvent;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.jobalert.Interval;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.jobalert.JobAlert;
 import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.searchfilter.SearchFilter;
 
 import javax.persistence.AttributeOverride;
@@ -17,122 +24,183 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+
+import static ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.jobalert.JobAlert.calculateReleaseTime;
 
 @Entity
 public class SearchProfile implements Aggregate<SearchProfile, SearchProfileId> {
 
-    @EmbeddedId
-    @AttributeOverride(name = "value", column = @Column(name = "ID"))
-    @Valid
-    private SearchProfileId id;
+	@EmbeddedId
+	@AttributeOverride(name = "value", column = @Column(name = "ID"))
+	@Valid
+	private SearchProfileId id;
 
-    @NotNull
-    private LocalDateTime createdTime;
+	@NotNull
+	private LocalDateTime createdTime;
 
-    @NotNull
-    private LocalDateTime updatedTime;
+	@NotNull
+	private LocalDateTime updatedTime;
 
-    @NotBlank
-    @Size(max = 50)
-    private String name;
+	@NotBlank
+	@Size(max = 50)
+	private String name;
 
-    @NotBlank
-    private String ownerUserId;
+	@NotBlank
+	private String ownerUserId;
 
-    @Embedded
-    @Valid
-    @NotNull
-    private SearchFilter searchFilter;
+	@Embedded
+	@Valid
+	@NotNull
+	private SearchFilter searchFilter;
 
-    private SearchProfile() {
-        // FOR REFLECTION
-    }
+	@Embedded
+	@Valid
+	private JobAlert jobAlert;
 
-    public static Builder builder() {
-        return new Builder();
-    }
 
-    private SearchProfile(Builder builder) {
-        this.id = Condition.notNull(builder.id);
-        this.createdTime = TimeMachine.now();
-        this.updatedTime = this.createdTime;
-        this.name = Condition.notNull(builder.name);
-        this.ownerUserId = Condition.notBlank(builder.ownerUserId);
-        this.searchFilter = Condition.notNull(builder.searchFilter);
-    }
+	private SearchProfile() {
+		// FOR REFLECTION
+	}
 
-    public SearchProfileId getId() {
-        return id;
-    }
+	public static Builder builder() {
+		return new Builder();
+	}
 
-    public LocalDateTime getCreatedTime() {
-        return createdTime;
-    }
+	private SearchProfile(Builder builder) {
+		this.id = Condition.notNull(builder.id);
+		this.createdTime = TimeMachine.now();
+		this.updatedTime = this.createdTime;
+		this.name = Condition.notNull(builder.name);
+		this.ownerUserId = Condition.notBlank(builder.ownerUserId);
+		this.searchFilter = Condition.notNull(builder.searchFilter);
+		this.jobAlert = builder.jobAlert;
+	}
 
-    public LocalDateTime getUpdatedTime() {
-        return updatedTime;
-    }
+	public SearchProfileId getId() {
+		return id;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public LocalDateTime getCreatedTime() {
+		return createdTime;
+	}
 
-    public String getOwnerUserId() {
-        return ownerUserId;
-    }
+	public LocalDateTime getUpdatedTime() {
+		return updatedTime;
+	}
 
-    public SearchFilter getSearchFilter() {
-        return searchFilter;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void update(String name, SearchFilter searchFilter) {
-        this.name = name;
-        this.searchFilter = searchFilter;
-        this.updatedTime = TimeMachine.now();
-        DomainEventPublisher.publish(new SearchProfileUpdatedEvent(this));
-    }
+	public String getOwnerUserId() {
+		return ownerUserId;
+	}
 
-    public static final class Builder {
+	public SearchFilter getSearchFilter() {
+		return searchFilter;
+	}
 
-        private SearchProfileId id;
+	public JobAlert getJobAlert() {
+		return jobAlert;
+	}
 
-        private String name;
+	public void update(String name, SearchFilter searchFilter) {
+		this.name = name;
+		this.searchFilter = searchFilter;
+		this.updatedTime = TimeMachine.now();
+		DomainEventPublisher.publish(new SearchProfileUpdatedEvent(this));
+	}
 
-        private String ownerUserId;
 
-        private SearchFilter searchFilter;
+	public void subscribeToJobAlert(Interval interval, String email, String language) {
+		AccessTokenGenerator accessTokenGenerator = new AccessTokenGenerator();
+		this.jobAlert = JobAlert.builder()
+				.setMatchedJobAdvertisementIds(new LinkedHashSet<>())
+				.setLastUpdatedAt(TimeMachine.now())
+				.setInterval(interval)
+				.setCreatedAt(TimeMachine.now())
+				.setNextReleaseAt(calculateReleaseTime(interval))
+				.setEmail(email)
+				.setLanguage(language)
+				.setAccessToken(accessTokenGenerator.generateToken())
+				.build();
+		DomainEventPublisher.publish(new JobAlertSubscribedEvent(this));
+	}
 
-        public Builder() { }
+	public void unsubscribeFromJobAlert() {
+		this.jobAlert = JobAlert.builder()
+				.setMatchedJobAdvertisementIds(new LinkedHashSet<>())
+				.setLastUpdatedAt(null)
+				.setInterval(null)
+				.setCreatedAt(null)
+				.setNextReleaseAt(null)
+				.setEmail(null)
+				.setLanguage(null)
+				.setAccessToken(null)
+				.build();
+		DomainEventPublisher.publish(new JobAlertUnsubscribedEvent(this));
+	}
 
-        public SearchProfile build() { return new SearchProfile(this); }
+	public void release() {
+		List<JobAdvertisementId> matchedIds = new ArrayList<>(this.jobAlert.getMatchedJobAdvertisementIdsForRelease());
+		this.jobAlert.clearMatchedIdsAndCalculateNextRelease();
+		DomainEventPublisher.publish(new JobAlertReleasedEvent(this, matchedIds));
+	}
 
-        public  Builder setId(SearchProfileId id) {
-            this.id = id;
-            return this;
-        }
+	public static final class Builder {
 
-        public Builder setName(String name) {
-            this.name = name;
-            return this;
-        }
+		private SearchProfileId id;
 
-        public Builder setOwnerUserId(String ownerUserId) {
-            this.ownerUserId = ownerUserId;
-            return this;
-        }
+		private String name;
 
-        public Builder setSearchFilter(SearchFilter searchFilter) {
-            this.searchFilter = searchFilter;
-            return this;
-        }
-    }
+		private String ownerUserId;
 
-    @Override
-    public String toString() {
-        return "SearchProfile{" +
-                " id=" + id.getValue() + '\'' +
-                ",name=" + name + '\'' +
-                ",ownerUserId=" + ownerUserId + '\'' +
-                "}";
-    }
+		private SearchFilter searchFilter;
+
+		private JobAlert jobAlert;
+
+		public Builder() {
+		}
+
+		public SearchProfile build() {
+			return new SearchProfile(this);
+		}
+
+		public Builder setId(SearchProfileId id) {
+			this.id = id;
+			return this;
+		}
+
+		public Builder setName(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public Builder setOwnerUserId(String ownerUserId) {
+			this.ownerUserId = ownerUserId;
+			return this;
+		}
+
+		public Builder setSearchFilter(SearchFilter searchFilter) {
+			this.searchFilter = searchFilter;
+			return this;
+		}
+
+		public Builder setJobAlert(JobAlert jobAlert) {
+			this.jobAlert = jobAlert;
+			return this;
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "SearchProfile{" +
+				" id=" + id.getValue() + '\'' +
+				",name=" + name + '\'' +
+				",ownerUserId=" + ownerUserId + '\'' +
+				"}";
+	}
 }

@@ -229,6 +229,13 @@
             <artifactId>awaitility</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>ch.admin.seco.jobs.services.jobadservice</groupId>
+            <artifactId>domain</artifactId>
+            <scope>test</scope>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+        </dependency>
     </dependencies>
 
     <build>

@@ -1,21 +1,12 @@
 package ch.admin.seco.jobs.services.jobadservice.integration.external.exporter.config;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.List;
-
-import javax.persistence.EntityManagerFactory;
-
+import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
+import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadexport.Oste;
+import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadexport.OsteList;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeroturnaround.zip.ZipUtil;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -39,11 +30,17 @@ import org.springframework.integration.sftp.outbound.SftpMessageHandler;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.zeroturnaround.zip.ZipUtil;
 
-import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
-import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadexport.Oste;
-import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadexport.OsteList;
+import javax.persistence.EntityManagerFactory;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.List;
 
 @Configuration
 public class ExternalJobAdvertisementExportTaskConfig {
@@ -61,7 +58,7 @@ public class ExternalJobAdvertisementExportTaskConfig {
             JobBuilderFactory jobBuilderFactory,
             StepBuilderFactory stepBuilderFactory,
             SftpMessageHandler sftpMessageHandler,
-            ExternalJobAdvertisementProperties externalJobAdvertisementProperties ) {
+            ExternalJobAdvertisementProperties externalJobAdvertisementProperties) {
         this.jobBuilderFactory = jobBuilderFactory;
         this.stepBuilderFactory = stepBuilderFactory;
         this.sftpMessageHandler = sftpMessageHandler;
@@ -69,11 +66,10 @@ public class ExternalJobAdvertisementExportTaskConfig {
     }
 
     @Bean
-    public Job externalExportJob(
-            JpaPagingItemReader<JobAdvertisement> jpaPagingItemReader,
-            ExternalJobAdvertisementTransformer externalJobAdvertisementTransformer,
-            StaxEventItemWriter<Oste> xmlWriter,
-            PlatformTransactionManager jobAdTransactionManager) {
+    public Job externalExportJob(JpaPagingItemReader<JobAdvertisement> jpaPagingItemReader,
+                                 ExternalJobAdvertisementTransformer externalJobAdvertisementTransformer,
+                                 StaxEventItemWriter<Oste> xmlWriter,
+                                 PlatformTransactionManager jobAdTransactionManager) {
         return jobBuilderFactory.get("external-jobad-xml-export")
                 .incrementer(new RunIdIncrementer())
                 .listener(new PrepareAndCleanupXmlFileJobExecutionListener())
@@ -143,6 +139,7 @@ public class ExternalJobAdvertisementExportTaskConfig {
     ExternalJobAdvertisementTransformer externalJobAdvertisementTransformer() {
         return new ExternalJobAdvertisementTransformer();
     }
+
     @Bean
     @JobScope
     StaxEventItemWriter<Oste> xmlFileReader(@Value("#{jobExecutionContext['" + PARAMETER_XML_FILE_PATH + "']}") File xmlFile) {

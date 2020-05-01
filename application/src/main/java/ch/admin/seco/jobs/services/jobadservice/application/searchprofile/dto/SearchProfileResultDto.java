@@ -1,5 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.jobalert.Interval;
+
 import java.time.LocalDateTime;
 
 public class SearchProfileResultDto {
@@ -11,6 +13,8 @@ public class SearchProfileResultDto {
     private String name;
 
     private String ownerUserId;
+
+    private Interval interval;
 
     public String getId() {
         return id;
@@ -45,6 +49,15 @@ public class SearchProfileResultDto {
 
     public SearchProfileResultDto setOwnerUserId(String ownerUserId) {
         this.ownerUserId = ownerUserId;
+        return this;
+    }
+
+    public Interval getInterval() {
+        return interval;
+    }
+
+    public SearchProfileResultDto setInterval(Interval interval) {
+        this.interval = interval;
         return this;
     }
 }

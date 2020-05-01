@@ -28,6 +28,10 @@ public interface FavouriteItemRepository extends JpaRepository<FavouriteItem, Fa
     @Query("select i from FavouriteItem i where i.jobAdvertisementId in :jobAdvertisementIds and i.ownerUserId = :ownerUserId")
     List<FavouriteItem> findByJobAdvertisementIdsAndOwnerId(@Param("jobAdvertisementIds") Set<JobAdvertisementId> jobAdvertisementIds, @Param("ownerUserId") String ownerUserId);
 
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Query("select i from FavouriteItem i where i.ownerUserId = :ownerUserId")
+    List<FavouriteItem> findAllByOwnerUserId(@Param("ownerUserId") String ownerUserId);
+
     @QueryHints({
             @QueryHint(name = HINT_FETCH_SIZE, value = "1000"),
             @QueryHint(name = HINT_CACHE_MODE, value = "IGNORE")})

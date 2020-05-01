@@ -1,6 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors;
 
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.SearchProfileNameAlreadyExistsException;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.JobAlertMaxAmountReachedException;
 import ch.admin.seco.jobs.services.jobadservice.application.security.CurrentUserContext;
 import ch.admin.seco.jobs.services.jobadservice.application.security.Role;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.ConditionException;
@@ -168,6 +169,17 @@ public class ExceptionTranslator implements ProblemHandling {
                 .withTitle("SearchProfile already exists")
 				.withType(ErrorConstants.SEARCH_PROFILE_EXISTS)
 				.withStatus(Status.BAD_REQUEST)
+				.with(MESSAGE, ex.getMessage())
+				.build();
+		return create(ex, problem, request);
+	}
+
+	@ExceptionHandler(JobAlertMaxAmountReachedException.class)
+	public ResponseEntity<Problem> handleJobAlertMaxAmountReachedException(JobAlertMaxAmountReachedException ex, NativeWebRequest request) {
+		Problem problem = Problem.builder()
+				.withTitle("Maximum amount of JobAlerts Reached!")
+				.withType(ErrorConstants.JOB_ALERT_MAX_AMOUNT_REACHED)
+				.withStatus(Status.PRECONDITION_FAILED)
 				.with(MESSAGE, ex.getMessage())
 				.build();
 		return create(ex, problem, request);

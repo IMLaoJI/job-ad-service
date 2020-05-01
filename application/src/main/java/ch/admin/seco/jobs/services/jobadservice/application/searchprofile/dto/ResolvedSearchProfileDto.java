@@ -1,6 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto;
 
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.ResolvedSearchFilterDto;
+import ch.admin.seco.jobs.services.jobadservice.domain.searchprofile.jobalert.Interval;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +16,8 @@ public class ResolvedSearchProfileDto {
     private String name;
 
     private String ownerUserId;
+
+    private Interval interval;
 
     private ResolvedSearchFilterDto searchFilter;
 
@@ -69,6 +72,15 @@ public class ResolvedSearchProfileDto {
 
     public ResolvedSearchProfileDto setSearchFilter(ResolvedSearchFilterDto searchFilter) {
         this.searchFilter = searchFilter;
+        return this;
+    }
+
+    public Interval getInterval() {
+        return interval;
+    }
+
+    public ResolvedSearchProfileDto setInterval(Interval interval) {
+        this.interval = interval;
         return this;
     }
 }
