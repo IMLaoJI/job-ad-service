@@ -40,11 +40,10 @@ public class JobAdvertisementSearchController {
 
     @PostMapping("/_search")
     @Timed
-    public ResponseEntity<List<JobAdvertisementSearchResult>> searchJobs(
-            @RequestBody @Valid JobAdvertisementSearchRequest jobAdvertisementSearchRequest,
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "20") int size,
-            @RequestParam(defaultValue = "score") ElasticJobAdvertisementSearchService.SearchSort sort
+    public ResponseEntity<List<JobAdvertisementSearchResult>> searchJobs(@RequestBody @Valid JobAdvertisementSearchRequest jobAdvertisementSearchRequest,
+                                                                         @RequestParam(name = "page", defaultValue = "0") int page,
+                                                                         @RequestParam(name = "size", defaultValue = "20") int size,
+                                                                         @RequestParam(defaultValue = "score") ElasticJobAdvertisementSearchService.SearchSort sort
     ) {
 
         Page<JobAdvertisementSearchResult> resultPage = jobAdvertisementSearchService.search(jobAdvertisementSearchRequest, page, size, sort)
@@ -56,8 +55,8 @@ public class JobAdvertisementSearchController {
 
     @PostMapping("/_search/managed")
     @Timed
-    public ResponseEntity<List<JobAdvertisementDto>> searchManagedJobAds(
-            @RequestBody @Valid ManagedJobAdSearchRequest searchRequest, Pageable pageable) {
+    public ResponseEntity<List<JobAdvertisementDto>> searchManagedJobAds(@RequestBody @Valid ManagedJobAdSearchRequest searchRequest,
+                                                                         Pageable pageable) {
 
         Page<JobAdvertisementDto> resultPage = jobAdvertisementSearchService.searchManagedJobAds(searchRequest, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(resultPage, "/api/jobAdvertisements/_search/managed");

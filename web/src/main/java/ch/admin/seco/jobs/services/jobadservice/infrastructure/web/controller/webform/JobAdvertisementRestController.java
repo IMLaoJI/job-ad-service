@@ -12,6 +12,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.CancellationResource;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.PageResource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,10 @@ public class JobAdvertisementRestController {
     private final EventStore eventStore;
 
     private final JobAdvertisementFromWebAssembler jobAdvertisementFromWebAssembler;
+
+    @Value("${jobad.complaint.toggle.reportAdvertisementLink.visible}")
+    private boolean reportAdvertisementLinkVisible;
+
 
     public JobAdvertisementRestController(JobAdvertisementApplicationService jobAdvertisementApplicationService, EventStore eventStore, JobAdvertisementFromWebAssembler jobAdvertisementFromWebAssembler) {
         this.jobAdvertisementApplicationService = jobAdvertisementApplicationService;
@@ -71,7 +76,9 @@ public class JobAdvertisementRestController {
      */
     @GetMapping("/{id}")
     public JobAdvertisementDto getOne(@PathVariable String id) throws AggregateNotFoundException {
-        return jobAdvertisementApplicationService.getById(new JobAdvertisementId(id));
+        final JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.getById(new JobAdvertisementId(id));
+        jobAdvertisementDto.setReportAdvertisementLinkVisible(this.reportAdvertisementLinkVisible);
+        return jobAdvertisementDto;
     }
 
     /**
