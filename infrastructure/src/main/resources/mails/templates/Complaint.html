@@ -22,22 +22,6 @@
 <a th:href="@{|${linkToJobAdDetail}|}"
    th:text="${linkToJobAdDetail}"></a>
 
-<p><strong th:text="#{mail.complaint.body.contactinformation}"></strong></p>
-<div th:if="${contactInformation?.salutation}">
-    <div th:switch="${contactInformation?.salutation}">
-        <div th:case="${T(ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation).MR}"
-             th:text="#{mail.complaint.body.contactinformation.salutation.mr}"></div>
-        <div th:case="${T(ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation).MS}"
-             th:text="#{mail.complaint.body.contactinformation.salutation.ms}"></div>
-    </div>
-</div>
-<div th:if="${contactInformation?.name}"
-     th:text="#{mail.complaint.body.contactinformation.name(${contactInformation?.name})}"></div>
-<div th:if="${contactInformation?.phone}"
-     th:text="#{mail.complaint.body.contactinformation.phone(${contactInformation?.phone})}"></div>
-<div th:if="${contactInformation?.email}"
-     th:text="#{mail.complaint.body.contactinformation.email(${contactInformation?.email})}"></div>
-
 
 <div th:switch="${complaintType}">
     <span th:case="${T(ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintType).BRIBE}"
@@ -46,9 +30,24 @@
           th:text="#{mail.complaint.body.reason(#{mail.complaint.body.complainttype.offensive})}"></span>
     <span th:case="${T(ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintType).DISCRIMINATION}"
           th:text="#{mail.complaint.body.reason(#{mail.complaint.body.complainttype.discrimination})}"></span>
+    <span th:case="${T(ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintType).UNTRUSTWORTHY}"
+          th:text="#{mail.complaint.body.reason(#{mail.complaint.body.complainttype.untrustworthy})}"></span>
+    <span th:case="${T(ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintType).INACTIVE}"
+          th:text="#{mail.complaint.body.reason(#{mail.complaint.body.complainttype.inactive})}"></span>
+    <span th:case="${T(ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintType).EMAIL_INCORRECT}"
+          th:text="#{mail.complaint.body.reason(#{mail.complaint.body.complainttype.email-incorrect})}"></span>
+    <span th:case="${T(ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintType).PHONE_NR_INCORRECT}"
+          th:text="#{mail.complaint.body.reason(#{mail.complaint.body.complainttype.phone_nr_incorrect})}"></span>
+    <span th:case="${T(ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintType).OCCUPIED}"
+          th:text="#{mail.complaint.body.reason(#{mail.complaint.body.complainttype.occupied})}"></span>
+    <span th:case="${T(ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintType).LOCATION_INCORRECT}"
+          th:text="#{mail.complaint.body.reason(#{mail.complaint.body.complainttype.location-incorrect})}"></span>
+    <span th:case="${T(ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintType).WORKLOAD_INCORRECT}"
+          th:text="#{mail.complaint.body.reason(#{mail.complaint.body.complainttype.workload_incorrect})}"></span>
+    <span th:case="${T(ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintType).TEMPORARY_PERMANENT_INCORRECT}"
+          th:text="#{mail.complaint.body.reason(#{mail.complaint.body.complainttype.temporary-permanent-incorrect})}"></span>
 </div>
-<p><strong th:text="#{mail.complaint.body.complaintmessage}"></strong></p>
-<em th:text="${complaintMessage}"></em>
+
 
 </body>
 </html>

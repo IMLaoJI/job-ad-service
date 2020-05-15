@@ -14,14 +14,7 @@ public class ComplaintDtoFixture {
     public static ComplaintDto testComplaintDto() {
         return new ComplaintDto()
                 .setJobAdvertisementId(job01.id().getValue())
-                .setComplaintType(ComplaintType.DISCRIMINATION)
-                .setComplaintMessage("meckermecker")
-                .setContactInformation(
-                        new ContactInformationDto()
-                                .setSalutation(Salutation.MR)
-                                .setName("name")
-                                .setPhone("phone")
-                                .setEmail("email")
-                                .setContactLanguage(new Locale("de")));
+                .setComplaintType(ComplaintType.DISCRIMINATION);
+
     }
 }
