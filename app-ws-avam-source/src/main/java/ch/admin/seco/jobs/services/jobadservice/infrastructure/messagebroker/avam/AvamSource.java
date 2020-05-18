@@ -32,8 +32,8 @@ public class AvamSource {
         LOG.debug("Approve JobAdvertisement stellennummerAvam={}, stellennummerEgov={}", approvalDto.getStellennummerAvam(), approvalDto.getStellennummerEgov());
         output.send(MessageBuilder
                 .withPayload(approvalDto)
-                .setHeader(PARTITION_KEY, approvalDto.getStellennummerEgov())
-                .setHeader(RELEVANT_ID, approvalDto.getStellennummerEgov())
+                .setHeader(PARTITION_KEY, approvalDto.getStellennummerAvam())
+                .setHeader(RELEVANT_ID, approvalDto.getStellennummerAvam())
                 .setHeader(ACTION, APPROVE.name())
                 .setHeader(SOURCE_SYSTEM, AVAM.name())
                 .setHeader(TARGET_SYSTEM, JOB_AD_SERVICE.name())
@@ -45,8 +45,8 @@ public class AvamSource {
         LOG.debug("Reject JobAdvertisement stellennummerAvam={}, stellennummerEgov={}", rejectionDto.getStellennummerAvam(), rejectionDto.getStellennummerEgov());
         output.send(MessageBuilder
                 .withPayload(rejectionDto)
-                .setHeader(PARTITION_KEY, rejectionDto.getStellennummerEgov())
-                .setHeader(RELEVANT_ID, rejectionDto.getStellennummerEgov())
+                .setHeader(PARTITION_KEY, rejectionDto.getStellennummerAvam())
+                .setHeader(RELEVANT_ID, rejectionDto.getStellennummerAvam())
                 .setHeader(ACTION, REJECT.name())
                 .setHeader(SOURCE_SYSTEM, AVAM.name())
                 .setHeader(TARGET_SYSTEM, JOB_AD_SERVICE.name())
