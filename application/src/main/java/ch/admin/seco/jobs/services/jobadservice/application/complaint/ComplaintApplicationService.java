@@ -56,7 +56,7 @@ public class ComplaintApplicationService {
                 .setSubject(COMPLAINT_SUBJECT)
                 .setTemplateName(COMPLAINT_TEMPLATE)
                 .setTemplateVariables(variables)
-                .setLocale(Locale.GERMAN)
+                .setLocale(complaintDto.getLocale())
                 .build();
 
         mailSenderService.send(mailSenderData);
