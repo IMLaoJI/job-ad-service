@@ -11,8 +11,7 @@ public class ComplaintDtoFixture {
     public static ComplaintDto testComplaintDto() {
         return new ComplaintDto()
                 .setJobAdvertisementId(job01.id().getValue())
-                .setComplaintType(ComplaintType.DISCRIMINATION)
-                .setLocale(new Locale("de"));
+                .setComplaintType(ComplaintType.DISCRIMINATION);
 
     }
 }

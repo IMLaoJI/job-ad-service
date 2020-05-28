@@ -15,9 +15,6 @@ public class ComplaintDto {
     @Enumerated(EnumType.STRING)
     private ComplaintType complaintType;
 
-    @NotNull
-    private Locale locale;
-
 
 
     public String getJobAdvertisementId() {
@@ -38,21 +35,11 @@ public class ComplaintDto {
         return this;
     }
 
-    public Locale getLocale() {
-        return locale;
-    }
-
-    public ComplaintDto setLocale(Locale locale) {
-        this.locale = locale;
-        return this;
-    }
-
     @Override
     public String toString() {
         return "ComplaintDto{" +
                 "jobAdvertisementId='" + jobAdvertisementId + '\'' +
                 ", complaintType=" + complaintType +
-                ", locale=" + locale +
                 '}';
     }
 }

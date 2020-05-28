@@ -12,7 +12,6 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.CancellationResource;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.PageResource;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -30,9 +29,6 @@ public class JobAdvertisementRestController {
     private final EventStore eventStore;
 
     private final JobAdvertisementFromWebAssembler jobAdvertisementFromWebAssembler;
-
-    @Value("${jobad.complaint.toggle.reportAdvertisementLink.visible}")
-    private boolean reportAdvertisementLinkVisible;
 
 
     public JobAdvertisementRestController(JobAdvertisementApplicationService jobAdvertisementApplicationService, EventStore eventStore, JobAdvertisementFromWebAssembler jobAdvertisementFromWebAssembler) {
@@ -59,10 +55,8 @@ public class JobAdvertisementRestController {
      * - 200 Ok: The page with job ads has been returned
      */
     @GetMapping
-    public PageResource<JobAdvertisementDto> getAll(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "25") int size
-    ) {
+    public PageResource<JobAdvertisementDto> getAll(@RequestParam(name = "page", defaultValue = "0") int page,
+                                                    @RequestParam(name = "size", defaultValue = "25") int size) {
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdTime")));
         return PageResource.of(jobAdvertisementApplicationService.findAllPaginated(pageRequest));
     }
@@ -77,7 +71,6 @@ public class JobAdvertisementRestController {
     @GetMapping("/{id}")
     public JobAdvertisementDto getOne(@PathVariable String id) throws AggregateNotFoundException {
         final JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.getById(new JobAdvertisementId(id));
-        jobAdvertisementDto.setReportAdvertisementLinkVisible(this.reportAdvertisementLinkVisible);
         return jobAdvertisementDto;
     }
 

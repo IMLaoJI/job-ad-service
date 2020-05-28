@@ -9,6 +9,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
@@ -30,6 +31,9 @@ public class ComplaintApplicationService {
     private static final String COMPLAINT_SUBJECT = "mail.complaint.subject";
     private static final String COMPLAINT_TEMPLATE = "Complaint.html";
 
+    @Value("${alv.complaint.toggle.reportAdvertisementLink.visible}")
+    private boolean reportAdvertisementLinkVisible;
+
     public ComplaintApplicationService(MailSenderService mailSenderService, ComplaintProperties complaintProperties, JobAdvertisementRepository jobAdvertisementRepository) {
         this.mailSenderService = mailSenderService;
         this.complaintProperties = complaintProperties;
@@ -37,29 +41,31 @@ public class ComplaintApplicationService {
     }
 
     public void sendComplaint(ComplaintDto complaintDto) {
-        Condition.notNull(complaintDto);
-        Condition.notEmpty(complaintDto.getJobAdvertisementId());
-        JobAdvertisement jobAdvertisement = getJobAdvertisement(new JobAdvertisementId(complaintDto.getJobAdvertisementId()));
+        if (this.reportAdvertisementLinkVisible) {
+            Condition.notNull(complaintDto);
+            Condition.notEmpty(complaintDto.getJobAdvertisementId());
+            JobAdvertisement jobAdvertisement = getJobAdvertisement(new JobAdvertisementId(complaintDto.getJobAdvertisementId()));
 
-        LOG.info("Sending complaint for JobAdvertisement with ID: " + complaintDto.getJobAdvertisementId());
+            LOG.info("Sending complaint for JobAdvertisement with ID: " + complaintDto.getJobAdvertisementId());
 
-        final Map<String, Object> variables = new HashMap<>();
-        variables.put("sourceSystem", jobAdvertisement.getSourceSystem());
-        variables.put("jobAdvertisementId", jobAdvertisement.getId().getValue());
-        variables.put("stellennummerEgov", jobAdvertisement.getStellennummerEgov());
-        variables.put("stellennummerAvam", jobAdvertisement.getStellennummerAvam());
-        variables.put("complaintType", complaintDto.getComplaintType());
-        variables.put("linkToJobAdDetail", complaintProperties.getLinkToJobAdDetail() + complaintDto.getJobAdvertisementId());
+            final Map<String, Object> variables = new HashMap<>();
+            variables.put("sourceSystem", jobAdvertisement.getSourceSystem());
+            variables.put("jobAdvertisementId", jobAdvertisement.getId().getValue());
+            variables.put("stellennummerEgov", jobAdvertisement.getStellennummerEgov());
+            variables.put("stellennummerAvam", jobAdvertisement.getStellennummerAvam());
+            variables.put("complaintType", complaintDto.getComplaintType());
+            variables.put("linkToJobAdDetail", complaintProperties.getLinkToJobAdDetail() + complaintDto.getJobAdvertisementId());
 
-        MailSenderData mailSenderData = new MailSenderData.Builder()
-                .setTo(complaintProperties.getReceiverEmailAddress())
-                .setSubject(COMPLAINT_SUBJECT)
-                .setTemplateName(COMPLAINT_TEMPLATE)
-                .setTemplateVariables(variables)
-                .setLocale(complaintDto.getLocale())
-                .build();
+            MailSenderData mailSenderData = new MailSenderData.Builder()
+                    .setTo(complaintProperties.getReceiverEmailAddress())
+                    .setSubject(COMPLAINT_SUBJECT)
+                    .setTemplateName(COMPLAINT_TEMPLATE)
+                    .setTemplateVariables(variables)
+                    .setLocale(Locale.GERMAN)
+                    .build();
 
-        mailSenderService.send(mailSenderData);
+            mailSenderService.send(mailSenderData);
+        }
     }
 
     private JobAdvertisement getJobAdvertisement(JobAdvertisementId jobAdvertisementId) {
