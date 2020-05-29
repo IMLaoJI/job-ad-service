@@ -45,8 +45,8 @@ public class AvamSource {
         LOG.debug("Reject JobAdvertisement stellennummerAvam={}, stellennummerEgov={}", rejectionDto.getStellennummerAvam(), rejectionDto.getStellennummerEgov());
         output.send(MessageBuilder
                 .withPayload(rejectionDto)
-                .setHeader(PARTITION_KEY, rejectionDto.getStellennummerAvam())
-                .setHeader(RELEVANT_ID, rejectionDto.getStellennummerAvam())
+                .setHeader(PARTITION_KEY, rejectionDto.getStellennummerEgov())
+                .setHeader(RELEVANT_ID, rejectionDto.getStellennummerEgov())
                 .setHeader(ACTION, REJECT.name())
                 .setHeader(SOURCE_SYSTEM, AVAM.name())
                 .setHeader(TARGET_SYSTEM, JOB_AD_SERVICE.name())
