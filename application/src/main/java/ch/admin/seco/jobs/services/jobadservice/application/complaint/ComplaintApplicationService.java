@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,6 +30,7 @@ public class ComplaintApplicationService {
     private static final String COMPLAINT_SUBJECT = "mail.complaint.subject";
     private static final String COMPLAINT_TEMPLATE = "Complaint.html";
 
+
     public ComplaintApplicationService(MailSenderService mailSenderService, ComplaintProperties complaintProperties, JobAdvertisementRepository jobAdvertisementRepository) {
         this.mailSenderService = mailSenderService;
         this.complaintProperties = complaintProperties;
@@ -36,33 +38,30 @@ public class ComplaintApplicationService {
     }
 
     public void sendComplaint(ComplaintDto complaintDto) {
-        Condition.notNull(complaintDto);
-        Condition.notEmpty(complaintDto.getJobAdvertisementId());
-        JobAdvertisement jobAdvertisement = getJobAdvertisement(new JobAdvertisementId(complaintDto.getJobAdvertisementId()));
+            Condition.notNull(complaintDto);
+            Condition.notEmpty(complaintDto.getJobAdvertisementId());
+            JobAdvertisement jobAdvertisement = getJobAdvertisement(new JobAdvertisementId(complaintDto.getJobAdvertisementId()));
 
-        LOG.info("Sending complaint for JobAdvertisement with ID: " + complaintDto.getJobAdvertisementId());
+            LOG.info("Sending complaint for JobAdvertisement with ID: " + complaintDto.getJobAdvertisementId());
 
-        final Map<String, Object> variables = new HashMap<>();
-        variables.put("sourceSystem", jobAdvertisement.getSourceSystem());
-        variables.put("jobAdvertisementId", jobAdvertisement.getId().getValue());
-        variables.put("stellennummerEgov", jobAdvertisement.getStellennummerEgov());
-        variables.put("stellennummerAvam", jobAdvertisement.getStellennummerAvam());
-        variables.put("contactInformation", complaintDto.getContactInformation());
-        variables.put("complaintType", complaintDto.getComplaintType());
-        variables.put("complaintMessage", complaintDto.getComplaintMessage());
-        variables.put("linkToJobAdDetail", complaintProperties.getLinkToJobAdDetail() + complaintDto.getJobAdvertisementId());
+            final Map<String, Object> variables = new HashMap<>();
+            variables.put("sourceSystem", jobAdvertisement.getSourceSystem());
+            variables.put("jobAdvertisementId", jobAdvertisement.getId().getValue());
+            variables.put("stellennummerEgov", jobAdvertisement.getStellennummerEgov());
+            variables.put("stellennummerAvam", jobAdvertisement.getStellennummerAvam());
+            variables.put("complaintType", complaintDto.getComplaintType());
+            variables.put("linkToJobAdDetail", complaintProperties.getLinkToJobAdDetail() + complaintDto.getJobAdvertisementId());
 
-        MailSenderData mailSenderData = new MailSenderData.Builder()
-                .setTo(complaintProperties.getReceiverEmailAddress())
-                .setCc(complaintDto.getContactInformation().getEmail())
-                .setSubject(COMPLAINT_SUBJECT)
-                .setTemplateName(COMPLAINT_TEMPLATE)
-                .setTemplateVariables(variables)
-                .setLocale(complaintDto.getContactInformation().getContactLanguage())
-                .build();
+            MailSenderData mailSenderData = new MailSenderData.Builder()
+                    .setTo(complaintProperties.getReceiverEmailAddress())
+                    .setSubject(COMPLAINT_SUBJECT)
+                    .setTemplateName(COMPLAINT_TEMPLATE)
+                    .setTemplateVariables(variables)
+                    .setLocale(Locale.GERMAN)
+                    .build();
 
-        mailSenderService.send(mailSenderData);
-    }
+            mailSenderService.send(mailSenderData);
+        }
 
     private JobAdvertisement getJobAdvertisement(JobAdvertisementId jobAdvertisementId) {
         Optional<JobAdvertisement> jobAdvertisement = jobAdvertisementRepository.findById(jobAdvertisementId);

@@ -22,33 +22,11 @@
 <a th:href="@{|${linkToJobAdDetail}|}"
    th:text="${linkToJobAdDetail}"></a>
 
-<p><strong th:text="#{mail.complaint.body.contactinformation}"></strong></p>
-<div th:if="${contactInformation?.salutation}">
-    <div th:switch="${contactInformation?.salutation}">
-        <div th:case="${T(ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation).MR}"
-             th:text="#{mail.complaint.body.contactinformation.salutation.mr}"></div>
-        <div th:case="${T(ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation).MS}"
-             th:text="#{mail.complaint.body.contactinformation.salutation.ms}"></div>
-    </div>
-</div>
-<div th:if="${contactInformation?.name}"
-     th:text="#{mail.complaint.body.contactinformation.name(${contactInformation?.name})}"></div>
-<div th:if="${contactInformation?.phone}"
-     th:text="#{mail.complaint.body.contactinformation.phone(${contactInformation?.phone})}"></div>
-<div th:if="${contactInformation?.email}"
-     th:text="#{mail.complaint.body.contactinformation.email(${contactInformation?.email})}"></div>
 
-
-<div th:switch="${complaintType}">
-    <span th:case="${T(ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintType).BRIBE}"
-          th:text="#{mail.complaint.body.reason(#{mail.complaint.body.complainttype.bribe})}"></span>
-    <span th:case="${T(ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintType).OFFENSIVE}"
-          th:text="#{mail.complaint.body.reason(#{mail.complaint.body.complainttype.offensive})}"></span>
-    <span th:case="${T(ch.admin.seco.jobs.services.jobadservice.application.complaint.ComplaintType).DISCRIMINATION}"
-          th:text="#{mail.complaint.body.reason(#{mail.complaint.body.complainttype.discrimination})}"></span>
+<div>
+    <span th:text="#{mail.complaint.body.reason(#{'mail.complaint.body.complainttype.' + ${complaintType}}) }">   </span>
 </div>
-<p><strong th:text="#{mail.complaint.body.complaintmessage}"></strong></p>
-<em th:text="${complaintMessage}"></em>
+
 
 </body>
 </html>

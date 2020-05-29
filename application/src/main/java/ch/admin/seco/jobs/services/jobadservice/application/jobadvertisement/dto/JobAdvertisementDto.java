@@ -308,4 +308,5 @@ public class JobAdvertisementDto {
         return toDto(jobAdvertisement)
                 .setOwner(OwnerDto.toDto(jobAdvertisement.getOwner()));
     }
+
 }

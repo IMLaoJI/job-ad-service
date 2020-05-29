@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
- * This Class is mainly used for unit test puposes in order to manipulate the creation point (.now()) of java.time classes such as {@link LocalDateTime}.
+ * This Class is mainly used for unit test purposes in order to manipulate the creation point (.now()) of java.time classes such as {@link LocalDateTime}.
  * <p>
  * It is important to call the TimeMachine.now() method within the productive code in order to receive a new {@link LocalDateTime} for the given manipulated date
  */
