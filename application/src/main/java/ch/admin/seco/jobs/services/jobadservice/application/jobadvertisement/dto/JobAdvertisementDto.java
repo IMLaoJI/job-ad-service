@@ -59,8 +59,6 @@ public class JobAdvertisementDto {
 
     private OwnerDto owner;
 
-    private  boolean reportAdvertisementLinkVisible;
-
     public JobAdvertisementDto() {
         // For reflection libs
     }
@@ -311,11 +309,4 @@ public class JobAdvertisementDto {
                 .setOwner(OwnerDto.toDto(jobAdvertisement.getOwner()));
     }
 
-    public boolean isReportAdvertisementLinkVisible() {
-        return reportAdvertisementLinkVisible;
-    }
-
-    public void setReportAdvertisementLinkVisible(boolean reportAdvertisementLinkVisible) {
-        this.reportAdvertisementLinkVisible = reportAdvertisementLinkVisible;
-    }
 }
