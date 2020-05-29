@@ -13,8 +13,8 @@ import javax.validation.Valid;
 public class ComplaintRestController {
     private final ComplaintApplicationService complaintApplicationService;
 
-    @Value("${alv.complaint.toggle.reportAdvertisementLink.visible}")
-    private boolean reportAdvertisementLinkVisible;
+    @Value("${alv.feature.toggle.isComplaintLinkEnabled}")
+    private boolean complaintLinkEnabled;
 
     public ComplaintRestController(ComplaintApplicationService complaintApplicationService) {
         this.complaintApplicationService = complaintApplicationService;
@@ -23,7 +23,7 @@ public class ComplaintRestController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void sendComplaint(@RequestBody @Valid ComplaintDto complaintDto) {
-        if (reportAdvertisementLinkVisible) {
+        if (complaintLinkEnabled) {
             complaintApplicationService.sendComplaint(complaintDto);
         }
     }
