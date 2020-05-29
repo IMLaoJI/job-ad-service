@@ -89,6 +89,7 @@
         <sk5SpracheCode xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
         <sprachenBemerkungen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
         <stellenantritt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+        <nachVereinbarung xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
         <stellennummerAvam>stellennummerAvam</stellennummerAvam>
         <stellennummerEgov>100</stellennummerEgov>
         <fristTyp>BEFR</fristTyp>
