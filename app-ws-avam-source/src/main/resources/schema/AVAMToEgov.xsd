@@ -212,7 +212,8 @@
 			<xs:element name="kpFragenVorname" nillable="true" type="xs:string"/>
 			<xs:element name="kpFragenEmail" nillable="true" type="xs:string"/>
 			<xs:element name="kpFragenTelefonNr" nillable="true" type="xs:string"/>
-            <xs:element name="event" nillable="false" type="xs:string"/>
+            		<xs:element name="event" nillable="false" type="xs:string"/>
+			<xs:element name="nachVereinbarung" nillable="true" type="xs:boolean"/>
 		</xs:sequence>
 	</xs:complexType>
 

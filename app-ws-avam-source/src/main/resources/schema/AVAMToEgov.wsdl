@@ -8,7 +8,7 @@
 		Seiten der Schnittstelle einen Service, der die verschiedenen Operationen
 		implementiert.
 		Es wurde besonders darauf geachtet, dass die WSDL-Dateien kompatibel zu AJAX2 sind, 
-		da eGov seine WdockerS-Clients und -Services mit AJAX implementieren will.
+		da eGov seine WS-Clients und -Services mit AJAX implementieren will.
 
 		Sicherheit
 		==========

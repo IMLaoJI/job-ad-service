@@ -1,14 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.AddressDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
@@ -24,6 +16,8 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.source.WS
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,23 +26,11 @@ import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.CANCELLATION_CODE;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.EXPERIENCES;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.LANGUAGES;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.LANGUAGE_LEVEL;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.QUALIFICATION_CODE;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.SALUTATIONS;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.SOURCE_SYSTEM;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.WORK_FORMS;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.*;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamDateTimeFormatter.parseToLocalDate;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.util.StringUtils.hasText;
@@ -59,10 +41,6 @@ public class JobAdvertisementFromAvamAssembler {
     private static final Logger LOG = LoggerFactory.getLogger(JobAdvertisementFromAvamAssembler.class);
     private static final EmailValidator emailValidator = new EmailValidator();
     private static final Set<String> LANGUAGE_CODES_TO_IGNORE = new HashSet<>(Arrays.asList("99", "98"));
-
-    private static boolean safeBoolean(Boolean value, boolean defaultValue) {
-        return (value != null) ? value.booleanValue() : defaultValue;
-    }
 
     private static String safeTrimOrNull(String value) {
         return (hasText(value)) ? value.trim() : null;
@@ -193,16 +171,38 @@ public class JobAdvertisementFromAvamAssembler {
     }
 
     private EmploymentDto createEmploymentDto(WSOsteEgov avamJobAdvertisement) {
-        WorkingTimePercentage workingTimePercentage = WorkingTimePercentage.evaluate(avamJobAdvertisement.getPensumVon(), avamJobAdvertisement.getPensumBis());
+        final WorkingTimePercentage workingTimePercentage = WorkingTimePercentage.evaluate(avamJobAdvertisement.getPensumVon(), avamJobAdvertisement.getPensumBis());
+        final Pair<LocalDate, Boolean> startDateAndImmediately = determineStartDateAndImmediately(
+                avamJobAdvertisement.getStellenantritt(),
+                avamJobAdvertisement.isNachVereinbarung(),
+                avamJobAdvertisement.isAbSofort());
+
         return new EmploymentDto()
-                .setStartDate(parseToLocalDate(avamJobAdvertisement.getStellenantritt()))
+                .setStartDate(startDateAndImmediately.getLeft())
                 .setEndDate(getEmploymentEndDate(avamJobAdvertisement))
                 .setShortEmployment(avamJobAdvertisement.getFristTyp().equals(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.SHORT_TERM)))
-                .setImmediately(safeBoolean(avamJobAdvertisement.isAbSofort(), avamJobAdvertisement.getStellenantritt() == null))
+                .setImmediately(startDateAndImmediately.getRight())
                 .setPermanent(avamJobAdvertisement.getFristTyp().equals(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.PERMANENT)))
                 .setWorkloadPercentageMin(workingTimePercentage.getMin())
                 .setWorkloadPercentageMax(workingTimePercentage.getMax())
                 .setWorkForms(createWorkForms(avamJobAdvertisement));
+    }
+
+    static Pair<LocalDate, Boolean> determineStartDateAndImmediately(String stellenAntritt, Boolean nachVereinbarung, Boolean abSofort) {
+        if (Boolean.TRUE.equals(abSofort)) {
+            return ImmutablePair.of(null, Boolean.TRUE);
+        }
+
+        LocalDate stellenAntrittDate = parseToLocalDate(stellenAntritt);
+        if (stellenAntritt != null) {
+            return ImmutablePair.of(stellenAntrittDate, Boolean.FALSE);
+        }
+
+        if (Boolean.TRUE.equals(nachVereinbarung)) {
+            return ImmutablePair.of(null, Boolean.FALSE);
+        }
+
+        return ImmutablePair.of(stellenAntrittDate, Boolean.TRUE);
     }
 
     private LocalDate getEmploymentEndDate(WSOsteEgov avamJobAdvertisement) {

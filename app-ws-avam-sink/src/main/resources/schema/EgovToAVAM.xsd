@@ -23,50 +23,50 @@
             <xs:element name="abmeldeDatum" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="30"/>
+                        <xs:maxLength value="30" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="abmeldeGrundCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="alterBis" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="alterVon" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="angabenAlter" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="255"/>
+                        <xs:maxLength value="255" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="anmeldeDatum" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="30"/>
+                        <xs:maxLength value="30" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="arbeitsamtBereich" nillable="false">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:minLength value="1"/>
-                        <xs:maxLength value="5"/>
+                        <xs:minLength value="1" />
+                        <xs:maxLength value="5" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -74,45 +74,45 @@
             <xs:element name="arbeitsOrtGemeinde" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="255"/>
+                        <xs:maxLength value="255" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="arbeitsOrtText" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="50"/>
+                        <xs:maxLength value="50" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="arbeitsOrtPlz" nillable="false">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:minLength value="1"/>
-                        <xs:maxLength value="50"/>
+                        <xs:minLength value="1" />
+                        <xs:maxLength value="50" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="arbeitsOrtOrt" nillable="false">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:minLength value="1"/>
-                        <xs:maxLength value="50"/>
+                        <xs:minLength value="1" />
+                        <xs:maxLength value="50" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="arbeitsOrtLand" nillable="false">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:minLength value="1"/>
-                        <xs:maxLength value="100"/>
+                        <xs:minLength value="1" />
+                        <xs:maxLength value="100" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="arbeitzeitStd" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="3"/>
+                        <xs:maxLength value="3" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -120,7 +120,7 @@
             <xs:element name="beschreibung" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10000"/>
+                        <xs:maxLength value="10000" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -131,50 +131,50 @@
             <xs:element name="bewerAngaben" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="255"/>
+                        <xs:maxLength value="255" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bezeichnung" nillable="false">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:minLength value="1"/>
-                        <xs:maxLength value="255"/>
+                        <xs:minLength value="1" />
+                        <xs:maxLength value="255" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bq1AusbildungCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bq1AvamBerufNr" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bq1AvamBeruf" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="255"/>
+                        <xs:maxLength value="255" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bq1ErfahrungCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bq1QualifikationCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -182,28 +182,28 @@
             <xs:element name="bq2AusbildungCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bq2AvamBeruf" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="255"/>
+                        <xs:maxLength value="255" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bq2ErfahrungCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bq2QualifikationCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -211,28 +211,28 @@
             <xs:element name="bq3AusbildungCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bq3AvamBeruf" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="255"/>
+                        <xs:maxLength value="255" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bq3ErfahrungCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bq3QualifikationCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -240,7 +240,7 @@
             <xs:element name="detailangabenCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -249,21 +249,21 @@
             <xs:element name="geschlechtCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="gleicheOste" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="3"/>
+                        <xs:maxLength value="3" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="gueltigkeit" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="30"/>
+                        <xs:maxLength value="30" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -271,56 +271,56 @@
             <xs:element name="kategorieCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="kpAnredeCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="kpEmail" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="50"/>
+                        <xs:maxLength value="50" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="kpName" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="255"/>
+                        <xs:maxLength value="255" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="kpTelefonNr" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="50"/>
+                        <xs:maxLength value="50" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="kpVorname" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="255"/>
+                        <xs:maxLength value="255" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="lohnMax" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="19"/>
+                        <xs:maxLength value="19" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="lohnMin" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="19"/>
+                        <xs:maxLength value="19" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -328,7 +328,7 @@
             <xs:element name="lohnartCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -339,7 +339,7 @@
             <xs:element name="sk1MuendlichCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -347,14 +347,14 @@
             <xs:element name="sk1SchriftlichCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="sk1SpracheCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -362,7 +362,7 @@
             <xs:element name="sk2MuendlichCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -370,14 +370,14 @@
             <xs:element name="sk2SchriftlichCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="sk2SpracheCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -385,7 +385,7 @@
             <xs:element name="sk3MuendlichCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -393,14 +393,14 @@
             <xs:element name="sk3SchriftlichCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="sk3SpracheCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -408,7 +408,7 @@
             <xs:element name="sk4MuendlichCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -416,14 +416,14 @@
             <xs:element name="sk4SchriftlichCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="sk4SpracheCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -431,7 +431,7 @@
             <xs:element name="sk5MuendlichCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -439,42 +439,42 @@
             <xs:element name="sk5SchriftlichCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="sk5SpracheCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="sprachenBemerkungen" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="255"/>
+                        <xs:maxLength value="255" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="stellenantritt" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="30"/>
+                        <xs:maxLength value="30" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="stellennummerAvam" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="11"/>
+                        <xs:maxLength value="11" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="stellennummerEgov" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="11"/>
+                        <xs:maxLength value="11" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -482,163 +482,163 @@
             <xs:element name="untHausNr" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="50"/>
+                        <xs:maxLength value="50" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="untLand" nillable="false">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:minLength value="1"/>
-                        <xs:maxLength value="100"/>
+                        <xs:minLength value="1" />
+                        <xs:maxLength value="100" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="untName" nillable="false">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:minLength value="1"/>
-                        <xs:maxLength value="255"/>
+                        <xs:minLength value="1" />
+                        <xs:maxLength value="255" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="untOrt" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="100"/>
+                        <xs:maxLength value="100" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="untPlz" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="untPostfach" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="20"/>
+                        <xs:maxLength value="20" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="untPostfachOrt" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="100"/>
+                        <xs:maxLength value="100" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="untPostfachPlz" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="untStrasse" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="60"/>
+                        <xs:maxLength value="60" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bewerUntTelefon" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="50"/>
+                        <xs:maxLength value="50" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bewerUntEmail" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="50"/>
+                        <xs:maxLength value="50" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bewerUntUrl" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="255"/>
+                        <xs:maxLength value="255" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bewerUntName" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="255"/>
+                        <xs:maxLength value="255" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bewerUntStrasse" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="60"/>
+                        <xs:maxLength value="60" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bewerUntHausNr" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="50"/>
+                        <xs:maxLength value="50" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bewerUntPlz" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bewerUntOrt" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="100"/>
+                        <xs:maxLength value="100" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bewerUntPostfach" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="20"/>
+                        <xs:maxLength value="20" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bewerUntPostfachPlz" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bewerUntPostfachOrt" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="100"/>
+                        <xs:maxLength value="100" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="bewerUntLand" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="100"/>
+                        <xs:maxLength value="100" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="vertragsdauer" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="30"/>
+                        <xs:maxLength value="30" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="waehrungCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -649,16 +649,16 @@
             <xs:element name="quelleCode" nillable="false">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:minLength value="1"/>
-                        <xs:maxLength value="10"/>
+                        <xs:minLength value="1" />
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
-            <xs:element name="meldepflicht" nillable="false" type="xs:boolean"/>
+            <xs:element name="meldepflicht" nillable="false" type="xs:boolean" />
             <xs:element name="sperrfrist" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="30"/>
+                        <xs:maxLength value="30" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -666,66 +666,67 @@
             <xs:element name="auftraggeberName" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="255"/>
+                        <xs:maxLength value="255" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="auftraggeberPlz" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="auftraggeberOrt" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="100"/>
+                        <xs:maxLength value="100" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="auftraggeberLand" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="100"/>
+                        <xs:maxLength value="100" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="kpFragenAnredeCode" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="10"/>
+                        <xs:maxLength value="10" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="kpFragenName" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="255"/>
+                        <xs:maxLength value="255" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="kpFragenVorname" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="255"/>
+                        <xs:maxLength value="255" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="kpFragenEmail" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="50"/>
+                        <xs:maxLength value="50" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
             <xs:element name="kpFragenTelefonNr" nillable="true">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="50"/>
+                        <xs:maxLength value="50" />
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
+            <xs:element name="nachVereinbarung" nillable="true" type="xs:boolean" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -741,6 +742,8 @@
             <xs:element maxOccurs="unbounded" minOccurs="0" name="WSArbeitsformArrayItem" type="tns:WSArbeitsform"/>
         </xs:sequence>
     </xs:complexType>
+
+
     <!--
     Codes abfragen in AVAM
     -->
@@ -826,8 +829,7 @@
 
     <xs:complexType name="WSArbeitsamtbereichArray">
         <xs:sequence>
-            <xs:element maxOccurs="unbounded" minOccurs="0" name="WSArbeitsamtbereichArrayItem"
-                        type="tns:WSArbeitsamtbereich"/>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="WSArbeitsamtbereichArrayItem" type="tns:WSArbeitsamtbereich"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -844,8 +846,7 @@
 
     <xs:complexType name="WSRavSachbearbeiterArray">
         <xs:sequence>
-            <xs:element maxOccurs="unbounded" minOccurs="0" name="WSRavSachbearbeiterArrayItem"
-                        type="tns:WSRavSachbearbeiter"/>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="WSRavSachbearbeiterArrayItem" type="tns:WSRavSachbearbeiter"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -913,8 +914,7 @@
     <xs:element name="getRavSachbearbeiterResponse">
         <xs:complexType>
             <xs:sequence>
-                <xs:element form="qualified" name="ravSachbearbeiterReturn" nillable="true"
-                            type="tns:WSRavSachbearbeiterArray"/>
+                <xs:element form="qualified" name="ravSachbearbeiterReturn" nillable="true" type="tns:WSRavSachbearbeiterArray"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
