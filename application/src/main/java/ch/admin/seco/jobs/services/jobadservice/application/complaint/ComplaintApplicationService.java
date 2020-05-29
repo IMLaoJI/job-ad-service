@@ -9,7 +9,6 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
@@ -31,8 +30,6 @@ public class ComplaintApplicationService {
     private static final String COMPLAINT_SUBJECT = "mail.complaint.subject";
     private static final String COMPLAINT_TEMPLATE = "Complaint.html";
 
-    @Value("${alv.complaint.toggle.reportAdvertisementLink.visible}")
-    private boolean reportAdvertisementLinkVisible;
 
     public ComplaintApplicationService(MailSenderService mailSenderService, ComplaintProperties complaintProperties, JobAdvertisementRepository jobAdvertisementRepository) {
         this.mailSenderService = mailSenderService;
@@ -41,7 +38,6 @@ public class ComplaintApplicationService {
     }
 
     public void sendComplaint(ComplaintDto complaintDto) {
-        if (this.reportAdvertisementLinkVisible) {
             Condition.notNull(complaintDto);
             Condition.notEmpty(complaintDto.getJobAdvertisementId());
             JobAdvertisement jobAdvertisement = getJobAdvertisement(new JobAdvertisementId(complaintDto.getJobAdvertisementId()));
@@ -66,7 +62,6 @@ public class ComplaintApplicationService {
 
             mailSenderService.send(mailSenderData);
         }
-    }
 
     private JobAdvertisement getJobAdvertisement(JobAdvertisementId jobAdvertisementId) {
         Optional<JobAdvertisement> jobAdvertisement = jobAdvertisementRepository.findById(jobAdvertisementId);
