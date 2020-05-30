@@ -86,27 +86,29 @@
                     <div class="publication-date" th:text="#{mail.jobad.vacancy} + ${#temporals.format(jobad.publication.startDate, 'dd.MM.yyyy')}"></div>
                     <h3  style="'float:left'" th:if="${jobad.jobContent.jobDescriptions[0]}"
                          th:text="${jobad.jobContent.jobDescriptions[0].title}"></h3>
-                    <strong th:style="'font-size: 20px'" th:if="${jobad.jobContent.company}"
-                            th:text="${jobad.jobContent.company.name}"></strong>
-                    <small class="badge reporting-obligation" th:if="${jobad.reportingObligation}"
-                           th:text="#{mail.jobalert.badge.reporting.obligation}"></small>
-                    <small class="badge location" th:if="${jobad.jobContent.location}"
-                           th:text="${jobad.jobContent.location.city == ''} ? '(CH)' : ${jobad.jobContent.location.city}"></small>
-                    <small class="badge workload"
-                           th:text="${jobad.jobContent.employment.workloadPercentageMin} + '%'"></small>
+                    <p>
+                        <strong th:style="'font-size: 20px'" th:if="${jobad.jobContent.company}"
+                                th:text="${jobad.jobContent.company.name}"></strong>
+                        <small class="badge reporting-obligation" th:if="${jobad.reportingObligation}"
+                               th:text="#{mail.jobalert.badge.reporting.obligation}"></small>
+                        <small class="badge location" th:if="${jobad.jobContent.location}"
+                               th:text="${jobad.jobContent.location.city == ''} ? '(CH)' : ${jobad.jobContent.location.city}"></small>
+                        <small class="badge workload"
+                               th:text="${jobad.jobContent.employment.workloadPercentageMin} + '%'"></small>
 
-                    <small class="badge immediatly" th:if="${jobad.jobContent.employment.immediately}"
-                           th:text="#{mail.jobalert.badge.reporting.immediately.truthy}">
-                    </small>
-                    <small class="badge immediatly" th:if="${jobad.jobContent.employment.immediately == false}"
-                           th:text="#{mail.jobalert.badge.reporting.immediately.falsy}">
-                    </small>
-                    <small class="badge permanent" th:if="${jobad.jobContent.employment.permanent}"
-                           th:text="#{mail.jobalert.badge.reporting.permanent.truthy}">
-                    </small>
-                    <small class="badge permanent" th:if="${jobad.jobContent.employment.permanent == false}"
-                           th:text="#{mail.jobalert.badge.reporting.permanent.falsy}">
-                    </small>
+                        <small class="badge immediatly" th:if="${jobad.jobContent.employment.immediately}"
+                               th:text="#{mail.jobalert.badge.reporting.immediately.truthy}">
+                        </small>
+                        <small class="badge immediatly" th:if="${jobad.jobContent.employment.immediately == false}"
+                               th:text="#{mail.jobalert.badge.reporting.immediately.falsy}">
+                        </small>
+                        <small class="badge permanent" th:if="${jobad.jobContent.employment.permanent}"
+                               th:text="#{mail.jobalert.badge.reporting.permanent.truthy}">
+                        </small>
+                        <small class="badge permanent" th:if="${jobad.jobContent.employment.permanent == false}"
+                               th:text="#{mail.jobalert.badge.reporting.permanent.falsy}">
+                        </small>
+                    </p>
                 </a>
             </div>
         </div>
