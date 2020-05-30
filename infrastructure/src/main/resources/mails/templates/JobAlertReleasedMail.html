@@ -86,9 +86,9 @@
                     <div class="publication-date" th:text="#{mail.jobad.vacancy} + ${#temporals.format(jobad.publication.startDate, 'dd.MM.yyyy')}"></div>
                     <h3  style="'float:left'" th:if="${jobad.jobContent.jobDescriptions[0]}"
                          th:text="${jobad.jobContent.jobDescriptions[0].title}"></h3>
-                    <p>
-                        <strong th:style="'font-size: 20px'" th:if="${jobad.jobContent.company}"
-                                th:text="${jobad.jobContent.company.name}"></strong>
+                    <strong th:style="'font-size: 20px'" th:if="${jobad.jobContent.company}"
+                            th:text="${jobad.jobContent.company.name}"></strong>
+                    <div>
                         <small class="badge reporting-obligation" th:if="${jobad.reportingObligation}"
                                th:text="#{mail.jobalert.badge.reporting.obligation}"></small>
                         <small class="badge location" th:if="${jobad.jobContent.location}"
@@ -108,7 +108,7 @@
                         <small class="badge permanent" th:if="${jobad.jobContent.employment.permanent == false}"
                                th:text="#{mail.jobalert.badge.reporting.permanent.falsy}">
                         </small>
-                    </p>
+                    </div>
                 </a>
             </div>
         </div>
