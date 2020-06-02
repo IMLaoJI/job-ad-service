@@ -31,7 +31,7 @@ public class JobAdvertisementFromAvamAssemblerTest {
     public LocalDate startDate;
 
 
-    @Parameterized.Parameters(name = "{index}: Test with abSofort={0}, stellenAntritt={1}, nachVereinbarung={2} reust is immediately={3}, startDate={4}")
+    @Parameterized.Parameters(name = "{index}: Test with abSofort={0}, stellenAntritt={1}, nachVereinbarung={2} result is immediately={3}, startDate={4}")
     public static Collection<Object[]> data() {
         LocalDate nextWeek = LocalDate.now().plusWeeks(1);
         String stellenAntritt = AvamDateTimeFormatter.formatLocalDate(nextWeek);
