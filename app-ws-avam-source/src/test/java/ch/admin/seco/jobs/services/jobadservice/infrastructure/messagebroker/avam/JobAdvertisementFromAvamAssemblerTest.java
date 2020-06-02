@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.*;
 @RunWith(Parameterized.class)
 public class JobAdvertisementFromAvamAssemblerTest {
     @Parameterized.Parameter(0)
-    public Boolean abSofrot;
+    public Boolean abSofort;
 
     @Parameterized.Parameter(1)
     public String stellenAntritt;
@@ -31,7 +31,7 @@ public class JobAdvertisementFromAvamAssemblerTest {
     public LocalDate startDate;
 
 
-    @Parameterized.Parameters(name = "{index}: Test with abSofrot={0}, stellenAntritt={1}, nachVereinbarung={2} reust is immediately={3}, startDate={4}")
+    @Parameterized.Parameters(name = "{index}: Test with abSofort={0}, stellenAntritt={1}, nachVereinbarung={2} reust is immediately={3}, startDate={4}")
     public static Collection<Object[]> data() {
         LocalDate nextWeek = LocalDate.now().plusWeeks(1);
         String stellenAntritt = AvamDateTimeFormatter.formatLocalDate(nextWeek);
@@ -51,7 +51,7 @@ public class JobAdvertisementFromAvamAssemblerTest {
     @Test
     public void testDetermineStartDateAndImmediately() {
 
-        assertThat(determineStartDateAndImmediately(stellenAntritt, nachVereinbarung, abSofrot))
+        assertThat(determineStartDateAndImmediately(stellenAntritt, nachVereinbarung, abSofort))
                 .isEqualTo(ImmutablePair.of(startDate, immediately));
     }
 }
