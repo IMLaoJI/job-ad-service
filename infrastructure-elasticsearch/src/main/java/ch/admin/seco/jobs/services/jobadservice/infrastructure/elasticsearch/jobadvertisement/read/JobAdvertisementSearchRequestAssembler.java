@@ -85,23 +85,19 @@ public class JobAdvertisementSearchRequestAssembler {
 		if (resolvedSearchProfileDto.getSearchFilter().getOccupations().isEmpty()) {
 			return null;
 		}
-		final List<ResolvedOccupationFilterDto> occupations = resolvedSearchProfileDto.getSearchFilter().getOccupations();
+		final List<ResolvedOccupationFilterDto> occupations = filterMappings(resolvedSearchProfileDto.getSearchFilter().getOccupations());
 		ArrayList<ProfessionCode> professionCodes = new ArrayList<>();
-
 		for (ResolvedOccupationFilterDto resolvedOccupationFilterDto : occupations) {
-			professionCodes.add(new ProfessionCode(extractProfessionCodeType(resolvedOccupationFilterDto), resolvedOccupationFilterDto.getCode()));
 			final Map<ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType, String> mappings = resolvedOccupationFilterDto.getMappings();
 			if (mappings == null || mappings.isEmpty()) {
 				continue;
 			}
-			final Map<ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType, String> filteredProfessionTypeMap = getFilteredProfessionTypeMap(occupations);
-			filteredProfessionTypeMap.forEach((key, value) -> professionCodes.add(new ProfessionCode(ProfessionCodeType.fromString(key.toString()), value)));
+			mappings.forEach((key, value) -> professionCodes.add(new ProfessionCode(ProfessionCodeType.fromString(key.toString()), value)));
 		}
-
 		return professionCodes.toArray(new ProfessionCode[0]);
 	}
 
-	private Map<ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType, String> getFilteredProfessionTypeMap(List<ResolvedOccupationFilterDto> occupations) {
+	private List<ResolvedOccupationFilterDto> filterMappings(List<ResolvedOccupationFilterDto> occupations) {
 		return occupations.stream()
 				.filter(i -> i.getType().equals(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.X28))
 				.peek(filteredOccupations -> {
@@ -110,11 +106,7 @@ public class JobAdvertisementSearchRequestAssembler {
 					filteredMappings.remove(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.CHISCO5);
 					filteredMappings.remove(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.BFS);
 				})
-				.collect(Collectors.toMap(ResolvedOccupationFilterDto::getType, ResolvedOccupationFilterDto::getCode));
-	}
-
-	private static ProfessionCodeType extractProfessionCodeType(ResolvedOccupationFilterDto resolvedOccupationFilterDto) {
-		return ProfessionCodeType.fromString(resolvedOccupationFilterDto.getType().toString());
+				.collect(Collectors.toList());
 	}
 
 	private static String[] extractKeywords(ResolvedSearchProfileDto resolvedSearchProfileDto) {
