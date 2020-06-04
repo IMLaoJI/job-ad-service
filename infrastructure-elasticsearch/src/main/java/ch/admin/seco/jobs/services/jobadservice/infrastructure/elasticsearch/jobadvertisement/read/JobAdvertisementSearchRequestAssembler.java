@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -98,15 +97,17 @@ public class JobAdvertisementSearchRequestAssembler {
 	}
 
 	private List<ResolvedOccupationFilterDto> filterX28Mappings(List<ResolvedOccupationFilterDto> occupations) {
-		return occupations.stream()
-				.filter(resolvedOccupationFilterDto -> resolvedOccupationFilterDto.getType().equals(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.X28))
-				.peek(filteredOccupations -> {
-					final Map<ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType, String> filteredMappings = filteredOccupations.getMappings();
-					filteredMappings.remove(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.CHISCO3);
-					filteredMappings.remove(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.CHISCO5);
-					filteredMappings.remove(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.BFS);
-				})
-				.collect(Collectors.toList());
+		ArrayList<ResolvedOccupationFilterDto> resolvedOccupationFilterDtos = new ArrayList<>();
+		occupations.forEach(resolvedOccupationFilterDto -> {
+			if (resolvedOccupationFilterDto.getType().equals(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.X28)) {
+				final Map<ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType, String> mappings = resolvedOccupationFilterDto.getMappings();
+				mappings.remove(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.CHISCO3);
+				mappings.remove(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.CHISCO5);
+				mappings.remove(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.BFS);
+			}
+			resolvedOccupationFilterDtos.add(resolvedOccupationFilterDto);
+		});
+		return resolvedOccupationFilterDtos;
 	}
 
 	private static String[] extractKeywords(ResolvedSearchProfileDto resolvedSearchProfileDto) {
