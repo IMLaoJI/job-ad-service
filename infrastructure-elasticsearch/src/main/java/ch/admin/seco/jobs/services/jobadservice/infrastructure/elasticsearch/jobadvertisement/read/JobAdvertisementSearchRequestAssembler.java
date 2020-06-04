@@ -99,7 +99,7 @@ public class JobAdvertisementSearchRequestAssembler {
 
 	private List<ResolvedOccupationFilterDto> filterMappings(List<ResolvedOccupationFilterDto> occupations) {
 		return occupations.stream()
-				.filter(i -> i.getType().equals(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.X28))
+				.filter(resolvedOccupationFilterDto -> resolvedOccupationFilterDto.getType().equals(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.X28))
 				.peek(filteredOccupations -> {
 					final Map<ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType, String> filteredMappings = filteredOccupations.getMappings();
 					filteredMappings.remove(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.CHISCO3);
