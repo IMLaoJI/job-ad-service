@@ -85,7 +85,7 @@ public class JobAdvertisementSearchRequestAssembler {
 		if (resolvedSearchProfileDto.getSearchFilter().getOccupations().isEmpty()) {
 			return null;
 		}
-		final List<ResolvedOccupationFilterDto> occupations = filterMappings(resolvedSearchProfileDto.getSearchFilter().getOccupations());
+		final List<ResolvedOccupationFilterDto> occupations = filterX28Mappings(resolvedSearchProfileDto.getSearchFilter().getOccupations());
 		ArrayList<ProfessionCode> professionCodes = new ArrayList<>();
 		for (ResolvedOccupationFilterDto resolvedOccupationFilterDto : occupations) {
 			final Map<ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType, String> mappings = resolvedOccupationFilterDto.getMappings();
@@ -97,7 +97,7 @@ public class JobAdvertisementSearchRequestAssembler {
 		return professionCodes.toArray(new ProfessionCode[0]);
 	}
 
-	private List<ResolvedOccupationFilterDto> filterMappings(List<ResolvedOccupationFilterDto> occupations) {
+	private List<ResolvedOccupationFilterDto> filterX28Mappings(List<ResolvedOccupationFilterDto> occupations) {
 		return occupations.stream()
 				.filter(resolvedOccupationFilterDto -> resolvedOccupationFilterDto.getType().equals(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.X28))
 				.peek(filteredOccupations -> {
