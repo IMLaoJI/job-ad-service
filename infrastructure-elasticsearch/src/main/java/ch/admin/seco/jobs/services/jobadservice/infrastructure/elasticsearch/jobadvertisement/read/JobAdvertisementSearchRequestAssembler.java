@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -67,7 +68,7 @@ public class JobAdvertisementSearchRequestAssembler {
 
 	private Boolean isPermanent(ResolvedSearchFilterDto searchFilter) {
 		final ContractType contractType = searchFilter.getContractType();
-		if(contractType == null){
+		if (contractType == null) {
 			return null;
 		}
 		switch (contractType) {
@@ -92,8 +93,19 @@ public class JobAdvertisementSearchRequestAssembler {
 			if (mappings == null || mappings.isEmpty()) {
 				continue;
 			}
-			mappings
-					.forEach((key, value) -> professionCodes.add(new ProfessionCode(ProfessionCodeType.fromString(key.toString()), value)));
+			final Map<ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType, String> collect = occupations.stream()
+					.filter(i -> i.getType().equals(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.X28))
+					.peek(occupations2 -> {
+						occupations2.getMappings().remove(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.CHISCO3);
+						occupations2.getMappings().remove(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.CHISCO5);
+						occupations2.getMappings().remove(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.BFS);
+					})
+					.collect(Collectors.toMap(ResolvedOccupationFilterDto::getType, ResolvedOccupationFilterDto::getCode));
+
+			collect
+					.forEach((key, value) -> {
+						professionCodes.add(new ProfessionCode(ProfessionCodeType.fromString(key.toString()), value));
+					});
 		}
 		return professionCodes.toArray(new ProfessionCode[0]);
 	}
