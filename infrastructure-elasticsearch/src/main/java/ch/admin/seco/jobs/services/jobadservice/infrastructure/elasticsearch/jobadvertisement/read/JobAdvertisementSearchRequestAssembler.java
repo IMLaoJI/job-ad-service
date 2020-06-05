@@ -7,6 +7,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.search.JobAdvertisementSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.ResolvedSearchProfileDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.CantonFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.ResolvedOccupationFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.ResolvedSearchFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.GeoPoint;
@@ -126,8 +127,8 @@ public class JobAdvertisementSearchRequestAssembler {
 		if (resolvedSearchProfileDto.getSearchFilter().getCantons().isEmpty()) {
 			return null;
 		}
-		return resolvedSearchProfileDto.getSearchFilter().getLocations().stream()
-				.map(LocationDto::getCantonCode)
+		return resolvedSearchProfileDto.getSearchFilter().getCantons().stream()
+				.map(CantonFilterDto::getCode)
 				.toArray(String[]::new);
 	}
 
