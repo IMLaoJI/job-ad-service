@@ -2,16 +2,20 @@ package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
 import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
-import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
-import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Employment;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
 import org.junit.After;
 import org.junit.Before;
@@ -23,21 +27,28 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.ApprovalDtoTestFixture.testApprovalDto;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementFromAvamDtoTestFixture.testCreateJobAdvertisementDto;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementFromAvamDtoTestFixture.testCreateJobAdvertisementDtoWithCompanyAnonymous;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.PublicationDtoTestFixture.testPublicationDtoWithCompanyAnonymous;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.RejectionDtoTestFixture.testRejectionDto;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.*;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_APPROVED;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_REJECTED;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_UPDATED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.ApplyChannelFixture.testApplyChannel;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.ApplyChannelFixture.testDisplayApplyChannel;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.CompanyFixture.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.CompanyFixture.testCompany;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.CompanyFixture.testDisplayCompany;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture.testJobAdvertisement;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.PublicationFixture.testPublicationEmpty;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.fixture.JobCenterTestFixture.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.fixture.JobCenterTestFixture.createJobCenterUser;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.fixture.JobCenterTestFixture.testJobCenter;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.fixture.JobCenterTestFixture.testJobCenterWithUserDetail;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -59,13 +70,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
     private LocationService locationService;
 
     @Autowired
-    private ProfessionService professionService;
-
-    @Autowired
     private JobCenterService jobCenterService;
-
-    @Autowired
-    private ReportingObligationService reportingObligationService;
 
     @Autowired
     private JobAdvertisementRepository jobAdvertisementRepository;
@@ -167,7 +172,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         when(jobCenterService.findJobCenterByCode(any())).thenReturn(testJobCenterWithUserDetail("jobCenter-name"));
         when(jobCenterService.findJobCenterUserByJobCenterUserId(any())).thenReturn(createJobCenterUser());
         String jobCenterUserName = "Markus Meier";
-        AvamCreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(testCompany().build(), testPublicationDtoWithCompanyAnonymous());
+        CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(testCompany().build(), testPublicationDtoWithCompanyAnonymous());
 
         JobAdvertisementId jobAdvertisementId = sut.createFromAvam(createJobAdvertisementDto);
 
