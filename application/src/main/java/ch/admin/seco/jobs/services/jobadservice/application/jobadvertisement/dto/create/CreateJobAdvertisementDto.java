@@ -1,22 +1,12 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create;
 
-import java.time.LocalDate;
-import java.util.List;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmployerDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
+import java.time.LocalDate;
+import java.util.List;
 
 public class CreateJobAdvertisementDto {
 
@@ -33,6 +23,8 @@ public class CreateJobAdvertisementDto {
     private LocalDate reportingObligationEndDate;
 
     private String JobCenterCode;
+
+    private String JobCenterUserId;
 
     private LocalDate approvalDate;
 
@@ -260,6 +252,14 @@ public class CreateJobAdvertisementDto {
         return this;
     }
 
+    public String getJobCenterUserId() {
+        return JobCenterUserId;
+    }
+
+    public CreateJobAdvertisementDto setJobCenterUserId(String jobCenterUserId) {
+        JobCenterUserId = jobCenterUserId;
+        return this;
+    }
 
     @Override
     public String toString() {

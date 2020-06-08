@@ -1,12 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
@@ -20,6 +13,12 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.LanguageIsoCode;
 import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.util.List;
 
 import static java.util.Collections.singletonList;
 
@@ -45,6 +44,8 @@ public class AvamCreateJobAdvertisementDto {
     private LocalDate reportingObligationEndDate;
 
     private String jobCenterCode;
+
+    private String jobCenterUserId;
 
     @NotNull
     private LocalDate approvalDate;
@@ -139,6 +140,8 @@ public class AvamCreateJobAdvertisementDto {
     public String getJobCenterCode() {
         return jobCenterCode;
     }
+
+
 
     public AvamCreateJobAdvertisementDto setJobCenterCode(String jobCenterCode) {
         this.jobCenterCode = jobCenterCode;
@@ -235,6 +238,15 @@ public class AvamCreateJobAdvertisementDto {
         return this;
     }
 
+    public String getJobCenterUserId() {
+        return jobCenterUserId;
+    }
+
+    public AvamCreateJobAdvertisementDto setJobCenterUserId(String jobCenterUserId) {
+        this.jobCenterUserId = jobCenterUserId;
+        return this;
+    }
+
     public static CreateJobAdvertisementDto toDto(AvamCreateJobAdvertisementDto createJobAdvertisementDto) {
         return new CreateJobAdvertisementDto()
                 .setReportToAvam(false) // TODO: 07/03/2019 fago check this
@@ -244,6 +256,7 @@ public class AvamCreateJobAdvertisementDto {
                 .setReportingObligation(createJobAdvertisementDto.isReportingObligation())
                 .setReportingObligationEndDate(createJobAdvertisementDto.getReportingObligationEndDate())
                 .setJobCenterCode(createJobAdvertisementDto.getJobCenterCode())
+                .setJobCenterUserId(createJobAdvertisementDto.getJobCenterUserId())
                 .setApprovalDate(createJobAdvertisementDto.getApprovalDate())
                 .setContact(createJobAdvertisementDto.getContact())
                 .setPublication(createJobAdvertisementDto.getPublication())
