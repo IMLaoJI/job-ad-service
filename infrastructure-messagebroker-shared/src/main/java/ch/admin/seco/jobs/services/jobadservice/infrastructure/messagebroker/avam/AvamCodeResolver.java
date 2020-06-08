@@ -116,4 +116,10 @@ public class AvamCodeResolver {
             .put("2", Qualification.SEMISKILLED)
             .put("3", Qualification.UNSKILLED)
             .toImmutable();
+
+    public static final MappingBuilder<String, EmploymentTermType> EMPLOYMENT_TERM_TYPE = new MappingBuilder<String, EmploymentTermType>()
+            .put("BEFR", EmploymentTermType.FIXED_TERM)
+            .put("UNBEFR", EmploymentTermType.PERMANENT)
+            .put("KURZ", EmploymentTermType.SHORT_TERM)
+            .toImmutable();
 }

@@ -11,10 +11,10 @@
 | externalReference | String(255) | Your internal reference to this job ad | Optional |
 | reportToAvam | Boolean | Should the ad be transmitted to the PES (RAV)? | Required (`true` or `false`) | Usually false. Use this option if you want a PES agent to know about your vacancy
 | numberOfJobs | String(3) | The number of identical positions | Optional | Use this option only if you have a number of identical vacancies. The number will be transmitted to the PES agent. 
-| contact | <<Contact>> | Contact person about the job ad | Required | Administrative contact, not for publication
+| contact | <<Contact>> | Contact person about the job ad | Required | Administrative contact; not for publication, will be treated confidentially
 | jobDescriptions | Array<<<JobDescription>>> | Language specific title and description | Required 1..4 | The text of the job advertisement; may be multilingual
-| company | <<Company>> | The company that handles the recruitment | Required | May be a private employment agency acting as surrogate
-| employer | <<Employer>> | The actual employer that offers the job | Required, if _company.surrogate_ is `true` | For administrative purposes, not for publication
+| company | <<Company>> | The company that handles the recruitment | Required | May be a private placement agency or hiring of services agency
+| employer | <<Employer>> | The actual employer that offers the job | Required, if _company.surrogate_ is `true` | Not for publication, will be treated confidentially
 | employment | <<Employment>> | Certain employment conditions | Required |
 | location | <<Location>> | The work location | Required |
 | occupation | <<Occupation>> | Occupation, education and work experience | Required |
@@ -27,7 +27,8 @@
 ==== Contact
 Provide an administrative contact (e. g. an HR employee).
 
-Important: this contact is used for email notifications concerning the reporting obligation
+Important: this contact is used for email notifications concerning the reporting obligation.
+The contact details are not for publication and will be treated confidentially.
 [cols="30,10,30,30"]
 |===
 | Path | Type | Description | Constraints
@@ -58,9 +59,9 @@ The company that handles the recruitment. This information is published.
 | Path | Type | Description | Constraints
 
 | name | String(255) | The name of the company | Required
-| street | String(50) | | Optional
-| houseNumber | String(10) | | Optional
-| postOfficeBoxNumber | String(10) | | Optional
+| street | String(50) | | Provide a street or post office box address
+| houseNumber | String(10) | | Provide a street or post office box address
+| postOfficeBoxNumber | String(10) | | Provide a street or post office box address
 | postOfficeBoxPostalCode | String(10) | | Optional
 | postOfficeBoxCity | String(100) | | Optional
 | postalCode | String(10) | | Required. Must be a valid swiss postal code if the company is located in Switzerland
@@ -68,12 +69,14 @@ The company that handles the recruitment. This information is published.
 | countryIsoCode | String(2) | | Required (ISO 3166-1 alpha-2)
 | website | String(255) | | Optional (Format: http://www.example.org)
 | phone | String(20) | | Optional (Format: +41123456789)
-| email | String(50) | Only one addresses allowed | Optional
+| email | String(50) | Only one address allowed | Optional
 | surrogate | Boolean | Does the company act as a surrogate for the actual employer? | Required (`true` or `false`)
 |===
 
 ==== Employer
-Must be provided if the company handling the recruitment is not the actual employer; will not be published.
+If the recruitment is handled by a private placement agency or hiring of services agency, the _company.surrogate_ flag
+MUST be set to `true` and the actual employer information MUST be provided. This information is required for
+administrative purposes and will be treated strictly confidentially by SECO and the Public Employment Service.
 [cols="30,10,30,30"]
 |===
 | Path | Type | Description | Constraints
@@ -147,6 +150,7 @@ Provide at least one channel for applications.
 
 ==== PublicContact
 Provide a public contact if you want to give applicants the opportunity to ask questions about the job.
+The contact details will be published.
 [cols="30,10,30,30"]
 |===
 | Path | Type | Description | Constraints
@@ -178,96 +182,107 @@ in the Job-Room public area if the publicDisplay flag is set, otherwise not.
 [source,json]
 ----
 {
-    "externalUrl": "string",
-    "externalReference": "string",
-    "reportToAvam": true,
-    "numberOfJobs": 1,
-    "contact": {
-        "languageIsoCode": "string",
-        "salutation": "string",
-        "firstName": "string",
-        "lastName": "string",
-        "phone": "string",
-        "email": "string"
-    },
-    "jobDescriptions": [
-        {
-            "languageIsoCode": "string",
-            "title": "string",
-            "description": "string"
-        }
-    ],
-    "company": {
-        "name": "string",
-        "street": "string",
-        "houseNumber": "string",
-        "postOfficeBoxNumber": "string",
-        "postOfficeBoxPostalCode": "string",
-        "postOfficeBoxCity": "string",
-        "postalCode": "string",
-        "city": "string",
-        "countryIsoCode": "string",
-        "website": "string",
-        "phone": "string",
-        "email": "string",
-        "surrogate": true
-    },
-    "employer": {
-        "name": "string",
-        "postalCode": "string",
-        "city": "string",
-        "countryIsoCode": "string"
-    },
-    "employment": {
-        "startDate": "string",
-        "endDate": "string",
-        "shortEmployment": true,
-        "immediately": true,
-        "permanent": true,
-        "workloadPercentageMax": 0,
-        "workloadPercentageMin": 0,
-        "workForms": [
-            "string"
-        ]
-    },
-    "location": {
-        "remarks": "string",
-        "postalCode": "string",
-        "city": "string",
-        "countryIsoCode": "string"
-    },
-    "occupation": {
-        "avamOccupationCode": "string",
-        "workExperience": "string",
-        "educationCode": "string"
-    },
-    "languageSkills": [
-        {
-            "languageIsoCode": "string",
-            "spokenLevel": "string",
-            "writtenLevel": "string"
-        }
-    ],
-    "applyChannel": {
-        "mailAddress": "string",
-        "emailAddress": "string",
-        "phoneNumber": "string",
-        "formUrl": "string",
-        "additionalInfo": "string"
-    },
-    "publicContact": {
-        "salutation": "string",
-        "firstName": "string",
-        "lastName": "string",
-        "phone": "string",
-        "email": "string"
-    },
-    "publication": {
-        "startDate": "string",
-        "endDate": "string",
-        "euresDisplay": true,
-        "publicDisplay": true
-    }
+   "externalUrl":"https://jobs.admin.ch/offene-stellen/Bauarbeiter-1234",
+   "externalReference":"1234",
+   "reportToAvam":false,
+   "numberOfJobs":1,
+   "contact":{
+      "languageIsoCode":"de",
+      "salutation":"MR",
+      "firstName":"Max",
+      "lastName":"Mustermann",
+      "phone":"+41311234567",
+      "email":"max.mustermann@example.com"
+   },
+   "jobDescriptions":[
+      {
+         "languageIsoCode":"de",
+         "title":"Bauarbeiter",
+         "description":
+         "# Anforderungen
+         - Zwingende Baustellenkenntnisse im Hoch- und Tiefbau
+         - Kenntnisse in den Schalungssystemen Doka, Peri, Meva und Noe
+         - Sicherheitsschulung von Vorteil
+         - Handwerkliches Geschick
+
+         # Aufgaben
+         - Betonieren
+         - Ein- und Ausschalen
+         - Aufräumen der Baustelle
+         - Allgemeine Mithilfe auf Hoch- und Tiefbau Baustellen"
+      }
+   ],
+   "company":{
+      "name":"Muster AG",
+      "street":"Münsterstrasse",
+      "houseNumber":"9",
+      "postOfficeBoxNumber":null,
+      "postOfficeBoxPostalCode":null,
+      "postOfficeBoxCity":null,
+      "postalCode":"3007",
+      "city":"Bern",
+      "countryIsoCode":"CH",
+      "website":"https://www.musterag.ch",
+      "phone":"+41321234567",
+      "email":"info@musterag.ch",
+      "surrogate":true
+   },
+   "employer":{
+      "name":"Example company",
+      "postalCode":"1200",
+      "city":"Geneva",
+      "countryIsoCode":"CH"
+   },
+   "employment":{
+      "startDate":"2020-01-20",
+      "endDate":null,
+      "shortEmployment":false,
+      "immediately":false,
+      "permanent":true,
+      "workloadPercentageMax":100,
+      "workloadPercentageMin":100,
+      "workForms":[
+         "NIGHT_WORK"
+      ]
+   },
+   "location":{
+      "remarks":null,
+      "postalCode":"3003",
+      "city":"Bern",
+      "countryIsoCode":"CH"
+   },
+   "occupation":{
+      "avamOccupationCode":"52502",
+      "workExperience":"LESS_THAN_1_YEAR",
+      "educationCode":"132"
+   },
+   "languageSkills":[
+      {
+         "languageIsoCode":"de",
+         "spokenLevel":"PROFICIENT",
+         "writtenLevel":"INTERMEDIATE"
+      }
+   ],
+   "applyChannel":{
+      "mailAddress":null,
+      "emailAddress":"bewerbungen@musterag.ch",
+      "phoneNumber":"+41311234567",
+      "formUrl":null,
+      "additionalInfo":null
+   },
+   "publicContact":{
+      "salutation":"MR",
+      "firstName":"Max",
+      "lastName":"Muster",
+      "phone":"+41311234567",
+      "email":"max.muster@musterag.ch"
+   },
+   "publication":{
+      "startDate":"2020-01-01",
+      "endDate":"2020-02-01",
+      "euresDisplay":true,
+      "publicDisplay":true
+   }
 }
 ----
 
@@ -279,112 +294,133 @@ based on the occupation code provided.
 [source,json]
 ----
 {
-    "id": "string",
-    "status": "string",
-    "sourceSystem": "string",
-    "stellennummerEgov": "string",
-    "stellennummerAvam": "string",
-    "externalReference": "string",
-    "fingerprint": "string",
-    "jobCenterCode": "string",
-    "reportToAvam": true,
-    "reportingObligation": true,
-    "reportingObligationEndDate": "string",
-    "approvalDate": "string",
-    "rejectionCode": "string",
-    "rejectionDate": "string",
-    "rejectionReason": "string",
-    "cancellationCode": "string",
-    "cancellationDate": "string",
-    "jobContent": {
-        "externalUrl": "string",
-        "jobDescriptions": [
-            {
-                "languageIsoCode": "string",
-                "title": "string",
-                "description": "string"
-            }
-        ],
-        "company": {
-            "name": "string",
-            "street": "string",
-            "houseNumber": "string",
-            "postOfficeBoxNumber": "string",
-            "postOfficeBoxPostalCode": "string",
-            "postOfficeBoxCity": "string",
-            "postalCode": "string",
-            "city": "string",
-            "countryIsoCode": "string",
-            "website": "string",
-            "phone": "string",
-            "email": "string",
-            "surrogate": true
-        },
-        "employment": {
-            "startDate": "string",
-            "endDate": "string",
-            "shortEmployment": true,
-            "immediately": true,
-            "permanent": true,
-            "workloadPercentageMax": 0,
-            "workloadPercentageMin": 0,
-            "workForms": [
-                "string"
-            ]
-        },
-        "location": {
-            "remarks": "string",
-            "postalCode": "string",
-            "city": "string",
-            "communalCode": "string",
-            "regionCode": "string",
-            "cantonCode": "string",
-            "countryIsoCode": "string",
-            "coordinates": {
-                "latitude": 0,
-                "longitude": 0
-            }
-        },
-        "occupations": [
-            {
-                "avamOccupationCode": "string",
-                "workExperience": "string",
-                "educationCode": "string"
-            }
-        ],
-        "languageSkills": [
-            {
-                "languageIsoCode": "string",
-                "spokenLevel": "string",
-                "writtenLevel": "string"
-            }
-        ],
-        "applyChannel": {
-            "mailAddress": "string",
-            "emailAddress": "string",
-            "phoneNumber": "string",
-            "formUrl": "string",
-            "additionalInfo": "string"
-        },
-        "publicContact": {
-            "salutation": "string",
-            "firstName": "string",
-            "lastName": "string",
-            "phone": "string",
-            "email": "string"
-        }
+  "id": "4feae516-d62c-11e9-ab5e-005056ac3479",
+  "status": "INSPECTING",
+  "sourceSystem": "API",
+  "externalReference": "1234",
+  "stellennummerEgov": "300002290",
+  "stellennummerAvam": null,
+  "fingerprint": null,
+  "reportingObligation": true,
+  "reportingObligationEndDate": null,
+  "reportToAvam": false,
+  "jobCenterCode": "BEAF0",
+  "approvalDate": null,
+  "rejectionDate": null,
+  "rejectionCode": null,
+  "rejectionReason": null,
+  "cancellationDate": null,
+  "cancellationCode": null,
+  "jobContent": {
+    "externalUrl": "https://jobs.admin.ch/offene-stellen/Bauarbeiter-1234",
+    "numberOfJobs": "1",
+    "jobDescriptions": [
+      {
+        "languageIsoCode": "de",
+        "title": "Bauarbeiter",
+        "description":
+         "# Anforderungen
+         - Zwingende Baustellenkenntnisse im Hoch- und Tiefbau
+         - Kenntnisse in den Schalungssystemen Doka, Peri, Meva und Noe
+         - Sicherheitsschulung von Vorteil
+         - Handwerkliches Geschick
+
+         # Aufgaben
+         - Betonieren
+         - Ein- und Ausschalen
+         - Aufräumen der Baustelle
+         - Allgemeine Mithilfe auf Hoch- und Tiefbau Baustellen"
+      }
+    ],
+    "company": {
+      "name": "Muster AG",
+      "street": "Münsterstrasse",
+      "houseNumber": "9",
+      "postalCode": "3007",
+      "city": "Bern",
+      "countryIsoCode": "CH",
+      "postOfficeBoxNumber": null,
+      "postOfficeBoxPostalCode": null,
+      "postOfficeBoxCity": null,
+      "phone": "+41 32 123 45 67",
+      "email": "info@musterag.ch",
+      "website": "https://www.musterag.ch",
+      "surrogate": true
     },
-    "publication": {
-        "startDate": "string",
-        "endDate": "string",
-        "euresDisplay": true,
-        "euresAnonymous": true,
-        "publicDisplay": true,
-        "restrictedDisplay": true,
-        "companyAnonymous": true
+    "employment": {
+      "startDate": "2020-01-20",
+      "endDate": null,
+      "shortEmployment": false,
+      "immediately": false,
+      "permanent": true,
+      "workloadPercentageMin": "100",
+      "workloadPercentageMax": "100",
+      "workForms": [
+        "NIGHT_WORK"
+      ]
+    },
+    "location": {
+      "remarks": null,
+      "city": "Bern",
+      "postalCode": "3003",
+      "communalCode": "351",
+      "regionCode": "BE01",
+      "cantonCode": "BE",
+      "countryIsoCode": "CH",
+      "coordinates": null
+    },
+    "occupations": [
+      {
+        "avamOccupationCode": "52502",
+        "workExperience": "LESS_THAN_1_YEAR",
+        "educationCode": "132"
+      }
+    ],
+    "languageSkills": [
+      {
+        "languageIsoCode": "de",
+        "spokenLevel": "PROFICIENT",
+        "writtenLevel": "INTERMEDIATE"
+      }
+    ],
+    "applyChannel": {
+      "mailAddress": null,
+      "emailAddress": "bewerbungen@musterag.ch",
+      "phoneNumber": "+41 31 123 45 67",
+      "formUrl": null,
+      "additionalInfo": null
+    },
+    "publicContact": {
+      "salutation": "MR",
+      "firstName": "Max",
+      "lastName": "Muster",
+      "phone": "+41 31 123 45 67",
+      "email": "max.muster@musterag.ch"
     }
+  },
+  "publication": {
+    "startDate": "2020-01-01",
+    "endDate": "2020-02-01",
+    "euresDisplay": true,
+    "euresAnonymous": false,
+    "publicDisplay": true,
+    "restrictedDisplay": true,
+    "companyAnonymous": false
+  }
 }
 ----
+
+=== Access token
+An access token is returned in the response headers.
+The token can be used to check the state of jobs under the reporting obligation. The link is built according to the following
+pattern:
+
+`\https://www.job-room.ch/manage-job-ads/{id of job-ad}?token={token}`
+[cols="10,20,70"]
+|===
+| Name | Type | Description
+| token | String | The access token
+|===
 
 === Response status
 [cols="10,20,70"]

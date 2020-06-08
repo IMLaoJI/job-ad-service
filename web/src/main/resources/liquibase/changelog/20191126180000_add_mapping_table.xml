@@ -1,0 +1,78 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="fago" id="20191126180000-1">
+        <createTable tableName="occupation_label_mapping_for_migration">
+
+            <column name="ID" type="varchar(36)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="avam_code_old" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="avam_code_new" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="bfs_code_new" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="chisco3_code" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="chisco5_code" type="varchar(5)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="description" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20191126180000-2" author="fago" runOnChange="true">
+        <validCheckSum>ANY</validCheckSum>
+        <delete tableName="occupation_label_mapping_for_migration"/>
+        <loadData tableName="occupation_label_mapping_for_migration"
+                  file="liquibase/changelog/data/occupation-label-mapping-for-migration.csv"/>
+    </changeSet>
+
+    <changeSet author="fago" id="20191126180000-3">
+        <createTable tableName="avam_old_with_ch_isco_codes_mapping_for_migration">
+
+            <column name="ID" type="varchar(36)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="avam_code_old" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="description" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="chisco3_code" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="chisco5_code" type="varchar(5)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20191126180000-4" author="fago" runOnChange="true">
+        <validCheckSum>ANY</validCheckSum>
+        <delete tableName="avam_old_with_ch_isco_codes_mapping_for_migration"/>
+        <loadData tableName="avam_old_with_ch_isco_codes_mapping_for_migration"
+                  file="liquibase/changelog/data/avam-old-with-ch-isco-codes-mapping-for-migration.csv"/>
+    </changeSet>
+
+
+</databaseChangeLog>

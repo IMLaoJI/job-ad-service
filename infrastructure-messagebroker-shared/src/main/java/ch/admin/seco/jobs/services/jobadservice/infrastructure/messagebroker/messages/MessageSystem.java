@@ -4,6 +4,6 @@ public enum MessageSystem {
 
     AVAM,
     JOB_AD_SERVICE,
-    X28
+    EXTERNAL
 
 }

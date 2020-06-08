@@ -1,14 +1,15 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.service.reference.jobcenter;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-
 import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenterAddress;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenterUser;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 class DefaultJobCenterService implements JobCenterService {
@@ -47,26 +48,43 @@ class DefaultJobCenterService implements JobCenterService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Optional<JobCenterUser> findJobCenterUserByJobCenterUserId(String jobCenterUserId) {
+        return jobCenterApiClient.findJobCenterUserByJobCenterUseId(jobCenterUserId)
+                .map(this::toJobCenterUser);
+    }
+
     private JobCenter toJobCenter(JobCenterResource jobCenterResource) {
-        AddressResource jobCenterAddressResource = jobCenterResource.getAddress();
-        return new JobCenter(
-                jobCenterResource.getId(),
-                jobCenterResource.getCode(),
-                jobCenterResource.getEmail(),
-                jobCenterResource.getPhone(),
-                jobCenterResource.getFax(),
-                jobCenterResource.isShowContactDetailsToPublic(),
-                toJobCenterAddress(jobCenterAddressResource)
-        );
+        return JobCenter.builder()
+                .setCode(jobCenterResource.getCode())
+                .setEmail(jobCenterResource.getEmail())
+                .setPhone(jobCenterResource.getPhone())
+                .setFax(jobCenterResource.getFax())
+                .setContactDisplayStyle(jobCenterResource.getContactDisplayStyle())
+                .setAddress(toJobCenterAddress(jobCenterResource.getAddress()))
+                .build();
+    }
+
+    private JobCenterUser toJobCenterUser(JobCenterUserResource jobCenterUserResource) {
+        return JobCenterUser.builder()
+                .setCode(jobCenterUserResource.getCode())
+                .setEmail(jobCenterUserResource.getEmail())
+                .setPhone(jobCenterUserResource.getPhone())
+                .setFax(jobCenterUserResource.getFax())
+                .setExternalId(jobCenterUserResource.getExternalId())
+                .setFirstName(jobCenterUserResource.getFirstName())
+                .setLastName(jobCenterUserResource.getLastName())
+                .setAddress(toJobCenterAddress(jobCenterUserResource.getAddress()))
+                .build();
     }
 
     private JobCenterAddress toJobCenterAddress(AddressResource jobCenterAddressResource) {
-        return new JobCenterAddress(
-                jobCenterAddressResource.getName(),
-                jobCenterAddressResource.getCity(),
-                jobCenterAddressResource.getStreet(),
-                jobCenterAddressResource.getHouseNumber(),
-                jobCenterAddressResource.getZipCode()
-        );
+        return JobCenterAddress.builder()
+                .setName(jobCenterAddressResource.getName())
+                .setCity(jobCenterAddressResource.getCity())
+                .setStreet(jobCenterAddressResource.getStreet())
+                .setHouseNumber(jobCenterAddressResource.getHouseNumber())
+                .setZipCode(jobCenterAddressResource.getZipCode())
+                .build();
     }
 }

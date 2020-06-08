@@ -38,7 +38,7 @@ public class AvamWebServiceClient {
     }
 
     public void deregister(JobAdvertisement jobAdvertisement) {
-        LOG.info("Start sending deregister of jobAdvertisement id=" + jobAdvertisement.getId().getValue() + " stellennummerAvam=" + jobAdvertisement.getStellennummerEgov() + " stellennummerEgov=" + jobAdvertisement.getStellennummerEgov() + " to AVAM");
+        LOG.info("Start sending deregister of jobAdvertisement id=" + jobAdvertisement.getId().getValue() + " stellennummerAvam=" + jobAdvertisement.getStellennummerAvam() + " stellennummerEgov=" + jobAdvertisement.getStellennummerEgov() + " to AVAM");
         LOG.debug(jobAdvertisement.toString());
         AvamAction action = AvamAction.ABMELDUNG;
         TOsteEgov tOsteEgov = assembler.toOsteEgov(jobAdvertisement, action);
@@ -61,8 +61,9 @@ public class AvamWebServiceClient {
     }
 
     void handleResponse(JobAdvertisementId jobAdvertisementId, AvamAction action, DeliverOsteResponse response) {
-        String returnCode = response.getDeliverOsteReturn();
-        if (!AVAM_RESPONSE_OK.equals(StringUtils.trim(returnCode))) {
+        String returnCode = StringUtils.trim(response.getDeliverOsteReturn());
+        LOG.info("Action {} for jobAdvertisement id={} receives AVAM response: {}", action.name(), jobAdvertisementId, StringUtils.left(returnCode, 150));
+        if (!AVAM_RESPONSE_OK.equals(returnCode)) {
             throw new AvamException(jobAdvertisementId, action.name(), returnCode);
         }
     }

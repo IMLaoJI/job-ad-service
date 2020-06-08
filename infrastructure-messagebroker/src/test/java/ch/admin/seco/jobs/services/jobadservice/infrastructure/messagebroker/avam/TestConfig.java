@@ -8,31 +8,49 @@ import ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.Mes
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.integration.channel.DirectChannel;
+import org.springframework.integration.channel.NullChannel;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.SubscribableChannel;
 
 @SpringBootApplication
 public class TestConfig {
 
-    @MockBean
-    MailSenderService mailSenderService;
+	@MockBean
+	MailSenderService mailSenderService;
 
-    @MockBean
-    JobAdvertisementApplicationService jobAdvertisementApplicationService;
+	@MockBean
+	JobAdvertisementApplicationService jobAdvertisementApplicationService;
 
-    @MockBean
-    JobCenterService jobCenterService;
+	@MockBean
+	JobCenterService jobCenterService;
 
-    @MockBean
-    MessageBrokerChannels messageBrokerChannels;
+	@MockBean
+	JobAdvertisementRepository jobAdvertisementRepository;
 
-    @MockBean
-    JobAdvertisementRepository jobAdvertisementRepository;
+	@Bean
+	MessageBrokerChannels messageBrokerChannels() {
+		return new MessageBrokerChannels() {
 
-    @Bean
-    public ResourceBundleMessageSource messageSource() {
-        ResourceBundleMessageSource source = new ResourceBundleMessageSource();
-        source.setBasenames("mails/i18n/mail-messages");
-        return source;
-    }
+			@Override
+			public SubscribableChannel jobAdIntActionChannel() {
+				return new DirectChannel();
+			}
 
+			@Override
+			public SubscribableChannel userEventChannel() {
+				return new DirectChannel();
+			}
+
+			@Override
+			public MessageChannel jobAdIntEventChannel() {
+				return new NullChannel();
+			}
+
+			@Override
+			public MessageChannel jobAdEventChannel() {
+				return new NullChannel();
+			}
+		};
+	}
 }

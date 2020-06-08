@@ -3,6 +3,7 @@ package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Embeddable;
+import java.util.Objects;
 
 @Embeddable
 @Access(AccessType.FIELD)
@@ -26,5 +27,19 @@ public class GeoPoint {
 
     public double getLat() {
         return lat;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GeoPoint geoPoint = (GeoPoint) o;
+        return Double.compare(geoPoint.lon, lon) == 0 &&
+                Double.compare(geoPoint.lat, lat) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(lon, lat);
     }
 }

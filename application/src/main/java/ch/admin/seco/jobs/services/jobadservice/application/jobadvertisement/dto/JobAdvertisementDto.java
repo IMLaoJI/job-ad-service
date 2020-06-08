@@ -37,6 +37,8 @@ public class JobAdvertisementDto {
 
     private String jobCenterCode;
 
+    private String jobCenterUserId;
+
     private LocalDate approvalDate;
 
     private LocalDate rejectionDate;
@@ -178,6 +180,15 @@ public class JobAdvertisementDto {
         return this;
     }
 
+    public JobAdvertisementDto setJobCenterUserId(String jobCenterUserId) {
+        this.jobCenterUserId = jobCenterUserId;
+        return this;
+    }
+
+    public String getJobCenterUserId() {
+        return jobCenterUserId;
+    }
+
     public LocalDate getApprovalDate() {
         return approvalDate;
     }
@@ -274,6 +285,7 @@ public class JobAdvertisementDto {
                 .setReportingObligationEndDate(jobAdvertisement.getReportingObligationEndDate())
                 .setReportToAvam(jobAdvertisement.isReportToAvam())
                 .setJobCenterCode(jobAdvertisement.getJobCenterCode())
+                .setJobCenterUserId(jobAdvertisement.getJobCenterUserId())
                 .setApprovalDate(jobAdvertisement.getApprovalDate())
                 .setRejectionDate(jobAdvertisement.getRejectionDate())
                 .setRejectionCode(jobAdvertisement.getRejectionCode())
@@ -296,4 +308,5 @@ public class JobAdvertisementDto {
         return toDto(jobAdvertisement)
                 .setOwner(OwnerDto.toDto(jobAdvertisement.getOwner()));
     }
+
 }

@@ -2,7 +2,6 @@ package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
 import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
-import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
@@ -24,7 +23,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Propagation;
@@ -39,25 +37,11 @@ import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisem
 import static ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine.reset;
 import static ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine.useFixedClockAt;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode.OCCUPIED_OTHER;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.ARCHIVED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.CANCELLED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.CREATED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.INSPECTING;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REFINING;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.JOBROOM;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.RAV;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_BLACKOUT_EXPIRED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_CANCELLED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_INSPECTING;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_PUBLISH_EXPIRED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_PUBLISH_PUBLIC;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job02;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job03;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job04;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job05;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.testJobAdvertisementJobWithStatusAndReportingObligationEndDate;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.testJobAdvertisementWithAnonymousCompany;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.testJobAdvertisementWithStatusAndPublicationEndDate;
@@ -80,25 +64,21 @@ public class JobAdvertisementApplicationServiceTest {
 
     private static final String TEST_STELLEN_NUMMER_EGOV = "1000000";
 
-    @MockBean
     private DomainEventMockUtils domainEventMockUtils;
 
-    @MockBean
+    @Autowired
     private ReportingObligationService reportingObligationService;
 
-    @MockBean
+    @Autowired
     private LocationService locationService;
 
-    @MockBean
-    private ProfessionService professionService;
-
-    @MockBean
+    @Autowired
     private JobCenterService jobCenterService;
 
     @Autowired
     private JobAdvertisementRepository jobAdvertisementRepository;
 
-    @MockBean
+    @Autowired
     private DataFieldMaxValueIncrementer egovNumberGenerator;
 
     @Autowired
@@ -166,7 +146,7 @@ public class JobAdvertisementApplicationServiceTest {
     public void shouldSetReportingObligationToTrueWhenLocationIsSwiss() {
         //Prepare
         CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto();
-        when(reportingObligationService.hasReportingObligation(AVAM, "avamCode", "BE")).thenReturn(true);
+        when(reportingObligationService.hasReportingObligation(AVAM, "101970", "BE")).thenReturn(true);
 
         checkReportingObligation(createJobAdvertisementDto, true);
     }
@@ -221,7 +201,7 @@ public class JobAdvertisementApplicationServiceTest {
         // then
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.findById(job01.id()).get();
         assertThat(jobAdvertisement.getStatus()).isEqualTo(REFINING);
-        // TODO: uncomment once we have x28-api
+        // TODO: uncomment once we have external-api
 //        domainEventMockUtils.assertSingleDomainEventPublished(JobAdvertisementEvents.JOB_ADVERTISEMENT_REFINING.getDomainEventType());
     }
 
@@ -270,10 +250,25 @@ public class JobAdvertisementApplicationServiceTest {
     }
 
     @Test
-    public void shouldNotRepublish() {
+    public void shouldNotRepublishIfExternalJobAdReactivationExceeded() {
         // given
         useFixedClockAt(LocalDateTime.now().minusDays(EXTERN_JOB_AD_REACTIVATION_DAY_NUM + 1));
         jobAdvertisementRepository.save(testJobAdvertisementWithStatusAndPublicationEndDate(job01.id(), ARCHIVED, null));
+        reset();
+
+        // when
+        sut.republishIfArchived(job01.id());
+
+        // then
+        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.findById(job01.id()).get();
+        assertThat(jobAdvertisement.getStatus()).isEqualTo(ARCHIVED);
+    }
+
+    @Test
+    public void shouldNotRepublishIfPublicationEndDateExceeded() {
+        // given
+        useFixedClockAt(LocalDateTime.now().minusDays(EXTERN_JOB_AD_REACTIVATION_DAY_NUM));
+        jobAdvertisementRepository.save(testJobAdvertisementWithStatusAndPublicationEndDate(job01.id(), ARCHIVED, now().minusDays(1)));
         reset();
 
         // when
@@ -296,7 +291,7 @@ public class JobAdvertisementApplicationServiceTest {
         );
 
         // when
-        this.sut.scheduledCheckPublicationStarts();
+        this.sut.checkPublicationStarts();
 
         // then
         domainEventMockUtils.assertMultipleDomainEventPublished(2, JOB_ADVERTISEMENT_PUBLISH_PUBLIC.getDomainEventType());
@@ -316,7 +311,7 @@ public class JobAdvertisementApplicationServiceTest {
         );
 
         // when
-        this.sut.scheduledCheckBlackoutPolicyExpiration();
+        this.sut.checkBlackoutPolicyExpiration();
 
         // then
         DomainEvent domainEvent = domainEventMockUtils.assertSingleDomainEventPublished(JOB_ADVERTISEMENT_BLACKOUT_EXPIRED.getDomainEventType());
@@ -337,7 +332,7 @@ public class JobAdvertisementApplicationServiceTest {
         );
 
         // when
-        this.sut.scheduledCheckPublicationExpiration();
+        this.sut.checkPublicationExpiration();
 
         // then
         DomainEvent domainEvent = domainEventMockUtils.assertSingleDomainEventPublished(JOB_ADVERTISEMENT_PUBLISH_EXPIRED.getDomainEventType());
@@ -353,7 +348,7 @@ public class JobAdvertisementApplicationServiceTest {
                     testJobAdvertisementWithAnonymousCompany(new JobAdvertisementId("Job-Add-Test" + i), CREATED, JOB_CENTER_CODE)
             );
         }
-        JobCenter testRav = testJobCenter();
+        JobCenter testRav = testJobCenter("jobCenter-name");
         when(this.jobCenterService.findAllJobCenters()).thenReturn(singletonList(testRav));
 
         // when

@@ -1,9 +1,12 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.events;
 
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.channel.QueueChannel;
+
+import ch.admin.seco.alv.shared.spring.integration.actuator.QueueChannelHealthProvider;
 
 @Configuration
 @EnableConfigurationProperties(DomainEventGatewayProperties.class)
@@ -11,19 +14,25 @@ class DomainEventGatewayConfig {
 
     private final DomainEventGatewayProperties domainEventGatewayProperties;
 
-    private final MessageBrokerChannels messageBrokerChannels;
+    private final DomainEventIntegrationChannels domainEventIntegrationChannels;
 
-    DomainEventGatewayConfig(DomainEventGatewayProperties domainEventGatewayProperties, MessageBrokerChannels messageBrokerChannels) {
+    DomainEventGatewayConfig(DomainEventGatewayProperties domainEventGatewayProperties, DomainEventIntegrationChannels domainEventIntegrationChannels) {
         this.domainEventGatewayProperties = domainEventGatewayProperties;
-        this.messageBrokerChannels = messageBrokerChannels;
+        this.domainEventIntegrationChannels = domainEventIntegrationChannels;
     }
 
     @Bean
-    public DomainEventGateway domainEventGateway() {
-        return new DomainEventGateway(
-                this.messageBrokerChannels.jobAdEventChannel(),
-                this.domainEventGatewayProperties.getRelevantEventTypes()
-        );
+    public DomainEventSenderGateway domainEventGateway() {
+        return new DomainEventSenderGateway(this.domainEventIntegrationChannels, this.domainEventGatewayProperties.getRelevantEventTypes());
     }
 
+    @Bean
+    QueueChannelHealthProvider eventQueueChannelHealthProvider() {
+        return new QueueChannelHealthProvider() {
+            @Override
+            public QueueChannel queueChannel() {
+                return domainEventIntegrationChannels.eventGatewayInputChannel();
+            }
+        };
+    }
 }

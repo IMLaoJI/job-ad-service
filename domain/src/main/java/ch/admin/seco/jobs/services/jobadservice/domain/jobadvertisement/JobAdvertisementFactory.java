@@ -81,6 +81,7 @@ public class JobAdvertisementFactory {
                 .setReportingObligationEndDate(creator.getReportingObligationEndDate())
                 .setReportToAvam(true)
                 .setJobCenterCode(creator.getJobCenterCode())
+                .setJobCenterUserId(creator.getJobCenterUserId())
                 .setApprovalDate(creator.getApprovalDate())
                 .setJobContent(creator.getJobContent())
                 .setOwner(toOwner(creator.getAuditUser()))

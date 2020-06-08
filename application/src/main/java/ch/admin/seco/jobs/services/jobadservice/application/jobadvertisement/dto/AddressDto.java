@@ -14,10 +14,8 @@ public class AddressDto {
 
     private String houseNumber;
 
-    @NotBlank
     private String postalCode;
 
-    @NotBlank
     private String city;
 
     private String postOfficeBoxNumber;

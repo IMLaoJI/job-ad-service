@@ -6,7 +6,6 @@ import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Sink;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 
 @EnableBinding(Sink.class)
 public class AvamWebServiceSink {
@@ -30,9 +29,6 @@ public class AvamWebServiceSink {
     }
 
     private boolean mustSendDeregistratonNotification(JobAdvertisement jobAdvertisement) {
-        // send deregistration message only for JobAds registered by JOBROOM or API.
-        return (jobAdvertisement.getStellennummerAvam() != null) &&
-                (SourceSystem.JOBROOM.equals(jobAdvertisement.getSourceSystem())
-                        || SourceSystem.API.equals(jobAdvertisement.getSourceSystem()));
+        return jobAdvertisement.getStellennummerAvam() != null;
     }
 }

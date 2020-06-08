@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        * {
+            font-family: Arial, sans-serif;
+        }
+
+        h3 {
+            font-weight: 100;
+            margin: auto;
+            font-size:24px
+        }
+
+        .jobads {
+            list-style: none;
+            margin: 0;
+            padding-left: 0px;
+        }
+
+        .jobads a{
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .jobad-link {
+            text-decoration: none;
+            text-transform: none;
+        }
+
+        .publication-date {
+            font-style: italic;
+            text-align: right;
+            margin-left: 200px;
+            float: right;
+            font-size: 12px;
+        }
+
+        .jobad {
+            padding: 0.2em 0.5em 0.6em 0;
+            width: 675px;
+            border-top: 1px solid #ccc;
+        }
+
+        .badge {
+            padding: .25em .4em;
+            font-size: 14px;
+        }
+
+        .immediatly {
+            background-color: #ffe8a0;
+        }
+
+        .workload {
+            background-color: #f0f0f0;
+        }
+
+        .location {
+            background-color: #fee0de;
+        }
+
+        .permanent {
+            background-color: #e3f1dc;
+        }
+
+        .reporting-obligation {
+            background-color: #fff;
+        }
+
+        .jobad-content {
+            color: #333;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+
+<p th:text="#{mail.jobalert.header}"></p>
+<p th:if="${jobads!=null and !jobads.empty}" th:text="#{mail.jobalert.body(${searchProfile?.name})}"></p>
+<br>
+<ul class="jobads" th:if="${jobads!=null and !jobads.empty}">
+    <li th:each="jobad: ${jobads}">
+        <div class="jobad">
+            <div class="jobad-content">
+                <a class="jobad-link" th:href="#{mail.jobalert.url(${baseUrl}, ${jobad.id.value})}">
+                    <div class="publication-date" th:text="#{mail.jobad.vacancy} + ${#temporals.format(jobad.publication.startDate, 'dd.MM.yyyy')}"></div>
+                    <h3  style="'float:left'" th:if="${jobad.jobContent.jobDescriptions[0]}"
+                         th:text="${jobad.jobContent.jobDescriptions[0].title}"></h3>
+                    <strong th:style="'font-size: 20px'" th:if="${jobad.jobContent.company}"
+                            th:text="${jobad.jobContent.company.name}"></strong>
+                    <div>
+                        <small class="badge reporting-obligation" th:if="${jobad.reportingObligation}"
+                               th:text="#{mail.jobalert.badge.reporting.obligation}"></small>
+                        <small class="badge location" th:if="${jobad.jobContent.location}"
+                               th:text="${jobad.jobContent.location.city == ''} ? '(CH)' : ${jobad.jobContent.location.city}"></small>
+                        <small class="badge workload"
+                               th:text="${jobad.jobContent.employment.workloadPercentageMin} + '%'"></small>
+
+                        <small class="badge immediatly" th:if="${jobad.jobContent.employment.immediately}"
+                               th:text="#{mail.jobalert.badge.reporting.immediately.truthy}">
+                        </small>
+                        <small class="badge immediatly" th:if="${jobad.jobContent.employment.immediately == false}"
+                               th:text="#{mail.jobalert.badge.reporting.immediately.falsy}">
+                        </small>
+                        <small class="badge permanent" th:if="${jobad.jobContent.employment.permanent}"
+                               th:text="#{mail.jobalert.badge.reporting.permanent.truthy}">
+                        </small>
+                        <small class="badge permanent" th:if="${jobad.jobContent.employment.permanent == false}"
+                               th:text="#{mail.jobalert.badge.reporting.permanent.falsy}">
+                        </small>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </li>
+</ul>
+<div class="jobads" th:if="${jobads==null or jobads.empty}">
+    <p th:text="#{mail.jobalert.no-results.paragraph1(${searchProfile?.name})}"></p>
+    <p th:text="#{mail.jobalert.no-results.paragraph2}"></p>
+</div>
+
+<br>
+<div>
+    <a class="jobad-link"
+       th:href="${deregisterUrl}">
+        <p th:text="#{mail.deregister.link}"></p>
+    </a>
+</div>
+
+<p th:if="${jobads!=null and !jobads.empty}" th:text="#{mail.jobalert.body2}"></p>
+<p th:text="#{mail.jobalert.footer.salutations}"></p>
+<p th:text="#{mail.jobalert.footer.details}"></p>
+
+</body>
+</html>

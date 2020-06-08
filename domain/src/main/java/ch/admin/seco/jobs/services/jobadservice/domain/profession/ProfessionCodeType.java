@@ -1,9 +1,9 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.profession;
 
 public enum ProfessionCodeType {
-    SBN3,
-    SBN5,
     AVAM,
     BFS,
-    X28;
+    X28,
+    CHISCO5,
+    CHISCO3;
 }

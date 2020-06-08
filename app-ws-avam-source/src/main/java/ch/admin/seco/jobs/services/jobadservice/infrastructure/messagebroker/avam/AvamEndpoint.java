@@ -41,7 +41,7 @@ public class AvamEndpoint {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Recieved request: {}", transformToXml(request));
         }
-        LOG.info("Recieved stellennummerAvam={}, stellennummerEgov={}", request.getOste().getStellennummerAvam(), request.getOste().getStellennummerEgov());
+        LOG.info("Recieved stellennummerAvam={}, stellennummerEgov={}, event={}", request.getOste().getStellennummerAvam(), request.getOste().getStellennummerEgov(), request.getOste().getEvent());
 
         WSOsteEgov avamJobAdvertisement = request.getOste();
 

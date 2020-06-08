@@ -1,27 +1,20 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.JobAdvertisementToAvamAssembler.fetchFirstEmail;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Collections;
-import java.util.Locale;
-
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.TOsteEgov;
 import org.junit.Test;
 
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Company;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Employer;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Employment;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobContent;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobDescription;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageSkill;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Owner;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Publication;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.TOsteEgov;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamDateTimeFormatter.formatLocalDate;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.JobAdvertisementToAvamAssembler.fetchFirstEmail;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.fixtures.AvamSinkCompanyFixture.testCompany;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.fixtures.AvamSinkCompanyFixture.testCompanyWithSurrogate;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.fixtures.AvamSinkEmployerFixture.testEmployer;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.fixtures.AvamSinkEmploymentFixture.*;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.fixtures.AvamSinkJobAdFixture.testJobAd;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.fixtures.AvamSinkJobAdFixture.testJobAdWithContent;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.fixtures.AvamSinkJobContentFixture.testJobContentBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class JobAdvertisementToAvamAssemblerTest {
 
@@ -42,26 +35,22 @@ public class JobAdvertisementToAvamAssemblerTest {
 
     @Test
     public void shouldHaveCompanyAndEmployer() {
-        Company company = new Company.Builder<>()
-                .setName("companyName")
-                .setStreet("companyStreet")
-                .setPostalCode("companyPostalCode")
-                .setCity("companyCity")
-                .setCountryIsoCode("ch")
-                .setSurrogate(true)
+        // given
+        Company company = testCompanyWithSurrogate();
+        Employer employer = testEmployer();
+        JobAdvertisement jobAdvertisement = testJobAdWithContent(
+                testJobContentBuilder()
+                        .setCompany(testCompanyWithSurrogate())
+                        .setEmployer(testEmployer())
+                        .build())
                 .build();
-        Employer employer = new Employer.Builder()
-                .setName("employerName")
-                .setPostalCode("employerPostalCode")
-                .setCity("employerCity")
-                .setCountryIsoCode("ch")
-                .build();
-        JobAdvertisement jobAdvertisement = createJobAdvertisementForCompanyAndEmployer(company, employer);
 
         JobAdvertisementToAvamAssembler assembler = new JobAdvertisementToAvamAssembler();
 
+        // when
         TOsteEgov oste = assembler.toOsteEgov(jobAdvertisement, AvamAction.ANMELDUNG);
 
+        // then
         assertThat(oste).isNotNull();
 
         assertThat(oste.getUntName()).isEqualTo(company.getName());
@@ -80,21 +69,21 @@ public class JobAdvertisementToAvamAssemblerTest {
 
     @Test
     public void shouldHaveCompanyButNotEmployer() {
-        Company company = new Company.Builder<>()
-                .setName("companyName")
-                .setStreet("companyStreet")
-                .setPostalCode("companyPostalCode")
-                .setCity("companyCity")
-                .setCountryIsoCode("ch")
-                .setSurrogate(false)
+        // given
+        Company company = testCompany();
+        JobAdvertisement jobAdvertisement = testJobAdWithContent(
+                testJobContentBuilder()
+                        .setCompany(company)
+                        .setEmployer(null)
+                        .build())
                 .build();
-
-        JobAdvertisement jobAdvertisement = createJobAdvertisementForCompanyAndEmployer(company, null);
 
         JobAdvertisementToAvamAssembler assembler = new JobAdvertisementToAvamAssembler();
 
+        // when
         TOsteEgov oste = assembler.toOsteEgov(jobAdvertisement, AvamAction.ANMELDUNG);
 
+        // then
         assertThat(oste).isNotNull();
 
         assertThat(oste.getUntName()).isEqualTo(company.getName());
@@ -111,42 +100,91 @@ public class JobAdvertisementToAvamAssemblerTest {
         assertThat(oste.getAuftraggeberLand()).isNull();
     }
 
-    private JobAdvertisement createJobAdvertisementForCompanyAndEmployer(Company company, Employer employer) {
-        JobDescription jobDescription = new JobDescription.Builder()
-                .setLanguage(Locale.GERMAN)
-                .setTitle("title")
-                .setDescription("description")
+    @Test
+    public void shouldBeShortTermEmployment() {
+        // given
+        JobAdvertisement jobAdvertisement = testJobAdWithContent(
+                testJobContentBuilder()
+                        .setEmployment(shortTermEmployment())
+                        .build())
                 .build();
-        Employment employment = new Employment.Builder()
-                .setWorkloadPercentageMin(80)
-                .setWorkloadPercentageMax(100)
-                .build();
-        Occupation occupation = new Occupation.Builder()
-                .setAvamOccupationCode("avamOccupationCode")
-                .build();
-        LanguageSkill languageSkill = new LanguageSkill.Builder()
-                .setLanguageIsoCode("de")
-                .build();
-        JobContent jobContent = new JobContent.Builder()
-                .setJobDescriptions(Collections.singletonList(jobDescription))
-                .setCompany(company)
-                .setEmployer(employer)
-                .setEmployment(employment)
-                .setOccupations(Collections.singletonList(occupation))
-                .setLanguageSkills(Collections.singletonList(languageSkill))
-                .build();
-        Owner owner = new Owner.Builder()
-                .setAccessToken("accessToken")
-                .build();
-        Publication publication = new Publication.Builder().build();
-        return new JobAdvertisement.Builder()
-                .setId(new JobAdvertisementId("id"))
-                .setStatus(JobAdvertisementStatus.INSPECTING)
-                .setSourceSystem(SourceSystem.JOBROOM)
-                .setJobContent(jobContent)
-                .setOwner(owner)
-                .setPublication(publication)
-                .build();
+
+        JobAdvertisementToAvamAssembler assembler = new JobAdvertisementToAvamAssembler();
+
+        // when
+        TOsteEgov oste = assembler.toOsteEgov(jobAdvertisement, AvamAction.ANMELDUNG);
+
+        // then
+        assertThat(oste).isNotNull();
+
+        assertThat(oste).isNotNull();
+        assertThat(oste.getFristTyp()).isEqualTo(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.SHORT_TERM));
     }
 
+    @Test
+    public void shouldbeFixedTermEmployment() {
+        // given
+        JobAdvertisement jobAdvertisement = testJobAdWithContent(
+                testJobContentBuilder()
+                        .setEmployment(fixedTermEmployment())
+                        .build())
+                .build();
+
+        JobAdvertisementToAvamAssembler assembler = new JobAdvertisementToAvamAssembler();
+
+        // when
+        TOsteEgov oste = assembler.toOsteEgov(jobAdvertisement, AvamAction.ANMELDUNG);
+
+        // then
+        assertThat(oste).isNotNull();
+        assertThat(oste.getVertragsdauer()).isNotBlank();
+        assertThat(oste.getFristTyp()).isEqualTo(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.FIXED_TERM));
+    }
+
+    @Test
+    public void shouldBePermanentEmployment() {
+        // given
+        JobAdvertisement jobAdvertisement = testJobAdWithContent(
+                testJobContentBuilder()
+                        .setEmployment(permanentEmployment())
+                        .build())
+                .build();
+
+        JobAdvertisementToAvamAssembler assembler = new JobAdvertisementToAvamAssembler();
+
+        // when
+        TOsteEgov oste = assembler.toOsteEgov(jobAdvertisement, AvamAction.ANMELDUNG);
+
+        // then
+        assertThat(oste).isNotNull();
+        assertThat(oste.getFristTyp()).isEqualTo(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.PERMANENT));
+    }
+
+    @Test
+    public void shouldHaveCancellationCode() {
+        // given
+        JobAdvertisement jobAdvertisement = testJobAd()
+                .setStatus(JobAdvertisementStatus.CANCELLED)
+                .setCancellationCode(CancellationCode.OCCUPIED_OTHER)
+                .build();
+
+        JobAdvertisementToAvamAssembler assembler = new JobAdvertisementToAvamAssembler();
+
+        // when
+        TOsteEgov oste = assembler.toOsteEgov(jobAdvertisement, AvamAction.ABMELDUNG);
+
+        // then
+        assertThat(oste).isNotNull();
+
+        assertThat(oste.getAbmeldeDatum()).isEqualTo(formatLocalDate(jobAdvertisement.getCancellationDate()));
+        assertThat(oste.getAbmeldeGrundCode()).isEqualTo("7"); // JobAdvertisementToAvamAssembler.tempMapCancellationCode()
+    }
+
+    @Test
+    public void testPhoneNumberFormattin() {
+        JobAdvertisementToAvamAssembler assembler = new JobAdvertisementToAvamAssembler();
+        String unFormatted = "+41313456789";
+        String formatted = "+41 31 345 67 89";
+        assertEquals("Not properly formatted ",formatted, assembler.sanitizePhoneNumber(unFormatted));
+    }
 }

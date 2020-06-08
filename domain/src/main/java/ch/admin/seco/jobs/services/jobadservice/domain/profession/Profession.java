@@ -5,27 +5,28 @@ import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 public class Profession {
 
     private ProfessionId id;
+
     private String avamCode;
-    private String sbn3Code;
-    private String sbn5Code;
+
+    private String chIsco3Code;
+
+    private String chIsco5Code;
+
     private String bfsCode;
+
     private String label;
 
     protected Profession() {
         // For reflection libs
     }
 
-    public Profession(ProfessionId id) {
-        this.id = Condition.notNull(id);
-    }
-
-    public Profession(ProfessionId id, String avamCode, String sbn3Code, String sbn5Code, String bfsCode, String label) {
-        this(id);
-        this.avamCode = avamCode;
-        this.sbn3Code = sbn3Code;
-        this.sbn5Code = sbn5Code;
-        this.bfsCode = bfsCode;
-        this.label = label;
+    private Profession(Builder builder){
+        this.id = Condition.notNull(builder.id);
+        this.avamCode = builder.avamCode;
+        this.chIsco3Code = builder.chIsco3Code;
+        this.chIsco5Code = builder.chIsco5Code;
+        this.bfsCode = builder.bfsCode;
+        this.label = builder.label;
     }
 
     public ProfessionId getId() {
@@ -36,12 +37,12 @@ public class Profession {
         return avamCode;
     }
 
-    public String getSbn3Code() {
-        return sbn3Code;
+    public String getChIsco3Code() {
+        return chIsco3Code;
     }
 
-    public String getSbn5Code() {
-        return sbn5Code;
+    public String getChIsco5Code() {
+        return chIsco5Code;
     }
 
     public String getBfsCode() {
@@ -50,5 +51,54 @@ public class Profession {
 
     public String getLabel() {
         return label;
+    }
+
+    public static class Builder {
+        private ProfessionId id;
+
+        private String avamCode;
+
+        private String chIsco3Code;
+
+        private String chIsco5Code;
+
+        private String bfsCode;
+
+        private String label;
+
+        public Builder setId(ProfessionId id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder setAvamCode(String avamCode) {
+            this.avamCode = avamCode;
+            return this;
+        }
+
+        public Builder setChIsco3Code(String chIsco3Code) {
+            this.chIsco3Code = chIsco3Code;
+            return this;
+        }
+
+        public Builder setChIsco5Code(String chIsco5Code) {
+            this.chIsco5Code = chIsco5Code;
+            return this;
+        }
+
+        public Builder setBfsCode(String bfsCode) {
+            this.bfsCode = bfsCode;
+            return this;
+        }
+
+        public Builder setLabel(String label) {
+            this.label = label;
+            return this;
+        }
+
+        public Profession build() {
+            return new Profession(this);
+        }
+
     }
 }

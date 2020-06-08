@@ -1,11 +1,15 @@
 dependencies {
-    compile project(':infrastructure')
+    compile project(':application')
     compile 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     compile 'org.springframework:spring-tx'
     compile 'io.projectreactor:reactor-core'
+    compile 'org.apache.commons:commons-io'
 
     compile 'org.hibernate.validator:hibernate-validator'
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
+    testCompile files(this.project(':domain').sourceSets.test.output)
+    testCompile 'com.h2database:h2'
+    testCompile 'org.awaitility:awaitility'
 }

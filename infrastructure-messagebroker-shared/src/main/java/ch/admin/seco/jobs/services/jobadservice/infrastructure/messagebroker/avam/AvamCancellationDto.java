@@ -38,6 +38,8 @@ public class AvamCancellationDto {
     @NotBlank
     private String jobCenterCode;
 
+    private String jobCenterUserId;
+
     public String getStellennummerEgov() {
         return stellennummerEgov;
     }
@@ -116,6 +118,15 @@ public class AvamCancellationDto {
 
     public AvamCancellationDto setJobCenterCode(String jobCenterCode) {
         this.jobCenterCode = jobCenterCode;
+        return this;
+    }
+
+    public String getJobCenterUserId() {
+        return jobCenterUserId;
+    }
+
+    public AvamCancellationDto setJobCenterUserId(String jobCenterUserId) {
+        this.jobCenterUserId = jobCenterUserId;
         return this;
     }
 

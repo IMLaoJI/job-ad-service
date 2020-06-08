@@ -1,31 +1,31 @@
 package ch.admin.seco.jobs.services.jobadservice;
 
-import static ch.admin.seco.jobs.services.jobadservice.application.ProfileRegistry.CLOUD;
-import static ch.admin.seco.jobs.services.jobadservice.application.ProfileRegistry.DEV;
-import static ch.admin.seco.jobs.services.jobadservice.application.ProfileRegistry.PROD;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.Collection;
-
-import javax.annotation.PostConstruct;
-
+import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPublisher;
+import ch.admin.seco.jobs.services.jobadservice.domain.LanguageProvider;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.config.DefaultProfileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
-import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPublisher;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.web.config.DefaultProfileUtil;
+import javax.annotation.PostConstruct;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Collection;
+
+import static ch.admin.seco.jobs.services.jobadservice.application.ProfileRegistry.CLOUD;
+import static ch.admin.seco.jobs.services.jobadservice.application.ProfileRegistry.DEV;
+import static ch.admin.seco.jobs.services.jobadservice.application.ProfileRegistry.PROD;
 
 @SpringBootApplication
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
@@ -106,5 +106,10 @@ public class Application {
             log.error("You have misconfigured your application! It should not " +
                     "run with both the 'dev' and 'cloud' profiles at the same time.");
         }
+    }
+
+    @Bean
+    public LanguageProvider languageProvider(){
+        return new LanguageProvider(LocaleContextHolder::getLocale);
     }
 }

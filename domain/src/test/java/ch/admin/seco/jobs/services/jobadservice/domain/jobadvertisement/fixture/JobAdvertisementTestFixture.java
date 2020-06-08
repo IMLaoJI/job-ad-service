@@ -1,5 +1,18 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture;
 
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobContent;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageSkill;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Location;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Owner;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Publication;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
+
+import java.time.LocalDate;
+
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.ARCHIVED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_RESTRICTED;
@@ -16,19 +29,6 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.f
 import static java.time.LocalDate.now;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-
-import java.time.LocalDate;
-
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobContent;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageSkill;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Location;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Owner;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Publication;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 
 public class JobAdvertisementTestFixture {
 
@@ -329,7 +329,7 @@ public class JobAdvertisementTestFixture {
                         .build());
     }
 
-    public static JobAdvertisement createJobWithX28Code(JobAdvertisementId jobAdvertisementId, String x28Codes) {
+    public static JobAdvertisement createJobWithExternalCode(JobAdvertisementId jobAdvertisementId, String x28Codes) {
         return testJobAdvertisementWithContent(jobAdvertisementId,
                 JobContentFixture.of(jobAdvertisementId)
                         .setX28OccupationCodes(x28Codes)
@@ -352,6 +352,14 @@ public class JobAdvertisementTestFixture {
         );
     }
 
+    public static JobAdvertisement createJobWithLocationAndPublicationStartDate(JobAdvertisementId jobAdvertisementId, LocalDate startDate, Location location) {
+        return testJobAdvertisementWithContentAndPublication(jobAdvertisementId, startDate,
+                JobContentFixture.of(jobAdvertisementId)
+                        .setLocation(location)
+                        .build()
+        );
+    }
+
     private static JobAdvertisement testJobAdvertisementWithContent(JobAdvertisementId jobAdvertisementId, JobContent jobContent) {
         return new JobAdvertisement.Builder()
                 .setId(jobAdvertisementId)
@@ -360,6 +368,32 @@ public class JobAdvertisementTestFixture {
                 .setOwner(OwnerFixture.of(jobAdvertisementId).build())
                 .setPublication(testPublication().setPublicDisplay(true).build())
                 .setJobContent(jobContent)
+                .build();
+    }
+
+    private static JobAdvertisement testJobAdvertisementWithContentAndPublication(JobAdvertisementId jobAdvertisementId, LocalDate startDate, JobContent jobContent) {
+        return new JobAdvertisement.Builder()
+                .setId(jobAdvertisementId)
+                .setSourceSystem(JOBROOM)
+                .setStatus(PUBLISHED_PUBLIC)
+                .setOwner(OwnerFixture.of(jobAdvertisementId).build())
+                .setPublication(testPublication()
+                        .setPublicDisplay(true)
+                        .setStartDate(startDate)
+                        .setEndDate(startDate.plusMonths(1))
+                        .build())
+                .setJobContent(jobContent)
+                .build();
+    }
+
+    public static JobAdvertisement testJobAdvertisementWithContentAndLocation(JobAdvertisementId jobAdvertisementId, JobContent jobContent) {
+        return new JobAdvertisement.Builder()
+                .setId(jobAdvertisementId)
+                .setSourceSystem(JOBROOM)
+                .setStatus(PUBLISHED_PUBLIC)
+                .setOwner(OwnerFixture.of(jobAdvertisementId).build())
+                .setJobContent(jobContent)
+                .setPublication(testPublication().setPublicDisplay(true).build())
                 .build();
     }
 }

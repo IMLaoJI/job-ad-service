@@ -1,26 +1,23 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.errors;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import ch.admin.seco.jobs.services.jobadservice.Application;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.zalando.problem.spring.web.advice.MediaTypes;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.zalando.problem.spring.web.advice.MediaTypes;
 
-import ch.admin.seco.jobs.services.jobadservice.Application;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the ExceptionTranslator controller advice.
@@ -30,6 +27,7 @@ import ch.admin.seco.jobs.services.jobadservice.Application;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 @ActiveProfiles("dev")
+@WithMockUser(roles = "USER")
 public class ExceptionTranslatorIntTest {
 
     @Autowired
@@ -56,7 +54,7 @@ public class ExceptionTranslatorIntTest {
         mockMvc.perform(get("/test/aggregate-not-found-failure"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaTypes.PROBLEM))
-                .andExpect(jsonPath("$.message").value(ErrorConstants.ENTITY_NOT_FOUND_TYPE.toString()))
+                .andExpect(jsonPath("$.message").value("Aggregate with ID 1 not found"))
                 .andExpect(jsonPath("$.aggregateName").value("JobAdvertisement"))
                 .andExpect(jsonPath("$.aggregateId").value("1"));
     }

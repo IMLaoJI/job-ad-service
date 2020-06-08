@@ -31,8 +31,8 @@ public class AvamSource {
         LOG.debug("Approve JobAdvertisement stellennummerAvam={}, stellennummerEgov={}", approvalDto.getStellennummerAvam(), approvalDto.getStellennummerEgov());
         output.send(MessageBuilder
                 .withPayload(approvalDto)
-                .setHeader(PARTITION_KEY, approvalDto.getStellennummerEgov())
-                .setHeader(RELEVANT_ID, approvalDto.getStellennummerEgov())
+                .setHeader(PARTITION_KEY, approvalDto.getStellennummerAvam())
+                .setHeader(RELEVANT_ID, approvalDto.getStellennummerAvam())
                 .setHeader(ACTION, APPROVE.name())
                 .setHeader(SOURCE_SYSTEM, AVAM.name())
                 .setHeader(TARGET_SYSTEM, JOB_AD_SERVICE.name())

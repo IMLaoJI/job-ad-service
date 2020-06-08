@@ -7,9 +7,7 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupati
 public class OccupationFixture {
     public static Builder testOccupation() {
         return testOccupationEmpty()
-        .setAvamOccupationCode("avamOccupationCode")
-        .setSbn3Code("sbn3Code")
-        .setSbn5Code("sbn5Code")
+        .setAvamOccupationCode("9999")
         .setBfsCode("bfsCode")
         .setLabel("label")
         .setWorkExperience(LESS_THAN_1_YEAR)

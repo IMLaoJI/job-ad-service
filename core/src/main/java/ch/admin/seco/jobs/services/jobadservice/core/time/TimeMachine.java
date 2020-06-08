@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
- * This Class is mainly used for unit test puposes in order to manipulate the creation point (.now()) of java.time classes such as {@link LocalDateTime}.
+ * This Class is mainly used for unit test purposes in order to manipulate the creation point (.now()) of java.time classes such as {@link LocalDateTime}.
  * <p>
  * It is important to call the TimeMachine.now() method within the productive code in order to receive a new {@link LocalDateTime} for the given manipulated date
  */
@@ -42,11 +42,19 @@ public class TimeMachine {
         return date.isAfter(now().toLocalDate());
     }
 
+    public static boolean isNotAfterToday(LocalDate date) {
+        return !isAfterToday(date);
+    }
+
     public static boolean isAfterToday(LocalDateTime dateTime) {
         if (dateTime == null) {
             return false;
         }
         return dateTime.isAfter(now());
+    }
+
+    public static boolean isNotAfterToday(LocalDateTime dateTime) {
+        return !isAfterToday(dateTime);
     }
 
     public static boolean isBeforeToday(LocalDate date) {
@@ -56,10 +64,18 @@ public class TimeMachine {
         return date.isBefore(now().toLocalDate());
     }
 
+    public static boolean isNotBeforeToday(LocalDate date) {
+        return !isBeforeToday(date);
+    }
+
     public static boolean isBeforeToday(LocalDateTime dateTime) {
         if (dateTime == null) {
             return false;
         }
         return dateTime.isBefore(now());
+    }
+
+    public static boolean isNotBeforeToday(LocalDateTime dateTime) {
+        return !isBeforeToday(dateTime);
     }
 }

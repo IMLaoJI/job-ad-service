@@ -13,6 +13,7 @@ public class RejectionDtoTestFixture {
                 STELLENNUMMER_AVAM,
                 LocalDate.of(2018, 1, 1), "code",
                 "reason",
-                "jobcenterid");
+                "jobcenterid",
+                "14711");
     }
 }

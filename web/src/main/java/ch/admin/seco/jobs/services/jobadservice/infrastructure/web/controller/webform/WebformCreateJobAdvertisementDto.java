@@ -1,22 +1,13 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.webform;
 
-import java.util.List;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmployerDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 
 public class WebformCreateJobAdvertisementDto {
 
@@ -43,7 +34,7 @@ public class WebformCreateJobAdvertisementDto {
 
     @Valid
     @NotNull
-    private CompanyDto company;
+    private WebformCreateCompanyDto company;
 
     @Valid
     private EmployerDto employer;
@@ -65,7 +56,7 @@ public class WebformCreateJobAdvertisementDto {
 
     @Valid
     @NotNull
-    private ApplyChannelDto applyChannel;
+    private WebformCreateApplyChannelDto applyChannel;
 
     @Valid
     @NotNull
@@ -134,11 +125,11 @@ public class WebformCreateJobAdvertisementDto {
         return this;
     }
 
-    public CompanyDto getCompany() {
+    public WebformCreateCompanyDto getCompany() {
         return company;
     }
 
-    public WebformCreateJobAdvertisementDto setCompany(CompanyDto company) {
+    public WebformCreateJobAdvertisementDto setCompany(WebformCreateCompanyDto company) {
         this.company = company;
         return this;
     }
@@ -188,11 +179,11 @@ public class WebformCreateJobAdvertisementDto {
         return this;
     }
 
-    public ApplyChannelDto getApplyChannel() {
+    public WebformCreateApplyChannelDto getApplyChannel() {
         return applyChannel;
     }
 
-    public WebformCreateJobAdvertisementDto setApplyChannel(ApplyChannelDto applyChannel) {
+    public WebformCreateJobAdvertisementDto setApplyChannel(WebformCreateApplyChannelDto applyChannel) {
         this.applyChannel = applyChannel;
         return this;
     }

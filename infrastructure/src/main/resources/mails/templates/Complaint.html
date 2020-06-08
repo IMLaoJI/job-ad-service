@@ -1,27 +1,32 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link rel="shortcut icon" th:href="@{|${baseUrl}/favicon.ico|}"/>
+    <meta http-equiv="Content-Type"
+          content="text/html; charset=UTF-8"/>
+    <link rel="shortcut icon"
+          th:href="@{|${baseUrl}/favicon.ico|}"/>
 </head>
 <body>
 <p th:text="#{mail.complaint.body.introduction}"></p>
 
 <p><strong th:text="#{mail.complaint.body.jobad}"></strong></p>
-<div th:if="${sourceSystem}" th:text="#{mail.complaint.body.jobad.sourcesystem(${sourceSystem})}"></div>
-<div th:if="${jobAdvertisementId}" th:text="#{mail.complaint.body.jobad.id(${jobAdvertisementId})}"></div>
-<div th:if="${stellennummerEgov}" th:text="#{mail.complaint.body.jobad.stellennummeregov(${stellennummerEgov})}"></div>
-<div th:if="${stellennummerAvam}" th:text="#{mail.complaint.body.jobad.stellennummeravam(${stellennummerAvam})}"></div>
+<div th:if="${sourceSystem}"
+     th:text="#{mail.complaint.body.jobad.sourcesystem(${sourceSystem})}"></div>
+<div th:if="${jobAdvertisementId}"
+     th:text="#{mail.complaint.body.jobad.id(${jobAdvertisementId})}"></div>
+<div th:if="${stellennummerEgov}"
+     th:text="#{mail.complaint.body.jobad.stellennummeregov(${stellennummerEgov})}"></div>
+<div th:if="${stellennummerAvam}"
+     th:text="#{mail.complaint.body.jobad.stellennummeravam(${stellennummerAvam})}"></div>
 <span th:text="#{mail.complaint.body.jobad.linkToJobAdDetail}"></span>
-<a th:href="@{|${linkToJobAdDetail}|}" th:text="${linkToJobAdDetail}"></a>
+<a th:href="@{|${linkToJobAdDetail}|}"
+   th:text="${linkToJobAdDetail}"></a>
 
-<p><strong th:text="#{mail.complaint.body.contactinformation}"></strong></p>
-<div th:if="${contactInformation?.salutation}" th:text="#{mail.complaint.body.contactinformation.salutation(${contactInformation?.salutation})}"></div>
-<div th:if="${contactInformation?.name}" th:text="#{mail.complaint.body.contactinformation.name(${contactInformation?.name})}"></div>
-<div th:if="${contactInformation?.phone}" th:text="#{mail.complaint.body.contactinformation.phone(${contactInformation?.phone})}"></div>
-<div th:if="${contactInformation?.email}"th:text="#{mail.complaint.body.contactinformation.email(${contactInformation?.email})}"></div>
-<p><strong th:text="#{mail.complaint.body.complaintmessage}"></strong></p>
-<em th:text="${complaintMessage}"></em>
+
+<div>
+    <span th:text="#{mail.complaint.body.reason(#{'mail.complaint.body.complainttype.' + ${complaintType}}) }">   </span>
+</div>
+
 
 </body>
 </html>

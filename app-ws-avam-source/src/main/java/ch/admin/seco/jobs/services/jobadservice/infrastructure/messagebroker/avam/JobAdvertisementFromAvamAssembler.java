@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -66,6 +67,10 @@ public class JobAdvertisementFromAvamAssembler {
         return (hasText(value)) ? value.trim() : null;
     }
 
+    private static String safeToStringOrNull(BigInteger value) {
+        return Objects.toString(value, null);
+    }
+
     AvamCreateJobAdvertisementDto createCreateJobAdvertisementAvamDto(WSOsteEgov avamJobAdvertisement) {
         return new AvamCreateJobAdvertisementDto()
                 .setStellennummerAvam(safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()))
@@ -95,6 +100,8 @@ public class JobAdvertisementFromAvamAssembler {
                 parseToLocalDate(avamJobAdvertisement.getAnmeldeDatum()),
                 avamJobAdvertisement.isMeldepflicht(),
                 parseToLocalDate(avamJobAdvertisement.getSperrfrist()),
+                safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()),
+                safeToStringOrNull(avamJobAdvertisement.getBenutzerDetailId()),
                 new UpdateJobAdvertisementFromAvamDto(
                         safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()),
                         safeTrimOrNull(avamJobAdvertisement.getBezeichnung()),
@@ -104,6 +111,7 @@ public class JobAdvertisementFromAvamAssembler {
                         avamJobAdvertisement.isMeldepflicht(),
                         parseToLocalDate(avamJobAdvertisement.getSperrfrist()),
                         safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()),
+                        safeToStringOrNull(avamJobAdvertisement.getBenutzerDetailId()),
                         parseToLocalDate(avamJobAdvertisement.getAnmeldeDatum()),
                         createEmploymentDto(avamJobAdvertisement),
                         createApplyChannelDto(avamJobAdvertisement),
@@ -125,7 +133,8 @@ public class JobAdvertisementFromAvamAssembler {
                 parseToLocalDate(avamJobAdvertisement.getAblehnungDatum()),
                 safeTrimOrNull(avamJobAdvertisement.getAblehnungGrundCode()),
                 safeTrimOrNull(avamJobAdvertisement.getAblehnungGrund()),
-                safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich())
+                safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()),
+                safeToStringOrNull(avamJobAdvertisement.getBenutzerDetailId())
         );
     }
 
@@ -139,6 +148,7 @@ public class JobAdvertisementFromAvamAssembler {
                 .setJobDescriptionTitle(safeTrimOrNull(avamJobAdvertisement.getBezeichnung()))
                 .setContactEmail(safeTrimOrNull(avamJobAdvertisement.getKpEmail()))
                 .setJobCenterCode(safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()))
+                .setJobCenterUserId(safeToStringOrNull(avamJobAdvertisement.getBenutzerDetailId()))
                 .setCancelledBy(SourceSystem.RAV);
     }
 
@@ -183,13 +193,17 @@ public class JobAdvertisementFromAvamAssembler {
         WorkingTimePercentage workingTimePercentage = WorkingTimePercentage.evaluate(avamJobAdvertisement.getPensumVon(), avamJobAdvertisement.getPensumBis());
         return new EmploymentDto()
                 .setStartDate(parseToLocalDate(avamJobAdvertisement.getStellenantritt()))
-                .setEndDate(parseToLocalDate(avamJobAdvertisement.getVertragsdauer()))
-                .setShortEmployment(safeBoolean(avamJobAdvertisement.isKurzeinsatz(), false))
+                .setEndDate(getEmploymentEndDate(avamJobAdvertisement))
+                .setShortEmployment(avamJobAdvertisement.getFristTyp().equals(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.SHORT_TERM)))
                 .setImmediately(safeBoolean(avamJobAdvertisement.isAbSofort(), avamJobAdvertisement.getStellenantritt() == null))
-                .setPermanent(safeBoolean(avamJobAdvertisement.isUnbefristet(), avamJobAdvertisement.getVertragsdauer() == null))
+                .setPermanent(avamJobAdvertisement.getFristTyp().equals(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.PERMANENT)))
                 .setWorkloadPercentageMin(workingTimePercentage.getMin())
                 .setWorkloadPercentageMax(workingTimePercentage.getMax())
                 .setWorkForms(createWorkForms(avamJobAdvertisement));
+    }
+
+    private LocalDate getEmploymentEndDate(WSOsteEgov avamJobAdvertisement) {
+        return (avamJobAdvertisement.getFristTyp().equals(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.FIXED_TERM))) ? parseToLocalDate(avamJobAdvertisement.getVertragsdauer()) : null;
     }
 
     private CreateLocationDto createCreateLocationDto(WSOsteEgov avamJobAdvertisement) {

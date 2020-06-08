@@ -28,6 +28,19 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Company;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Qualification;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkForm;
+
+import java.time.LocalDate;
+import java.util.Collections;
+
+import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationServiceForAvamTest.STELLENNUMMER_AVAM;
+import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.PublicationDtoTestFixture.testPublicationDto;
+import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.PublicationDtoTestFixture.testPublicationDtoWithCompanyAnonymous;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel.PROFICIENT;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience.MORE_THAN_1_YEAR;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.CompanyFixture.testCompany;
+import static com.google.common.collect.Sets.immutableEnumSet;
+import static java.time.LocalDate.now;
 
 public class CreateJobAdvertisementFromAvamDtoTestFixture {
 
@@ -62,13 +75,13 @@ public class CreateJobAdvertisementFromAvamDtoTestFixture {
                         .setPostAddress(new AddressDto()
                                 .setName("postAddressName")
                                 .setStreet("postAddressStreet")
-                                .setHouseNumber("postAddressHouseNumber")
-                                .setPostalCode("postAddressPostalCode")
+                                .setHouseNumber("123")
+                                .setPostalCode("3000")
                                 .setCity("postAddressCity")
-                                .setPostOfficeBoxNumber("postAddressPostOfficeBoxNumber")
-                                .setPostOfficeBoxPostalCode("postAddressPostOfficeBoxPostalCode")
+                                .setPostOfficeBoxNumber("200")
+                                .setPostOfficeBoxPostalCode("3000")
                                 .setPostOfficeBoxCity("postAddressPostOfficeBoxCity")
-                                .setCountryIsoCode("postAddressCountryIsoCode")
+                                .setCountryIsoCode("CH")
                         )
                         .setEmailAddress("emailAddress")
                         .setPhoneNumber("phoneNumber")

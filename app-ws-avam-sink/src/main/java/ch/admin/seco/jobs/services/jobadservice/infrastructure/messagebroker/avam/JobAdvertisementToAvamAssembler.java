@@ -1,50 +1,37 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode.CHANGE_OR_REPOSE;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode.NOT_OCCUPIED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode.OCCUPIED_OTHER;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.TOsteEgov;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.WSArbeitsform;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.WSArbeitsformArray;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode.*;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.SOURCE_SYSTEM;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.WORK_FORMS;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamDateTimeFormatter.formatLocalDate;
 import static org.springframework.util.StringUtils.hasText;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.util.Assert;
-
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Address;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.ApplyChannel;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Company;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Contact;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Employer;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Employment;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobContent;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobDescription;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageSkill;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Location;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.PublicContact;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Publication;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.TOsteEgov;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.WSArbeitsform;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.ws.avam.WSArbeitsformArray;
-
 public class JobAdvertisementToAvamAssembler {
 
     private static String DEFAULT_JOB_CENTER_CODE = "CHA20";
+    private static final Logger LOG = LoggerFactory.getLogger(JobAdvertisementToAvamAssembler.class);
 
     private static boolean safeBoolean(Boolean value) {
         return (value != null) ? value : false;
     }
 
     private static String tempMapCancellationCode(CancellationCode code) {
-        if (code == NOT_OCCUPIED || code == CHANGE_OR_REPOSE) {
+        if (code == NOT_OCCUPIED || code == CHANGE_OR_REPOSE || code == OCCUPIED_OTHER) {
             return "7";
-        } else if (code == OCCUPIED_OTHER) {
-            return "5";
         }
 
         return AvamCodeResolver.CANCELLATION_CODE.getLeft(code);
@@ -118,12 +105,8 @@ public class JobAdvertisementToAvamAssembler {
         if (!immediately) {
             avamJobAdvertisement.setStellenantritt(formatLocalDate(employment.getStartDate()));
         }
-        boolean permanent = safeBoolean(employment.isPermanent());
-        avamJobAdvertisement.setUnbefristet(permanent);
-        if (!permanent) {
-            avamJobAdvertisement.setVertragsdauer(formatLocalDate(employment.getEndDate()));
-        }
-        avamJobAdvertisement.setKurzeinsatz(employment.isShortEmployment());
+
+        determineEmploymentTermType(avamJobAdvertisement, employment);
 
         avamJobAdvertisement.setPensumVon((short) employment.getWorkloadPercentageMin());
         avamJobAdvertisement.setPensumBis((short) employment.getWorkloadPercentageMax());
@@ -142,6 +125,20 @@ public class JobAdvertisementToAvamAssembler {
             WSArbeitsformArray wsArbeitsformArray = new WSArbeitsformArray();
             wsArbeitsformArray.getWSArbeitsformArrayItem().addAll(wsArbeitsformList);
             avamJobAdvertisement.setArbeitsformCodeList(wsArbeitsformArray);
+        }
+    }
+
+    private void determineEmploymentTermType(TOsteEgov avamJobAdvertisement, Employment employment) {
+        boolean permanent = safeBoolean(employment.isPermanent());
+        avamJobAdvertisement.setFristTyp(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.PERMANENT));
+
+        if (!permanent) {
+            if (employment.isShortEmployment()) {
+                avamJobAdvertisement.setFristTyp(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.SHORT_TERM));
+                return;
+            }
+            avamJobAdvertisement.setFristTyp(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.FIXED_TERM));
+            avamJobAdvertisement.setVertragsdauer(formatLocalDate(employment.getEndDate()));
         }
     }
 
@@ -169,7 +166,7 @@ public class JobAdvertisementToAvamAssembler {
         avamJobAdvertisement.setBewerUntUrl(applyChannel.getFormUrl());
 
         avamJobAdvertisement.setBewerTelefonisch(hasText(applyChannel.getPhoneNumber()));
-        avamJobAdvertisement.setBewerUntTelefon(applyChannel.getPhoneNumber());
+        avamJobAdvertisement.setBewerUntTelefon(sanitizePhoneNumber(applyChannel.getPhoneNumber()));
 
         avamJobAdvertisement.setBewerAngaben(applyChannel.getAdditionalInfo());
     }
@@ -207,7 +204,7 @@ public class JobAdvertisementToAvamAssembler {
         avamJobAdvertisement.setKpAnredeCode(AvamCodeResolver.SALUTATIONS.getLeft(contact.getSalutation()));
         avamJobAdvertisement.setKpVorname(contact.getFirstName());
         avamJobAdvertisement.setKpName(contact.getLastName());
-        avamJobAdvertisement.setKpTelefonNr(contact.getPhone());
+        avamJobAdvertisement.setKpTelefonNr(sanitizePhoneNumber(contact.getPhone()));
         // FIXME: Temparory fix for mulitple email-addresses. to be remove after 01.09.2018 or handled otherwise
         avamJobAdvertisement.setKpEmail(fetchFirstEmail(contact.getEmail()));
         //avamJobAdvertisement.setKpEmail(contact.getEmail());
@@ -220,7 +217,7 @@ public class JobAdvertisementToAvamAssembler {
         avamJobAdvertisement.setKpFragenAnredeCode(AvamCodeResolver.SALUTATIONS.getLeft(contact.getSalutation()));
         avamJobAdvertisement.setKpFragenVorname(contact.getFirstName());
         avamJobAdvertisement.setKpFragenName(contact.getLastName());
-        avamJobAdvertisement.setKpFragenTelefonNr(contact.getPhone());
+        avamJobAdvertisement.setKpFragenTelefonNr(sanitizePhoneNumber(contact.getPhone()));
         avamJobAdvertisement.setKpFragenEmail(fetchFirstEmail(contact.getEmail()));
     }
 
@@ -255,22 +252,6 @@ public class JobAdvertisementToAvamAssembler {
             avamJobAdvertisement.setBq1QualifikationCode(AvamCodeResolver.QUALIFICATION_CODE.getLeft(occupation.getQualificationCode()));
             avamJobAdvertisement.setBq1AusbildungCode(occupation.getEducationCode());
         }
-        /*
-        if (occupations.size() > 1) {
-            Occupation occupation = occupations.get(1);
-            tOsteEgov.setBq2AvamBeruf(occupation.getLabel());
-            tOsteEgov.setBq2AvamBerufNr(occupation.getAvamOccupationCode());
-            tOsteEgov.setBq2ErfahrungCode(AvamCodeResolver.EXPERIENCES.getLeft(occupation.getWorkExperience()));
-            tOsteEgov.setBq2AusbildungCode(occupation.getEducationCode());
-        }
-        if (occupations.size() > 2) {
-            Occupation occupation = occupations.get(2);
-            tOsteEgov.setBq3AvamBeruf(occupation.getLabel());
-            tOsteEgov.setBq3AvamBerufNr(occupation.getAvamOccupationCode());
-            tOsteEgov.setBq3ErfahrungCode(AvamCodeResolver.EXPERIENCES.getLeft(occupation.getWorkExperience()));
-            tOsteEgov.setBq3AusbildungCode(occupation.getEducationCode());
-        }
-        */
     }
 
     private void fillLangaugeSkills(TOsteEgov avamJobAdvertisement, List<LanguageSkill> languageSkills) {
@@ -308,4 +289,21 @@ public class JobAdvertisementToAvamAssembler {
             avamJobAdvertisement.setSk5SchriftlichCode(AvamCodeResolver.LANGUAGE_LEVEL.getLeft(languageSkill.getWrittenLevel()));
         }
     }
+
+    /*
+     * Check for a valid phone number and format as international number,
+     * example: +41795551234 -> +41 795 551 234
+     */
+     String sanitizePhoneNumber(final String phone) {
+        if (hasText(phone)) {
+            try {
+                Phonenumber.PhoneNumber phoneNumber = PhoneNumberUtil.getInstance().parse(phone, "CH");
+                return PhoneNumberUtil.getInstance().format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
+            } catch (NumberParseException e) {
+                LOG.warn("Invalid phone number: {}", phone);
+            }
+        }
+        return "";
+    }
+
 }

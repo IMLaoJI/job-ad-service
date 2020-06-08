@@ -1,23 +1,21 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-
-import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.AuditUser;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvent;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.ContactFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 public class JobAdvertisementFactoryTest {
 
@@ -57,6 +55,15 @@ public class JobAdvertisementFactoryTest {
         assertThat(jobAdvertisement.getSourceSystem()).isEqualTo(SourceSystem.JOBROOM);
         assertThat(jobAdvertisement.getStellennummerEgov()).isEqualTo(TEST_STELLEN_NUMMER_EGOV);
 
+        Employment employment = jobAdvertisement.getJobContent().getEmployment();
+        Employment employmentCreator = creator.getJobContent().getEmployment();
+        assertThat(employment.getStartDate()).isEqualTo(employmentCreator.getStartDate());
+        assertThat(employment.getEndDate()).isEqualTo(employmentCreator.getEndDate());
+        assertThat(employment.getWorkloadPercentageMin()).isEqualTo(employmentCreator.getWorkloadPercentageMin());
+        assertThat(employment.getWorkloadPercentageMax()).isEqualTo(employmentCreator.getWorkloadPercentageMax());
+        assertThat(employment.getWorkForms()).isNotNull();
+        assertThat(employment.getWorkForms()).isEqualTo(employmentCreator.getWorkForms());
+
         JobAdvertisementEvent jobAdvertisementEvent = domainEventMockUtils.assertSingleDomainEventPublished(JobAdvertisementEvents.JOB_ADVERTISEMENT_CREATED.getDomainEventType());
         assertThat(jobAdvertisementEvent.getAggregateId()).isEqualTo(jobAdvertisement.getId());
     }
@@ -73,6 +80,15 @@ public class JobAdvertisementFactoryTest {
         assertThat(jobAdvertisement.getStatus()).isEqualTo(JobAdvertisementStatus.CREATED);
         assertThat(jobAdvertisement.getSourceSystem()).isEqualTo(SourceSystem.API);
         assertThat(jobAdvertisement.getStellennummerEgov()).isEqualTo(TEST_STELLEN_NUMMER_EGOV);
+
+        Employment employment = jobAdvertisement.getJobContent().getEmployment();
+        Employment employmentCreator = creator.getJobContent().getEmployment();
+        assertThat(employment.getStartDate()).isEqualTo(employmentCreator.getStartDate());
+        assertThat(employment.getEndDate()).isEqualTo(employmentCreator.getEndDate());
+        assertThat(employment.getWorkloadPercentageMin()).isEqualTo(employmentCreator.getWorkloadPercentageMin());
+        assertThat(employment.getWorkloadPercentageMax()).isEqualTo(employmentCreator.getWorkloadPercentageMax());
+        assertThat(employment.getWorkForms()).isNotNull();
+        assertThat(employment.getWorkForms()).isEqualTo(employmentCreator.getWorkForms());
 
         JobAdvertisementEvent jobAdvertisementEvent = domainEventMockUtils.assertSingleDomainEventPublished(JobAdvertisementEvents.JOB_ADVERTISEMENT_CREATED.getDomainEventType());
         assertThat(jobAdvertisementEvent.getAggregateId()).isEqualTo(jobAdvertisement.getId());

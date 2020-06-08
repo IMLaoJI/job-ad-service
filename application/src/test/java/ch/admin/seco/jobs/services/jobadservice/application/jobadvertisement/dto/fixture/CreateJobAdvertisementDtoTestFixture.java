@@ -15,6 +15,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Company;
@@ -22,6 +23,11 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Language
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Qualification;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience;
+
+import java.time.LocalDate;
+import java.util.Collections;
+
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.CompanyFixture.testCompany;
 
 public class CreateJobAdvertisementDtoTestFixture {
 
@@ -70,7 +76,7 @@ public class CreateJobAdvertisementDtoTestFixture {
                         .setCountryIsoCode("CH"))
                 .setOccupations(singletonList(
                         new OccupationDto()
-                                .setAvamOccupationCode("avamCode")
+                                .setAvamOccupationCode("101970")
                                 .setWorkExperience(WorkExperience.MORE_THAN_1_YEAR)
                                 .setEducationCode("educationCode")
                                 .setQualificationCode(Qualification.SKILLED)))

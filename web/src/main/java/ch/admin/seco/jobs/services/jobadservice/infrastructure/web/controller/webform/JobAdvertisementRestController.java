@@ -30,6 +30,7 @@ public class JobAdvertisementRestController {
 
     private final JobAdvertisementFromWebAssembler jobAdvertisementFromWebAssembler;
 
+
     public JobAdvertisementRestController(JobAdvertisementApplicationService jobAdvertisementApplicationService, EventStore eventStore, JobAdvertisementFromWebAssembler jobAdvertisementFromWebAssembler) {
         this.jobAdvertisementApplicationService = jobAdvertisementApplicationService;
         this.eventStore = eventStore;
@@ -54,10 +55,8 @@ public class JobAdvertisementRestController {
      * - 200 Ok: The page with job ads has been returned
      */
     @GetMapping
-    public PageResource<JobAdvertisementDto> getAll(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "25") int size
-    ) {
+    public PageResource<JobAdvertisementDto> getAll(@RequestParam(name = "page", defaultValue = "0") int page,
+                                                    @RequestParam(name = "size", defaultValue = "25") int size) {
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdTime")));
         return PageResource.of(jobAdvertisementApplicationService.findAllPaginated(pageRequest));
     }
@@ -71,7 +70,8 @@ public class JobAdvertisementRestController {
      */
     @GetMapping("/{id}")
     public JobAdvertisementDto getOne(@PathVariable String id) throws AggregateNotFoundException {
-        return jobAdvertisementApplicationService.getById(new JobAdvertisementId(id));
+        final JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.getById(new JobAdvertisementId(id));
+        return jobAdvertisementDto;
     }
 
     /**

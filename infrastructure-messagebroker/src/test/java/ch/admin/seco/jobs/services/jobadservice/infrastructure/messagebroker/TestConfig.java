@@ -2,8 +2,8 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker;
 
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.x28.X28MessageLog;
-import ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.x28.X28MessageLogRepository;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.external.ExternalJobAdvertisementMessageLog;
+import ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.external.ExternalMessageLogRepository;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -13,8 +13,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import java.util.Properties;
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackageClasses = {JobAdvertisementRepository.class, X28MessageLogRepository.class})
-@EntityScan(basePackageClasses = {JobAdvertisement.class, X28MessageLog.class})
+@EnableJpaRepositories(basePackageClasses = {JobAdvertisementRepository.class, ExternalMessageLogRepository.class})
+@EntityScan(basePackageClasses = {JobAdvertisement.class, ExternalJobAdvertisementMessageLog.class})
 public class TestConfig {
 
     @Bean

@@ -1,6 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement;
 
 import ch.admin.seco.jobs.services.jobadservice.core.domain.ValueObject;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.ContactDisplayStyle;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenterAddress;
 
@@ -110,7 +111,7 @@ public class ApplyChannel implements ValueObject<ApplyChannel> {
         public Builder(JobCenter jobCenter) {
             JobCenterAddress jobCenterAddress = jobCenter.getAddress();
             this.postAddress = createApplyPostAddress(jobCenterAddress);
-            if (jobCenter.isShowContactDetailsToPublic()) {
+            if (jobCenter.getContactDisplayStyle() == ContactDisplayStyle.DETAILED) {
                 this.phoneNumber = jobCenter.getPhone();
                 this.emailAddress = jobCenter.getEmail();
             }

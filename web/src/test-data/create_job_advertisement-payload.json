@@ -36,13 +36,11 @@
     "postalCode": "3006",
     "city": "Bern",
     "countryIsoCode": "CH",
-    "postOfficeBoxNumber": "",
-    "surrogate": false,
-    "postOfficeBoxPostalCode": "",
-    "postOfficeBoxCity": ""
+    "postOfficeBoxNumber": "1234",
+    "surrogate": false
   },
   "contact": {
-    "salutation": 0,
+    "salutation": "MR",
     "firstName": "Rudolf",
     "lastName": "Rüedisüeli",
     "phone": "+41 31 999 99 99",
@@ -50,14 +48,13 @@
     "languageIsoCode": "de"
   },
   "publicContact": {
-    "salutation": 0,
+    "salutation": "MR",
     "firstName": "Rudolf",
     "lastName": "Rüedisüeli",
     "phone": "+41 31 999 99 99",
     "email": "abc@def.gh"
   },
   "applyChannel": {
-    "mailAddress": "Denk Mal AG, Junkerngasse 12, 3006 Bern",
     "emailAddress": "abc@def.gh",
     "phoneNumber": "+41 31 999 99 99",
     "formUrl": "",

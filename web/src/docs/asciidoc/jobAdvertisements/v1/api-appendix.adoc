@@ -17,7 +17,9 @@ The Countries are sent as string with the ISO 3166-1 alpha-2 (e.g. "ch")
 
 ==== Phone numbers
 
-The phone numbers are sent as string in the format "+41123456789" (Regex "[+][0-9]{8,}")
+The phone numbers are sent as string in the format "\+41123456789" (Regex "[+][1-9][0-9]{7,18}").
+The phone numbers are also validated using the com.google.i18n.phonenumbers.PhoneNumberUtil utility.
+
 
 === Status of a job advertisement
 
@@ -120,4 +122,6 @@ see https://en.wikipedia.org/wiki/Common_European_Framework_of_Reference_for_Lan
 === AVAM occupation code
 Refer to separate Excel sheet. The AVAM occupation list comprises > 4000 occupations with labels in three languages.
 Each is assigned to an SBN occupation group. The occupation code is required to determine whether
-a job vacancy falls under the registration requirement. link:AVAM-Berufsliste-Juni-2018.xlsx[Download occupations Excel sheet]
+a job vacancy falls under the registration requirement.
+The required occupation code is found in **column D of sheet "AVAM-Berufe komplett NEU"
+**link:AVAM-Berufsliste_API_April_2019.xlsx[Download occupations Excel sheet]

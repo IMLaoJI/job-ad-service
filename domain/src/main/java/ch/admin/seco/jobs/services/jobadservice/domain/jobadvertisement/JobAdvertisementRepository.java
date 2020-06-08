@@ -1,14 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement;
 
-import static org.hibernate.jpa.QueryHints.HINT_CACHE_MODE;
-import static org.hibernate.jpa.QueryHints.HINT_FETCH_SIZE;
-
-import java.time.LocalDate;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import javax.persistence.QueryHint;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,8 +9,19 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.QueryHint;
+import java.time.LocalDate;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static org.hibernate.annotations.QueryHints.READ_ONLY;
+import static org.hibernate.jpa.QueryHints.*;
+
 @Transactional(propagation = Propagation.MANDATORY)
 public interface JobAdvertisementRepository extends JpaRepository<JobAdvertisement, JobAdvertisementId> {
+
+    int HINT_FETCH_SIZE_VALUE = 100;
 
     @Query("select j from JobAdvertisement j " +
             "where j.status = ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REFINING and j.publication.startDate <= :currentDate")
@@ -33,6 +35,12 @@ public interface JobAdvertisementRepository extends JpaRepository<JobAdvertiseme
             "where j.status = ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC and j.publication.endDate < :currentDate")
     Stream<JobAdvertisement> findAllWherePublicationNeedToExpire(@Param("currentDate") LocalDate currentDate);
 
+    @QueryHints({
+            @QueryHint(name = HINT_FETCH_SIZE, value = "" + HINT_FETCH_SIZE_VALUE),
+            @QueryHint(name = HINT_CACHE_MODE, value = "IGNORE"),
+            @QueryHint(name = HINT_CACHEABLE, value = "false"),
+            @QueryHint(name = READ_ONLY, value = "true")
+    })
     @Query("select j from JobAdvertisement j " +
             "where j.sourceSystem = ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem.EXTERN " +
             "and j.status = ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC")
@@ -58,6 +66,9 @@ public interface JobAdvertisementRepository extends JpaRepository<JobAdvertiseme
 
     @Query("select j from JobAdvertisement j where j.owner.userId = :userId or j.owner.companyId = :companyId")
     Page<JobAdvertisement> findOwnJobAdvertisements(Pageable pageable, @Param("userId") String userId, @Param("companyId") String companyId);
+
+    @Query("select j from JobAdvertisement j where j.status in :status and (j.owner.userId = :userId or j.owner.companyId = :companyId) ")
+    Page<JobAdvertisement> findJobAdvertisementsByStatus(@Param("userId") String userId, @Param("companyId") String companyId, @Param("status") Set<JobAdvertisementStatus> status, Pageable pageable);
 
     @Query("select j from JobAdvertisement j where j.jobCenterCode = :jobCenterCode")
     Stream<JobAdvertisement> findByJobCenterCode(@Param("jobCenterCode") String jobCenterCode);

@@ -7,13 +7,22 @@ Seco eGovernment Services <{contact-mail}>
 :icons: font
 
 :sectnums:
-:sectnumlevels: 2
+:sectnumlevels: 3
+
+= The Job-Room Jobs API
+
+* The Job-Room Jobs API provides an additional channel for employers to publish job advertisements to the Swiss Public
+Employment Services system and thereby to comply with the reporting obligation
+(https://www.arbeit.swiss/secoalv/en/home/menue/unternehmen/stellenmeldepflicht.html).
+
+= Important notes (latest change: August 20, 2019)
+- **Occupation** codes: Use the most recent <<AVAM occupation code>> list. The relevant codes are in column D, not column A.
+- **Filtering by status:** You can now filter job ads by status (<<Filter by status>>)
+- **Access token:** On creation of a job ad, you get an <<Access token>> back as a header which allows the owner to view the job ad even if it is restricted.
 
 = Testing and productive access credentials
-
 - For testing:
 * Use URL link:{api-url}/jobAdvertisements/v1[{api-url}/jobAdvertisements/v1]
-* Test users apiuser01 to apiuser99 are available (password same as user name).
 * Do NOT use any confidential data in the test environment but DO use real postal codes.
 - The URL for the productive API is https://api.job-room.ch/jobAdvertisements/v1
 * Do NOT submit test data to the production environment!
@@ -22,7 +31,7 @@ Seco eGovernment Services <{contact-mail}>
 * Specify the company name, address and email, at least one technical contact person with email address and phone number, and user name. Please also specify the expected volume of job registrations.
 * The technical contact will receive an email with further instructions.
 
-= Important notes (latest change: August 30, 2018)
+= Important notes
 - The recommended format for job descriptions is **Markdown formating**. You may use simple html tags as well but they will be converted to Markdown.
 Some markdown references you might find helpful:
 * http://en.wikipedia.org/wiki/Markdown
@@ -30,25 +39,25 @@ Some markdown references you might find helpful:
 * http://html2markdown.bayn.es
 - **Company address**: While the <<Company>> address is not currently defined as mandatory, we strongly request that this data is included
 for jobs under reporting obligation. If the address is missing, this causes extra work for the public employment agent.
-- **Postal codes** must be valid. From beginning of September, postal codes will be validated and invalid data will be rejected.
-- **Phone number validation**: The minimum length of a phone number will be reduced in order to accomodate Liechtenstein phone numbers.
-The format is [+][0-9]{8,}.
+- **Postal code validation**: The job location must have valid postal code and city data. Validation is based on the Swiss Post, refer to https://www.post.ch/en/pages/plz-suche.
+- **Phone number validation**: The minimum length of a phone number was reduced in order to accomodate Liechtenstein phone numbers.
+The format is [+][1-9][0-9]{7,18}.
 - You can find a list of language codes supported by Job-Room at link:Job-Room-Languages.xlsx[List of supported languages]
 - It is not possible currently to **cancel** a job advertisement in status INSPECTING.
 Only cancel job ads in status PUBLISHED_RESTRICTED or PUBLISHED_PUBLIC.
 - **Updating** a job ad is currently not supported.
 
-= General
+== General
 
 include::api-general.adoc[]
 
-= Jobs advertisement API
-
 include::api-create.adoc[]
+
+include::api-get.adoc[]
 
 include::api-getAll.adoc[]
 
-include::api-get.adoc[]
+include::api-getAllFiltered.adoc[]
 
 include::api-update.adoc[]
 

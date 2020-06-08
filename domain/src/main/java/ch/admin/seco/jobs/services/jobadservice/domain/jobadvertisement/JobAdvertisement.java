@@ -1,61 +1,25 @@
 package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement;
 
-import static ch.admin.seco.jobs.services.jobadservice.core.utils.CompareUtils.hasChanged;
-import static ch.admin.seco.jobs.services.jobadservice.core.utils.CompareUtils.hasChangedContent;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.SECTION_APPLY_CHANNEL;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.SECTION_COMPANY;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.SECTION_CONTACT;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.SECTION_DISPLAY_APPLY_CHANNEL;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.SECTION_DISPLAY_COMPANY;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.SECTION_EMPLOYMENT;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.SECTION_FINGERPRINT;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.SECTION_JOBDESCRIPTION;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.SECTION_JOB_CENTER_CODE;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.SECTION_LANGUAGE_SKILLS;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.SECTION_LOCATION;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.SECTION_NUMBER_OF_JOBS;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.SECTION_OCCUPATIONS;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.SECTION_PUBLICATION;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.SECTION_PUBLIC_CONTACT;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.SECTION_REPORTING_OBLIGATION;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.SECTION_X28_OCCUPATION_CODES;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Locale;
-import java.util.Objects;
-
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.Aggregate;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventPublisher;
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.core.validations.Violations;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.changes.ChangeLog;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementAdjournedPublicationEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementApprovedEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementArchivedEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementBlackoutExpiredEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementCancelledEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementInspectingEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementPublishExpiredEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementPublishPublicEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementPublishRestrictedEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementRefinedEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementRefiningEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementRejectedEvent;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementUpdatedEvent;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.*;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
+
+import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Locale;
+import java.util.Objects;
+
+import static ch.admin.seco.jobs.services.jobadservice.core.utils.CompareUtils.hasChanged;
+import static ch.admin.seco.jobs.services.jobadservice.core.utils.CompareUtils.hasChangedContent;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater.*;
 
 @Entity
 public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertisementId> {
@@ -92,6 +56,8 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
     private boolean reportToAvam;
 
     private String jobCenterCode;
+
+    private String jobCenterUserId;
 
     private LocalDate approvalDate;
 
@@ -166,6 +132,7 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
         this.reportingObligationEndDate = builder.reportingObligationEndDate;
         this.reportToAvam = builder.reportToAvam;
         this.jobCenterCode = builder.jobCenterCode;
+        this.jobCenterUserId = builder.jobCenterUserId;
         this.approvalDate = builder.approvalDate;
         this.rejectionDate = builder.rejectionDate;
         this.rejectionCode = builder.rejectionCode;
@@ -229,6 +196,10 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
 
     public String getJobCenterCode() {
         return jobCenterCode;
+    }
+
+    public String getJobCenterUserId() {
+        return jobCenterUserId;
     }
 
     public LocalDate getApprovalDate() {
@@ -305,17 +276,26 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
         DomainEventPublisher.publish(new JobAdvertisementInspectingEvent(this));
     }
 
-    public void approve(String stellennummerAvam, LocalDate date, boolean reportingObligation, LocalDate reportingObligationEndDate) {
+    public void approve(String stellennummerAvam, LocalDate date, boolean reportingObligation,
+                        LocalDate reportingObligationEndDate, String jobCenterCode, String jobCenterUserId) {
+
         if (reportingObligation) {
             Condition.notNull(reportingObligationEndDate, "Reporting obligation end date is missing");
         }
         this.stellennummerAvam = Condition.notBlank(stellennummerAvam);
         this.approvalDate = Condition.notNull(date);
-        this.reportingObligation = reportingObligation;
-        this.reportingObligationEndDate = reportingObligationEndDate;
+
+        this.rejectionCode = null;
+        this.rejectionReason = null;
+        this.rejectionDate = null;
+        this.cancellationCode = null;
+        this.cancellationDate = null;
+
+        ChangeLog changeLog = applyApprove(reportingObligation, reportingObligationEndDate, jobCenterCode, jobCenterUserId);
         this.status = status.validateTransitionTo(JobAdvertisementStatus.APPROVED);
         this.updatedTime = TimeMachine.now();
-        DomainEventPublisher.publish(new JobAdvertisementApprovedEvent(this));
+
+        DomainEventPublisher.publish(new JobAdvertisementApprovedEvent(this, changeLog));
     }
 
     public void expireBlackout() {
@@ -331,12 +311,13 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
         DomainEventPublisher.publish(new JobAdvertisementPublishExpiredEvent(this));
     }
 
-    public void reject(String stellennummerAvam, LocalDate date, String code, String reason, String jobCenterCode) {
+    public void reject(String stellennummerAvam, LocalDate date, String code, String reason, String jobCenterCode, String jobCenterUserId) {
         this.stellennummerAvam = stellennummerAvam;
         this.rejectionDate = Condition.notNull(date);
         this.rejectionCode = Condition.notBlank(code);
         this.rejectionReason = reason;
         this.jobCenterCode = jobCenterCode;
+        this.jobCenterUserId = jobCenterUserId;
         this.status = status.validateTransitionTo(JobAdvertisementStatus.REJECTED);
         this.updatedTime = TimeMachine.now();
         DomainEventPublisher.publish(new JobAdvertisementRejectedEvent(this));
@@ -356,7 +337,7 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
         this.status = status.validateTransitionTo(JobAdvertisementStatus.REFINING);
         this.updatedTime = TimeMachine.now();
         DomainEventPublisher.publish(new JobAdvertisementRefiningEvent(this));
-        // FIXME: shortcut, because the x28-api is not yet ready. to bee handel when api is implemented
+        // FIXME: shortcut, because the external-api is not yet ready. to bee handel when api is implemented
         DomainEventPublisher.publish(new JobAdvertisementRefinedEvent(this));
     }
 
@@ -439,6 +420,7 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
                 ", reportingObligationEndDate=" + reportingObligationEndDate +
                 ", reportToAvam=" + reportToAvam +
                 ", jobCenterCode='" + jobCenterCode + '\'' +
+                ", jobCenterUserId='" + jobCenterUserId + '\'' +
                 ", approvalDate=" + approvalDate +
                 ", rejectionDate=" + rejectionDate +
                 ", rejectionCode='" + rejectionCode + '\'' +
@@ -490,6 +472,30 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
         Condition.isTrue(violations.isEmpty(), String.valueOf(violations.getMessages()));
     }
 
+    private ChangeLog applyApprove(boolean reportingObligation, LocalDate reportingObligationEndDate, String jobCenterCode, String jobCenterUserId) {
+        ChangeLog changeLog = new ChangeLog();
+
+        if (hasChanged(this.reportingObligation, reportingObligation)) {
+            changeLog.add("reportingObligation", this.reportingObligation, reportingObligation);
+            this.reportingObligation = reportingObligation;
+        }
+        if (hasChanged(this.reportingObligationEndDate, reportingObligationEndDate)) {
+            changeLog.add("reportingObligationEndDate", this.reportingObligationEndDate, reportingObligationEndDate);
+            this.reportingObligationEndDate = reportingObligationEndDate;
+        }
+        if (hasChanged(this.jobCenterCode, jobCenterCode)) {
+            changeLog.add("jobCenterCode", this.jobCenterCode, jobCenterCode);
+            this.jobCenterCode = jobCenterCode;
+        }
+
+        if (hasChanged(this.jobCenterUserId, jobCenterUserId)) {
+            changeLog.add("jobCenterUserId", this.jobCenterUserId, jobCenterUserId);
+            this.jobCenterUserId = jobCenterUserId;
+        }
+
+        return changeLog;
+    }
+
     private ChangeLog applyUpdates(JobAdvertisementUpdater updater) {
         ChangeLog changeLog = new ChangeLog();
 
@@ -503,7 +509,7 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
             getJobContent().setX28OccupationCodes(updater.getX28OccupationCodes());
         }
 
-        if (updater.hasAnyChangesIn(SECTION_NUMBER_OF_JOBS) && hasChanged(jobContent.getNumberOfJobs(), updater.getNumberOfJobs())) { // h
+        if (updater.hasAnyChangesIn(SECTION_NUMBER_OF_JOBS) && hasChanged(jobContent.getNumberOfJobs(), updater.getNumberOfJobs())) {
             changeLog.add("numberOfJobs", jobContent.getNumberOfJobs(), updater.getNumberOfJobs());
             jobContent.setNumberOfJobs(updater.getNumberOfJobs());
         }
@@ -528,12 +534,17 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
             }
         }
 
-        if (updater.hasAnyChangesIn(SECTION_JOB_CENTER_CODE) && hasChanged(jobCenterCode, updater.getJobCenterCode())) { //
+        if (updater.hasAnyChangesIn(SECTION_JOB_CENTER) && hasChanged(jobCenterCode, updater.getJobCenterCode())) {
             changeLog.add("jobCenterCode", jobCenterCode, updater.getJobCenterCode());
-            this.jobCenterCode = updater.getJobCenterCode();
+            jobCenterCode = updater.getJobCenterCode();
         }
 
-        if (updater.hasAnyChangesIn(SECTION_DISPLAY_COMPANY) && hasChanged(jobContent.getDisplayCompany(), updater.getDisplayCompany())) { //
+        if (updater.hasAnyChangesIn(SECTION_JOB_CENTER) && hasChanged(jobCenterUserId, updater.getJobCenterUserId())) {
+            changeLog.add("jobCenterUserId", jobCenterUserId, updater.getJobCenterUserId());
+            jobCenterUserId = updater.getJobCenterUserId();
+        }
+
+        if (updater.hasAnyChangesIn(SECTION_DISPLAY_COMPANY) && hasChanged(jobContent.getDisplayCompany(), updater.getDisplayCompany())) {
             changeLog.add("displayCompany", jobContent.getDisplayCompany(), updater.getDisplayCompany());
             jobContent.setDisplayCompany(updater.getDisplayCompany());
         }
@@ -616,6 +627,7 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
         private LocalDate reportingObligationEndDate;
         private boolean reportToAvam;
         private String jobCenterCode;
+        private String jobCenterUserId;
         private LocalDate approvalDate;
         private LocalDate rejectionDate;
         private String rejectionCode;
@@ -686,6 +698,11 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
 
         public Builder setJobCenterCode(String jobCenterCode) {
             this.jobCenterCode = jobCenterCode;
+            return this;
+        }
+
+        public Builder setJobCenterUserId(String jobCenterUserId) {
+            this.jobCenterUserId = jobCenterUserId;
             return this;
         }
 

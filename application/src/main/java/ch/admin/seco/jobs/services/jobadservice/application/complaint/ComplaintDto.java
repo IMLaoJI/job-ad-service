@@ -1,22 +1,20 @@
 package ch.admin.seco.jobs.services.jobadservice.application.complaint;
 
-import javax.validation.Valid;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import java.util.Locale;
 
 public class ComplaintDto {
 
     @NotBlank
     private String jobAdvertisementId;
 
-    @Valid
     @NotNull
-    private ContactInformationDto contactInformation;
+    @Enumerated(EnumType.STRING)
+    private ComplaintType complaintType;
 
-    @NotBlank
-    @Size(max = 1000)
-    private String complaintMessage;
 
 
     public String getJobAdvertisementId() {
@@ -28,21 +26,12 @@ public class ComplaintDto {
         return this;
     }
 
-    public ContactInformationDto getContactInformation() {
-        return contactInformation;
+    public ComplaintType getComplaintType() {
+        return complaintType;
     }
 
-    public ComplaintDto setContactInformation(ContactInformationDto contactInformation) {
-        this.contactInformation = contactInformation;
-        return this;
-    }
-
-    public String getComplaintMessage() {
-        return complaintMessage;
-    }
-
-    public ComplaintDto setComplaintMessage(String complaintMessage) {
-        this.complaintMessage = complaintMessage;
+    public ComplaintDto setComplaintType(ComplaintType complaintType) {
+        this.complaintType = complaintType;
         return this;
     }
 
@@ -50,8 +39,7 @@ public class ComplaintDto {
     public String toString() {
         return "ComplaintDto{" +
                 "jobAdvertisementId='" + jobAdvertisementId + '\'' +
-                ", contactInformation=" + contactInformation +
-                ", complaintMessage='" + complaintMessage + '\'' +
+                ", complaintType=" + complaintType +
                 '}';
     }
 }

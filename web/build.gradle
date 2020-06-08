@@ -10,11 +10,11 @@ project.ext {
 apply from: "${rootProject.rootDir}/gradle/docker.gradle"
 
 dependencies {
-    compile project(":infrastructure-database")
     compile project(":infrastructure-elasticsearch")
     compile project(":infrastructure-messagebroker")
     compile project(":infrastructure-service-reference")
     compile project(":infrastructure-elasticsearch")
+    compile project(":infrastructure")
 
     compile "org.springframework.boot:spring-boot-autoconfigure"
     compile "org.springframework.boot:spring-boot-starter-actuator"
@@ -22,7 +22,6 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-security"
     compile "org.springframework.boot:spring-boot-starter-web"
     compile "org.springframework.boot:spring-boot-starter-undertow"
-    compile "org.springframework.boot:spring-boot-starter-actuator"
 
     compile "org.springframework.cloud:spring-cloud-starter"
     compile "org.springframework.cloud:spring-cloud-starter-netflix-ribbon"
@@ -30,24 +29,27 @@ dependencies {
     compile "org.springframework.retry:spring-retry"
     compile "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client"
     compile "org.springframework.cloud:spring-cloud-starter-config"
-    compile "org.springframework.cloud:spring-cloud-starter-openfeign"
-
+    compile 'ch.admin.seco.alv:alv-feign-starter'
+    compile "ch.admin.seco.alv:alv-jwt-starter"
+    
     compile "org.springframework.security:spring-security-web"
-    compile "org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure"
 
-    compile "io.jsonwebtoken:jjwt"
     compile "io.springfox:springfox-swagger2"
     runtime "io.springfox:springfox-swagger-ui"
+    
+    compile 'org.springframework.cloud:spring-cloud-starter-zipkin'
 
     compile "org.codehaus.jackson:jackson-core-asl"
     compile "com.fasterxml.jackson.core:jackson-annotations"
     compile "com.fasterxml.jackson.core:jackson-databind"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
     compile "com.fasterxml.jackson.module:jackson-module-afterburner"
+
+    compile 'com.googlecode.libphonenumber:libphonenumber'
     
-    compile "net.logstash.logback:logstash-logback-encoder"
     compile "org.zalando:problem-spring-web"
     compile "org.jsoup:jsoup:1.11.3"
+    compile 'org.postgresql:postgresql'
 
     runtime "org.liquibase:liquibase-core"
     runtime "com.mattbertolini:liquibase-slf4j"
@@ -55,6 +57,7 @@ dependencies {
     testCompile files(this.project(':domain').sourceSets.test.output)
     testCompile "org.springframework.boot:spring-boot-starter-test"
     testCompile "org.springframework.security:spring-security-test"
+    testCompile 'org.awaitility:awaitility'
 
     optional "org.springframework.boot:spring-boot-configuration-processor"
 }
@@ -77,8 +80,7 @@ task cleanResources(type: Delete) {
 }
 
 asciidoctor {
-    attributes "base-url": "https://api.job-room.ch/0.2"
-    attributes "api-url": "http://test-api.job-room.ch"
+    attributes "api-url": "http://staging.job-room.ch"
     inputs.dir "api-docs"
 }
 

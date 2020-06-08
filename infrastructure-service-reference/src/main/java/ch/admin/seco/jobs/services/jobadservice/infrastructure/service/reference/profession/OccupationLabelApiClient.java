@@ -1,14 +1,22 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.service.reference.profession;
 
-import org.springframework.cloud.openfeign.FeignClient;
+import ch.admin.seco.alv.shared.feign.AlvUnauthorizedFeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "referenceservice", contextId = "occupation-api", url = "${feign.referenceservice.url:}", fallback = OccupationLabelApiClientFallback.class, decode404 = true)
+import java.util.Optional;
+
+@AlvUnauthorizedFeignClient(name = "referenceservice", contextId = "occupation-api", url = "${feign.referenceservice.url:}", path = "/api/occupations")
 public interface OccupationLabelApiClient {
 
-    @GetMapping("/api/occupations/label/mapping/{type}/{code}")
-    OccupationLabelMappingResource getOccupationMapping(@PathVariable("type") String type, @PathVariable("code") String code);
+	@GetMapping("/label/mapping/{type}/{code}")
+	Optional<OccupationLabelMappingResource> getOccupationMapping(@PathVariable("type") String type, @PathVariable("code") String code);
+
+	@GetMapping("/label/{id}")
+	Optional<OccupationLabelSuggestionResource> getOccupationInfoById(@PathVariable("id") String id);
+
+	@GetMapping("/label/isKnown/{avamCode}")
+	boolean isKnownAvamCode(@PathVariable("avamCode") String avamCode);
 
 }
 

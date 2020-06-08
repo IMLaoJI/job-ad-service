@@ -8,8 +8,8 @@ public class AggregateNotFoundException extends RuntimeException {
 
     private Object identifierValue;
 
-    private AggregateNotFoundException(Class<?> aggregateClass) {
-        super("Aggregate was not found");
+    private AggregateNotFoundException(Class<?> aggregateClass, Object identifierValue) {
+        super("Aggregate with ID " + identifierValue + " not found");
         this.aggregateName = aggregateClass.getSimpleName();
     }
 
@@ -18,7 +18,7 @@ public class AggregateNotFoundException extends RuntimeException {
     }
 
     public AggregateNotFoundException(Class<?> aggregateClass, IndentifierType identifierType, Object identifierValue) {
-        this(aggregateClass);
+        this(aggregateClass, identifierValue);
         this.indentifierType = identifierType;
         this.identifierValue = identifierValue;
     }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="fago" id="20190911080000-1">
+        <addColumn tableName="job_advertisement_occupation">
+            <column name="chisco5_code" type="varchar(5)"/>
+            <column name="chisco3_code" type="varchar(3)"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>
