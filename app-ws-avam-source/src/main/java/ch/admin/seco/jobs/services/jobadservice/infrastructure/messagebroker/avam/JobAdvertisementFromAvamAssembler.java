@@ -40,14 +40,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.CANCELLATION_CODE;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.EXPERIENCES;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.LANGUAGES;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.LANGUAGE_LEVEL;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.QUALIFICATION_CODE;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.SALUTATIONS;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.SOURCE_SYSTEM;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.WORK_FORMS;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.*;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamDateTimeFormatter.parseToLocalDate;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.util.StringUtils.hasText;
@@ -81,6 +74,7 @@ public class JobAdvertisementFromAvamAssembler {
                 .setReportingObligation(avamJobAdvertisement.isMeldepflicht())
                 .setReportingObligationEndDate(parseToLocalDate(avamJobAdvertisement.getSperrfrist()))
                 .setJobCenterCode(safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()))
+                .setJobCenterUserId(safeToStringOrNull(avamJobAdvertisement.getBenutzerDetailId()))
                 .setApprovalDate(parseToLocalDate(avamJobAdvertisement.getAnmeldeDatum()))
                 .setEmployment(createEmploymentDto(avamJobAdvertisement))
                 .setApplyChannel(createApplyChannelDto(avamJobAdvertisement))
