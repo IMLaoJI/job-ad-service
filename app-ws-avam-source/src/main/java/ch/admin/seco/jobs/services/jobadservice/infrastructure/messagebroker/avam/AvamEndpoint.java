@@ -24,8 +24,12 @@ public class AvamEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(AvamEndpoint.class);
 
     private static final String RESPONSE_OK = "SECO_WS: OK";
+
     private static final String RESPONSE_ERROR = "SECO_WS: ERROR";
+
     private static final String NAMESPACE_URI = "http://valueobjects.common.avam.bit.admin.ch";
+
+    private static final String AKTIVIERT = "AKTIVIERT";
 
     private final AvamSource avamSource;
     private final JobAdvertisementFromAvamAssembler jobAdvertisementFromAvamAssembler;
@@ -52,7 +56,11 @@ public class AvamEndpoint {
                 avamSource.cancel(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
             } else if (isApproved(avamJobAdvertisement)) {
                 avamSource.approve(jobAdvertisementFromAvamAssembler.createApprovalDto(avamJobAdvertisement));
-            } else if (isCreatedFromAvam(avamJobAdvertisement)) {
+            }
+            else if (avamJobAdvertisement.getEvent().equals(AKTIVIERT)){
+                avamSource.create(jobAdvertisementFromAvamAssembler.createCreateJobAdvertisementAvamDto(avamJobAdvertisement));
+            }
+            else if (isCreatedFromAvam(avamJobAdvertisement)) {
                 avamSource.create(jobAdvertisementFromAvamAssembler.createCreateJobAdvertisementAvamDto(avamJobAdvertisement));
             } else {
                 LOG.warn("Received JobAdvertisement in unknown state from AVAM: {}", transformToXml(request));
