@@ -156,11 +156,11 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         assertThat(jobAdvertisement.getPublication().isCompanyAnonymous()).isTrue();
 
         assertThat(jobAdvertisement.isReportingObligation()).isTrue();
-        assertThat(jobAdvertisement.getJobContent().getDisplayCompany()).isEqualTo(testDisplayCompany(testJobCenter("Markus Meier"))
+        assertThat(jobAdvertisement.getJobContent().getDisplayCompany()).isEqualTo(testDisplayCompany(testJobCenter("jobCenter-name"))
                 .setSurrogate(true)
                 .build()
         );
-        assertThat(jobAdvertisement.getJobContent().getDisplayApplyChannel()).isEqualTo(testDisplayApplyChannel(testJobCenter("Markus Meier"))
+        assertThat(jobAdvertisement.getJobContent().getDisplayApplyChannel()).isEqualTo(testDisplayApplyChannel(testJobCenter("jobCenter-name"))
                 .build()
         );
 
