@@ -249,9 +249,6 @@ public class AvamCreateJobAdvertisementDto {
 
     public static CreateJobAdvertisementDto toDto(AvamCreateJobAdvertisementDto createJobAdvertisementDto) {
         return new CreateJobAdvertisementDto()
-                .setReportToAvam(false) // TODO: 07/03/2019 fago check this
-                .setExternalUrl("") // TODO: 07/03/2019 fago check this
-                .setExternalReference("")  // TODO: 07/03/2019 fago check this
                 .setStellennummerAvam(createJobAdvertisementDto.getStellennummerAvam())
                 .setReportingObligation(createJobAdvertisementDto.isReportingObligation())
                 .setReportingObligationEndDate(createJobAdvertisementDto.getReportingObligationEndDate())
@@ -270,7 +267,6 @@ public class AvamCreateJobAdvertisementDto {
                         )
                 )
                 .setCompany(createJobAdvertisementDto.getCompany())
-                .setEmployer(null) // TODO: 08/03/2019 fago check this
                 .setEmployment(createJobAdvertisementDto.getEmployment())
                 .setLocation(createJobAdvertisementDto.getLocation())
                 .setOccupations(createJobAdvertisementDto.getOccupations())
