@@ -15,8 +15,5 @@ public interface OccupationLabelApiClient {
 	@GetMapping("/label/{id}")
 	Optional<OccupationLabelSuggestionResource> getOccupationInfoById(@PathVariable("id") String id);
 
-	@GetMapping("/label/isKnown/{avamCode}")
-	boolean isKnownAvamCode(@PathVariable("avamCode") String avamCode);
-
 }
 

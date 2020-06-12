@@ -129,8 +129,6 @@ public class JobAdvertisementApplicationService {
         if(isDeprecatedAvamCode(avamOccupationCode)) {
             LOG.info("The ApiUser with the ID: '{}' and the E-Mail: '{}' is using a deprecated avam code '{}'", currentUserContext.getCurrentUser().getUserId(), currentUserContext.getCurrentUser().getEmail(), avamOccupationCode);
         }
-        Condition.isTrue(professionService.isKnownAvamCode(avamOccupationCode),
-                String.format("Unknown AVAM Occupation Code: %s", avamOccupationCode));
         LOG.debug("Create '{}'", createJobAdvertisementDto.getJobDescriptions().get(0).getTitle());
 
         final JobAdvertisementCreator creator = getJobAdvertisementCreatorFromInternal(createJobAdvertisementDto);

@@ -74,7 +74,6 @@ public class JobAdvertisementApiRestControllerIntTest {
         this.jobAdvertisementElasticsearchRepository.deleteAll();
         when(locationService.isLocationValid(ArgumentMatchers.any())).thenReturn(true);
         when(locationService.enrichCodes(ArgumentMatchers.any())).then(returnsFirstArg());
-        when(professionService.isKnownAvamCode(ArgumentMatchers.any())).thenReturn(true);
         when(reportingObligationService.hasReportingObligation(any(), any(), any())).thenReturn(true);
         when(jobCenterService.findJobCenterByCode((any()))).thenReturn(new JobCenter());
     }

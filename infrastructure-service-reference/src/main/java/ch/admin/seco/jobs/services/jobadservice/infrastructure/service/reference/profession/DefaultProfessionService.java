@@ -32,10 +32,6 @@ public class DefaultProfessionService implements ProfessionService {
 				.map(this::toProfession);
 	}
 
-	@Override
-	public boolean isKnownAvamCode(String avamCode) {
-		return occupationLabelApiClient.isKnownAvamCode(avamCode);
-	}
 
 	private ProfessionSuggestion toProfessionSuggestion(OccupationLabelSuggestionResource resource) {
 		if (resource == null) {
