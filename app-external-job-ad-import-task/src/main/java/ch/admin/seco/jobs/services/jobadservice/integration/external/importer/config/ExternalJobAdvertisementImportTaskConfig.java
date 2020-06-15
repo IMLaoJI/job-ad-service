@@ -74,14 +74,14 @@ public class ExternalJobAdvertisementImportTaskConfig {
 
     @Bean
     public Job externalImportJob(StaxEventItemReader<Oste> xmlFileReader, ExternalJobAdvertisementWriter externalJobAdvertisementWriter,
-                                 ExternalJobAdvertisementProperties externalJobAdvertisementProperties) {
+                                 SftpProperties sftpProperties) {
         return jobBuilderFactory.get("external-jobad-xml-import")
                 .incrementer(new RunIdIncrementer())
                 .listener(new CleanupXmlFileJobExecutionListener())
                 .start(stepBuilderFactory
                         .get("download-from-sftp")
                         .allowStartIfComplete(true)
-                        .tasklet(downloadFromSftpServer(externalJobAdvertisementProperties))
+                        .tasklet(downloadFromSftpServer(sftpProperties))
                         .build())
                 .on("NO_FILE").end()
                 .on("*")
@@ -108,12 +108,12 @@ public class ExternalJobAdvertisementImportTaskConfig {
     }
 
     @Bean
-    public Tasklet downloadFromSftpServer(ExternalJobAdvertisementProperties externalJobAdvertisementProperties) {
+    public Tasklet downloadFromSftpServer(SftpProperties sftpProperties) {
         return (contribution, chunkContext) -> {
             LOG.info("Downloading from SFTP Server ('{}:{}/{}')",
-                    externalJobAdvertisementProperties.getHost(),
-                    externalJobAdvertisementProperties.getPort(),
-                    externalJobAdvertisementProperties.getRemoteDirectory());
+                    sftpProperties.getHost(),
+                    sftpProperties.getPort(),
+                    sftpProperties.getRemoteDirectory());
 
             Message<File> externalJobAdDataFileMessage = externalJobAdvertisementDataFileMessageSource.receive();
             if ((externalJobAdDataFileMessage == null) || (externalJobAdDataFileMessage.getPayload() == null)) {

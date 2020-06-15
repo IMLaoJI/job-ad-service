@@ -21,7 +21,7 @@ public class DataSourceConfig {
      */
     @Bean
     @Primary
-    @ConfigurationProperties(prefix = "spring.datasource")
+    @ConfigurationProperties(prefix = "job-ad-export.datasource.batch")
     DataSourceProperties batchDataSourceProperties() {
         return new DataSourceProperties();
     }
@@ -31,6 +31,7 @@ public class DataSourceConfig {
      */
     @Bean
     @Primary
+    @ConfigurationProperties(prefix = "job-ad-export.datasource.batch.hikari")
     DataSource batchDataSource() {
         return batchDataSourceProperties().initializeDataSourceBuilder().build();
     }
@@ -39,12 +40,13 @@ public class DataSourceConfig {
      * Define data source for JobAdvertisement export with custom prefix.
      */
     @Bean
-    @ConfigurationProperties("spring.datasource.jobadservice")
+    @ConfigurationProperties("job-ad-export.datasource.jobadservice")
     DataSourceProperties jobAdServiceDataSourceProperties() {
         return new DataSourceProperties();
     }
 
     @Bean
+    @ConfigurationProperties("job-ad-export.datasource.jobadservice.hikari")
     DataSource jobAdServiceDataSource() {
         DataSourceProperties jobAdServiceDataSourceProperties = jobAdServiceDataSourceProperties();
         LOG.info("Building jobAdServiceDataSource ({})", jobAdServiceDataSourceProperties.getUrl());

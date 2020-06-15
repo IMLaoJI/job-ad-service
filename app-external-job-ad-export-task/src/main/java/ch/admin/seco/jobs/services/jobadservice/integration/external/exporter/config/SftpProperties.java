@@ -1,13 +1,13 @@
-package ch.admin.seco.jobs.services.jobadservice.integration.external.importer.config;
+package ch.admin.seco.jobs.services.jobadservice.integration.external.exporter.config;
 
 import javax.validation.constraints.NotBlank;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-@ConfigurationProperties(prefix = "jobroom.external.sftp")
+@ConfigurationProperties(prefix = "job-ad-export.sftp")
 @Validated
-public class ExternalJobAdvertisementProperties {
+public class SftpProperties {
 
     @NotBlank
     private String host;
@@ -29,7 +29,7 @@ public class ExternalJobAdvertisementProperties {
     private String remoteDirectory;
 
     @NotBlank
-    private String fileNamePattern;
+    private String xmlFileName;
 
     public Boolean getAllowUnknownKeys() {
         return allowUnknownKeys;
@@ -87,11 +87,11 @@ public class ExternalJobAdvertisementProperties {
         this.remoteDirectory = remoteDirectory;
     }
 
-    public String getFileNamePattern() {
-        return fileNamePattern;
+    public String getXmlFileName() {
+        return xmlFileName;
     }
 
-    public void setFileNamePattern(String fileNamePattern) {
-        this.fileNamePattern = fileNamePattern;
+    public void setXmlFileName(String xmlFileName) {
+        this.xmlFileName = xmlFileName;
     }
 }
