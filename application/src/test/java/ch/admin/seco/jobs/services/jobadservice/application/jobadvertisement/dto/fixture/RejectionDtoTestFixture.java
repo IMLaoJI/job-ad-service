@@ -15,7 +15,7 @@ public class RejectionDtoTestFixture {
                 .setDate(LocalDate.of(2018, 1, 1))
                 .setCode("code")
                 .setReason("reason")
-                .setJobCenterCode("14711")
-                .setJobCenterUserId("jobcenterid");
+                .setJobCenterCode("jobcenterid")
+                .setJobCenterUserId("14711");
     }
 }
