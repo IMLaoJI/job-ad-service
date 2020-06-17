@@ -1,7 +1,11 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.web.controller.webform;
 
 import ch.admin.seco.jobs.services.jobadservice.application.HtmlToMarkdownConverter;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.AddressDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
@@ -12,6 +16,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import org.springframework.stereotype.Component;
 
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PhoneNumberUtil.sanitizePhoneNumber;
+import static java.util.Collections.singletonList;
 import static org.springframework.util.StringUtils.hasText;
 import static org.springframework.util.StringUtils.trimWhitespace;
 
@@ -43,7 +48,7 @@ public class JobAdvertisementFromWebAssembler {
                 .setExternalUrl(createJobAdvertisementFromWebDto.getExternalUrl())
                 .setPublicContact(sanitizePublicPhone(createJobAdvertisementFromWebDto.getPublicContact()))
                 .setLocation(createJobAdvertisementFromWebDto.getLocation())
-                .setOccupation(createJobAdvertisementFromWebDto.getOccupation());
+                .setOccupations(singletonList(createJobAdvertisementFromWebDto.getOccupation()));
     }
 
     private PublicContactDto sanitizePublicPhone(PublicContactDto publicContact) {

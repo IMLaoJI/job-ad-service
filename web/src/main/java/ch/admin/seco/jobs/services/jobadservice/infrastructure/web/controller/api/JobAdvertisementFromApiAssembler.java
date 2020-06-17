@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.web.util.PhoneNumberUtil.sanitizePhoneNumber;
+import static java.util.Collections.singletonList;
 import static org.springframework.util.StringUtils.hasText;
 
 @Component
@@ -39,7 +40,7 @@ public class JobAdvertisementFromApiAssembler {
                 .setEmployer(convertEmployer(apiCreateDto.getEmployer()))
                 .setEmployment(convertEmployment(apiCreateDto.getEmployment()))
                 .setLocation(convertCreateLocation(apiCreateDto.getLocation()))
-                .setOccupation(convertOccupation(apiCreateDto.getOccupation()))
+				.setOccupations(singletonList(convertOccupation(apiCreateDto.getOccupation())))
                 .setLanguageSkills(convertLanguageSkills(apiCreateDto.getLanguageSkills()))
                 .setApplyChannel(convertApplyChannel(apiCreateDto))
                 .setPublicContact(convertPublicContact(apiCreateDto.getPublicContact()));
