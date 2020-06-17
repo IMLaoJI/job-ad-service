@@ -1,22 +1,14 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update;
 
-import java.time.LocalDate;
-import java.util.List;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.LanguageIsoCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.LanguageIsoCode;
+import java.time.LocalDate;
+import java.util.List;
 
 public class UpdateJobAdvertisementFromAvamDto {
 
@@ -69,185 +61,174 @@ public class UpdateJobAdvertisementFromAvamDto {
     @NotNull
     private PublicationDto publication;
 
-    protected UpdateJobAdvertisementFromAvamDto() {
-        // For reflection libs
-    }
-
-    public UpdateJobAdvertisementFromAvamDto(String stellennummerAvam, String title, String description, String languageIsoCode, String numberOfJobs,
-                                             boolean reportingObligation, LocalDate reportingObligationEndDate, String jobCenterCode, String jobCenterUserId,
-                                             LocalDate approvalDate, EmploymentDto employment, ApplyChannelDto applyChannel, CompanyDto company, ContactDto contact, CreateLocationDto location,
-                                             List<OccupationDto> occupations, List<LanguageSkillDto> languageSkills, PublicationDto publication, PublicContactDto publicContact
-    ) {
-        this.stellennummerAvam = stellennummerAvam;
-        this.title = title;
-        this.description = description;
-        this.languageIsoCode = languageIsoCode;
-        this.numberOfJobs = numberOfJobs;
-        this.reportingObligation = reportingObligation;
-        this.reportingObligationEndDate = reportingObligationEndDate;
-        this.jobCenterCode = jobCenterCode;
-        this.jobCenterUserId = jobCenterUserId;
-        this.approvalDate = approvalDate;
-        this.employment = employment;
-        this.applyChannel = applyChannel;
-        this.company = company;
-        this.contact = contact;
-        this.location = location;
-        this.occupations = occupations;
-        this.languageSkills = languageSkills;
-        this.publication = publication;
-        this.publicContact = publicContact;
-    }
-
     public String getStellennummerAvam() {
         return stellennummerAvam;
     }
 
-    public void setStellennummerAvam(String stellennummerAvam) {
+    public UpdateJobAdvertisementFromAvamDto setStellennummerAvam(String stellennummerAvam) {
         this.stellennummerAvam = stellennummerAvam;
+        return this;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public UpdateJobAdvertisementFromAvamDto setTitle(String title) {
         this.title = title;
+        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public UpdateJobAdvertisementFromAvamDto setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     public String getLanguageIsoCode() {
         return languageIsoCode;
     }
 
-    public void setLanguageIsoCode(String languageIsoCode) {
+    public UpdateJobAdvertisementFromAvamDto setLanguageIsoCode(String languageIsoCode) {
         this.languageIsoCode = languageIsoCode;
+        return this;
     }
 
     public String getNumberOfJobs() {
         return numberOfJobs;
     }
 
-    public void setNumberOfJobs(String numberOfJobs) {
+    public UpdateJobAdvertisementFromAvamDto setNumberOfJobs(String numberOfJobs) {
         this.numberOfJobs = numberOfJobs;
+        return this;
     }
 
     public boolean isReportingObligation() {
         return reportingObligation;
     }
 
-    public void setReportingObligation(boolean reportingObligation) {
+    public UpdateJobAdvertisementFromAvamDto setReportingObligation(boolean reportingObligation) {
         this.reportingObligation = reportingObligation;
+        return this;
     }
 
     public LocalDate getReportingObligationEndDate() {
         return reportingObligationEndDate;
     }
 
-    public void setReportingObligationEndDate(LocalDate reportingObligationEndDate) {
+    public UpdateJobAdvertisementFromAvamDto setReportingObligationEndDate(LocalDate reportingObligationEndDate) {
         this.reportingObligationEndDate = reportingObligationEndDate;
+        return this;
     }
 
     public String getJobCenterCode() {
         return jobCenterCode;
     }
 
-    public void setJobCenterCode(String jobCenterCode) {
+    public UpdateJobAdvertisementFromAvamDto setJobCenterCode(String jobCenterCode) {
         this.jobCenterCode = jobCenterCode;
+        return this;
     }
 
     public String getJobCenterUserId() {
         return jobCenterUserId;
     }
 
-    public void setJobCenterUserId(String jobCenterUserId) {
+    public UpdateJobAdvertisementFromAvamDto setJobCenterUserId(String jobCenterUserId) {
         this.jobCenterUserId = jobCenterUserId;
+        return this;
     }
 
     public LocalDate getApprovalDate() {
         return approvalDate;
     }
 
-    public void setApprovalDate(LocalDate approvalDate) {
+    public UpdateJobAdvertisementFromAvamDto setApprovalDate(LocalDate approvalDate) {
         this.approvalDate = approvalDate;
+        return this;
     }
 
     public EmploymentDto getEmployment() {
         return employment;
     }
 
-    public void setEmployment(EmploymentDto employment) {
+    public UpdateJobAdvertisementFromAvamDto setEmployment(EmploymentDto employment) {
         this.employment = employment;
+        return this;
     }
 
     public ApplyChannelDto getApplyChannel() {
         return applyChannel;
     }
 
-    public void setApplyChannel(ApplyChannelDto applyChannel) {
+    public UpdateJobAdvertisementFromAvamDto setApplyChannel(ApplyChannelDto applyChannel) {
         this.applyChannel = applyChannel;
+        return this;
     }
 
     public CompanyDto getCompany() {
         return company;
     }
 
-    public void setCompany(CompanyDto company) {
+    public UpdateJobAdvertisementFromAvamDto setCompany(CompanyDto company) {
         this.company = company;
+        return this;
     }
 
     public ContactDto getContact() {
         return contact;
     }
 
-    public void setContact(ContactDto contact) {
+    public UpdateJobAdvertisementFromAvamDto setContact(ContactDto contact) {
         this.contact = contact;
-    }
-
-    public CreateLocationDto getLocation() {
-        return location;
-    }
-
-    public void setLocation(CreateLocationDto location) {
-        this.location = location;
-    }
-
-    public List<OccupationDto> getOccupations() {
-        return occupations;
-    }
-
-    public void setOccupations(List<OccupationDto> occupations) {
-        this.occupations = occupations;
-    }
-
-    public List<LanguageSkillDto> getLanguageSkills() {
-        return languageSkills;
-    }
-
-    public void setLanguageSkills(List<LanguageSkillDto> languageSkills) {
-        this.languageSkills = languageSkills;
-    }
-
-    public PublicationDto getPublication() {
-        return publication;
-    }
-
-    public void setPublication(PublicationDto publication) {
-        this.publication = publication;
+        return this;
     }
 
     public PublicContactDto getPublicContact() {
         return publicContact;
     }
 
-    public void setPublicContact(PublicContactDto publicContact) {
+    public UpdateJobAdvertisementFromAvamDto setPublicContact(PublicContactDto publicContact) {
         this.publicContact = publicContact;
+        return this;
+    }
+
+    public CreateLocationDto getLocation() {
+        return location;
+    }
+
+    public UpdateJobAdvertisementFromAvamDto setLocation(CreateLocationDto location) {
+        this.location = location;
+        return this;
+    }
+
+    public List<OccupationDto> getOccupations() {
+        return occupations;
+    }
+
+    public UpdateJobAdvertisementFromAvamDto setOccupations(List<OccupationDto> occupations) {
+        this.occupations = occupations;
+        return this;
+    }
+
+    public List<LanguageSkillDto> getLanguageSkills() {
+        return languageSkills;
+    }
+
+    public UpdateJobAdvertisementFromAvamDto setLanguageSkills(List<LanguageSkillDto> languageSkills) {
+        this.languageSkills = languageSkills;
+        return this;
+    }
+
+    public PublicationDto getPublication() {
+        return publication;
+    }
+
+    public UpdateJobAdvertisementFromAvamDto setPublication(PublicationDto publication) {
+        this.publication = publication;
+        return this;
     }
 }

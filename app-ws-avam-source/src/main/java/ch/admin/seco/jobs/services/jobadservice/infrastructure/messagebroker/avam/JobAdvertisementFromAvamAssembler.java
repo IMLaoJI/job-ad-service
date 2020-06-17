@@ -1,14 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.AddressDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
@@ -31,12 +23,7 @@ import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -88,48 +75,46 @@ public class JobAdvertisementFromAvamAssembler {
     }
 
     ApprovalDto createApprovalDto(WSOsteEgov avamJobAdvertisement) {
-        return new ApprovalDto(
-                safeTrimOrNull(avamJobAdvertisement.getStellennummerEgov()),
-                safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()),
-                parseToLocalDate(avamJobAdvertisement.getAnmeldeDatum()),
-                avamJobAdvertisement.isMeldepflicht(),
-                parseToLocalDate(avamJobAdvertisement.getSperrfrist()),
-                safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()),
-                safeToStringOrNull(avamJobAdvertisement.getBenutzerDetailId()),
-                new UpdateJobAdvertisementFromAvamDto(
-                        safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()),
-                        safeTrimOrNull(avamJobAdvertisement.getBezeichnung()),
-                        safeTrimOrNull(avamJobAdvertisement.getBeschreibung()),
-                        "de", // Not defined in this AVAM version
-                        safeTrimOrNull(avamJobAdvertisement.getGleicheOste()),
-                        avamJobAdvertisement.isMeldepflicht(),
-                        parseToLocalDate(avamJobAdvertisement.getSperrfrist()),
-                        safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()),
-                        safeToStringOrNull(avamJobAdvertisement.getBenutzerDetailId()),
-                        parseToLocalDate(avamJobAdvertisement.getAnmeldeDatum()),
-                        createEmploymentDto(avamJobAdvertisement),
-                        createApplyChannelDto(avamJobAdvertisement),
-                        createCompanyDto(avamJobAdvertisement),
-                        createContactDto(avamJobAdvertisement),
-                        createCreateLocationDto(avamJobAdvertisement),
-                        createOccupationDtos(avamJobAdvertisement),
-                        createLanguageSkillDtos(avamJobAdvertisement),
-                        createPublicationDto(avamJobAdvertisement),
-                        createPublicContactDto(avamJobAdvertisement)
-                )
-        );
+        return new ApprovalDto()
+                .setStellennummerEgov(safeTrimOrNull(avamJobAdvertisement.getStellennummerEgov()))
+                .setStellennummerAvam(safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()))
+                .setDate(parseToLocalDate(avamJobAdvertisement.getAnmeldeDatum()))
+                .setReportingObligation(avamJobAdvertisement.isMeldepflicht())
+                .setReportingObligationEndDate(parseToLocalDate(avamJobAdvertisement.getSperrfrist()))
+                .setJobCenterCode(safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()))
+                .setJobCenterUserId(safeToStringOrNull(avamJobAdvertisement.getBenutzerDetailId()))
+                .setUpdateJobAdvertisement(new UpdateJobAdvertisementFromAvamDto()
+                        .setStellennummerAvam(safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()))
+                        .setTitle(safeTrimOrNull(avamJobAdvertisement.getBezeichnung()))
+                        .setDescription(safeTrimOrNull(avamJobAdvertisement.getBeschreibung()))
+                        .setLanguageIsoCode("de") // Not defined in this AVAM version
+                        .setNumberOfJobs(safeTrimOrNull(avamJobAdvertisement.getGleicheOste()))
+                        .setReportingObligation(avamJobAdvertisement.isMeldepflicht())
+                        .setReportingObligationEndDate(parseToLocalDate(avamJobAdvertisement.getSperrfrist()))
+                        .setJobCenterCode(safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()))
+                        .setJobCenterUserId(safeToStringOrNull(avamJobAdvertisement.getBenutzerDetailId()))
+                        .setApprovalDate(parseToLocalDate(avamJobAdvertisement.getAnmeldeDatum()))
+                        .setEmployment(createEmploymentDto(avamJobAdvertisement))
+                        .setApplyChannel(createApplyChannelDto(avamJobAdvertisement))
+                        .setCompany(createCompanyDto(avamJobAdvertisement))
+                        .setContact(createContactDto(avamJobAdvertisement))
+                        .setLocation(createCreateLocationDto(avamJobAdvertisement))
+                        .setOccupations(createOccupationDtos(avamJobAdvertisement))
+                        .setLanguageSkills(createLanguageSkillDtos(avamJobAdvertisement))
+                        .setPublication(createPublicationDto(avamJobAdvertisement))
+                        .setPublicContact(createPublicContactDto(avamJobAdvertisement))
+                );
     }
 
     RejectionDto createRejectionDto(WSOsteEgov avamJobAdvertisement) {
-        return new RejectionDto(
-                safeTrimOrNull(avamJobAdvertisement.getStellennummerEgov()),
-                safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()),
-                parseToLocalDate(avamJobAdvertisement.getAblehnungDatum()),
-                safeTrimOrNull(avamJobAdvertisement.getAblehnungGrundCode()),
-                safeTrimOrNull(avamJobAdvertisement.getAblehnungGrund()),
-                safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()),
-                safeToStringOrNull(avamJobAdvertisement.getBenutzerDetailId())
-        );
+        return new RejectionDto()
+                .setStellennummerEgov(safeTrimOrNull(avamJobAdvertisement.getStellennummerEgov()))
+                .setStellennummerAvam(safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()))
+                .setDate(parseToLocalDate(avamJobAdvertisement.getAblehnungDatum()))
+                .setCode(safeTrimOrNull(avamJobAdvertisement.getAblehnungGrundCode()))
+                .setReason(safeTrimOrNull(avamJobAdvertisement.getAblehnungGrund()))
+                .setJobCenterCode(safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()))
+                .setJobCenterUserId(safeToStringOrNull(avamJobAdvertisement.getBenutzerDetailId()));
     }
 
     AvamCancellationDto createCancellationDto(WSOsteEgov avamJobAdvertisement) {
@@ -209,7 +194,7 @@ public class JobAdvertisementFromAvamAssembler {
     }
 
     private CompanyDto createCompanyDto(WSOsteEgov avamJobAdvertisement) {
-        // This fields are also used for ApplChannel from AVAM
+        // This fields are also used for ApplyChannel from AVAM
         return new CompanyDto()
                 .setName(safeTrimOrNull(avamJobAdvertisement.getUntName()))
                 .setStreet(safeTrimOrNull(avamJobAdvertisement.getUntStrasse()))
@@ -309,6 +294,19 @@ public class JobAdvertisementFromAvamAssembler {
         return Collections.emptySet();
     }
 
+    private AddressDto createApplyChannelPostAddress(WSOsteEgov avamJobAdvertisement) {
+        return new AddressDto()
+                .setName(safeTrimOrNull(avamJobAdvertisement.getBewerUntName()))
+                .setStreet(safeTrimOrNull(avamJobAdvertisement.getBewerUntStrasse()))
+                .setHouseNumber(safeTrimOrNull(avamJobAdvertisement.getBewerUntHausNr()))
+                .setPostalCode(safeTrimOrNull(avamJobAdvertisement.getBewerUntPlz()))
+                .setCity(safeTrimOrNull(avamJobAdvertisement.getBewerUntOrt()))
+                .setPostOfficeBoxNumber(safeTrimOrNull(avamJobAdvertisement.getBewerUntPostfach()))
+                .setPostOfficeBoxPostalCode(safeTrimOrNull(avamJobAdvertisement.getBewerUntPostfachPlz()))
+                .setPostOfficeBoxCity(safeTrimOrNull(avamJobAdvertisement.getBewerUntPostfachOrt()))
+                .setCountryIsoCode(safeTrimOrNull(avamJobAdvertisement.getBewerUntLand()));
+    }
+
     /*
      * Check for a valid phone number and remove remarks.
      */
@@ -359,20 +357,6 @@ public class JobAdvertisementFromAvamAssembler {
         }
         return null;
     }
-
-    private AddressDto createApplyChannelPostAddress(WSOsteEgov avamJobAdvertisement) {
-        return new AddressDto()
-                .setName(safeTrimOrNull(avamJobAdvertisement.getBewerUntName()))
-                .setStreet(safeTrimOrNull(avamJobAdvertisement.getBewerUntStrasse()))
-                .setHouseNumber(safeTrimOrNull(avamJobAdvertisement.getBewerUntHausNr()))
-                .setPostalCode(safeTrimOrNull(avamJobAdvertisement.getBewerUntPlz()))
-                .setCity(safeTrimOrNull(avamJobAdvertisement.getBewerUntOrt()))
-                .setPostOfficeBoxNumber(safeTrimOrNull(avamJobAdvertisement.getBewerUntPostfach()))
-                .setPostOfficeBoxPostalCode(safeTrimOrNull(avamJobAdvertisement.getBewerUntPostfachPlz()))
-                .setPostOfficeBoxCity(safeTrimOrNull(avamJobAdvertisement.getBewerUntPostfachOrt()))
-                .setCountryIsoCode(safeTrimOrNull(avamJobAdvertisement.getBewerUntLand()));
-    }
-
 
     private <T> T resolveMapping(MappingBuilder<String, T> mapping, String key, String mappingName) {
         final String trimmedKey = safeTrimOrNull(key);
