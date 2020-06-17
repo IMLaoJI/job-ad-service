@@ -5,6 +5,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromAvamDto;
+import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.utils.MappingBuilder;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Salutation;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
@@ -170,9 +171,13 @@ public class JobAdvertisementFromAvamAssembler {
 
     private EmploymentDto createEmploymentDto(WSOsteEgov avamJobAdvertisement) {
         WorkingTimePercentage workingTimePercentage = WorkingTimePercentage.evaluate(avamJobAdvertisement.getPensumVon(), avamJobAdvertisement.getPensumBis());
+        Condition.isTrue(workingTimePercentage.getMax() >= workingTimePercentage.getMin(), "Workload percentage MAX must be greater or equal to workload percentage MIN value.");
+        LocalDate startDate = parseToLocalDate(avamJobAdvertisement.getStellenantritt());
+        LocalDate endDate = getEmploymentEndDate(avamJobAdvertisement);
+        validateDates(startDate, endDate);
         return new EmploymentDto()
-                .setStartDate(parseToLocalDate(avamJobAdvertisement.getStellenantritt()))
-                .setEndDate(getEmploymentEndDate(avamJobAdvertisement))
+                .setStartDate(startDate)
+                .setEndDate(endDate)
                 .setShortEmployment(avamJobAdvertisement.getFristTyp().equals(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.SHORT_TERM)))
                 .setImmediately(safeBoolean(avamJobAdvertisement.isAbSofort(), avamJobAdvertisement.getStellenantritt() == null))
                 .setPermanent(avamJobAdvertisement.getFristTyp().equals(AvamCodeResolver.EMPLOYMENT_TERM_TYPE.getLeft(EmploymentTermType.PERMANENT)))
@@ -356,6 +361,13 @@ public class JobAdvertisementFromAvamAssembler {
             }
         }
         return null;
+    }
+
+    private void validateDates(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            return;
+        }
+        Condition.isTrue(endDate.isAfter(startDate), "EndDate must be after StartDate value.");
     }
 
     private <T> T resolveMapping(MappingBuilder<String, T> mapping, String key, String mappingName) {
