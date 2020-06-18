@@ -701,7 +701,6 @@ public class JobAdvertisementApplicationService {
                         .setChIsco3Code(profession.getChIsco3Code())
                         .setChIsco5Code(profession.getChIsco5Code())
                         .setBfsCode(profession.getBfsCode())
-                        .setLabel(profession.getLabel())
                         .setWorkExperience(occupation.getWorkExperience())
                         .setEducationCode(occupation.getEducationCode())
                         .setQualification(occupation.getQualificationCode())
