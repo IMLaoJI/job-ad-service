@@ -7,6 +7,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.search.JobAdvertisementSearchRequest;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.ResolvedSearchProfileDto;
+import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.CantonFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.ResolvedOccupationFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.application.searchprofile.dto.searchfilter.ResolvedSearchFilterDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.GeoPoint;
@@ -67,7 +68,7 @@ public class JobAdvertisementSearchRequestAssembler {
 
 	private Boolean isPermanent(ResolvedSearchFilterDto searchFilter) {
 		final ContractType contractType = searchFilter.getContractType();
-		if(contractType == null){
+		if (contractType == null) {
 			return null;
 		}
 		switch (contractType) {
@@ -84,22 +85,30 @@ public class JobAdvertisementSearchRequestAssembler {
 		if (resolvedSearchProfileDto.getSearchFilter().getOccupations().isEmpty()) {
 			return null;
 		}
-		final List<ResolvedOccupationFilterDto> occupations = resolvedSearchProfileDto.getSearchFilter().getOccupations();
+		final List<ResolvedOccupationFilterDto> occupations = filterX28Mappings(resolvedSearchProfileDto.getSearchFilter().getOccupations());
 		ArrayList<ProfessionCode> professionCodes = new ArrayList<>();
 		for (ResolvedOccupationFilterDto resolvedOccupationFilterDto : occupations) {
-			professionCodes.add(new ProfessionCode(extractProfessionCodeType(resolvedOccupationFilterDto), resolvedOccupationFilterDto.getCode()));
 			final Map<ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType, String> mappings = resolvedOccupationFilterDto.getMappings();
 			if (mappings == null || mappings.isEmpty()) {
 				continue;
 			}
-			mappings
-					.forEach((key, value) -> professionCodes.add(new ProfessionCode(ProfessionCodeType.fromString(key.toString()), value)));
+			mappings.forEach((key, value) -> professionCodes.add(new ProfessionCode(ProfessionCodeType.fromString(key.toString()), value)));
 		}
 		return professionCodes.toArray(new ProfessionCode[0]);
 	}
 
-	private static ProfessionCodeType extractProfessionCodeType(ResolvedOccupationFilterDto resolvedOccupationFilterDto) {
-		return ProfessionCodeType.fromString(resolvedOccupationFilterDto.getType().toString());
+	private List<ResolvedOccupationFilterDto> filterX28Mappings(List<ResolvedOccupationFilterDto> occupations) {
+		ArrayList<ResolvedOccupationFilterDto> resolvedOccupationFilterDtos = new ArrayList<>();
+		occupations.forEach(resolvedOccupationFilterDto -> {
+			if (resolvedOccupationFilterDto.getType().equals(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.X28)) {
+				final Map<ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType, String> mappings = resolvedOccupationFilterDto.getMappings();
+				mappings.remove(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.CHISCO3);
+				mappings.remove(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.CHISCO5);
+				mappings.remove(ch.admin.seco.jobs.services.jobadservice.domain.profession.ProfessionCodeType.BFS);
+			}
+			resolvedOccupationFilterDtos.add(resolvedOccupationFilterDto);
+		});
+		return resolvedOccupationFilterDtos;
 	}
 
 	private static String[] extractKeywords(ResolvedSearchProfileDto resolvedSearchProfileDto) {
@@ -118,8 +127,8 @@ public class JobAdvertisementSearchRequestAssembler {
 		if (resolvedSearchProfileDto.getSearchFilter().getCantons().isEmpty()) {
 			return null;
 		}
-		return resolvedSearchProfileDto.getSearchFilter().getLocations().stream()
-				.map(LocationDto::getCantonCode)
+		return resolvedSearchProfileDto.getSearchFilter().getCantons().stream()
+				.map(CantonFilterDto::getCode)
 				.toArray(String[]::new);
 	}
 
