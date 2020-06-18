@@ -49,6 +49,5 @@
     <include file="classpath:/liquibase/changelog/20191126180000_add_mapping_table.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20191126180001_migrate_SearchProfile_Occupationlabel_UUIDS_to_composite_keys.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20200113180001_add_jobalert.xml" relativeToChangelogFile="false"/>
-    <include file="classpath:/liquibase/changelog/20200113180001_add_jobalert.xml" relativeToChangelogFile="false"/>
     <include file="classpath:/liquibase/changelog/20200611180001_remove_occupationlabel.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
