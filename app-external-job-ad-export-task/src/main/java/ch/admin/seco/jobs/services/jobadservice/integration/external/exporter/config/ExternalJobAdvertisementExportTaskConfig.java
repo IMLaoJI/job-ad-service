@@ -51,18 +51,18 @@ public class ExternalJobAdvertisementExportTaskConfig {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final SftpMessageHandler sftpMessageHandler;
-    private final ExternalJobAdvertisementProperties externalJobAdvertisementProperties;
+    private final SftpProperties sftpProperties;
 
     @Autowired
     public ExternalJobAdvertisementExportTaskConfig(
             JobBuilderFactory jobBuilderFactory,
             StepBuilderFactory stepBuilderFactory,
             SftpMessageHandler sftpMessageHandler,
-            ExternalJobAdvertisementProperties externalJobAdvertisementProperties) {
+            SftpProperties sftpProperties) {
         this.jobBuilderFactory = jobBuilderFactory;
         this.stepBuilderFactory = stepBuilderFactory;
         this.sftpMessageHandler = sftpMessageHandler;
-        this.externalJobAdvertisementProperties = externalJobAdvertisementProperties;
+        this.sftpProperties = sftpProperties;
     }
 
     @Bean
@@ -98,11 +98,11 @@ public class ExternalJobAdvertisementExportTaskConfig {
     public Tasklet uploadToSftpServer() {
         return (contribution, chunkContext) -> {
             LOG.info("Uploading jobs to SFTP Server: '{}:{}/{}'",
-                    externalJobAdvertisementProperties.getHost(), externalJobAdvertisementProperties.getPort(), externalJobAdvertisementProperties.getRemoteDirectory());
+                    sftpProperties.getHost(), sftpProperties.getPort(), sftpProperties.getRemoteDirectory());
             File xmlFile = (File) chunkContext.getStepContext().getJobExecutionContext().get(PARAMETER_XML_FILE_PATH);
 
-            File zipFile = zip(xmlFile, externalJobAdvertisementProperties.getXmlFileName());
-            String remoteFileName = FilenameUtils.getBaseName(externalJobAdvertisementProperties.getXmlFileName()) + ".zip";
+            File zipFile = zip(xmlFile, sftpProperties.getXmlFileName());
+            String remoteFileName = FilenameUtils.getBaseName(sftpProperties.getXmlFileName()) + ".zip";
 
             LOG.info("Sending zip '{}' to SFTP", remoteFileName);
             sftpMessageHandler.handleMessage(
@@ -193,7 +193,7 @@ public class ExternalJobAdvertisementExportTaskConfig {
         @Override
         public void beforeJob(JobExecution jobExecution) {
             try {
-                Path tempFolder = Paths.get(externalJobAdvertisementProperties.getLocalDirectory());
+                Path tempFolder = Paths.get(sftpProperties.getLocalDirectory());
                 Files.createDirectories(tempFolder);
                 Path tempXmlFilePath = Files.createTempFile(tempFolder, null, ".xml")
                         .toAbsolutePath();
