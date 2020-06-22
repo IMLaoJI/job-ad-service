@@ -115,7 +115,7 @@ public class JobAdvertisementApplicationService {
     public JobAdvertisementId createFromWebForm(CreateJobAdvertisementDto createJobAdvertisementDto) {
         LOG.debug("Start creating new job ad from WebForm");
         Condition.notNull(createJobAdvertisementDto, "CreateJobAdvertisementDto can't be null");
-        LOG.debug("Create '{}'", createJobAdvertisementDto.getJobDescriptions().get(0).getTitle());
+        LOG.debug("Create '{}'", createJobAdvertisementDto.getSingleJobDescription().getTitle());
         final JobAdvertisementCreator creator = getJobAdvertisementCreatorFromInternal(createJobAdvertisementDto);
         JobAdvertisement jobAdvertisement = jobAdvertisementFactory.createFromWebForm(creator);
         return jobAdvertisement.getId();
@@ -124,13 +124,13 @@ public class JobAdvertisementApplicationService {
     public CreatedJobAdvertisementIdWithTokenDto createFromApi(CreateJobAdvertisementDto createJobAdvertisementDto) {
         LOG.debug("Start creating new job ad from API");
         Condition.notNull(createJobAdvertisementDto, "CreateJobAdvertisementDto can't be null");
-        String avamOccupationCode = createJobAdvertisementDto.getOccupations().get(0).getAvamOccupationCode();
+        String avamOccupationCode = createJobAdvertisementDto.getSingleOccupation().getAvamOccupationCode();
         if(isDeprecatedAvamCode(avamOccupationCode)) {
             LOG.info("The ApiUser with the ID: '{}' and the E-Mail: '{}' is using a deprecated avam code '{}'", currentUserContext.getCurrentUser().getUserId(), currentUserContext.getCurrentUser().getEmail(), avamOccupationCode);
         }
         Condition.isTrue(professionService.isKnownAvamCode(avamOccupationCode),
                 String.format("Unknown AVAM Occupation Code: %s", avamOccupationCode));
-        LOG.debug("Create '{}'", createJobAdvertisementDto.getJobDescriptions().get(0).getTitle());
+        LOG.debug("Create '{}'", createJobAdvertisementDto.getSingleJobDescription().getTitle());
 
         final JobAdvertisementCreator creator = getJobAdvertisementCreatorFromInternal(createJobAdvertisementDto);
         JobAdvertisement newJobAdvertisement = jobAdvertisementFactory.createFromApi(creator);
@@ -168,8 +168,8 @@ public class JobAdvertisementApplicationService {
                 .setJobDescriptions(Collections.singletonList(
                         new JobDescription.Builder()
                                 .setLanguage(Locale.GERMAN)
-                                .setTitle(createJobAdvertisementFromAvamDto.getJobDescriptions().get(0).getTitle()) // TODO: 07/03/2019 Fago check this
-                                .setDescription(createJobAdvertisementFromAvamDto.getJobDescriptions().get(0).getDescription()) // TODO: 07/03/2019 Fago check this
+                                .setTitle(createJobAdvertisementFromAvamDto.getSingleJobDescription().getTitle())
+                                .setDescription(createJobAdvertisementFromAvamDto.getSingleJobDescription().getDescription())
                                 .build()
                 ))
                 .setLocation(location)
@@ -438,7 +438,7 @@ public class JobAdvertisementApplicationService {
         Company company = toCompany(createJobAdvertisement.getCompany());
         return new JobAdvertisementUpdater.Builder(currentUserContext.getAuditUser())
                 .setNumberOfJobs(createJobAdvertisement.getNumberOfJobs())
-                .setJobDescription(createJobAdvertisement.getJobDescriptions().get(0).getTitle(), createJobAdvertisement.getJobDescriptions().get(0).getDescription())
+                .setJobDescription(createJobAdvertisement.getSingleJobDescription().getTitle(), createJobAdvertisement.getSingleJobDescription().getDescription())
                 .setReportingObligation(createJobAdvertisement.isReportingObligation(), createJobAdvertisement.getReportingObligationEndDate())
                 .setJobCenterCode(createJobAdvertisement.getJobCenterCode())
                 .setJobCenterUserId(createJobAdvertisement.getJobCenterUserId())
@@ -609,7 +609,7 @@ public class JobAdvertisementApplicationService {
 
         Condition.notNull(createJobAdvertisementDto.getOccupations(), "Occupations can't be null");
 
-        Occupation occupation = toOccupation(createJobAdvertisementDto.getOccupations().get(0));
+        Occupation occupation = toOccupation(createJobAdvertisementDto.getSingleOccupation());
         occupation = enrichOccupationWithProfessionCodes(occupation);
         List<Occupation> occupations = Collections.singletonList(occupation);
 

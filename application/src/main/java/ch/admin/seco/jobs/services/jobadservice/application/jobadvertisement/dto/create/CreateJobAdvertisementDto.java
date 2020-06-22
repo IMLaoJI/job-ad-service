@@ -261,6 +261,14 @@ public class CreateJobAdvertisementDto {
         return this;
     }
 
+    public OccupationDto getSingleOccupation() {
+        return occupations.get(0);
+    }
+
+    public JobDescriptionDto getSingleJobDescription() {
+        return jobDescriptions.get(0);
+    }
+
     @Override
     public String toString() {
         return "CreateJobAdvertisementDto{" +
