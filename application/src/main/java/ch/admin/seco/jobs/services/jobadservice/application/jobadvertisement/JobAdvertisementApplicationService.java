@@ -166,12 +166,8 @@ public class JobAdvertisementApplicationService {
         JobContent jobContent = new JobContent.Builder()
                 .setNumberOfJobs(createJobAdvertisementFromAvamDto.getNumberOfJobs())
                 .setJobDescriptions(Collections.singletonList(
-                        new JobDescription.Builder()
-                                .setLanguage(Locale.GERMAN)
-                                .setTitle(createJobAdvertisementFromAvamDto.getSingleJobDescription().getTitle())
-                                .setDescription(createJobAdvertisementFromAvamDto.getSingleJobDescription().getDescription())
-                                .build()
-                ))
+                        buildJobDescription(createJobAdvertisementFromAvamDto.getSingleJobDescription().getTitle(),
+                                createJobAdvertisementFromAvamDto.getSingleJobDescription().getDescription())))
                 .setLocation(location)
                 .setOccupations(occupations)
                 .setEmployment(toEmployment(createJobAdvertisementFromAvamDto.getEmployment()))
@@ -216,11 +212,7 @@ public class JobAdvertisementApplicationService {
         JobContent jobContent = new JobContent.Builder()
                 .setNumberOfJobs(createJobAdvertisementFromExternalDto.getNumberOfJobs())
                 .setJobDescriptions(Collections.singletonList(
-                        new JobDescription.Builder()
-                                .setLanguage(Locale.GERMAN)
-                                .setTitle(createJobAdvertisementFromExternalDto.getTitle())
-                                .setDescription(createJobAdvertisementFromExternalDto.getDescription())
-                                .build()
+                        buildJobDescription(createJobAdvertisementFromExternalDto.getTitle(), createJobAdvertisementFromExternalDto.getDescription())
                 ))
                 .setExternalUrl(createJobAdvertisementFromExternalDto.getExternalUrl())
                 .setLocation(location)
@@ -1056,4 +1048,13 @@ public class JobAdvertisementApplicationService {
         return Integer.parseInt(avamOccupationCode) < START_RANGE_OF_NEW_AVAMCODES
                 && currentUser.getDisplayName() != null && currentUser.getUserId() != null;
     }
+
+    private JobDescription buildJobDescription(String title, String description) {
+        return new JobDescription.Builder()
+                .setLanguage(Locale.GERMAN)
+                .setTitle(title)
+                .setDescription(description)
+                .build();
+    }
+
 }
