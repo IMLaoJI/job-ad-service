@@ -1,8 +1,13 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.external;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Publication;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.ContactFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.OwnerFixture;
@@ -15,11 +20,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.time.LocalDate;
-import java.util.Collections;
 import java.util.Optional;
 
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.external.CreateJobAdvertisementDtoTestFixture.testCreateJobAdvertisementDto;
 import static java.time.LocalDate.now;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -55,7 +59,7 @@ public class ExternalJobAdvertisementAdapterTest {
         when(jobAdvertisementRepository.findByStellennummerEgov(any())).thenReturn(Optional.empty());
         when(jobAdvertisementRepository.findByStellennummerAvam(any())).thenReturn(Optional.empty());
         when(jobAdvertisementRepository.findByFingerprint(any())).thenReturn(Optional.empty());
-        ExternalCreateJobAdvertisementDto externalDto = createJobAdvertisementFromExternalDto();
+        CreateJobAdvertisementDto externalDto = testCreateJobAdvertisementDto();
 
         sut.handleCreateFromExternalAction(externalDto);
 
@@ -68,7 +72,7 @@ public class ExternalJobAdvertisementAdapterTest {
     public void shouldEnrichJobroomJobAdvertisementFromExternal() {
         when(jobAdvertisementRepository.findByStellennummerEgov(any())).thenReturn(Optional.of(createJobRoomJobAdvertisement(job01.id())));
         when(jobAdvertisementRepository.findByStellennummerAvam(any())).thenReturn(Optional.empty());
-        ExternalCreateJobAdvertisementDto externalDto = createJobAdvertisementFromExternalDto();
+        CreateJobAdvertisementDto externalDto = testCreateJobAdvertisementDto();
 
         sut.handleCreateFromExternalAction(externalDto);
 
@@ -81,7 +85,7 @@ public class ExternalJobAdvertisementAdapterTest {
     public void shouldEnrichAVAMJobAdvertisementFromExternal() {
         when(jobAdvertisementRepository.findByStellennummerEgov(any())).thenReturn(Optional.empty());
         when(jobAdvertisementRepository.findByStellennummerAvam(any())).thenReturn(Optional.of(createAVAMJobAdvertisement(job01.id())));
-        ExternalCreateJobAdvertisementDto externalDto = createJobAdvertisementFromExternalDto();
+        CreateJobAdvertisementDto externalDto = testCreateJobAdvertisementDto();
 
         sut.handleCreateFromExternalAction(externalDto);
 
@@ -95,7 +99,7 @@ public class ExternalJobAdvertisementAdapterTest {
         when(jobAdvertisementRepository.findByStellennummerEgov(any())).thenReturn(Optional.empty());
         when(jobAdvertisementRepository.findByStellennummerAvam(any())).thenReturn(Optional.empty());
         when(jobAdvertisementRepository.findByFingerprint(any())).thenReturn(Optional.of(createExternalJobAdvertisement(job01.id(), "fingerprint")));
-        ExternalCreateJobAdvertisementDto externalDto = createJobAdvertisementFromExternalDto();
+        CreateJobAdvertisementDto externalDto = testCreateJobAdvertisementDto();
 
         sut.handleCreateFromExternalAction(externalDto);
 
@@ -129,40 +133,6 @@ public class ExternalJobAdvertisementAdapterTest {
                 .setStellennummerAvam(null)
                 .setStatus(status)
                 .build();
-    }
-
-    private ExternalCreateJobAdvertisementDto createJobAdvertisementFromExternalDto() {
-        return new ExternalCreateJobAdvertisementDto()
-                .setStellennummerEgov("stellennummerEgov")
-                .setStellennummerAvam("stellennummerAvam")
-                .setTitle("title")
-                .setDescription("description")
-                .setNumberOfJobs("numberOfJobs")
-                .setFingerprint("fingerprint")
-                .setExternalUrl("externalUrl")
-                .setJobCenterCode("jobCenterCode")
-                .setContact(new ExternalContactDto(Salutation.MR, "firstName", "lastName", "phone", "email", "de"))
-                .setEmployment(
-                        new EmploymentDto()
-                                .setStartDate(LocalDate.of(2018, 1, 1))
-                                .setEndDate(LocalDate.of(2018, 12, 31))
-                                .setShortEmployment(false)
-                                .setImmediately(false)
-                                .setPermanent(false)
-                                .setWorkloadPercentageMin(100)
-                                .setWorkloadPercentageMax(100)
-                                .setWorkForms(null))
-                .setCompany(new ExternalCompanyDto("companyName", "companyStreet", "companyHouseNumber", "companyPostalCode", "companyCity", "CH", null, null, null, "companyPhone", "companyEmail", "companyWebside", false))
-                .setLocation(new ExternalLocationDto(null, "locationCity", "locationPostalCode", "CH"))
-                .setOccupations(Collections.singletonList(new ExternalOccupationDto().setAvamOccupationCode("avamOccupationCode")
-                        .setWorkExperience(WorkExperience.MORE_THAN_1_YEAR)
-                        .setEducationCode("educationCode")
-                        .setQualificationCode(Qualification.SKILLED)))
-                .setProfessionCodes("professionCodes")
-                .setLanguageSkills(Collections.singletonList(new ExternalLanguageSkillDto("de", LanguageLevel.PROFICIENT, LanguageLevel.INTERMEDIATE)))
-                .setPublicationStartDate(LocalDate.of(2018, 1, 1))
-                .setPublicationEndDate(LocalDate.of(2018, 12, 31))
-                .setCompanyAnonymous(false);
     }
 
 }
