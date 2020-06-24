@@ -1,19 +1,10 @@
 package ch.admin.seco.jobs.services.jobadservice.integration.external.importer.config;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Date;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
-import javax.validation.Validator;
-
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadimport.Oste;
+import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadimport.OsteList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeroturnaround.zip.ZipUtil;
-
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -37,10 +28,16 @@ import org.springframework.integration.core.MessageSource;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+import org.zeroturnaround.zip.ZipUtil;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalCreateJobAdvertisementDto;
-import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadimport.Oste;
-import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadimport.OsteList;
+import javax.validation.Validator;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Date;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 @Configuration
 public class ExternalJobAdvertisementImportTaskConfig {
@@ -88,7 +85,7 @@ public class ExternalJobAdvertisementImportTaskConfig {
                 .to(stepBuilderFactory
                         .get("send-to-job-ad-service")
                         .listener(itemLoggerListener())
-                        .<Oste, ExternalCreateJobAdvertisementDto>chunk(10)
+                        .<Oste, CreateJobAdvertisementDto>chunk(10)
                         .reader(xmlFileReader)
                         .processor(externalItemProcessor())
                         .writer(externalJobAdvertisementWriter)

@@ -1,8 +1,8 @@
-package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external;
-
-import javax.validation.constraints.Size;
+package ch.admin.seco.jobs.services.jobadservice.integration.external.importer.config.dto;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
+
+import javax.validation.constraints.Size;
 
 public class ExternalLocationDto {
 

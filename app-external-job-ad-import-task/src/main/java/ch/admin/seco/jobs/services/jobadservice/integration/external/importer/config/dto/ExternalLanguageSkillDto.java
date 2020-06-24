@@ -1,10 +1,10 @@
-package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external;
-
-import javax.validation.constraints.NotBlank;
+package ch.admin.seco.jobs.services.jobadservice.integration.external.importer.config.dto;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedLanguageIsoCode;
+
+import javax.validation.constraints.NotBlank;
 
 public class ExternalLanguageSkillDto {
 

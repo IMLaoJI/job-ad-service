@@ -1,9 +1,9 @@
-package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external;
+package ch.admin.seco.jobs.services.jobadservice.integration.external.importer.config.dto;
+
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
 
 public class ExternalCompanyDto {
 
