@@ -24,9 +24,9 @@ public class CreateJobAdvertisementDto {
 
     private LocalDate reportingObligationEndDate;
 
-    private String JobCenterCode;
+    private String jobCenterCode;
 
-    private String JobCenterUserId;
+    private String jobCenterUserId;
 
     private LocalDate approvalDate;
 
@@ -133,11 +133,11 @@ public class CreateJobAdvertisementDto {
     }
 
     public String getJobCenterCode() {
-        return JobCenterCode;
+        return jobCenterCode;
     }
 
     public CreateJobAdvertisementDto setJobCenterCode(String jobCenterCode) {
-        JobCenterCode = jobCenterCode;
+        this.jobCenterCode = jobCenterCode;
         return this;
     }
 
@@ -258,12 +258,19 @@ public class CreateJobAdvertisementDto {
         return this;
     }
 
+    public String getNullsafeJobCenterUserId() {
+        if (jobCenterUserId == null) {
+            return null;
+        }
+        return jobCenterUserId;
+    }
+
     public String getJobCenterUserId() {
-        return JobCenterUserId;
+        return jobCenterUserId;
     }
 
     public CreateJobAdvertisementDto setJobCenterUserId(String jobCenterUserId) {
-        JobCenterUserId = jobCenterUserId;
+        this.jobCenterUserId = jobCenterUserId;
         return this;
     }
 
@@ -316,8 +323,8 @@ public class CreateJobAdvertisementDto {
                 ", stellennummerEgov='" + stellennummerEgov + '\'' +
                 ", reportingObligation=" + reportingObligation +
                 ", reportingObligationEndDate=" + reportingObligationEndDate +
-                ", JobCenterCode='" + JobCenterCode + '\'' +
-                ", JobCenterUserId='" + JobCenterUserId + '\'' +
+                ", JobCenterCode='" + jobCenterCode + '\'' +
+                ", JobCenterUserId='" + jobCenterUserId + '\'' +
                 ", approvalDate=" + approvalDate +
                 ", contact=" + contact +
                 ", publication=" + publication +
