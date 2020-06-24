@@ -142,7 +142,10 @@ class ExternalJobAdvertisementAssembler {
 			}
 
 			if (hasText(languageIsoCode)) {
-				return new ExternalLanguageSkillDto(languageIsoCode, spokenLevel, writtenLevel);
+				return new ExternalLanguageSkillDto()
+						.setLanguageIsoCode(languageIsoCode)
+						.setSpokenLevel(spokenLevel)
+						.setWrittenLevel(writtenLevel);
 			} else {
 				LOGGER.warn("No languageIsoCode was found for: {} ", spracheCode);
 			}
@@ -221,21 +224,20 @@ class ExternalJobAdvertisementAssembler {
 	}
 
 	private ExternalCompanyDto createCompany(Oste externalJobAdvertisement) {
-		return new ExternalCompanyDto(
-				externalJobAdvertisement.getUntName(),
-				externalJobAdvertisement.getUntStrasse(),
-				externalJobAdvertisement.getUntHausNr(),
-				externalJobAdvertisement.getUntPlz(),
-				externalJobAdvertisement.getUntOrt(),
-				externalJobAdvertisement.getUntLand(),
-				externalJobAdvertisement.getUntPostfach(),
-				externalJobAdvertisement.getUntPostfachPlz(),
-				externalJobAdvertisement.getUntPostfachOrt(),
-				sanitizePhoneNumber(externalJobAdvertisement.getUntTelefon(), externalJobAdvertisement.getFingerprint()),
-				externalJobAdvertisement.getUntEMail(),
-				externalJobAdvertisement.getUntUrl(),
-				false
-		);
+		return new ExternalCompanyDto()
+				.setName(externalJobAdvertisement.getUntName())
+				.setStreet(externalJobAdvertisement.getUntStrasse())
+				.setHouseNumber(externalJobAdvertisement.getUntHausNr())
+				.setPostalCode(externalJobAdvertisement.getUntPlz())
+				.setCity(externalJobAdvertisement.getUntOrt())
+				.setCountryIsoCode(externalJobAdvertisement.getUntLand())
+				.setPostOfficeBoxNumber(externalJobAdvertisement.getUntPostfach())
+				.setPostOfficeBoxPostalCode(externalJobAdvertisement.getUntPostfachPlz())
+				.setPostOfficeBoxCity(externalJobAdvertisement.getUntPostfachOrt())
+				.setPhone(sanitizePhoneNumber(externalJobAdvertisement.getUntTelefon(), externalJobAdvertisement.getFingerprint()))
+				.setEmail(externalJobAdvertisement.getUntEMail())
+				.setWebsite(externalJobAdvertisement.getUntUrl())
+				.setSurrogate(false);
 	}
 
 	private ExternalContactDto createContact(Oste externalJobAdvertisement) {
@@ -381,7 +383,11 @@ class ExternalJobAdvertisementAssembler {
 						city = StringUtils.trimWhitespace(cityCantonMatcher.group(1));
 					}
 				}
-				return new ExternalLocationDto(null, city, postalCode, countryIsoCode);
+				return new ExternalLocationDto()
+						.setRemarks(null)
+						.setCity(city)
+						.setPostalCode(postalCode)
+						.setCountryIsoCode(countryIsoCode);
 			}
 		}
 		return null;

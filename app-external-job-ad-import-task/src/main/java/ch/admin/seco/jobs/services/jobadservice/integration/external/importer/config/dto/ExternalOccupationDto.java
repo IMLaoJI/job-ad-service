@@ -64,11 +64,4 @@ public class ExternalOccupationDto {
         return this;
     }
 
-    OccupationDto ToOccupationDto() {
-        return new OccupationDto()
-                .setAvamOccupationCode(this.avamOccupationCode)
-                .setEducationCode(this.educationCode)
-                .setQualificationCode(this.qualificationCode)
-                .setWorkExperience(this.workExperience);
-    }
 }
