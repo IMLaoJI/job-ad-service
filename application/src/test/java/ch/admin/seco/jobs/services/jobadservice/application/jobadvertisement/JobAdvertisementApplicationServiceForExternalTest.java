@@ -5,11 +5,16 @@ import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.*;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
-import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents;
 import org.junit.After;
 import org.junit.Before;
@@ -22,15 +27,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService.COUNTRY_ISO_CODE_SWITZERLAND;
-import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementFromExternalDtoTestFixture.createCreateJobAdvertisementDto;
-import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.ExternalCompanyDtoFixture.testExternalCompanyDto;
+import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementFromAvamDtoTestFixture.testCreateJobAdvertisementDto;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.CREATED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.PUBLISHED_PUBLIC;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture.testJobAdvertisement;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementTestFixture.testJobAdvertisementWithExternalSourceSystemAndStatus;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocationEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -81,8 +82,7 @@ public class JobAdvertisementApplicationServiceForExternalTest {
     @Test
     public void createFromExtern() {
         //given
-        ExternalCompanyDto externalCompanyDto = testExternalCompanyDto();
-        ExternalJobAdvertisementDto createJobAdvertisementDto = createCreateJobAdvertisementDto(testExternalCompanyDto());
+        CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto();
 
         //when
         JobAdvertisementId jobAdvertisementId = sut.createFromExtern(createJobAdvertisementDto);
@@ -90,7 +90,7 @@ public class JobAdvertisementApplicationServiceForExternalTest {
         //then
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(jobAdvertisementId);
         assertThat(jobAdvertisement).isNotNull();
-        assertThat(jobAdvertisement.getStatus()).isEqualTo(PUBLISHED_PUBLIC);
+        assertThat(jobAdvertisement.getStatus()).isEqualTo(JobAdvertisementStatus.PUBLISHED_PUBLIC);
         assertThat(jobAdvertisement.getSourceSystem()).isEqualTo(SourceSystem.EXTERN);
         assertThat(jobAdvertisement.getStellennummerEgov()).isNull();
         assertThat(jobAdvertisement.getPublication().isEuresAnonymous()).isFalse();
@@ -98,86 +98,26 @@ public class JobAdvertisementApplicationServiceForExternalTest {
 
         assertThat(jobAdvertisement.isReportingObligation()).isFalse();
         assertThat(jobAdvertisement.getJobContent().getDisplayCompany()).isNotNull();
-        assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getName()).isEqualTo(externalCompanyDto.getName());
-        assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getCity()).isEqualTo(externalCompanyDto.getCity());
-        assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getStreet()).isEqualTo(externalCompanyDto.getStreet());
+
+        final CompanyDto company = createJobAdvertisementDto.getCompany();
+        assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getName()).isEqualTo(company.getName());
+        assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getCity()).isEqualTo(company.getCity());
+        assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getStreet()).isEqualTo(company.getStreet());
 
         Occupation occupation = jobAdvertisement.getJobContent().getOccupations().get(0);
-        ExternalOccupationDto externalOccupationDto = createJobAdvertisementDto.getOccupations().get(0);
-        assertThat(occupation.getWorkExperience()).isEqualByComparingTo(externalOccupationDto.getWorkExperience());
-        assertThat(occupation.getAvamOccupationCode()).isEqualToIgnoringCase(externalOccupationDto.getAvamOccupationCode());
-        assertThat(occupation.getEducationCode()).isEqualToIgnoringCase(externalOccupationDto.getEducationCode());
-        assertThat(occupation.getQualificationCode()).isEqualByComparingTo(externalOccupationDto.getQualificationCode());
+        final OccupationDto singleOccupation = createJobAdvertisementDto.getSingleOccupation();
+        assertThat(occupation.getWorkExperience()).isEqualByComparingTo(singleOccupation.getWorkExperience());
+        assertThat(occupation.getAvamOccupationCode()).isEqualToIgnoringCase(singleOccupation.getAvamOccupationCode());
+        assertThat(occupation.getEducationCode()).isEqualToIgnoringCase(singleOccupation.getEducationCode());
+        assertThat(occupation.getQualificationCode()).isEqualByComparingTo(singleOccupation.getQualificationCode());
 
         domainEventMockUtils.assertSingleDomainEventPublished(JobAdvertisementEvents.JOB_ADVERTISEMENT_PUBLISH_PUBLIC.getDomainEventType());
     }
 
     @Test
-    public void updateExtern() {
-        //given
-        jobAdvertisementRepository.save(testJobAdvertisementWithExternalSourceSystemAndStatus(job01.id(), "fingerprint1", PUBLISHED_PUBLIC));
-        when(locationService.enrichCodes(any())).thenReturn(testLocationEmpty().setCity("testCity").setPostalCode("9999").build());
-
-        ExternalJobAdvertisementDto updateExternalJobAdvertisementDto = createCreateJobAdvertisementDto(testExternalCompanyDto())
-                .setContact(new ExternalContactDto(
-                        Salutation.MR,
-                        "externalContactFirstName",
-                        "externalContactLastName",
-                        "999999999",
-                        "external.contact@test.ch",
-                        "de"
-                ))
-                .setEmployment(new EmploymentDto()
-                        .setShortEmployment(false)
-                        .setStartDate(TimeMachine.now().toLocalDate())
-                        .setPermanent(true)
-                        .setWorkloadPercentageMax(50)
-                        .setWorkloadPercentageMax(70)
-                );
-
-
-        //when
-        sut.updateFromExtern(job01.id(), updateExternalJobAdvertisementDto);
-
-
-        //then
-        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(job01.id());
-        assertThat(jobAdvertisement).isNotNull();
-        assertThat(jobAdvertisement.getJobContent().getJobDescriptions()).hasSize(1);
-        assertThat(jobAdvertisement.getJobContent().getJobDescriptions().get(0))
-                .extracting("title", "description")
-                .contains(updateExternalJobAdvertisementDto.getTitle(), updateExternalJobAdvertisementDto.getDescription());
-        assertThat(jobAdvertisement.getJobContent().getLocation())
-                .extracting("city", "postalCode")
-                .contains("testCity", "9999");
-        assertThat(jobAdvertisement.getContact())
-                .extracting("firstName", "lastName", "phone", "email")
-                .contains(
-                        updateExternalJobAdvertisementDto.getContact().getFirstName(),
-                        updateExternalJobAdvertisementDto.getContact().getLastName(),
-                        updateExternalJobAdvertisementDto.getContact().getPhone(),
-                        updateExternalJobAdvertisementDto.getContact().getEmail()
-                );
-        assertThat(jobAdvertisement.getJobContent().getEmployment())
-                .extracting("startDate", "endDate", "shortEmployment", "immediately", "permanent", "workloadPercentageMin", "workloadPercentageMax")
-                .contains(
-                        updateExternalJobAdvertisementDto.getEmployment().getStartDate(),
-                        updateExternalJobAdvertisementDto.getEmployment().getEndDate(),
-                        updateExternalJobAdvertisementDto.getEmployment().isShortEmployment(),
-                        updateExternalJobAdvertisementDto.getEmployment().isImmediately(),
-                        updateExternalJobAdvertisementDto.getEmployment().isPermanent(),
-                        updateExternalJobAdvertisementDto.getEmployment().getWorkloadPercentageMin(),
-                        updateExternalJobAdvertisementDto.getEmployment().getWorkloadPercentageMax()
-                );
-//        assertThat(jobAdvertisement.getPublication().isCompanyAnonymous()).isFalse();
-//
-//        domainEventMockUtils.assertSingleDomainEventPublished(JobAdvertisementEvents.JOB_ADVERTISEMENT_PUBLISH_PUBLIC.getDomainEventType());
-    }
-
-    @Test
     public void createFromExternWithEmptyCountry() {
         //given
-        ExternalJobAdvertisementDto createJobAdvertisementDto = createCreateJobAdvertisementDto(null);
+        CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto();
 
         //when
         JobAdvertisementId jobAdvertisementId = sut.createFromExtern(createJobAdvertisementDto);
