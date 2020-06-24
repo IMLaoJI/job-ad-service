@@ -109,18 +109,18 @@ public class ExternalJobAdvertisementAdapterTest {
     }
 
     private JobAdvertisement createExternalJobAdvertisement(JobAdvertisementId jobAdvertisementId, String fingerprint) {
-        return creatJobAdvertisement(jobAdvertisementId, fingerprint, JobAdvertisementStatus.PUBLISHED_PUBLIC, SourceSystem.EXTERN);
+        return createJobAdvertisement(jobAdvertisementId, fingerprint, JobAdvertisementStatus.PUBLISHED_PUBLIC, SourceSystem.EXTERN);
     }
 
     private JobAdvertisement createJobRoomJobAdvertisement(JobAdvertisementId jobAdvertisementId) {
-        return creatJobAdvertisement(jobAdvertisementId, null, JobAdvertisementStatus.PUBLISHED_PUBLIC, SourceSystem.JOBROOM);
+        return createJobAdvertisement(jobAdvertisementId, null, JobAdvertisementStatus.PUBLISHED_PUBLIC, SourceSystem.JOBROOM);
     }
 
     private JobAdvertisement createAVAMJobAdvertisement(JobAdvertisementId jobAdvertisementId) {
-        return creatJobAdvertisement(jobAdvertisementId, null, JobAdvertisementStatus.PUBLISHED_PUBLIC, SourceSystem.RAV);
+        return createJobAdvertisement(jobAdvertisementId, null, JobAdvertisementStatus.PUBLISHED_PUBLIC, SourceSystem.RAV);
     }
 
-    private JobAdvertisement creatJobAdvertisement(JobAdvertisementId jobAdvertisementId, String fingerprint, JobAdvertisementStatus status, SourceSystem sourceSystem) {
+    private JobAdvertisement createJobAdvertisement(JobAdvertisementId jobAdvertisementId, String fingerprint, JobAdvertisementStatus status, SourceSystem sourceSystem) {
         return new JobAdvertisement.Builder()
                 .setId(jobAdvertisementId)
                 .setFingerprint(fingerprint)
