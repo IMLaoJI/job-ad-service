@@ -5,11 +5,16 @@ import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalCompanyDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalCreateJobAdvertisementDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalOccupationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.*;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents;
 import org.junit.After;
 import org.junit.Before;
@@ -22,8 +27,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService.COUNTRY_ISO_CODE_SWITZERLAND;
-import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementFromExternalDtoTestFixture.createCreateJobAdvertisementDto;
-import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.ExternalCompanyDtoFixture.testExternalCompanyDto;
+import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementFromAvamDtoTestFixture.testCreateJobAdvertisementDto;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.CREATED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture.testJobAdvertisement;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
@@ -78,8 +82,7 @@ public class JobAdvertisementApplicationServiceForExternalTest {
     @Test
     public void createFromExtern() {
         //given
-        ExternalCompanyDto externalCompanyDto = testExternalCompanyDto();
-        ExternalCreateJobAdvertisementDto createJobAdvertisementDto = createCreateJobAdvertisementDto(testExternalCompanyDto());
+        CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto();
 
         //when
         JobAdvertisementId jobAdvertisementId = sut.createFromExtern(createJobAdvertisementDto);
@@ -95,16 +98,18 @@ public class JobAdvertisementApplicationServiceForExternalTest {
 
         assertThat(jobAdvertisement.isReportingObligation()).isFalse();
         assertThat(jobAdvertisement.getJobContent().getDisplayCompany()).isNotNull();
-        assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getName()).isEqualTo(externalCompanyDto.getName());
-        assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getCity()).isEqualTo(externalCompanyDto.getCity());
-        assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getStreet()).isEqualTo(externalCompanyDto.getStreet());
+
+        final CompanyDto company = createJobAdvertisementDto.getCompany();
+        assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getName()).isEqualTo(company.getName());
+        assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getCity()).isEqualTo(company.getCity());
+        assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getStreet()).isEqualTo(company.getStreet());
 
         Occupation occupation = jobAdvertisement.getJobContent().getOccupations().get(0);
-        ExternalOccupationDto externalOccupationDto = createJobAdvertisementDto.getOccupations().get(0);
-        assertThat(occupation.getWorkExperience()).isEqualByComparingTo(externalOccupationDto.getWorkExperience());
-        assertThat(occupation.getAvamOccupationCode()).isEqualToIgnoringCase(externalOccupationDto.getAvamOccupationCode());
-        assertThat(occupation.getEducationCode()).isEqualToIgnoringCase(externalOccupationDto.getEducationCode());
-        assertThat(occupation.getQualificationCode()).isEqualByComparingTo(externalOccupationDto.getQualificationCode());
+        final OccupationDto singleOccupation = createJobAdvertisementDto.getSingleOccupation();
+        assertThat(occupation.getWorkExperience()).isEqualByComparingTo(singleOccupation.getWorkExperience());
+        assertThat(occupation.getAvamOccupationCode()).isEqualToIgnoringCase(singleOccupation.getAvamOccupationCode());
+        assertThat(occupation.getEducationCode()).isEqualToIgnoringCase(singleOccupation.getEducationCode());
+        assertThat(occupation.getQualificationCode()).isEqualByComparingTo(singleOccupation.getQualificationCode());
 
         domainEventMockUtils.assertSingleDomainEventPublished(JobAdvertisementEvents.JOB_ADVERTISEMENT_PUBLISH_PUBLIC.getDomainEventType());
     }
@@ -112,7 +117,7 @@ public class JobAdvertisementApplicationServiceForExternalTest {
     @Test
     public void createFromExternWithEmptyCountry() {
         //given
-        ExternalCreateJobAdvertisementDto createJobAdvertisementDto = createCreateJobAdvertisementDto(null);
+        CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto();
 
         //when
         JobAdvertisementId jobAdvertisementId = sut.createFromExtern(createJobAdvertisementDto);
