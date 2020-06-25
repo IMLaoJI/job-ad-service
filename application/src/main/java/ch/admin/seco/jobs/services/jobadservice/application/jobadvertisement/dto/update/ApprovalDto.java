@@ -1,8 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update;
 
-import java.time.LocalDate;
-
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 public class ApprovalDto {
 
@@ -19,8 +18,6 @@ public class ApprovalDto {
 
     private LocalDate reportingObligationEndDate;
 
-    private UpdateJobAdvertisementFromAvamDto updateJobAdvertisementDto;
-
     private String jobCenterCode;
 
     private String jobCenterUserId;
@@ -30,8 +27,7 @@ public class ApprovalDto {
     }
 
     public ApprovalDto(String stellennummerEgov, String stellennummerAvam, LocalDate date, boolean reportingObligation,
-                       LocalDate reportingObligationEndDate, String jobCenterCode, String jobCenterUserId,
-                       UpdateJobAdvertisementFromAvamDto updateJobAdvertisementDto) {
+                       LocalDate reportingObligationEndDate, String jobCenterCode, String jobCenterUserId) {
         this.stellennummerEgov = stellennummerEgov;
         this.stellennummerAvam = stellennummerAvam;
         this.date = date;
@@ -39,7 +35,6 @@ public class ApprovalDto {
         this.reportingObligationEndDate = reportingObligationEndDate;
         this.jobCenterCode = jobCenterCode;
         this.jobCenterUserId = jobCenterUserId;
-        this.updateJobAdvertisementDto = updateJobAdvertisementDto;
     }
 
     public String getStellennummerEgov() {
@@ -98,11 +93,4 @@ public class ApprovalDto {
         this.jobCenterUserId = jobCenterUserId;
     }
 
-    public UpdateJobAdvertisementFromAvamDto getUpdateJobAdvertisement() {
-        return updateJobAdvertisementDto;
-    }
-
-    public void setUpdateJobAdvertisement(UpdateJobAdvertisementFromAvamDto updateJobAdvertisementDto) {
-        this.updateJobAdvertisementDto = updateJobAdvertisementDto;
-    }
 }
