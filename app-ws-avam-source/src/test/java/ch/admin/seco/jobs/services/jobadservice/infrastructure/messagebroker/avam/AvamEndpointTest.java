@@ -90,7 +90,6 @@ public class AvamEndpointTest {
 
     @Test
     public void approveJobAdvertisement() throws IOException {
-
         // process
         mockWebServiceClient.sendRequest(withPayload(getAsResource("soap/messages/insertOste-approve-1.xml")))
                 .andExpect(ResponseMatchers.noFault())
@@ -102,13 +101,9 @@ public class AvamEndpointTest {
         assertThat(received.getHeaders().get(ACTION)).isEqualTo(APPROVE.name());
 
         ApprovalDto approvalDto = approvalDtoJacksonTester.parse(received.getPayload()).getObject();
-        EmploymentDto employment = approvalDto.getUpdateJobAdvertisement().getEmployment();
         assertThat(approvalDto.getStellennummerEgov()).isEqualTo("EGOV-0001");
         assertThat(approvalDto.getStellennummerAvam()).isEqualTo("AVAM-0001");
         assertThat(approvalDto.getDate()).isEqualTo("2018-03-01");
-        assertThat(employment.getEndDate()).isNull();
-        assertThat(employment.isShortEmployment()).isFalse();
-        assertThat(employment.isPermanent()).isTrue();
     }
 
     @Test
