@@ -16,7 +16,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
 
-import static org.springframework.util.StringUtils.hasText;
 import static org.springframework.util.StringUtils.trimWhitespace;
 
 @Endpoint
@@ -30,6 +29,12 @@ public class AvamEndpoint {
 	private static final String NAMESPACE_URI = "http://valueobjects.common.avam.bit.admin.ch";
 
 	private static final String AKTIVIERT = "AKTIVIERT";
+
+	private static final String ABGEMELDET = "ABGEMELDET";
+
+	private static final String MUTIERT = "MUTIERT";
+
+	private static final String ABGELEHNT = "ABGELEHNT";
 
 	private final AvamSource avamSource;
 	private final JobAdvertisementFromAvamAssembler jobAdvertisementFromAvamAssembler;
@@ -48,37 +53,42 @@ public class AvamEndpoint {
 		LOG.info("Recieved stellennummerAvam={}, stellennummerEgov={}, event={}", request.getOste().getStellennummerAvam(), request.getOste().getStellennummerEgov(), request.getOste().getEvent());
 
 		WSOsteEgov avamJobAdvertisement = request.getOste();
-
 		try {
-			if (avamJobAdvertisement.getEvent().equals(AvamEvents.ABGELEHNT.name())) {
-				LOG.info("Rejecting JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
-				avamSource.reject(jobAdvertisementFromAvamAssembler.createRejectionDto(avamJobAdvertisement));
-			} else if (avamJobAdvertisement.getEvent().equals(AvamEvents.ABGEMELDET.name())) {
-				LOG.info("Cancelling JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
-				avamSource.cancel(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
-			} else if (avamJobAdvertisement.getEvent().equals(AvamEvents.MUTIERT.name())){
-				LOG.info("Updating JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
-				avamSource.update(jobAdvertisementFromAvamAssembler.createUpdateDto(avamJobAdvertisement));
-			}
-			else if (avamJobAdvertisement.getEvent().equals(AvamEvents.AKTIVIERT.name())) {
-				if (isApproved(avamJobAdvertisement)) {
-					LOG.info("Approving JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
-					avamSource.approve(jobAdvertisementFromAvamAssembler.createApprovalDto(avamJobAdvertisement));
-				} else {
-					LOG.info("Creating JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
-					avamSource.create(jobAdvertisementFromAvamAssembler.createCreateJobAdvertisementAvamDto(avamJobAdvertisement));
+			switch (avamJobAdvertisement.getEvent()) {
+				case AKTIVIERT: {
+					if (isApproved(avamJobAdvertisement)) {
+						LOG.info("Approving JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
+						avamSource.approve(jobAdvertisementFromAvamAssembler.createApprovalDto(avamJobAdvertisement));
+						break;
+					} else {
+						LOG.info("Creating JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
+						avamSource.create(jobAdvertisementFromAvamAssembler.createCreateJobAdvertisementAvamDto(avamJobAdvertisement));
+						break;
+					}
 				}
-			} else {
-				LOG.warn("Received JobAdvertisement in unknown state from AVAM: {}", transformToXml(request));
-				return response(RESPONSE_ERROR);
+				case ABGEMELDET: {
+					LOG.info("Cancelling JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
+					avamSource.cancel(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
+					break;
+				}
+				case MUTIERT: {
+					LOG.info("Updating JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
+					avamSource.update(jobAdvertisementFromAvamAssembler.createUpdateDto(avamJobAdvertisement));
+					break;
+				}
+				case ABGELEHNT: {
+					LOG.info("Rejecting JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
+					avamSource.reject(jobAdvertisementFromAvamAssembler.createRejectionDto(avamJobAdvertisement));
+					break;
+				}
+				default:
+					LOG.warn("Received JobAdvertisement in unknown state from AVAM: {}", transformToXml(request));
 			}
-
-			return response(RESPONSE_OK);
-
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			LOG.warn("Processing 'InsertOste' failed: {}", transformToXml(request), e);
 			return response(RESPONSE_ERROR);
 		}
+		return response(RESPONSE_OK);
 	}
 
 	private String transformToXml(Object xmlRootObject) {
@@ -96,20 +106,8 @@ public class AvamEndpoint {
 		}
 	}
 
-	private boolean isRejected(WSOsteEgov avamJobAdvertisement) {
-		return isFromJobroom(avamJobAdvertisement) && hasText(avamJobAdvertisement.getAblehnungGrundCode());
-	}
-
-	private boolean isCancelled(WSOsteEgov avamJobAdvertisement) {
-		return hasText(avamJobAdvertisement.getAbmeldeGrundCode());
-	}
-
 	private boolean isApproved(WSOsteEgov avamJobAdvertisement) {
 		return isFromJobroom(avamJobAdvertisement);
-	}
-
-	private boolean isCreatedFromAvam(WSOsteEgov avamJobAdvertisement) {
-		return !isCancelled(avamJobAdvertisement);
 	}
 
 	private boolean isFromJobroom(WSOsteEgov avamJobAdvertisement) {
