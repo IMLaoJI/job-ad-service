@@ -27,6 +27,7 @@ public class ApprovalDtoTestFixture {
 				LocalDate.of(2018, 1, 1),
 				true,
 				LocalDate.of(2018, 10, 1),
-				"jobcenterCode", "job-center-id");
+				"jobcenterCode",
+				"job-center-id");
 	}
 }
