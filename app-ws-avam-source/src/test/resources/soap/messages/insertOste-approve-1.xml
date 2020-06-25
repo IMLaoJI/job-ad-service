@@ -140,5 +140,6 @@
         <anonym>0</anonym>
         <publikation>1</publikation>
         <behindert>0</behindert>
+        <event>AKTIVIERT</event>
     </oste>
 </val:insertOste>
