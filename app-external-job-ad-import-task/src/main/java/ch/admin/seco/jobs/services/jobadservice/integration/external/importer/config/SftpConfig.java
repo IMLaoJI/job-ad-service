@@ -16,15 +16,15 @@ import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
 public class SftpConfig {
 
     @Bean
-    public DefaultSftpSessionFactory externalSftpSessionFactory(ExternalJobAdvertisementProperties externalJobAdvertisementProperties) {
+    public DefaultSftpSessionFactory externalSftpSessionFactory(SftpProperties sftpProperties) {
         DefaultSftpSessionFactory factory = new DefaultSftpSessionFactory();
-        factory.setHost(externalJobAdvertisementProperties.getHost());
-        if (nonNull(externalJobAdvertisementProperties.getPort())) {
-            factory.setPort(externalJobAdvertisementProperties.getPort());
+        factory.setHost(sftpProperties.getHost());
+        if (nonNull(sftpProperties.getPort())) {
+            factory.setPort(sftpProperties.getPort());
         }
-        factory.setUser(externalJobAdvertisementProperties.getUsername());
-        factory.setPassword(externalJobAdvertisementProperties.getPassword());
-        factory.setAllowUnknownKeys(externalJobAdvertisementProperties.getAllowUnknownKeys());
+        factory.setUser(sftpProperties.getUsername());
+        factory.setPassword(sftpProperties.getPassword());
+        factory.setAllowUnknownKeys(sftpProperties.getAllowUnknownKeys());
         factory.setSessionConfig(defaultSessionConfig());
         factory.setClientVersion("SSH-2.0-SFTP");
 
@@ -32,19 +32,19 @@ public class SftpConfig {
     }
 
     @Bean
-    public SftpInboundFileSynchronizingMessageSource externalJobAdDataFileMessageSource(ExternalJobAdvertisementProperties externalJobAdvertisementProperties, DefaultSftpSessionFactory sftpSessionFactory) {
-        SftpInboundFileSynchronizer sftpInboundFileSynchronizer = sftpInboundFileSynchronizer(externalJobAdvertisementProperties, sftpSessionFactory);
+    public SftpInboundFileSynchronizingMessageSource externalJobAdDataFileMessageSource(SftpProperties sftpProperties, DefaultSftpSessionFactory sftpSessionFactory) {
+        SftpInboundFileSynchronizer sftpInboundFileSynchronizer = sftpInboundFileSynchronizer(sftpProperties, sftpSessionFactory);
         SftpInboundFileSynchronizingMessageSource messageSource = new SftpInboundFileSynchronizingMessageSource(sftpInboundFileSynchronizer);
         messageSource.setAutoCreateLocalDirectory(true);
-        messageSource.setLocalDirectory(new File(externalJobAdvertisementProperties.getLocalDirectory()));
+        messageSource.setLocalDirectory(new File(sftpProperties.getLocalDirectory()));
         return messageSource;
     }
 
     @Bean
-    public SftpInboundFileSynchronizer sftpInboundFileSynchronizer(ExternalJobAdvertisementProperties externalJobAdvertisementProperties, DefaultSftpSessionFactory sftpSessionFactory) {
+    public SftpInboundFileSynchronizer sftpInboundFileSynchronizer(SftpProperties sftpProperties, DefaultSftpSessionFactory sftpSessionFactory) {
         SftpInboundFileSynchronizer synchronizer = new SftpInboundFileSynchronizer(sftpSessionFactory);
-        synchronizer.setRemoteDirectory(externalJobAdvertisementProperties.getRemoteDirectory());
-        synchronizer.setFilter(new SftpSimplePatternFileListFilter(externalJobAdvertisementProperties.getFileNamePattern()));
+        synchronizer.setRemoteDirectory(sftpProperties.getRemoteDirectory());
+        synchronizer.setFilter(new SftpSimplePatternFileListFilter(sftpProperties.getFileNamePattern()));
         synchronizer.setPreserveTimestamp(true);
         return synchronizer;
     }

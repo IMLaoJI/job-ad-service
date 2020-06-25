@@ -701,7 +701,6 @@ public class JobAdvertisementApplicationService {
                         .setChIsco3Code(profession.getChIsco3Code())
                         .setChIsco5Code(profession.getChIsco5Code())
                         .setBfsCode(profession.getBfsCode())
-                        .setLabel(profession.getLabel())
                         .setWorkExperience(occupation.getWorkExperience())
                         .setEducationCode(occupation.getEducationCode())
                         .setQualification(occupation.getQualificationCode())
@@ -800,7 +799,7 @@ public class JobAdvertisementApplicationService {
 
     private ApplyChannel toApplyChannel(JobCenterUser jobCenterUser) {
         final AddressDto addressDto = new AddressDto();
-        addressDto.setName(jobCenterUser.getFirstName() + " " + jobCenterUser.getLastName())
+        addressDto.setName(jobCenterUser.getAddress().getName())
                 .setCity(jobCenterUser.getAddress().getCity())
                 .setHouseNumber(jobCenterUser.getAddress().getHouseNumber())
                 .setPostalCode(jobCenterUser.getAddress().getZipCode())
@@ -944,7 +943,7 @@ public class JobAdvertisementApplicationService {
     private Company toCompany(JobCenterUser jobCenterUser) {
 
         return new Company.Builder()
-                .setName(jobCenterUser.getFirstName() + " " + jobCenterUser.getLastName())
+                .setName(jobCenterUser.getAddress().getName())
                 .setStreet(jobCenterUser.getAddress().getStreet())
                 .setHouseNumber(jobCenterUser.getAddress().getHouseNumber())
                 .setPostalCode(jobCenterUser.getAddress().getZipCode())

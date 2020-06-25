@@ -14,7 +14,9 @@ import org.springframework.util.Assert;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode.*;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode.CHANGE_OR_REPOSE;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode.NOT_OCCUPIED;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode.OCCUPIED_OTHER;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.SOURCE_SYSTEM;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.WORK_FORMS;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamDateTimeFormatter.formatLocalDate;
@@ -246,7 +248,6 @@ public class JobAdvertisementToAvamAssembler {
         }
         if (occupations.size() > 0) {
             Occupation occupation = occupations.get(0);
-            avamJobAdvertisement.setBq1AvamBeruf(occupation.getLabel());
             avamJobAdvertisement.setBq1AvamBerufNr(occupation.getAvamOccupationCode());
             avamJobAdvertisement.setBq1ErfahrungCode(AvamCodeResolver.EXPERIENCES.getLeft(occupation.getWorkExperience()));
             avamJobAdvertisement.setBq1QualifikationCode(AvamCodeResolver.QUALIFICATION_CODE.getLeft(occupation.getQualificationCode()));
