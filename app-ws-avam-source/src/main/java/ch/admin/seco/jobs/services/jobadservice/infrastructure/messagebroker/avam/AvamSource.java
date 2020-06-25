@@ -3,6 +3,7 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.av
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromAvamDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.annotation.EnableBinding;
@@ -12,7 +13,10 @@ import org.springframework.messaging.MessageChannel;
 
 import javax.validation.Valid;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.*;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.APPROVE;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.CANCEL;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.CREATE_FROM_AVAM;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.REJECT;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.*;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageSystem.AVAM;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageSystem.JOB_AD_SERVICE;
@@ -77,6 +81,19 @@ public class AvamSource {
                 .setHeader(SOURCE_SYSTEM, AVAM.name())
                 .setHeader(TARGET_SYSTEM, JOB_AD_SERVICE.name())
                 .setHeader(PAYLOAD_TYPE, cancellationDto.getClass().getSimpleName())
+                .build());
+    }
+
+    public void update(@Valid UpdateJobAdvertisementFromAvamDto updateDto) {
+        LOG.debug("Update JobAdvertisement stellennummerAvam={}", updateDto.getStellennummerAvam());
+        output.send(MessageBuilder
+                .withPayload(updateDto)
+                .setHeader(PARTITION_KEY, updateDto.getStellennummerAvam())
+                .setHeader(RELEVANT_ID, updateDto.getStellennummerAvam())
+                .setHeader(ACTION, CANCEL.name())
+                .setHeader(SOURCE_SYSTEM, AVAM.name())
+                .setHeader(TARGET_SYSTEM, JOB_AD_SERVICE.name())
+                .setHeader(PAYLOAD_TYPE, updateDto.getClass().getSimpleName())
                 .build());
     }
 }

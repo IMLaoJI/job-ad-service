@@ -8,6 +8,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromAvamDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
@@ -16,11 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.annotation.StreamListener;
 
 import static ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition.notNull;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.APPROVE_CONDITION;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.CANCEL_CONDITION;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.CREATE_FROM_AVAM_CONDITION;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.JOB_AD_INT_ACTION_CHANNEL;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.REJECT_CONDITION;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.MessageBrokerChannels.*;
 
 public class AvamEventReceiverGateway {
 
@@ -45,6 +42,13 @@ public class AvamEventReceiverGateway {
 		JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.getByStellennummerEgovOrAvam(approvalDto.getStellennummerEgov(), approvalDto.getStellennummerAvam());
 		notNull(jobAdvertisementDto, "Couldn't find the jobAdvertisement to approve for stellennummerEgov %s nor stellennummerAvam %s", approvalDto.getStellennummerEgov(), approvalDto.getStellennummerAvam());
 		jobAdvertisementApplicationService.approve(approvalDto);
+	}
+
+	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = UPDATE_CONDITION)
+	public void handleUpdateAction(UpdateJobAdvertisementFromAvamDto updateJobAdvertisementFromAvamDto) {
+		JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.getByStellennummerAvam(updateJobAdvertisementFromAvamDto.getStellennummerAvam());
+		notNull(jobAdvertisementDto, "Couldn't find the jobAdvertisement to approve for stellennummerAvam %s", updateJobAdvertisementFromAvamDto.getStellennummerAvam());
+		jobAdvertisementApplicationService.update(updateJobAdvertisementFromAvamDto);
 	}
 
 	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = REJECT_CONDITION)

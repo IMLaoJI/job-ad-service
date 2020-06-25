@@ -396,10 +396,12 @@ public class JobAdvertisementApplicationService {
             jobAdvertisement.approve(approvalDto.getStellennummerAvam(), approvalDto.getDate(), approvalDto.isReportingObligation(),
                     approvalDto.getReportingObligationEndDate(), approvalDto.getJobCenterCode(), approvalDto.getJobCenterUserId());
         }
-        // FIXME This is a workaround when updating after approval, until AVAM add an actionType on there message.
+    }
+
+    public void update(UpdateJobAdvertisementFromAvamDto updateJobAdvertisementFromAvamDto){
+        JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerAvam(updateJobAdvertisementFromAvamDto.getStellennummerAvam());
         LOG.debug("Starting UPDATE for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
-        UpdateJobAdvertisementFromAvamDto updateJobAdvertisement = approvalDto.getUpdateJobAdvertisement();
-        jobAdvertisement.update(prepareUpdaterFromAvam(updateJobAdvertisement));
+        jobAdvertisement.update(prepareUpdaterFromAvam(updateJobAdvertisementFromAvamDto));
     }
 
     public void updateJobCenters() {
