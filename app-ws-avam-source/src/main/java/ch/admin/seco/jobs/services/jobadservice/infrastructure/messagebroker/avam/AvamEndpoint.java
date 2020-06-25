@@ -21,101 +21,101 @@ import static org.springframework.util.StringUtils.trimWhitespace;
 
 @Endpoint
 public class AvamEndpoint {
-    private static final Logger LOG = LoggerFactory.getLogger(AvamEndpoint.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AvamEndpoint.class);
 
-    private static final String RESPONSE_OK = "SECO_WS: OK";
+	private static final String RESPONSE_OK = "SECO_WS: OK";
 
-    private static final String RESPONSE_ERROR = "SECO_WS: ERROR";
+	private static final String RESPONSE_ERROR = "SECO_WS: ERROR";
 
-    private static final String NAMESPACE_URI = "http://valueobjects.common.avam.bit.admin.ch";
+	private static final String NAMESPACE_URI = "http://valueobjects.common.avam.bit.admin.ch";
 
-    private static final String AKTIVIERT = "AKTIVIERT";
+	private static final String AKTIVIERT = "AKTIVIERT";
 
-    private final AvamSource avamSource;
-    private final JobAdvertisementFromAvamAssembler jobAdvertisementFromAvamAssembler;
+	private final AvamSource avamSource;
+	private final JobAdvertisementFromAvamAssembler jobAdvertisementFromAvamAssembler;
 
-    public AvamEndpoint(AvamSource avamSource, JobAdvertisementFromAvamAssembler jobAdvertisementFromAvamAssembler) {
-        this.avamSource = avamSource;
-        this.jobAdvertisementFromAvamAssembler = jobAdvertisementFromAvamAssembler;
-    }
+	public AvamEndpoint(AvamSource avamSource, JobAdvertisementFromAvamAssembler jobAdvertisementFromAvamAssembler) {
+		this.avamSource = avamSource;
+		this.jobAdvertisementFromAvamAssembler = jobAdvertisementFromAvamAssembler;
+	}
 
-    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "insertOste")
-    @ResponsePayload
-    public InsertOsteResponse receiveJobAdvertisementFromAvam(@RequestPayload InsertOste request) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Recieved request: {}", transformToXml(request));
-        }
-        LOG.info("Recieved stellennummerAvam={}, stellennummerEgov={}, event={}", request.getOste().getStellennummerAvam(), request.getOste().getStellennummerEgov(), request.getOste().getEvent());
+	@PayloadRoot(namespace = NAMESPACE_URI, localPart = "insertOste")
+	@ResponsePayload
+	public InsertOsteResponse receiveJobAdvertisementFromAvam(@RequestPayload InsertOste request) {
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Recieved request: {}", transformToXml(request));
+		}
+		LOG.info("Recieved stellennummerAvam={}, stellennummerEgov={}, event={}", request.getOste().getStellennummerAvam(), request.getOste().getStellennummerEgov(), request.getOste().getEvent());
 
-        WSOsteEgov avamJobAdvertisement = request.getOste();
+		WSOsteEgov avamJobAdvertisement = request.getOste();
 
-        try {
-            if (isRejected(avamJobAdvertisement)) {
-                avamSource.reject(jobAdvertisementFromAvamAssembler.createRejectionDto(avamJobAdvertisement));
-            } else if (isCancelled(avamJobAdvertisement)) {
-                avamSource.cancel(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
-            } else if (isApproved(avamJobAdvertisement)) {
-                avamSource.approve(jobAdvertisementFromAvamAssembler.createApprovalDto(avamJobAdvertisement));
-            }
-            else if (avamJobAdvertisement.getEvent().equals(AKTIVIERT)){
-                avamSource.create(jobAdvertisementFromAvamAssembler.createCreateJobAdvertisementAvamDto(avamJobAdvertisement));
-            }
-            else if (isCreatedFromAvam(avamJobAdvertisement)) {
-                avamSource.create(jobAdvertisementFromAvamAssembler.createCreateJobAdvertisementAvamDto(avamJobAdvertisement));
-            } else {
-                LOG.warn("Received JobAdvertisement in unknown state from AVAM: {}", transformToXml(request));
-                return response(RESPONSE_ERROR);
-            }
+		try {
+			if (avamJobAdvertisement.getEvent().equals(AvamEvents.ABGELEHNT.name())) {
+				avamSource.reject(jobAdvertisementFromAvamAssembler.createRejectionDto(avamJobAdvertisement));
+			} else if (avamJobAdvertisement.getEvent().equals(AvamEvents.ABGELEHNT.name())) {
+				avamSource.cancel(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
+			} else if (avamJobAdvertisement.getEvent().equals(AvamEvents.AKTIVIERT.name())) {
+				if (isCreatedFromAvam(avamJobAdvertisement)) {
+					LOG.info("Creating JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
+					avamSource.create(jobAdvertisementFromAvamAssembler.createCreateJobAdvertisementAvamDto(avamJobAdvertisement));
+				} else {
+					LOG.info("Approving JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
+					avamSource.approve(jobAdvertisementFromAvamAssembler.createApprovalDto(avamJobAdvertisement));
+				}
+			} else {
+				LOG.warn("Received JobAdvertisement in unknown state from AVAM: {}", transformToXml(request));
+				return response(RESPONSE_ERROR);
+			}
 
-            return response(RESPONSE_OK);
+			return response(RESPONSE_OK);
 
-        } catch (Throwable e) {
-            LOG.warn("Processing 'InsertOste' failed: {}", transformToXml(request), e);
-            return response(RESPONSE_ERROR);
-        }
-    }
+		} catch (Throwable e) {
+			LOG.warn("Processing 'InsertOste' failed: {}", transformToXml(request), e);
+			return response(RESPONSE_ERROR);
+		}
+	}
 
-    private String transformToXml(Object xmlRootObject) {
-        try {
-            JAXBContext context = JAXBContext.newInstance(xmlRootObject.getClass());
-            Marshaller m = context.createMarshaller();
+	private String transformToXml(Object xmlRootObject) {
+		try {
+			JAXBContext context = JAXBContext.newInstance(xmlRootObject.getClass());
+			Marshaller m = context.createMarshaller();
 
-            StringWriter sw = new StringWriter();
-            m.marshal(xmlRootObject, sw);
-            return sw.toString();
+			StringWriter sw = new StringWriter();
+			m.marshal(xmlRootObject, sw);
+			return sw.toString();
 
-        } catch (JAXBException e) {
-            LOG.error("Marshalling of JaxbObject failed", e);
-            return xmlRootObject.toString();
-        }
-    }
+		} catch (JAXBException e) {
+			LOG.error("Marshalling of JaxbObject failed", e);
+			return xmlRootObject.toString();
+		}
+	}
 
-    private boolean isRejected(WSOsteEgov avamJobAdvertisement) {
-        return isFromJobroom(avamJobAdvertisement) && hasText(avamJobAdvertisement.getAblehnungGrundCode());
-    }
+	private boolean isRejected(WSOsteEgov avamJobAdvertisement) {
+		return isFromJobroom(avamJobAdvertisement) && hasText(avamJobAdvertisement.getAblehnungGrundCode());
+	}
 
-    private boolean isCancelled(WSOsteEgov avamJobAdvertisement) {
-        return hasText(avamJobAdvertisement.getAbmeldeGrundCode());
-    }
+	private boolean isCancelled(WSOsteEgov avamJobAdvertisement) {
+		return hasText(avamJobAdvertisement.getAbmeldeGrundCode());
+	}
 
-    private boolean isApproved(WSOsteEgov avamJobAdvertisement) {
-        return isFromJobroom(avamJobAdvertisement);
-    }
+	private boolean isApproved(WSOsteEgov avamJobAdvertisement) {
+		return isFromJobroom(avamJobAdvertisement);
+	}
 
-    private boolean isCreatedFromAvam(WSOsteEgov avamJobAdvertisement) {
-        return !isCancelled(avamJobAdvertisement);
-    }
+	private boolean isCreatedFromAvam(WSOsteEgov avamJobAdvertisement) {
+		return !isCancelled(avamJobAdvertisement);
+	}
 
-    private boolean isFromJobroom(WSOsteEgov avamJobAdvertisement) {
-        String quelleCode = trimWhitespace(avamJobAdvertisement.getQuelleCode());
-        return (AvamCodeResolver.SOURCE_SYSTEM.getLeft(SourceSystem.JOBROOM).equals(quelleCode)
-                || AvamCodeResolver.SOURCE_SYSTEM.getLeft(SourceSystem.API).equals(quelleCode));
-    }
+	private boolean isFromJobroom(WSOsteEgov avamJobAdvertisement) {
+		String quelleCode = trimWhitespace(avamJobAdvertisement.getQuelleCode());
+		return (AvamCodeResolver.SOURCE_SYSTEM.getLeft(SourceSystem.JOBROOM).equals(quelleCode)
+				|| AvamCodeResolver.SOURCE_SYSTEM.getLeft(SourceSystem.API).equals(quelleCode));
+	}
 
-    private InsertOsteResponse response(String returnCode) {
-        InsertOsteResponse insertOsteResponse = new InsertOsteResponse();
-        insertOsteResponse.setReturn(returnCode);
-        return insertOsteResponse;
-    }
+	private InsertOsteResponse response(String returnCode) {
+		InsertOsteResponse insertOsteResponse = new InsertOsteResponse();
+		insertOsteResponse.setReturn(returnCode);
+		return insertOsteResponse;
+	}
 
 }
