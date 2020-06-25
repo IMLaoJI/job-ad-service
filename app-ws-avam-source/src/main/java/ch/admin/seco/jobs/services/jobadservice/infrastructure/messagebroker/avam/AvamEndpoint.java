@@ -57,12 +57,12 @@ public class AvamEndpoint {
 				LOG.info("Cancelling JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
 				avamSource.cancel(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
 			} else if (avamJobAdvertisement.getEvent().equals(AvamEvents.AKTIVIERT.name())) {
-				if (!isApproved(avamJobAdvertisement)) {
-					LOG.info("Creating JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
-					avamSource.create(jobAdvertisementFromAvamAssembler.createCreateJobAdvertisementAvamDto(avamJobAdvertisement));
-				} else {
+				if (isApproved(avamJobAdvertisement)) {
 					LOG.info("Approving JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
 					avamSource.approve(jobAdvertisementFromAvamAssembler.createApprovalDto(avamJobAdvertisement));
+				} else {
+					LOG.info("Creating JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
+					avamSource.create(jobAdvertisementFromAvamAssembler.createCreateJobAdvertisementAvamDto(avamJobAdvertisement));
 				}
 			} else {
 				LOG.warn("Received JobAdvertisement in unknown state from AVAM: {}", transformToXml(request));
