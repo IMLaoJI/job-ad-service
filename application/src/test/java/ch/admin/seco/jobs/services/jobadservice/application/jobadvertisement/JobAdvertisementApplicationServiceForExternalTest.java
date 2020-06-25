@@ -169,9 +169,6 @@ public class JobAdvertisementApplicationServiceForExternalTest {
                         updateExternalJobAdvertisementDto.getEmployment().getWorkloadPercentageMin(),
                         updateExternalJobAdvertisementDto.getEmployment().getWorkloadPercentageMax()
                 );
-//        assertThat(jobAdvertisement.getPublication().isCompanyAnonymous()).isFalse();
-//
-//        domainEventMockUtils.assertSingleDomainEventPublished(JobAdvertisementEvents.JOB_ADVERTISEMENT_PUBLISH_PUBLIC.getDomainEventType());
     }
 
     @Test
