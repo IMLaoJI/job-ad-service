@@ -7,28 +7,25 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import java.time.LocalDate;
 
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationServiceForAvamTest.STELLENNUMMER_AVAM;
-import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.UpdateJobAdvertisementFromAvamDtoTestFixture.updateJobAdvertisementFromAvamDto;
+import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.UpdateJobAdvertisementFromAvamDtoTestFixture.testUpdateJobAdvertisementFromAvamDto;
 
 
 public class ApprovalDtoTestFixture {
 
-    public static ApprovalDto approvalDto(JobAdvertisement jobAdvertisement) {
+	public static ApprovalDto testApprovalDto(JobAdvertisement jobAdvertisement) {
 
-        UpdateJobAdvertisementFromAvamDto updateJobAdAvamDto = updateJobAdvertisementFromAvamDto(jobAdvertisement);
-        updateJobAdAvamDto.setApprovalDate(LocalDate.of(2018, 1, 1));
-        updateJobAdAvamDto.setReportingObligation(true);
-        updateJobAdAvamDto.setReportingObligationEndDate(LocalDate.of(2018, 10, 1));
-        updateJobAdAvamDto.setStellennummerAvam(STELLENNUMMER_AVAM);
-        updateJobAdAvamDto.setJobCenterCode("job-center-id");
+		UpdateJobAdvertisementFromAvamDto updateJobAdAvamDto = testUpdateJobAdvertisementFromAvamDto(jobAdvertisement);
+		updateJobAdAvamDto.setApprovalDate(LocalDate.of(2018, 1, 1));
+		updateJobAdAvamDto.setReportingObligation(true);
+		updateJobAdAvamDto.setReportingObligationEndDate(LocalDate.of(2018, 10, 1));
+		updateJobAdAvamDto.setStellennummerAvam(STELLENNUMMER_AVAM);
+		updateJobAdAvamDto.setJobCenterCode("job-center-id");
 
-        return new ApprovalDto()
-                .setStellennummerEgov(jobAdvertisement.getId().getValue())
-                .setStellennummerAvam(updateJobAdAvamDto.getStellennummerAvam())
-                .setDate(updateJobAdAvamDto.getApprovalDate())
-                .setReportingObligation(updateJobAdAvamDto.isReportingObligation())
-                .setReportingObligationEndDate(updateJobAdAvamDto.getReportingObligationEndDate())
-                .setJobCenterCode(updateJobAdAvamDto.getJobCenterCode())
-                .setJobCenterUserId(updateJobAdAvamDto.getJobCenterUserId())
-                .setUpdateJobAdvertisement(updateJobAdAvamDto);
-    }
+		return new ApprovalDto(
+                jobAdvertisement.getId().getValue(),
+				STELLENNUMMER_AVAM, LocalDate.of(2018, 1, 1),
+				true,
+				LocalDate.of(2018, 10, 1),
+				"jobcenterCode", "job-center-id");
+	}
 }
