@@ -23,7 +23,8 @@ public class ApprovalDtoTestFixture {
 
 		return new ApprovalDto(
                 jobAdvertisement.getId().getValue(),
-				STELLENNUMMER_AVAM, LocalDate.of(2018, 1, 1),
+				STELLENNUMMER_AVAM,
+				LocalDate.of(2018, 1, 1),
 				true,
 				LocalDate.of(2018, 10, 1),
 				"jobcenterCode", "job-center-id");
