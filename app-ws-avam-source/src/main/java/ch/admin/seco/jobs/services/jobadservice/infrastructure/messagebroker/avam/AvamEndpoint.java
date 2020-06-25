@@ -58,9 +58,8 @@ public class AvamEndpoint {
 				avamSource.cancel(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
 			} else if (avamJobAdvertisement.getEvent().equals(AvamEvents.MUTIERT.name())){
 				LOG.info("Updating JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
-				avamSource.cancel(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
+				avamSource.update(jobAdvertisementFromAvamAssembler.createUpdateDto(avamJobAdvertisement));
 			}
-
 			else if (avamJobAdvertisement.getEvent().equals(AvamEvents.AKTIVIERT.name())) {
 				if (isApproved(avamJobAdvertisement)) {
 					LOG.info("Approving JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
