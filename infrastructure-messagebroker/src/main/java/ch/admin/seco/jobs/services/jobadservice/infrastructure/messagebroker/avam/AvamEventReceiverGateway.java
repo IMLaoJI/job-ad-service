@@ -79,7 +79,8 @@ public class AvamEventReceiverGateway {
 
 	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = DELETE_CONDITION)
 	public void handleDeleteAction(AvamCancellationDto avamCancellationDto) {
-
+		JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerEgovOrAvam(avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerAvam());
+		jobAdvertisementApplicationService.checkBlackoutPolicyExpirationForSingleJobAd(jobAdvertisementDto);
 	}
 
 
