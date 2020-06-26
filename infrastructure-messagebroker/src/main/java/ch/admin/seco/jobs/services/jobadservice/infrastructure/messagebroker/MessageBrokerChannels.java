@@ -11,6 +11,9 @@ public interface MessageBrokerChannels {
     String UPDATE_CONDITION = "headers['action']=='UPDATE'";
     String REJECT_CONDITION = "headers['action']=='REJECT'";
     String CANCEL_CONDITION = "headers['action']=='CANCEL'";
+    String INACTIVATE_CONDITION = "headers['action']=='INACTIVATE'";
+    String REACTIVATE_CONDITION = "headers['action']=='REACTIVATE'";
+    String DELETE_CONDITION = "headers['action']=='DELETE'";
     String CREATE_FROM_AVAM_CONDITION = "headers['action']=='CREATE_FROM_AVAM'";
 
     String JOB_AD_EVENT_CHANNEL = "job-ad-event";

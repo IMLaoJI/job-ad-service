@@ -65,6 +65,23 @@ public class AvamEventReceiverGateway {
 		}
 	}
 
+	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = REACTIVATE_CONDITION)
+	public void handleReactivateAction(AvamCancellationDto avamCancellationDto) {
+		JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerEgovOrAvam(avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerAvam());
+		jobAdvertisementApplicationService.checkBlackoutPolicyExpirationForSingleJobAd(jobAdvertisementDto);
+	}
+
+	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = INACTIVATE_CONDITION)
+	public void handleInactivateAction(AvamCancellationDto avamCancellationDto) {
+
+	}
+
+	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = DELETE_CONDITION)
+	public void handleDeleteAction(AvamCancellationDto avamCancellationDto) {
+
+	}
+
+
 	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CANCEL_CONDITION)
 	public void handleCancelAction(AvamCancellationDto avamCancellationDto) {
 		JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerEgovOrAvam(avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerAvam());
