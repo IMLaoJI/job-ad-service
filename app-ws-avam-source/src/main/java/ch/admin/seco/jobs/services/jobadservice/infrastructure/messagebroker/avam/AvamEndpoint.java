@@ -36,6 +36,12 @@ public class AvamEndpoint {
 
 	private static final String ABGELEHNT = "ABGELEHNT";
 
+	private static final String INAKTIVIERT = "INAKTIVIERT";
+
+	private static final String REAKTIVIERT = "REAKTIVIERT";
+
+	private static final String GELOESCHT = "GELOESCHT";
+
 	private final AvamSource avamSource;
 	private final JobAdvertisementFromAvamAssembler jobAdvertisementFromAvamAssembler;
 
@@ -79,6 +85,21 @@ public class AvamEndpoint {
 				case ABGELEHNT: {
 					LOG.info("Rejecting JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
 					avamSource.reject(jobAdvertisementFromAvamAssembler.createRejectionDto(avamJobAdvertisement));
+					break;
+				}
+				case INAKTIVIERT: {
+					LOG.info("Rejecting JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
+					avamSource.inactivate(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
+					break;
+				}
+				case GELOESCHT: {
+					LOG.info("Rejecting JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
+					avamSource.delete(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
+					break;
+				}
+				case REAKTIVIERT: {
+					LOG.info("Rejecting JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
+					avamSource.reactivate(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
 					break;
 				}
 				default:
