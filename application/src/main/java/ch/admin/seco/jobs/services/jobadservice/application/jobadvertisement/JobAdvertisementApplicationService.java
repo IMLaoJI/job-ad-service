@@ -574,21 +574,24 @@ public class JobAdvertisementApplicationService {
         this.jobAdvertisementRepository
                 .findAllWherePublicationShouldStart(TimeMachine.now().toLocalDate())
                 .forEach(this::publish);
-
     }
 
     public void checkBlackoutPolicyExpiration() {
         this.jobAdvertisementRepository
                 .findAllWhereBlackoutNeedToExpire(TimeMachine.now().toLocalDate())
                 .forEach(JobAdvertisement::expireBlackout);
+    }
 
+    public void checkBlackoutPolicyExpirationForSingleJobAd(JobAdvertisementDto jobAdvertisementDto) {
+        this.jobAdvertisementRepository
+                .findById(new JobAdvertisementId(jobAdvertisementDto.getId()))
+                .ifPresent(JobAdvertisement::expireBlackout);
     }
 
     public void checkPublicationExpiration() {
         this.jobAdvertisementRepository
                 .findAllWherePublicationNeedToExpire(TimeMachine.now().toLocalDate())
                 .forEach(JobAdvertisement::expirePublication);
-
     }
 
     private void checkIfJobAdvertisementAlreadyExists(ExternalCreateJobAdvertisementDto createJobAdvertisementFromExternalDto) {
