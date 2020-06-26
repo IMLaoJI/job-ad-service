@@ -30,8 +30,8 @@ public class AvamEventReceiverGateway {
 	private final AvamMailSender avamMailSender;
 
 	public AvamEventReceiverGateway(JobAdvertisementApplicationService jobAdvertisementApplicationService,
-			JobCenterService jobCenterService,
-			AvamMailSender avamMailSender) {
+	                                JobCenterService jobCenterService,
+	                                AvamMailSender avamMailSender) {
 		this.jobAdvertisementApplicationService = jobAdvertisementApplicationService;
 		this.jobCenterService = jobCenterService;
 		this.avamMailSender = avamMailSender;
@@ -68,12 +68,13 @@ public class AvamEventReceiverGateway {
 	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = REACTIVATE_CONDITION)
 	public void handleReactivateAction(AvamCancellationDto avamCancellationDto) {
 		JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerEgovOrAvam(avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerAvam());
-		jobAdvertisementApplicationService.checkBlackoutPolicyExpirationForSingleJobAd(jobAdvertisementDto);
+		jobAdvertisementApplicationService.decideIfValidForAdjourningPublication(new JobAdvertisementId(jobAdvertisementDto.getId()));
 	}
 
 	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = INACTIVATE_CONDITION)
 	public void handleInactivateAction(AvamCancellationDto avamCancellationDto) {
-
+		JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerEgovOrAvam(avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerAvam());
+		jobAdvertisementApplicationService.checkBlackoutPolicyExpirationForSingleJobAd(jobAdvertisementDto);
 	}
 
 	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = DELETE_CONDITION)
@@ -87,15 +88,15 @@ public class AvamEventReceiverGateway {
 		JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerEgovOrAvam(avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerAvam());
 
 		if ((jobAdvertisementDto == null) && (avamCancellationDto.getSourceSystem() == SourceSystem.RAV)) {
-            if (avamCancellationDto.getContactEmail() != null) {
-                LOG.info("Cancellation of an unknown jobAdvertisement from AVAM with stellennummerAvam {}", avamCancellationDto.getStellennummerAvam());
-                final JobCenter jobCenter = jobCenterService.findJobCenterByCode(avamCancellationDto.getJobCenterCode());
-                avamMailSender.sendCancellation(avamCancellationDto, jobCenter);
-                return;
-            } else {
-                LOG.info("No cancellation mail sent of unknown JobAdvertisement from AVAM with stellennummerAvam {}", avamCancellationDto.getStellennummerAvam());
-                return;
-            }
+			if (avamCancellationDto.getContactEmail() != null) {
+				LOG.info("Cancellation of an unknown jobAdvertisement from AVAM with stellennummerAvam {}", avamCancellationDto.getStellennummerAvam());
+				final JobCenter jobCenter = jobCenterService.findJobCenterByCode(avamCancellationDto.getJobCenterCode());
+				avamMailSender.sendCancellation(avamCancellationDto, jobCenter);
+				return;
+			} else {
+				LOG.info("No cancellation mail sent of unknown JobAdvertisement from AVAM with stellennummerAvam {}", avamCancellationDto.getStellennummerAvam());
+				return;
+			}
 		}
 
 		notNull(jobAdvertisementDto, "Couldn't find the jobAdvertisement to cancel for stellennummerEgov %s nor stellennummerAvam %s", avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerAvam());
