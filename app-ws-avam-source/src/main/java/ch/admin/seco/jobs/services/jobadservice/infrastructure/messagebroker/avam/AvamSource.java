@@ -30,7 +30,7 @@ public class AvamSource {
         this.output = output;
     }
 
-    public void approve(ApprovalDto approvalDto) {
+    public void approve(@Valid ApprovalDto approvalDto) {
         LOG.debug("Approve JobAdvertisement stellennummerAvam={}, stellennummerEgov={}", approvalDto.getStellennummerAvam(), approvalDto.getStellennummerEgov());
         output.send(MessageBuilder
                 .withPayload(approvalDto)
@@ -43,7 +43,7 @@ public class AvamSource {
                 .build());
     }
 
-    public void reject(RejectionDto rejectionDto) {
+    public void reject(@Valid RejectionDto rejectionDto) {
         LOG.debug("Reject JobAdvertisement stellennummerAvam={}, stellennummerEgov={}", rejectionDto.getStellennummerAvam(), rejectionDto.getStellennummerEgov());
         output.send(MessageBuilder
                 .withPayload(rejectionDto)
@@ -56,7 +56,7 @@ public class AvamSource {
                 .build());
     }
 
-    public void create(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
+    public void create(@Valid AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
         LOG.debug("Create JobAdvertisement stellennummerAvam={}", createJobAdvertisementFromAvamDto.getStellennummerAvam());
         output.send(MessageBuilder
                 .withPayload(createJobAdvertisementFromAvamDto)
