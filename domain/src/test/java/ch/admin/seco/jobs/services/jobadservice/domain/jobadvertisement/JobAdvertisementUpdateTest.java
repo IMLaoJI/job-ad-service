@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_ADJOURNED_PUBLICATION;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementFixture.testJobAdvertisement;
 import static com.google.common.collect.Sets.immutableEnumSet;
 import static java.time.LocalDate.now;
@@ -100,7 +101,6 @@ public class JobAdvertisementUpdateTest {
     }
 
     @Test
-    @Ignore // TODO fago: Rewrite for new adjour logic here
     public void shouldReactivateFromArchivedBeforeStartAndEndDate() {
         //given
         TimeMachine.useFixedClockAt(LocalDateTime.of(2019, 1, 18, 0, 0));
@@ -190,10 +190,8 @@ public class JobAdvertisementUpdateTest {
     }
 
     @Test
-    @Ignore // TODO fago: Rewrite for new adjour logic here
     public void shouldAdjournPublicationWhenBeforeStartAndEndDate() {
         //given
-        TimeMachine.useFixedClockAt(LocalDateTime.of(2019, 1, 18, 0, 0));
         JobAdvertisement jobAdvertisement = testJobAdvertisement()
                 .setStatus(JobAdvertisementStatus.PUBLISHED_PUBLIC)
                 .setPublication(
@@ -203,50 +201,13 @@ public class JobAdvertisementUpdateTest {
                                 .build()
                 )
                 .build();
-        JobAdvertisementUpdater updater = new JobAdvertisementUpdater.Builder(null)
-                .setPublication(
-                        new Publication.Builder()
-                                .setStartDate(LocalDate.of(2019, 1, 20))
-                                .setEndDate(LocalDate.of(2019, 1, 25))
-                                .build()
-                )
-                .build();
 
         //when
-        jobAdvertisement.update(updater);
+        jobAdvertisement.adjournPublication();
 
         //then
+        domainEventMockUtils.assertSingleDomainEventPublished(JOB_ADVERTISEMENT_ADJOURNED_PUBLICATION.getDomainEventType());
         assertThat(jobAdvertisement.getStatus()).isEqualTo(JobAdvertisementStatus.REFINING);
-    }
-
-    @Test
-    @Ignore // TODO fago: Rewrite for new adjour logic here
-    public void shouldNotAdjournPublicationWhenBetweenStartAndEndDate() {
-        //given
-        TimeMachine.useFixedClockAt(LocalDateTime.of(2019, 1, 18, 0, 0));
-        JobAdvertisement jobAdvertisement = testJobAdvertisement()
-                .setStatus(JobAdvertisementStatus.PUBLISHED_PUBLIC)
-                .setPublication(
-                        new Publication.Builder()
-                                .setStartDate(LocalDate.of(2019, 1, 10))
-                                .setEndDate(LocalDate.of(2019, 1, 15))
-                                .build()
-                )
-                .build();
-        JobAdvertisementUpdater updater = new JobAdvertisementUpdater.Builder(null)
-                .setPublication(
-                        new Publication.Builder()
-                                .setStartDate(LocalDate.of(2019, 1, 10))
-                                .setEndDate(LocalDate.of(2019, 1, 25))
-                                .build()
-                )
-                .build();
-
-        //when
-        jobAdvertisement.update(updater);
-
-        //then
-        assertThat(jobAdvertisement.getStatus()).isEqualTo(JobAdvertisementStatus.PUBLISHED_PUBLIC);
     }
 
 }

@@ -37,10 +37,7 @@ import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisem
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.PublicationDtoTestFixture.testPublicationDtoWithCompanyAnonymous;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.RejectionDtoTestFixture.testRejectionDto;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.UpdateJobAdvertisementFromAvamDtoTestFixture.testUpdateJobAdvertisementFromAvamDto;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.APPROVED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.ARCHIVED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.INSPECTING;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REJECTED;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_APPROVED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_REJECTED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_UPDATED;
@@ -308,5 +305,61 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         assertThat(repoJobAd.getJobCenterUserId()).isEqualTo("14711");
         assertThat(repoJobAd.getStatus()).isEqualTo(REJECTED);
         domainEventMockUtils.assertSingleDomainEventPublished(JOB_ADVERTISEMENT_REJECTED.getDomainEventType());
+    }
+
+    @Test
+    public void shouldAdjournPublicationFromArchived() {
+        // given
+        JobAdvertisement inspectingJobAd = jobAdvertisementRepository.save(
+                testJobAdvertisement()
+                        .setStatus(ARCHIVED)
+                        .setJobContent(JobContentFixture.of(job01.id()).build())
+                        .setStellennummerAvam(STELLENNUMMER_AVAM)
+                        .setRejectionDate(null)
+                        .setRejectionCode(null)
+                        .setRejectionReason(null)
+                        .setCancellationDate(null)
+                        .setCancellationCode(null)
+                        .setPublication(testPublicationEmpty()
+                                .setStartDate(now().plusDays(10))
+                                .setEndDate(now().plusDays(22))
+                                .build())
+                        .build()
+        );
+
+        // when
+        sut.decideIfValidForAdjourningPublication(inspectingJobAd.getId());
+
+        // then
+        JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
+        assertThat(repoJobAd.getStatus()).isEqualTo(JobAdvertisementStatus.REFINING);
+    }
+
+    @Test
+    public void shouldAdjournPublicationFromRefining() {
+        // given
+        JobAdvertisement inspectingJobAd = jobAdvertisementRepository.save(
+                testJobAdvertisement()
+                        .setStatus(REFINING)
+                        .setJobContent(JobContentFixture.of(job01.id()).build())
+                        .setStellennummerAvam(STELLENNUMMER_AVAM)
+                        .setRejectionDate(null)
+                        .setRejectionCode(null)
+                        .setRejectionReason(null)
+                        .setCancellationDate(null)
+                        .setCancellationCode(null)
+                        .setPublication(testPublicationEmpty()
+                                .setStartDate(now().plusDays(10))
+                                .setEndDate(now().plusDays(22))
+                                .build())
+                        .build()
+        );
+
+        // when
+        sut.decideIfValidForAdjourningPublication(inspectingJobAd.getId());
+
+        // then
+        JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
+        assertThat(repoJobAd.getStatus()).isEqualTo(JobAdvertisementStatus.REFINING);
     }
 }
