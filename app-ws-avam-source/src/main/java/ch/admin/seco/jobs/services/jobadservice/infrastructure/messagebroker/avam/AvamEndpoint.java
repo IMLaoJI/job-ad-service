@@ -74,17 +74,17 @@ public class AvamEndpoint {
 					break;
 				}
 				case INAKTIVIERT: {
-					LOG.info("Rejecting JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
+					LOG.info("Inactivating JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
 					avamSource.inactivate(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
 					break;
 				}
 				case GELOESCHT: {
-					LOG.info("Rejecting JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
+					LOG.info("Deleting JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
 					avamSource.delete(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
 					break;
 				}
 				case REAKTIVIERT: {
-					LOG.info("Rejecting JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
+					LOG.info("Reactivating JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
 					avamSource.reactivate(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
 					break;
 				}
