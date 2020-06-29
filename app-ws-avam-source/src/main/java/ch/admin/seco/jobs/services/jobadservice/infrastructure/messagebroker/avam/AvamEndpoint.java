@@ -28,20 +28,6 @@ public class AvamEndpoint {
 
 	private static final String NAMESPACE_URI = "http://valueobjects.common.avam.bit.admin.ch";
 
-	private static final String AKTIVIERT = "AKTIVIERT";
-
-	private static final String ABGEMELDET = "ABGEMELDET";
-
-	private static final String MUTIERT = "MUTIERT";
-
-	private static final String ABGELEHNT = "ABGELEHNT";
-
-	private static final String INAKTIVIERT = "INAKTIVIERT";
-
-	private static final String REAKTIVIERT = "REAKTIVIERT";
-
-	private static final String GELOESCHT = "GELOESCHT";
-
 	private final AvamSource avamSource;
 	private final JobAdvertisementFromAvamAssembler jobAdvertisementFromAvamAssembler;
 
@@ -60,7 +46,7 @@ public class AvamEndpoint {
 
 		WSOsteEgov avamJobAdvertisement = request.getOste();
 		try {
-			switch (avamJobAdvertisement.getEvent()) {
+			switch (Enum.valueOf(AvamEvents.class, avamJobAdvertisement.getEvent())) {
 				case AKTIVIERT: {
 					if (isApproved(avamJobAdvertisement)) {
 						LOG.info("Approving JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
