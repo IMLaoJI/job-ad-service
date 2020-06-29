@@ -6,11 +6,9 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.J
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Set;
 
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_ADJOURNED_PUBLICATION;
@@ -101,96 +99,7 @@ public class JobAdvertisementUpdateTest {
     }
 
     @Test
-    public void shouldReactivateFromArchivedBeforeStartAndEndDate() {
-        //given
-        TimeMachine.useFixedClockAt(LocalDateTime.of(2019, 1, 18, 0, 0));
-        JobAdvertisement jobAdvertisement = testJobAdvertisement()
-                .setStatus(JobAdvertisementStatus.ARCHIVED)
-                .setPublication(
-                        new Publication.Builder()
-                                .setStartDate(LocalDate.of(2019, 1, 10))
-                                .setEndDate(LocalDate.of(2019, 1, 15))
-                                .build()
-                )
-                .build();
-        JobAdvertisementUpdater updater = new JobAdvertisementUpdater.Builder(null)
-                .setPublication(
-                        new Publication.Builder()
-                                .setStartDate(LocalDate.of(2019, 1, 20))
-                                .setEndDate(LocalDate.of(2019, 1, 25))
-                                .build()
-                )
-                .build();
-
-        //when
-        jobAdvertisement.update(updater);
-
-        //then
-        assertThat(jobAdvertisement.getStatus()).isEqualTo(JobAdvertisementStatus.REFINING);
-    }
-
-    @Test
-    @Ignore // TODO fago: Rewrite for new adjour logic here
-    public void shouldReactivateFromArchivedBetweenStartAndEndDate() {
-        //given
-        TimeMachine.useFixedClockAt(LocalDateTime.of(2019, 1, 22, 0, 0));
-        JobAdvertisement jobAdvertisement = testJobAdvertisement()
-                .setStatus(JobAdvertisementStatus.ARCHIVED)
-                .setPublication(
-                        new Publication.Builder()
-                                .setStartDate(LocalDate.of(2019, 1, 10))
-                                .setEndDate(LocalDate.of(2019, 1, 15))
-                                .build()
-                )
-                .build();
-        JobAdvertisementUpdater updater = new JobAdvertisementUpdater.Builder(null)
-                .setPublication(
-                        new Publication.Builder()
-                                .setStartDate(LocalDate.of(2019, 1, 20))
-                                .setEndDate(LocalDate.of(2019, 1, 25))
-                                .build()
-                )
-                .build();
-
-        //when
-        jobAdvertisement.update(updater);
-
-        //then
-        assertThat(jobAdvertisement.getStatus()).isEqualTo(JobAdvertisementStatus.REFINING);
-    }
-
-    @Test
-    @Ignore // TODO fago: Rewrite for new adjour logic here
-    public void shouldReactivateFromArchivedAfterStartAndEndDate() {
-        //given
-        TimeMachine.useFixedClockAt(LocalDateTime.of(2019, 1, 28, 0, 0));
-        JobAdvertisement jobAdvertisement = testJobAdvertisement()
-                .setStatus(JobAdvertisementStatus.ARCHIVED)
-                .setPublication(
-                        new Publication.Builder()
-                                .setStartDate(LocalDate.of(2019, 1, 10))
-                                .setEndDate(LocalDate.of(2019, 1, 15))
-                                .build()
-                )
-                .build();
-        JobAdvertisementUpdater updater = new JobAdvertisementUpdater.Builder(null)
-                .setPublication(
-                        new Publication.Builder()
-                                .setStartDate(LocalDate.of(2019, 1, 20))
-                                .setEndDate(LocalDate.of(2019, 1, 25))
-                                .build()
-                )
-                .build();
-
-        //when
-        jobAdvertisement.update(updater);
-
-        //then
-        assertThat(jobAdvertisement.getStatus()).isEqualTo(JobAdvertisementStatus.ARCHIVED);
-    }
-
-    @Test
-    public void shouldAdjournPublicationWhenBeforeStartAndEndDate() {
+    public void shouldAdjournPublication() {
         //given
         JobAdvertisement jobAdvertisement = testJobAdvertisement()
                 .setStatus(JobAdvertisementStatus.PUBLISHED_PUBLIC)
