@@ -150,7 +150,7 @@ public class AvamEndpointTest {
     }
 
     @Test
-    public void createAvamCreateJobAdvertisementDtoAndAndAssembleToCreateJobAdvertisementDto() throws IOException {
+    public void assembleCreateJobAdDtoFromAvamCreateDto() throws IOException {
 
         // given
         mockWebServiceClient.sendRequest(withPayload(getAsResource("soap/messages/insertOste-create-1.xml")))
@@ -179,7 +179,7 @@ public class AvamEndpointTest {
     }
 
     @Test
-    public void createAvamCancellationDtoAndAssembleToCancellationDto() throws IOException {
+    public void assembleCancellationJobAdDtoFromAvamCancellationDto() throws IOException {
 
         //given
         mockWebServiceClient.sendRequest(withPayload(getAsResource("soap/messages/insertOste-cancel-1.xml")))

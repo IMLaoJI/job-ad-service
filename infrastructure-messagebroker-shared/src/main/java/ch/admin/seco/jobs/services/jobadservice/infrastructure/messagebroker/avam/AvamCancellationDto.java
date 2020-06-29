@@ -3,13 +3,11 @@ package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.av
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.CancellationCode;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
-import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-@Validated
 public class AvamCancellationDto {
 
     private String stellennummerEgov;
