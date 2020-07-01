@@ -6,7 +6,6 @@ import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
 import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
@@ -22,7 +21,6 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSy
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -195,41 +193,6 @@ public class JobAdvertisementApplicationServiceForAvamTest {
     }
 
     @Test
-    @Ignore // TODO fago: Rewrite for new adjour logic here
-    public void updateFromAvamWithRefining() {
-        // given
-        JobAdvertisement inspectingJobAd = jobAdvertisementRepository.save(
-                testJobAdvertisement()
-                        .setStatus(ARCHIVED)
-                        .setJobContent(JobContentFixture.of(job01.id()).build())
-                        .setStellennummerAvam(STELLENNUMMER_AVAM)
-                        .setRejectionDate(null)
-                        .setRejectionCode(null)
-                        .setRejectionReason(null)
-                        .setCancellationDate(null)
-                        .setCancellationCode(null)
-                        .setPublication(testPublicationEmpty()
-                                .setStartDate(now().minusDays(10))
-                                .setEndDate(now().minusDays(2))
-                                .build())
-                        .build()
-        );
-        AvamCreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(
-                inspectingJobAd.getJobContent().getCompany(),
-                new PublicationDto()
-                        .setStartDate(now().plusDays(10))
-                        .setEndDate(now().plusDays(22))
-        );
-
-        // when
-        sut.createFromAvam(createJobAdvertisementDto);
-
-        // then
-        JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
-        assertThat(repoJobAd.getStatus()).isEqualTo(JobAdvertisementStatus.REFINING);
-    }
-
-    @Test
     public void shouldApprove() {
         // given
         JobAdvertisement inspectingJobAd = jobAdvertisementRepository.save(
@@ -361,5 +324,33 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         // then
         JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
         assertThat(repoJobAd.getStatus()).isEqualTo(JobAdvertisementStatus.REFINING);
+    }
+
+    @Test
+    public void shouldIgnoreAdjournPublicationFromCancelled() {
+        // given
+        JobAdvertisement inspectingJobAd = jobAdvertisementRepository.save(
+                testJobAdvertisement()
+                        .setStatus(CANCELLED)
+                        .setJobContent(JobContentFixture.of(job01.id()).build())
+                        .setStellennummerAvam(STELLENNUMMER_AVAM)
+                        .setRejectionDate(null)
+                        .setRejectionCode(null)
+                        .setRejectionReason(null)
+                        .setCancellationDate(null)
+                        .setCancellationCode(null)
+                        .setPublication(testPublicationEmpty()
+                                .setStartDate(now().plusDays(10))
+                                .setEndDate(now().plusDays(22))
+                                .build())
+                        .build()
+        );
+
+        // when
+        sut.decideIfValidForAdjourningPublication(inspectingJobAd.getId());
+
+        // then
+        JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
+        assertThat(repoJobAd.getStatus()).isEqualTo(CANCELLED);
     }
 }
