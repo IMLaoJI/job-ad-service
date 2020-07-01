@@ -48,7 +48,7 @@ public class AvamEndpoint {
 		try {
 			switch (Enum.valueOf(AvamEvents.class, avamJobAdvertisement.getEvent())) {
 				case AKTIVIERT: {
-					if (isApproved(avamJobAdvertisement)) {
+					if (isFromJobroom(avamJobAdvertisement)) {
 						LOG.info("Approving JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
 						avamSource.approve(jobAdvertisementFromAvamAssembler.createApprovalDto(avamJobAdvertisement));
 						break;
@@ -111,10 +111,6 @@ public class AvamEndpoint {
 			LOG.error("Marshalling of JaxbObject failed", e);
 			return xmlRootObject.toString();
 		}
-	}
-
-	private boolean isApproved(WSOsteEgov avamJobAdvertisement) {
-		return isFromJobroom(avamJobAdvertisement);
 	}
 
 	private boolean isFromJobroom(WSOsteEgov avamJobAdvertisement) {

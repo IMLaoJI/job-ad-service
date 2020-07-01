@@ -187,6 +187,23 @@ public class AvamEndpointTest {
         assertThat(cancellationDto.getStellennummerAvam()).isEqualTo("AVAM-0001");
     }
 
+    @Test
+    public void inactivateJobAdvertisement() throws IOException {
+        // process
+        mockWebServiceClient.sendRequest(withPayload(getAsResource("soap/messages/insertOste-inactivate-1.xml")))
+                .andExpect(ResponseMatchers.noFault())
+                .andExpect(ResponseMatchers.validPayload(secoEgovServiceXsdResource));
+
+        // assert
+        Message<String> received = (Message<String>) messageCollector.forChannel(source.output()).poll();
+        assertThat(received).isNotNull();
+        assertThat(received.getHeaders().get(ACTION)).isEqualTo(INACTIVATE.name());
+
+        AvamCancellationDto cancellationDto = cancellationDtoJacksonTester.parse(received.getPayload()).getObject();
+        assertThat(cancellationDto.getStellennummerEgov()).isEqualTo("EGOV-0001");
+        assertThat(cancellationDto.getStellennummerAvam()).isEqualTo("AVAM-0001");
+    }
+
     private ClassPathResource getAsResource(String payloadFile) {
         return new ClassPathResource(payloadFile);
     }
