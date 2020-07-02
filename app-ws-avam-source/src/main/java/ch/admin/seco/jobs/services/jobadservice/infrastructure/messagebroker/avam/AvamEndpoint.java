@@ -52,47 +52,40 @@ public class AvamEndpoint {
 						LOG.info("Approving JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
 						avamSource.approve(jobAdvertisementFromAvamAssembler.createApprovalDto(avamJobAdvertisement));
 						break;
-					} else {
+					}
+					else {
 						LOG.info("Creating JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
 						avamSource.create(jobAdvertisementFromAvamAssembler.createCreateJobAdvertisementAvamDto(avamJobAdvertisement));
 						break;
 					}
 				}
-				case ABGEMELDET: {
-					LOG.info("Cancelling JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
-					avamSource.cancel(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
-					break;
-				}
-				case MUTIERT: {
-					LOG.info("Updating JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
-					avamSource.update(jobAdvertisementFromAvamAssembler.createUpdateDto(avamJobAdvertisement));
-					break;
-				}
+
 				case ABGELEHNT: {
 					LOG.info("Rejecting JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
 					avamSource.reject(jobAdvertisementFromAvamAssembler.createRejectionDto(avamJobAdvertisement));
 					break;
 				}
-				case INAKTIVIERT: {
-					LOG.info("Inactivating JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
-					avamSource.inactivate(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
-					break;
-				}
+
+				case ABGEMELDET:
 				case GELOESCHT: {
-					LOG.info("Deleting JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
+					LOG.info("Cancelling JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
 					avamSource.delete(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
 					break;
 				}
+
+				case MUTIERT:
+				case INAKTIVIERT:
 				case REAKTIVIERT: {
-					LOG.info("Reactivating JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
-					avamSource.reactivate(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
+					LOG.info("Updating JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
+					avamSource.update(jobAdvertisementFromAvamAssembler.createUpdateDto(avamJobAdvertisement));
 					break;
 				}
+
 				default:
 					LOG.warn("Received JobAdvertisement in unknown state from AVAM: {}", transformToXml(request));
 			}
 		} catch (Exception e) {
-			LOG.warn("Processing 'InsertOste' failed: {}", transformToXml(request), e);
+			LOG.error("Processing 'InsertOste' failed: {}", transformToXml(request), e);
 			return response(RESPONSE_ERROR);
 		}
 		return response(RESPONSE_OK);
