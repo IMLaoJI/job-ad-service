@@ -7,12 +7,12 @@
         <osteEgovId>900000</osteEgovId>
         <abSofort>1</abSofort>
         <abgelehnt>0</abgelehnt>
-        <abmeldeDatum></abmeldeDatum>
+        <abmeldeDatum>2018-03-03-00.00.00.0</abmeldeDatum>
         <abmeldeGrundCode></abmeldeGrundCode>
         <alterBis>50</alterBis>
         <alterVon>20</alterVon>
         <angabenAlter></angabenAlter>
-        <anmeldeDatum>null</anmeldeDatum>
+        <anmeldeDatum>2012-03-01-00.00.00.0</anmeldeDatum>
         <arbeitsamtBereich>BEA12</arbeitsamtBereich>
         <arbeitsOrtGemeindeNr>261</arbeitsOrtGemeindeNr>
         <arbeitsOrtGemeinde>Zürich</arbeitsOrtGemeinde>
