@@ -156,7 +156,7 @@ public class AvamEndpointTest {
         // assert
         Message<String> received = (Message<String>) messageCollector.forChannel(source.output()).poll();
         assertThat(received).isNotNull();
-        assertThat(received.getHeaders().get(ACTION)).isEqualTo(CANCEL.name());
+        assertThat(received.getHeaders().get(ACTION)).isEqualTo(DELETE.name());
 
         AvamCancellationDto cancellationDto = cancellationDtoJacksonTester.parse(received.getPayload()).getObject();
         assertThat(cancellationDto.getStellennummerEgov()).isEqualTo("EGOV-0004");
@@ -180,7 +180,7 @@ public class AvamEndpointTest {
         // assert
         Message<String> received = (Message<String>) messageCollector.forChannel(source.output()).poll();
         assertThat(received).isNotNull();
-        assertThat(received.getHeaders().get(ACTION)).isEqualTo(REACTIVATE.name());
+        assertThat(received.getHeaders().get(ACTION)).isEqualTo(UPDATE.name());
 
         AvamCancellationDto cancellationDto = cancellationDtoJacksonTester.parse(received.getPayload()).getObject();
         assertThat(cancellationDto.getStellennummerEgov()).isEqualTo("EGOV-0001");
@@ -197,7 +197,7 @@ public class AvamEndpointTest {
         // assert
         Message<String> received = (Message<String>) messageCollector.forChannel(source.output()).poll();
         assertThat(received).isNotNull();
-        assertThat(received.getHeaders().get(ACTION)).isEqualTo(INACTIVATE.name());
+        assertThat(received.getHeaders().get(ACTION)).isEqualTo(UPDATE.name());
 
         AvamCancellationDto cancellationDto = cancellationDtoJacksonTester.parse(received.getPayload()).getObject();
         assertThat(cancellationDto.getStellennummerEgov()).isEqualTo("EGOV-0001");

@@ -74,7 +74,7 @@ public class AvamSource {
                 .withPayload(cancellationDto)
                 .setHeader(PARTITION_KEY, cancellationDto.getStellennummerAvam())
                 .setHeader(RELEVANT_ID, cancellationDto.getStellennummerAvam())
-                .setHeader(ACTION, CANCEL.name())
+                .setHeader(ACTION, UPDATE.name())
                 .setHeader(SOURCE_SYSTEM, AVAM.name())
                 .setHeader(TARGET_SYSTEM, JOB_AD_SERVICE.name())
                 .setHeader(PAYLOAD_TYPE, cancellationDto.getClass().getSimpleName())
@@ -91,32 +91,6 @@ public class AvamSource {
                 .setHeader(SOURCE_SYSTEM, AVAM.name())
                 .setHeader(TARGET_SYSTEM, JOB_AD_SERVICE.name())
                 .setHeader(PAYLOAD_TYPE, updateDto.getClass().getSimpleName())
-                .build());
-    }
-
-    public void inactivate(@Valid AvamCancellationDto cancellationDto) {
-        LOG.debug("Inactivate JobAdvertisement stellennummerAvam={}", cancellationDto.getStellennummerAvam());
-        output.send(MessageBuilder
-                .withPayload(cancellationDto)
-                .setHeader(PARTITION_KEY, cancellationDto.getStellennummerAvam())
-                .setHeader(RELEVANT_ID, cancellationDto.getStellennummerAvam())
-                .setHeader(ACTION, INACTIVATE.name())
-                .setHeader(SOURCE_SYSTEM, AVAM.name())
-                .setHeader(TARGET_SYSTEM, JOB_AD_SERVICE.name())
-                .setHeader(PAYLOAD_TYPE, cancellationDto.getClass().getSimpleName())
-                .build());
-    }
-
-    public void reactivate(@Valid AvamCancellationDto cancellationDto) {
-        LOG.debug("Reactivate JobAdvertisement stellennummerAvam={}", cancellationDto.getStellennummerAvam());
-        output.send(MessageBuilder
-                .withPayload(cancellationDto)
-                .setHeader(PARTITION_KEY, cancellationDto.getStellennummerAvam())
-                .setHeader(RELEVANT_ID, cancellationDto.getStellennummerAvam())
-                .setHeader(ACTION, REACTIVATE.name())
-                .setHeader(SOURCE_SYSTEM, AVAM.name())
-                .setHeader(TARGET_SYSTEM, JOB_AD_SERVICE.name())
-                .setHeader(PAYLOAD_TYPE, cancellationDto.getClass().getSimpleName())
                 .build());
     }
 
