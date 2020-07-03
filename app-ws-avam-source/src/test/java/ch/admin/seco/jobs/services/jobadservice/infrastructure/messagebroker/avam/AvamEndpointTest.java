@@ -156,7 +156,7 @@ public class AvamEndpointTest {
         // assert
         Message<String> received = (Message<String>) messageCollector.forChannel(source.output()).poll();
         assertThat(received).isNotNull();
-        assertThat(received.getHeaders().get(ACTION)).isEqualTo(DELETE.name());
+        assertThat(received.getHeaders().get(ACTION)).isEqualTo(CANCEL.name());
 
         AvamCancellationDto cancellationDto = cancellationDtoJacksonTester.parse(received.getPayload()).getObject();
         assertThat(cancellationDto.getStellennummerEgov()).isEqualTo("EGOV-0004");

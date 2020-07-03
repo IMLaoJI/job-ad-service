@@ -74,7 +74,7 @@ public class AvamSource {
                 .withPayload(cancellationDto)
                 .setHeader(PARTITION_KEY, cancellationDto.getStellennummerAvam())
                 .setHeader(RELEVANT_ID, cancellationDto.getStellennummerAvam())
-                .setHeader(ACTION, UPDATE.name())
+                .setHeader(ACTION, CANCEL.name())
                 .setHeader(SOURCE_SYSTEM, AVAM.name())
                 .setHeader(TARGET_SYSTEM, JOB_AD_SERVICE.name())
                 .setHeader(PAYLOAD_TYPE, cancellationDto.getClass().getSimpleName())
@@ -94,16 +94,4 @@ public class AvamSource {
                 .build());
     }
 
-    public void delete(@Valid AvamCancellationDto cancellationDto) {
-        LOG.debug("Delete JobAdvertisement stellennummerAvam={}", cancellationDto.getStellennummerAvam());
-        output.send(MessageBuilder
-                .withPayload(cancellationDto)
-                .setHeader(PARTITION_KEY, cancellationDto.getStellennummerAvam())
-                .setHeader(RELEVANT_ID, cancellationDto.getStellennummerAvam())
-                .setHeader(ACTION, DELETE.name())
-                .setHeader(SOURCE_SYSTEM, AVAM.name())
-                .setHeader(TARGET_SYSTEM, JOB_AD_SERVICE.name())
-                .setHeader(PAYLOAD_TYPE, cancellationDto.getClass().getSimpleName())
-                .build());
-    }
 }
