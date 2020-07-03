@@ -1,5 +1,20 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture;
 
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.CompanyFixture.testCompany;
+import static java.util.Collections.singletonList;
+
+import java.time.LocalDate;
+
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.AddressDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobDescriptionDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
@@ -39,7 +54,7 @@ public class CreateJobAdvertisementDtoTestFixture {
                         .setCompanyAnonymous(false)
                 )
                 .setNumberOfJobs(null)
-                .setJobDescriptions(Collections.singletonList(new JobDescriptionDto()
+                .setJobDescriptions(singletonList(new JobDescriptionDto()
                         .setTitle("de")
                         .setTitle("title")
                         .setDescription("description")))
@@ -59,13 +74,13 @@ public class CreateJobAdvertisementDtoTestFixture {
                         .setCity("city")
                         .setPostalCode("postalCode")
                         .setCountryIsoCode("CH"))
-                .setOccupation(
+                .setOccupations(singletonList(
                         new OccupationDto()
                                 .setAvamOccupationCode("101970")
                                 .setWorkExperience(WorkExperience.MORE_THAN_1_YEAR)
                                 .setEducationCode("educationCode")
-                                .setQualificationCode(Qualification.SKILLED))
-                .setLanguageSkills(Collections.singletonList(new LanguageSkillDto()
+                                .setQualificationCode(Qualification.SKILLED)))
+                .setLanguageSkills(singletonList(new LanguageSkillDto()
                         .setLanguageIsoCode("de")
                         .setSpokenLevel(LanguageLevel.PROFICIENT)
                         .setWrittenLevel(LanguageLevel.PROFICIENT)))

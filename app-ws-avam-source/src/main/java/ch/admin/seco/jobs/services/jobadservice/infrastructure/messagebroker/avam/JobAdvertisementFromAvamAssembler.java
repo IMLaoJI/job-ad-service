@@ -9,7 +9,6 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
@@ -41,14 +40,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.CANCELLATION_CODE;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.EXPERIENCES;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.LANGUAGES;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.LANGUAGE_LEVEL;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.QUALIFICATION_CODE;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.SALUTATIONS;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.SOURCE_SYSTEM;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.WORK_FORMS;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamCodeResolver.*;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam.AvamDateTimeFormatter.parseToLocalDate;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.util.StringUtils.hasText;
@@ -73,27 +65,26 @@ public class JobAdvertisementFromAvamAssembler {
     }
 
     AvamCreateJobAdvertisementDto createCreateJobAdvertisementAvamDto(WSOsteEgov avamJobAdvertisement) {
-        return new AvamCreateJobAdvertisementDto(
-                safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()),
-                safeTrimOrNull(avamJobAdvertisement.getBezeichnung()),
-                safeTrimOrNull(avamJobAdvertisement.getBeschreibung()),
-                "de", // Not defined in this AVAM version
-                safeTrimOrNull(avamJobAdvertisement.getGleicheOste()),
-                avamJobAdvertisement.isMeldepflicht(),
-                parseToLocalDate(avamJobAdvertisement.getSperrfrist()),
-                safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()),
-                safeToStringOrNull(avamJobAdvertisement.getBenutzerDetailId()),
-                parseToLocalDate(avamJobAdvertisement.getAnmeldeDatum()),
-                createEmploymentDto(avamJobAdvertisement),
-                createApplyChannelDto(avamJobAdvertisement),
-                createCompanyDto(avamJobAdvertisement),
-                createContactDto(avamJobAdvertisement),
-                createCreateLocationDto(avamJobAdvertisement),
-                createOccupationDtos(avamJobAdvertisement),
-                createLanguageSkillDtos(avamJobAdvertisement),
-                createPublicationDto(avamJobAdvertisement),
-                createPublicContactDto(avamJobAdvertisement)
-        );
+        return new AvamCreateJobAdvertisementDto()
+                .setStellennummerAvam(safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()))
+                .setTitle(safeTrimOrNull(avamJobAdvertisement.getBezeichnung()))
+                .setDescription(safeTrimOrNull(avamJobAdvertisement.getBeschreibung()))
+                .setLanguageIsoCode("de") // Not defined in this AVAM version
+                .setNumberOfJobs(safeTrimOrNull(avamJobAdvertisement.getGleicheOste()))
+                .setReportingObligation(avamJobAdvertisement.isMeldepflicht())
+                .setReportingObligationEndDate(parseToLocalDate(avamJobAdvertisement.getSperrfrist()))
+                .setJobCenterCode(safeTrimOrNull(avamJobAdvertisement.getArbeitsamtBereich()))
+                .setJobCenterUserId(safeToStringOrNull(avamJobAdvertisement.getBenutzerDetailId()))
+                .setApprovalDate(parseToLocalDate(avamJobAdvertisement.getAnmeldeDatum()))
+                .setEmployment(createEmploymentDto(avamJobAdvertisement))
+                .setApplyChannel(createApplyChannelDto(avamJobAdvertisement))
+                .setCompany(createCompanyDto(avamJobAdvertisement))
+                .setContact(createContactDto(avamJobAdvertisement))
+                .setLocation(createCreateLocationDto(avamJobAdvertisement))
+                .setOccupations(createOccupationDtos(avamJobAdvertisement))
+                .setLanguageSkills(createLanguageSkillDtos(avamJobAdvertisement))
+                .setPublication(createPublicationDto(avamJobAdvertisement))
+                .setPublicContact(createPublicContactDto(avamJobAdvertisement));
     }
 
     ApprovalDto createApprovalDto(WSOsteEgov avamJobAdvertisement) {
