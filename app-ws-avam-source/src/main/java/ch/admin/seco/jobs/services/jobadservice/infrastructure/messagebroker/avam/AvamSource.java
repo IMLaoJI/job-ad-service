@@ -1,6 +1,5 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.avam;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
 import org.slf4j.Logger;
@@ -12,7 +11,10 @@ import org.springframework.messaging.MessageChannel;
 
 import javax.validation.Valid;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.*;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.APPROVE;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.CANCEL;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.CREATE_FROM_AVAM;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.JobAdvertisementAction.REJECT;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.*;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageSystem.AVAM;
 import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageSystem.JOB_AD_SERVICE;
@@ -28,7 +30,7 @@ public class AvamSource {
         this.output = output;
     }
 
-    public void approve(ApprovalDto approvalDto) {
+    public void approve(@Valid ApprovalDto approvalDto) {
         LOG.debug("Approve JobAdvertisement stellennummerAvam={}, stellennummerEgov={}", approvalDto.getStellennummerAvam(), approvalDto.getStellennummerEgov());
         output.send(MessageBuilder
                 .withPayload(approvalDto)
@@ -41,7 +43,7 @@ public class AvamSource {
                 .build());
     }
 
-    public void reject(RejectionDto rejectionDto) {
+    public void reject(@Valid RejectionDto rejectionDto) {
         LOG.debug("Reject JobAdvertisement stellennummerAvam={}, stellennummerEgov={}", rejectionDto.getStellennummerAvam(), rejectionDto.getStellennummerEgov());
         output.send(MessageBuilder
                 .withPayload(rejectionDto)
@@ -54,7 +56,7 @@ public class AvamSource {
                 .build());
     }
 
-    public void create(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
+    public void create(@Valid AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
         LOG.debug("Create JobAdvertisement stellennummerAvam={}", createJobAdvertisementFromAvamDto.getStellennummerAvam());
         output.send(MessageBuilder
                 .withPayload(createJobAdvertisementFromAvamDto)
