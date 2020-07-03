@@ -389,22 +389,6 @@ public class JobAdvertisementApplicationService {
     }
 
 
-    public void decideIfValidForAdjourningPublication(JobAdvertisementId jobAdvertisementId) {
-        Condition.notNull(jobAdvertisementId, "JobAdvertisementId can't be null");
-        JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
-        if (jobAdvertisement.getStatus().isInAnyStates(JobAdvertisementStatus.ARCHIVED)) {
-            if (TimeMachine.isAfterToday(jobAdvertisement.getPublication().getStartDate())
-                    || TimeMachine.isAfterToday(jobAdvertisement.getPublication().getEndDate())) {
-                jobAdvertisement.adjournPublication();
-            }
-        } else {
-            if (jobAdvertisement.getStatus().canTransitTo(JobAdvertisementStatus.REFINING)
-                    && TimeMachine.isAfterToday(jobAdvertisement.getPublication().getStartDate())) {
-                jobAdvertisement.adjournPublication();
-            }
-        }
-    }
-
     public void approve(ApprovalDto approvalDto) {
         Condition.notNull(approvalDto.getStellennummerEgov(), "StellennummerEgov can't be null");
         JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerEgov(approvalDto.getStellennummerEgov());
@@ -597,12 +581,6 @@ public class JobAdvertisementApplicationService {
         this.jobAdvertisementRepository
                 .findAllWhereBlackoutNeedToExpire(TimeMachine.now().toLocalDate())
                 .forEach(JobAdvertisement::expireBlackout);
-    }
-
-    public void checkBlackoutPolicyExpirationForSingleJobAd(JobAdvertisementDto jobAdvertisementDto) {
-        this.jobAdvertisementRepository
-                .findById(new JobAdvertisementId(jobAdvertisementDto.getId()))
-                .ifPresent(JobAdvertisement::expireBlackout);
     }
 
     public void checkPublicationExpiration() {

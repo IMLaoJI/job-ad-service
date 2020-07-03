@@ -69,7 +69,7 @@ public class AvamEndpoint {
 				case ABGEMELDET:
 				case GELOESCHT: {
 					LOG.info("Cancelling JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
-					avamSource.delete(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
+					avamSource.cancel(jobAdvertisementFromAvamAssembler.createCancellationDto(avamJobAdvertisement));
 					break;
 				}
 
