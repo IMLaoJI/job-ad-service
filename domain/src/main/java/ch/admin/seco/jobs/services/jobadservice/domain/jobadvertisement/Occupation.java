@@ -3,7 +3,12 @@ package ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement;
 import ch.admin.seco.jobs.services.jobadservice.core.conditions.Condition;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.ValueObject;
 
-import javax.persistence.*;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.constraints.Size;
 import java.util.Objects;
 
@@ -25,8 +30,6 @@ public class Occupation implements ValueObject<Occupation> {
     // TODO @Size(max = 16)
     private String bfsCode;
 
-    private String label;
-
     @Enumerated(EnumType.STRING)
     private WorkExperience workExperience;
 
@@ -45,7 +48,6 @@ public class Occupation implements ValueObject<Occupation> {
         this.chIsco3Code = builder.chIsco3Code;
         this.chIsco5Code = builder.chIsco5Code;
         this.bfsCode = builder.bfsCode;
-        this.label = builder.label;
         this.workExperience = builder.workExperience;
         this.educationCode = builder.educationCode;
         this.qualificationCode = builder.qualificationCode;
@@ -69,10 +71,6 @@ public class Occupation implements ValueObject<Occupation> {
         return chIsco5Code;
     }
 
-    public String getLabel() {
-        return label;
-    }
-
     public WorkExperience getWorkExperience() {
         return workExperience;
     }
@@ -92,7 +90,6 @@ public class Occupation implements ValueObject<Occupation> {
         Occupation that = (Occupation) o;
         return Objects.equals(avamOccupationCode, that.avamOccupationCode) &&
                 Objects.equals(bfsCode, that.bfsCode) &&
-                Objects.equals(label, that.label) &&
                 Objects.equals(chIsco3Code, that.chIsco3Code) &&
                 Objects.equals(chIsco5Code, that.chIsco5Code) &&
                 workExperience == that.workExperience &&
@@ -102,7 +99,7 @@ public class Occupation implements ValueObject<Occupation> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(avamOccupationCode, bfsCode, chIsco3Code, chIsco5Code, label, workExperience, educationCode, qualificationCode);
+        return Objects.hash(avamOccupationCode, bfsCode, chIsco3Code, chIsco5Code, workExperience, educationCode, qualificationCode);
     }
 
     @Override
@@ -112,7 +109,6 @@ public class Occupation implements ValueObject<Occupation> {
                 ", chIsco3Code='" + chIsco3Code + '\'' +
                 ", chIsco5Code='" + chIsco5Code + '\'' +
                 ", bfsCode='" + bfsCode + '\'' +
-                ", label='" + label + '\'' +
                 ", workExperience=" + workExperience +
                 ", educationCode='" + educationCode + '\'' +
                 ", qualificationCode=" + qualificationCode +
@@ -124,7 +120,6 @@ public class Occupation implements ValueObject<Occupation> {
         private String chIsco3Code;
         private String chIsco5Code;
         private String bfsCode;
-        private String label;
         private WorkExperience workExperience;
         private String educationCode;
         private Qualification qualificationCode;
@@ -153,11 +148,6 @@ public class Occupation implements ValueObject<Occupation> {
 
         public Builder setBfsCode(String bfsCode) {
             this.bfsCode = bfsCode;
-            return this;
-        }
-
-        public Builder setLabel(String label) {
-            this.label = label;
             return this;
         }
 
