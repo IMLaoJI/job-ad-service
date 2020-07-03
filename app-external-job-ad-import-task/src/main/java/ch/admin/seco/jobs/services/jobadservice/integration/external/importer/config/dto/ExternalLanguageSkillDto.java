@@ -1,10 +1,10 @@
-package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external;
-
-import javax.validation.constraints.NotBlank;
+package ch.admin.seco.jobs.services.jobadservice.integration.external.importer.config.dto;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.LanguageLevel;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.utils.SupportedLanguageIsoCode;
+
+import javax.validation.constraints.NotBlank;
 
 public class ExternalLanguageSkillDto {
 
@@ -16,14 +16,8 @@ public class ExternalLanguageSkillDto {
 
     private LanguageLevel writtenLevel;
 
-    protected ExternalLanguageSkillDto() {
+    public ExternalLanguageSkillDto() {
         // For reflection libs
-    }
-
-    public ExternalLanguageSkillDto(String languageIsoCode, LanguageLevel spokenLevel, LanguageLevel writtenLevel) {
-        this.languageIsoCode = languageIsoCode;
-        this.spokenLevel = spokenLevel;
-        this.writtenLevel = writtenLevel;
     }
 
     LanguageSkillDto toLanguageSkillDto() {
@@ -37,23 +31,26 @@ public class ExternalLanguageSkillDto {
         return languageIsoCode;
     }
 
-    public void setLanguageIsoCode(String languageIsoCode) {
+    public ExternalLanguageSkillDto setLanguageIsoCode(String languageIsoCode) {
         this.languageIsoCode = languageIsoCode;
+        return this;
     }
 
     public LanguageLevel getSpokenLevel() {
         return spokenLevel;
     }
 
-    public void setSpokenLevel(LanguageLevel spokenLevel) {
+    public ExternalLanguageSkillDto setSpokenLevel(LanguageLevel spokenLevel) {
         this.spokenLevel = spokenLevel;
+        return this;
     }
 
     public LanguageLevel getWrittenLevel() {
         return writtenLevel;
     }
 
-    public void setWrittenLevel(LanguageLevel writtenLevel) {
+    public ExternalLanguageSkillDto setWrittenLevel(LanguageLevel writtenLevel) {
         this.writtenLevel = writtenLevel;
+        return this;
     }
 }

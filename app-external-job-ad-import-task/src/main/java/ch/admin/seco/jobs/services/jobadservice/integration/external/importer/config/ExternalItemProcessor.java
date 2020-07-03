@@ -1,19 +1,17 @@
 package ch.admin.seco.jobs.services.jobadservice.integration.external.importer.config;
 
-import java.util.Set;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.integration.external.importer.config.dto.ExternalCreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadimport.Oste;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.batch.item.ItemProcessor;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.batch.item.ItemProcessor;
-
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalJobAdvertisementDto;
-import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadimport.Oste;
-
-public class ExternalItemProcessor implements ItemProcessor<Oste, ExternalJobAdvertisementDto> {
+public class ExternalItemProcessor implements ItemProcessor<Oste, CreateJobAdvertisementDto> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalItemProcessor.class);
 
@@ -28,11 +26,12 @@ public class ExternalItemProcessor implements ItemProcessor<Oste, ExternalJobAdv
     }
 
     @Override
-    public ExternalJobAdvertisementDto process(Oste item) {
-        ExternalJobAdvertisementDto createItem = externalJobAdvertisementAssembler.createJobAdvertisementFromExternalDto(item);
-        Set<ConstraintViolation<ExternalJobAdvertisementDto>> violations = validator.validate(createItem);
+    public CreateJobAdvertisementDto process(Oste item) {
+        ExternalCreateJobAdvertisementDto createItem = externalJobAdvertisementAssembler.createJobAdvertisementFromExternalDto(item);
+        final CreateJobAdvertisementDto createJobAdvertisementDto = createItem.toDto(createItem);
+        Set<ConstraintViolation<ExternalCreateJobAdvertisementDto>> violations = validator.validate(createItem);
         if (violations.isEmpty()) {
-            return createItem;
+            return createJobAdvertisementDto;
         }
         LOGGER.warn("Item with Fingerprint: {} has constraint violations: {}", item.getFingerprint(), violations);
         return null;

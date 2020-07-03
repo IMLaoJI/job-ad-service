@@ -1,11 +1,11 @@
-package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+package ch.admin.seco.jobs.services.jobadservice.integration.external.importer.config.dto;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Qualification;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.WorkExperience;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 public class ExternalOccupationDto {
 
@@ -63,4 +63,5 @@ public class ExternalOccupationDto {
         this.qualificationCode = qualificationCode;
         return this;
     }
+
 }

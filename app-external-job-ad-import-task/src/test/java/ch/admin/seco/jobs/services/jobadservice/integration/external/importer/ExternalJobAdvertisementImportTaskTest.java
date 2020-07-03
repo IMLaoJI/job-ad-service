@@ -1,25 +1,13 @@
 package ch.admin.seco.jobs.services.jobadservice.integration.external.importer;
 
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.JobAdvertisementAction.CREATE_FROM_EXTERNAL;
-import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.ACTION;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-import static org.springframework.batch.core.BatchStatus.COMPLETED;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromExternalDto;
+import ch.admin.seco.jobs.services.jobadservice.integration.external.importer.config.dto.ExternalCreateJobAdvertisementDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
@@ -39,8 +27,18 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalJobAdvertisementDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromExternalDto;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.JobAdvertisementAction.CREATE_FROM_EXTERNAL;
+import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.MessageHeaders.ACTION;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+import static org.springframework.batch.core.BatchStatus.COMPLETED;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -68,7 +66,7 @@ public class ExternalJobAdvertisementImportTaskTest {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
-    private JacksonTester<ExternalJobAdvertisementDto> createJobAdvertisementExternalDtoJacksonTester;
+    private JacksonTester<ExternalCreateJobAdvertisementDto> createJobAdvertisementExternalDtoJacksonTester;
 
     private JacksonTester<UpdateJobAdvertisementFromExternalDto> updateJobAdvertisementFromExternalDtoJacksonTester;
 

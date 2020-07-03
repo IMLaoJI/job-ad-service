@@ -1,8 +1,8 @@
-package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external;
-
-import javax.validation.constraints.Size;
+package ch.admin.seco.jobs.services.jobadservice.integration.external.importer.config.dto;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
+
+import javax.validation.constraints.Size;
 
 public class ExternalLocationDto {
 
@@ -18,16 +18,10 @@ public class ExternalLocationDto {
     @Size(max = 2)
     private String countryIsoCode;
 
-    protected ExternalLocationDto() {
+    public ExternalLocationDto() {
         // For reflection libs
     }
 
-    public ExternalLocationDto(String remarks, String city, String postalCode, String countryIsoCode) {
-        this.remarks = remarks;
-        this.city = city;
-        this.postalCode = postalCode;
-        this.countryIsoCode = countryIsoCode;
-    }
 
     CreateLocationDto toCreateLocationDto() {
         return new CreateLocationDto()

@@ -18,13 +18,15 @@ public class CreateJobAdvertisementDto {
 
     private String stellennummerAvam;
 
+    private String stellennummerEgov;
+
     private Boolean reportingObligation;
 
     private LocalDate reportingObligationEndDate;
 
-    private String JobCenterCode;
+    private String jobCenterCode;
 
-    private String JobCenterUserId;
+    private String jobCenterUserId;
 
     private LocalDate approvalDate;
 
@@ -71,6 +73,10 @@ public class CreateJobAdvertisementDto {
 
     @Valid
     private PublicContactDto publicContact;
+
+    private String professionCodes;
+
+    private String fingerprint;
 
     public boolean isReportToAvam() {
         return reportToAvam;
@@ -127,11 +133,11 @@ public class CreateJobAdvertisementDto {
     }
 
     public String getJobCenterCode() {
-        return JobCenterCode;
+        return jobCenterCode;
     }
 
     public CreateJobAdvertisementDto setJobCenterCode(String jobCenterCode) {
-        JobCenterCode = jobCenterCode;
+        this.jobCenterCode = jobCenterCode;
         return this;
     }
 
@@ -252,12 +258,19 @@ public class CreateJobAdvertisementDto {
         return this;
     }
 
+    public String getNullsafeJobCenterUserId() {
+        if (jobCenterUserId == null) {
+            return null;
+        }
+        return jobCenterUserId;
+    }
+
     public String getJobCenterUserId() {
-        return JobCenterUserId;
+        return jobCenterUserId;
     }
 
     public CreateJobAdvertisementDto setJobCenterUserId(String jobCenterUserId) {
-        JobCenterUserId = jobCenterUserId;
+        this.jobCenterUserId = jobCenterUserId;
         return this;
     }
 
@@ -269,6 +282,37 @@ public class CreateJobAdvertisementDto {
         return jobDescriptions.get(0);
     }
 
+    public Boolean getReportingObligation() {
+        return reportingObligation;
+    }
+
+    public String getProfessionCodes() {
+        return professionCodes;
+    }
+
+    public CreateJobAdvertisementDto setProfessionCodes(String professionCodes) {
+        this.professionCodes = professionCodes;
+        return this;
+    }
+
+    public String getFingerprint() {
+        return fingerprint;
+    }
+
+    public CreateJobAdvertisementDto setFingerprint(String fingerprint) {
+        this.fingerprint = fingerprint;
+        return this;
+    }
+
+    public String getStellennummerEgov() {
+        return stellennummerEgov;
+    }
+
+    public CreateJobAdvertisementDto setStellennummerEgov(String stellennummerEgov) {
+        this.stellennummerEgov = stellennummerEgov;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "CreateJobAdvertisementDto{" +
@@ -276,6 +320,12 @@ public class CreateJobAdvertisementDto {
                 ", externalUrl='" + externalUrl + '\'' +
                 ", externalReference='" + externalReference + '\'' +
                 ", stellennummerAvam='" + stellennummerAvam + '\'' +
+                ", stellennummerEgov='" + stellennummerEgov + '\'' +
+                ", reportingObligation=" + reportingObligation +
+                ", reportingObligationEndDate=" + reportingObligationEndDate +
+                ", JobCenterCode='" + jobCenterCode + '\'' +
+                ", JobCenterUserId='" + jobCenterUserId + '\'' +
+                ", approvalDate=" + approvalDate +
                 ", contact=" + contact +
                 ", publication=" + publication +
                 ", numberOfJobs='" + numberOfJobs + '\'' +
@@ -288,6 +338,8 @@ public class CreateJobAdvertisementDto {
                 ", languageSkills=" + languageSkills +
                 ", applyChannel=" + applyChannel +
                 ", publicContact=" + publicContact +
+                ", professionCodes='" + professionCodes + '\'' +
+                ", fingerprint='" + fingerprint + '\'' +
                 '}';
     }
 }
