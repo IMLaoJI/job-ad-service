@@ -16,7 +16,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 
-public class ExternalCreateJobAdvertisementDto {
+public class ExternalJobAdvertisementDto {
 
     @Size(max = 11)
     private String stellennummerEgov;
@@ -123,7 +123,7 @@ public class ExternalCreateJobAdvertisementDto {
         return stellennummerEgov;
     }
 
-    public ExternalCreateJobAdvertisementDto setStellennummerEgov(String stellennummerEgov) {
+    public ExternalJobAdvertisementDto setStellennummerEgov(String stellennummerEgov) {
         this.stellennummerEgov = stellennummerEgov;
         return this;
     }
@@ -132,7 +132,7 @@ public class ExternalCreateJobAdvertisementDto {
         return stellennummerAvam;
     }
 
-    public ExternalCreateJobAdvertisementDto setStellennummerAvam(String stellennummerAvam) {
+    public ExternalJobAdvertisementDto setStellennummerAvam(String stellennummerAvam) {
         this.stellennummerAvam = stellennummerAvam;
         return this;
     }
@@ -141,7 +141,7 @@ public class ExternalCreateJobAdvertisementDto {
         return title;
     }
 
-    public ExternalCreateJobAdvertisementDto setTitle(String title) {
+    public ExternalJobAdvertisementDto setTitle(String title) {
         this.title = title;
         return this;
     }
@@ -150,7 +150,7 @@ public class ExternalCreateJobAdvertisementDto {
         return description;
     }
 
-    public ExternalCreateJobAdvertisementDto setDescription(String description) {
+    public ExternalJobAdvertisementDto setDescription(String description) {
         this.description = description;
         return this;
     }
@@ -159,7 +159,7 @@ public class ExternalCreateJobAdvertisementDto {
         return numberOfJobs;
     }
 
-    public ExternalCreateJobAdvertisementDto setNumberOfJobs(String numberOfJobs) {
+    public ExternalJobAdvertisementDto setNumberOfJobs(String numberOfJobs) {
         this.numberOfJobs = numberOfJobs;
         return this;
     }
@@ -168,7 +168,7 @@ public class ExternalCreateJobAdvertisementDto {
         return fingerprint;
     }
 
-    public ExternalCreateJobAdvertisementDto setFingerprint(String fingerprint) {
+    public ExternalJobAdvertisementDto setFingerprint(String fingerprint) {
         this.fingerprint = fingerprint;
         return this;
     }
@@ -177,7 +177,7 @@ public class ExternalCreateJobAdvertisementDto {
         return externalUrl;
     }
 
-    public ExternalCreateJobAdvertisementDto setExternalUrl(String externalUrl) {
+    public ExternalJobAdvertisementDto setExternalUrl(String externalUrl) {
         this.externalUrl = externalUrl;
         return this;
     }
@@ -186,7 +186,7 @@ public class ExternalCreateJobAdvertisementDto {
         return jobCenterCode;
     }
 
-    public ExternalCreateJobAdvertisementDto setJobCenterCode(String jobCenterCode) {
+    public ExternalJobAdvertisementDto setJobCenterCode(String jobCenterCode) {
         this.jobCenterCode = jobCenterCode;
         return this;
     }
@@ -195,7 +195,7 @@ public class ExternalCreateJobAdvertisementDto {
         return contact;
     }
 
-    public ExternalCreateJobAdvertisementDto setContact(ExternalContactDto contact) {
+    public ExternalJobAdvertisementDto setContact(ExternalContactDto contact) {
         this.contact = contact;
         return this;
     }
@@ -204,7 +204,7 @@ public class ExternalCreateJobAdvertisementDto {
         return employment;
     }
 
-    public ExternalCreateJobAdvertisementDto setEmployment(EmploymentDto employment) {
+    public ExternalJobAdvertisementDto setEmployment(EmploymentDto employment) {
         this.employment = employment;
         return this;
     }
@@ -213,7 +213,7 @@ public class ExternalCreateJobAdvertisementDto {
         return company;
     }
 
-    public ExternalCreateJobAdvertisementDto setCompany(ExternalCompanyDto company) {
+    public ExternalJobAdvertisementDto setCompany(ExternalCompanyDto company) {
         this.company = company;
         return this;
     }
@@ -222,7 +222,7 @@ public class ExternalCreateJobAdvertisementDto {
         return location;
     }
 
-    public ExternalCreateJobAdvertisementDto setLocation(ExternalLocationDto location) {
+    public ExternalJobAdvertisementDto setLocation(ExternalLocationDto location) {
         this.location = location;
         return this;
     }
@@ -231,7 +231,7 @@ public class ExternalCreateJobAdvertisementDto {
         return occupations;
     }
 
-    public ExternalCreateJobAdvertisementDto setOccupations(List<ExternalOccupationDto> occupations) {
+    public ExternalJobAdvertisementDto setOccupations(List<ExternalOccupationDto> occupations) {
         this.occupations = occupations;
         return this;
     }
@@ -240,7 +240,7 @@ public class ExternalCreateJobAdvertisementDto {
         return professionCodes;
     }
 
-    public ExternalCreateJobAdvertisementDto setProfessionCodes(String professionCodes) {
+    public ExternalJobAdvertisementDto setProfessionCodes(String professionCodes) {
         this.professionCodes = professionCodes;
         return this;
     }
@@ -249,7 +249,7 @@ public class ExternalCreateJobAdvertisementDto {
         return languageSkills;
     }
 
-    public ExternalCreateJobAdvertisementDto setLanguageSkills(List<ExternalLanguageSkillDto> languageSkills) {
+    public ExternalJobAdvertisementDto setLanguageSkills(List<ExternalLanguageSkillDto> languageSkills) {
         this.languageSkills = languageSkills;
         return this;
     }
@@ -258,7 +258,7 @@ public class ExternalCreateJobAdvertisementDto {
         return publicationStartDate;
     }
 
-    public ExternalCreateJobAdvertisementDto setPublicationStartDate(LocalDate publicationStartDate) {
+    public ExternalJobAdvertisementDto setPublicationStartDate(LocalDate publicationStartDate) {
         this.publicationStartDate = publicationStartDate;
         return this;
     }
@@ -267,7 +267,7 @@ public class ExternalCreateJobAdvertisementDto {
         return publicationEndDate;
     }
 
-    public ExternalCreateJobAdvertisementDto setPublicationEndDate(LocalDate publicationEndDate) {
+    public ExternalJobAdvertisementDto setPublicationEndDate(LocalDate publicationEndDate) {
         this.publicationEndDate = publicationEndDate;
         return this;
     }
@@ -276,7 +276,7 @@ public class ExternalCreateJobAdvertisementDto {
         return companyAnonymous;
     }
 
-    public ExternalCreateJobAdvertisementDto setCompanyAnonymous(boolean companyAnonymous) {
+    public ExternalJobAdvertisementDto setCompanyAnonymous(boolean companyAnonymous) {
         this.companyAnonymous = companyAnonymous;
         return this;
     }

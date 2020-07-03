@@ -38,7 +38,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalCreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadimport.Oste;
 import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadimport.OsteList;
 
@@ -88,7 +88,7 @@ public class ExternalJobAdvertisementImportTaskConfig {
                 .to(stepBuilderFactory
                         .get("send-to-job-ad-service")
                         .listener(itemLoggerListener())
-                        .<Oste, ExternalCreateJobAdvertisementDto>chunk(10)
+                        .<Oste, ExternalJobAdvertisementDto>chunk(10)
                         .reader(xmlFileReader)
                         .processor(externalItemProcessor())
                         .writer(externalJobAdvertisementWriter)
