@@ -213,7 +213,7 @@ public class JobAdvertisementApplicationService {
         JobContent jobContent = new JobContent.Builder()
                 .setNumberOfJobs(externalJobAdvertisementDto.getNumberOfJobs())
                 .setJobDescriptions(Collections.singletonList(
-                        buildJobDescription(createJobAdvertisementFromExternalDto.getTitle(), createJobAdvertisementFromExternalDto.getDescription())
+                        buildJobDescription(externalJobAdvertisementDto.getTitle(), externalJobAdvertisementDto.getDescription())
                 ))
                 .setExternalUrl(externalJobAdvertisementDto.getExternalUrl())
                 .setLocation(location)
