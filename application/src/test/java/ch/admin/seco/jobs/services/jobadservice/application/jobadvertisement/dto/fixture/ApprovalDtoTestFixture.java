@@ -12,7 +12,7 @@ import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisem
 
 public class ApprovalDtoTestFixture {
 
-    public static ApprovalDto approvalDto(JobAdvertisement jobAdvertisement) {
+    public static ApprovalDto testApprovalDto(JobAdvertisement jobAdvertisement) {
 
         UpdateJobAdvertisementFromAvamDto updateJobAdAvamDto = updateJobAdvertisementFromAvamDto(jobAdvertisement);
         updateJobAdAvamDto.setApprovalDate(LocalDate.of(2018, 1, 1));

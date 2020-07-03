@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
-
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.ApprovalDtoTestFixture.testApprovalDto;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementFromAvamDtoTestFixture.testCreateJobAdvertisementDto;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementFromAvamDtoTestFixture.testCreateJobAdvertisementDtoWithCompanyAnonymous;
@@ -259,7 +258,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
                         .setJobContent(JobContentFixture.of(job01.id()).build())
                         .build()
         );
-        ApprovalDto approvalDto = approvalDto(inspectingJobAd);
+        ApprovalDto approvalDto = testApprovalDto(inspectingJobAd);
 
         // when
         sut.approve(approvalDto);
@@ -285,7 +284,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
                         .setStatus(INSPECTING)
                         .setJobContent(JobContentFixture.of(job01.id()).build())
                         .build());
-        ApprovalDto approvalDto = approvalDto(inspectingJobAd);
+        ApprovalDto approvalDto = testApprovalDto(inspectingJobAd);
         approvalDto.getUpdateJobAdvertisement().setDescription("OTHER VALUE");
 
         // when
