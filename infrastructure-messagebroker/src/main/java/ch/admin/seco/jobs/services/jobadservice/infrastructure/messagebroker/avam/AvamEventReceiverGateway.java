@@ -66,21 +66,17 @@ public class AvamEventReceiverGateway {
 	}
 
 	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = REACTIVATE_CONDITION)
-	public void handleReactivateAction(AvamCancellationDto avamCancellationDto) {
-		JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerEgovOrAvam(avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerAvam());
-		jobAdvertisementApplicationService.decideIfValidForAdjourningPublication(new JobAdvertisementId(jobAdvertisementDto.getId()));
+	public void handleReactivateAction(UpdateJobAdvertisementFromAvamDto updateJobAdvertisementFromAvamDto) {
+		JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.getByStellennummerAvam(updateJobAdvertisementFromAvamDto.getStellennummerAvam());
+		notNull(jobAdvertisementDto, "Couldn't find the jobAdvertisement to approve for stellennummerAvam %s", updateJobAdvertisementFromAvamDto.getStellennummerAvam());
+		jobAdvertisementApplicationService.update(updateJobAdvertisementFromAvamDto);
 	}
 
 	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = INACTIVATE_CONDITION)
-	public void handleInactivateAction(AvamCancellationDto avamCancellationDto) {
-		JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerEgovOrAvam(avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerAvam());
-		jobAdvertisementApplicationService.checkBlackoutPolicyExpirationForSingleJobAd(jobAdvertisementDto);
-	}
-
-	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = DELETE_CONDITION)
-	public void handleDeleteAction(AvamCancellationDto avamCancellationDto) {
-		JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerEgovOrAvam(avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerAvam());
-		jobAdvertisementApplicationService.checkBlackoutPolicyExpirationForSingleJobAd(jobAdvertisementDto);
+	public void handleInactivateAction(UpdateJobAdvertisementFromAvamDto updateJobAdvertisementFromAvamDto) {
+		JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.getByStellennummerAvam(updateJobAdvertisementFromAvamDto.getStellennummerAvam());
+		notNull(jobAdvertisementDto, "Couldn't find the jobAdvertisement to approve for stellennummerAvam %s", updateJobAdvertisementFromAvamDto.getStellennummerAvam());
+		jobAdvertisementApplicationService.update(updateJobAdvertisementFromAvamDto);
 	}
 
 	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CANCEL_CONDITION)

@@ -183,7 +183,6 @@ public class AvamEndpointTest {
         assertThat(received.getHeaders().get(ACTION)).isEqualTo(UPDATE.name());
 
         AvamCancellationDto cancellationDto = cancellationDtoJacksonTester.parse(received.getPayload()).getObject();
-        assertThat(cancellationDto.getStellennummerEgov()).isEqualTo("EGOV-0001");
         assertThat(cancellationDto.getStellennummerAvam()).isEqualTo("AVAM-0001");
     }
 
@@ -200,7 +199,6 @@ public class AvamEndpointTest {
         assertThat(received.getHeaders().get(ACTION)).isEqualTo(UPDATE.name());
 
         AvamCancellationDto cancellationDto = cancellationDtoJacksonTester.parse(received.getPayload()).getObject();
-        assertThat(cancellationDto.getStellennummerEgov()).isEqualTo("EGOV-0001");
         assertThat(cancellationDto.getStellennummerAvam()).isEqualTo("AVAM-0001");
     }
 

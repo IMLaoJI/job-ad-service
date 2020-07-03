@@ -254,6 +254,18 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
         if (!changeLog.isEmpty()) {
             this.updatedTime = TimeMachine.now();
             DomainEventPublisher.publish(new JobAdvertisementUpdatedEvent(this, changeLog));
+
+            if (this.status.isInAnyStates(JobAdvertisementStatus.ARCHIVED)) {
+                if (TimeMachine.isAfterToday(this.publication.getStartDate())
+                        || TimeMachine.isAfterToday(this.publication.getEndDate())) {
+                    this.adjournPublication();
+                }
+            } else {
+                if (this.status.canTransitTo(JobAdvertisementStatus.REFINING)
+                        && TimeMachine.isAfterToday(this.publication.getStartDate())) {
+                    this.adjournPublication();
+                }
+            }
         }
     }
 
