@@ -1,8 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update;
 
-import java.time.LocalDate;
-
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 public class ApprovalDto {
 
@@ -19,90 +18,81 @@ public class ApprovalDto {
 
     private LocalDate reportingObligationEndDate;
 
-    private UpdateJobAdvertisementFromAvamDto updateJobAdvertisementDto;
+    private UpdateJobAdvertisementFromAvamDto updateJobAdvertisement;
 
     private String jobCenterCode;
 
     private String jobCenterUserId;
 
-    protected ApprovalDto() {
-        // For reflection libs
-    }
-
-    public ApprovalDto(String stellennummerEgov, String stellennummerAvam, LocalDate date, boolean reportingObligation,
-                       LocalDate reportingObligationEndDate, String jobCenterCode, String jobCenterUserId,
-                       UpdateJobAdvertisementFromAvamDto updateJobAdvertisementDto) {
-        this.stellennummerEgov = stellennummerEgov;
-        this.stellennummerAvam = stellennummerAvam;
-        this.date = date;
-        this.reportingObligation = reportingObligation;
-        this.reportingObligationEndDate = reportingObligationEndDate;
-        this.jobCenterCode = jobCenterCode;
-        this.jobCenterUserId = jobCenterUserId;
-        this.updateJobAdvertisementDto = updateJobAdvertisementDto;
-    }
-
     public String getStellennummerEgov() {
         return stellennummerEgov;
     }
 
-    public void setStellennummerEgov(String stellennummerEgov) {
+    public ApprovalDto setStellennummerEgov(String stellennummerEgov) {
         this.stellennummerEgov = stellennummerEgov;
+        return this;
     }
 
     public String getStellennummerAvam() {
         return stellennummerAvam;
     }
 
-    public void setStellennummerAvam(String stellennummerAvam) {
+    public ApprovalDto setStellennummerAvam(String stellennummerAvam) {
         this.stellennummerAvam = stellennummerAvam;
+        return this;
     }
 
     public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public ApprovalDto setDate(LocalDate date) {
         this.date = date;
+        return this;
     }
 
     public boolean isReportingObligation() {
         return reportingObligation;
     }
 
-    public void setReportingObligation(boolean reportingObligation) {
+    public ApprovalDto setReportingObligation(boolean reportingObligation) {
         this.reportingObligation = reportingObligation;
+        return this;
     }
 
     public LocalDate getReportingObligationEndDate() {
         return reportingObligationEndDate;
     }
 
-    public void setReportingObligationEndDate(LocalDate reportingObligationEndDate) {
+    public ApprovalDto setReportingObligationEndDate(LocalDate reportingObligationEndDate) {
         this.reportingObligationEndDate = reportingObligationEndDate;
+        return this;
+    }
+
+    public UpdateJobAdvertisementFromAvamDto getUpdateJobAdvertisement() {
+        return updateJobAdvertisement;
+    }
+
+    public ApprovalDto setUpdateJobAdvertisement(UpdateJobAdvertisementFromAvamDto updateJobAdvertisement) {
+        this.updateJobAdvertisement = updateJobAdvertisement;
+        return this;
     }
 
     public String getJobCenterCode() {
         return jobCenterCode;
     }
 
-    public void setJobCenterCode(String jobCenterCode) {
+    public ApprovalDto setJobCenterCode(String jobCenterCode) {
         this.jobCenterCode = jobCenterCode;
+        return this;
     }
 
     public String getJobCenterUserId() {
         return jobCenterUserId;
     }
 
-    public void setJobCenterUserId(String jobCenterUserId) {
+    public ApprovalDto setJobCenterUserId(String jobCenterUserId) {
         this.jobCenterUserId = jobCenterUserId;
-    }
-
-    public UpdateJobAdvertisementFromAvamDto getUpdateJobAdvertisement() {
-        return updateJobAdvertisementDto;
-    }
-
-    public void setUpdateJobAdvertisement(UpdateJobAdvertisementFromAvamDto updateJobAdvertisementDto) {
-        this.updateJobAdvertisementDto = updateJobAdvertisementDto;
+        return this;
     }
 }

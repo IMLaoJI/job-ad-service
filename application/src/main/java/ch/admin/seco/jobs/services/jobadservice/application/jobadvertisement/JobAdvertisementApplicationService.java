@@ -602,6 +602,7 @@ public class JobAdvertisementApplicationService {
         Condition.notNull(createJobAdvertisementDto.getOccupations(), "Occupations can't be null");
 
         Occupation occupation = toOccupation(createJobAdvertisementDto.getSingleOccupation());
+
         occupation = enrichOccupationWithProfessionCodes(occupation);
         List<Occupation> occupations = Collections.singletonList(occupation);
 

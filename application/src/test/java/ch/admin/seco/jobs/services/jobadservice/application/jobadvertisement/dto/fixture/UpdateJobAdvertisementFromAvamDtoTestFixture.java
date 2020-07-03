@@ -1,13 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ApplyChannelDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.CompanyDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.ContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LanguageSkillDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromAvamDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
@@ -17,32 +10,31 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Location
 
 public class UpdateJobAdvertisementFromAvamDtoTestFixture {
 
-    public static UpdateJobAdvertisementFromAvamDto testUpdateJobAdvertisementFromAvamDto(JobAdvertisement jobAdvertisement) {
+    public static UpdateJobAdvertisementFromAvamDto updateJobAdvertisementFromAvamDto(JobAdvertisement jobAdvertisement) {
         JobContent jobContent = jobAdvertisement.getJobContent();
         JobDescription firstDescription = jobContent.getJobDescriptions().get(0);
         Location location = jobContent.getLocation();
         CreateLocationDto locationDto = testLocationDto(location);
-        return new UpdateJobAdvertisementFromAvamDto(
-                jobAdvertisement.getStellennummerAvam(),
-                firstDescription.getTitle(),
-                firstDescription.getDescription(),
-                firstDescription.getLanguage().getLanguage(),
-                jobContent.getNumberOfJobs(),
-                jobAdvertisement.isReportingObligation(),
-                jobAdvertisement.getReportingObligationEndDate(),
-                jobAdvertisement.getJobCenterCode(),
-                jobAdvertisement.getJobCenterUserId(),
-                jobAdvertisement.getApprovalDate(),
-                EmploymentDto.toDto(jobContent.getEmployment()),
-                ApplyChannelDto.toDto(jobContent.getApplyChannel()), // This is only for test purpose. Generally only the displayApplyChannel is converted to ApplyChannelDto
-                CompanyDto.toDto(jobContent.getCompany()), // This is only for test purpose. Generally only the displayCompany is converted to CompanyDto
-                ContactDto.toDto(jobAdvertisement.getContact()),
-                locationDto,
-                OccupationDto.toDto(jobContent.getOccupations()),
-                LanguageSkillDto.toDto(jobContent.getLanguageSkills()),
-                PublicationDto.toDto(jobAdvertisement.getPublication()),
-                PublicContactDto.toDto(jobContent.getPublicContact())
-        );
+        return new UpdateJobAdvertisementFromAvamDto()
+                .setStellennummerAvam(jobAdvertisement.getStellennummerAvam())
+                .setTitle(firstDescription.getTitle())
+                .setDescription(firstDescription.getDescription())
+                .setLanguageIsoCode(firstDescription.getLanguage().getLanguage())
+                .setNumberOfJobs(jobContent.getNumberOfJobs())
+                .setReportingObligation(jobAdvertisement.isReportingObligation())
+                .setReportingObligationEndDate(jobAdvertisement.getReportingObligationEndDate())
+                .setJobCenterCode(jobAdvertisement.getJobCenterCode())
+                .setJobCenterUserId(jobAdvertisement.getJobCenterUserId())
+                .setApprovalDate(jobAdvertisement.getApprovalDate())
+                .setEmployment(EmploymentDto.toDto(jobContent.getEmployment()))
+                .setApplyChannel(ApplyChannelDto.toDto(jobContent.getApplyChannel())) // This is only for test purpose. Generally only the displayApplyChannel is converted to ApplyChannelDto
+                .setCompany(CompanyDto.toDto(jobContent.getCompany())) // This is only for test purpose. Generally only the displayCompany is converted to CompanyDto
+                .setContact(ContactDto.toDto(jobAdvertisement.getContact()))
+                .setLocation(locationDto)
+                .setOccupations(OccupationDto.toDto(jobContent.getOccupations()))
+                .setLanguageSkills(LanguageSkillDto.toDto(jobContent.getLanguageSkills()))
+                .setPublication(PublicationDto.toDto(jobAdvertisement.getPublication()))
+                .setPublicContact(PublicContactDto.toDto(jobContent.getPublicContact()));
     }
 
     private static CreateLocationDto testLocationDto(Location location) {

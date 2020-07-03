@@ -1,8 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update;
 
-import java.time.LocalDate;
-
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 public class RejectionDto {
 
@@ -23,73 +22,66 @@ public class RejectionDto {
 
     private String jobCenterUserId;
 
-    protected RejectionDto() {
-        // For reflection libs
-    }
-
-    public RejectionDto(String stellennummerEgov, String stellennummerAvam, LocalDate date, String code, String reason, String jobCenterCode, String jobCenterUserId) {
-        this.stellennummerEgov = stellennummerEgov;
-        this.stellennummerAvam = stellennummerAvam;
-        this.date = date;
-        this.code = code;
-        this.reason = reason;
-        this.jobCenterCode = jobCenterCode;
-        this.jobCenterUserId = jobCenterUserId;
-    }
-
     public String getStellennummerEgov() {
         return stellennummerEgov;
     }
 
-    public void setStellennummerEgov(String stellennummerEgov) {
+    public RejectionDto setStellennummerEgov(String stellennummerEgov) {
         this.stellennummerEgov = stellennummerEgov;
+        return this;
     }
 
     public String getStellennummerAvam() {
         return stellennummerAvam;
     }
 
-    public void setStellennummerAvam(String stellennummerAvam) {
+    public RejectionDto setStellennummerAvam(String stellennummerAvam) {
         this.stellennummerAvam = stellennummerAvam;
+        return this;
     }
 
     public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public RejectionDto setDate(LocalDate date) {
         this.date = date;
+        return this;
     }
 
     public String getCode() {
         return code;
     }
 
-    public void setCode(String code) {
+    public RejectionDto setCode(String code) {
         this.code = code;
+        return this;
     }
 
     public String getReason() {
         return reason;
     }
 
-    public void setReason(String reason) {
+    public RejectionDto setReason(String reason) {
         this.reason = reason;
+        return this;
     }
 
     public String getJobCenterCode() {
         return jobCenterCode;
     }
 
-    public void setJobCenterCode(String jobCenterCode) {
+    public RejectionDto setJobCenterCode(String jobCenterCode) {
         this.jobCenterCode = jobCenterCode;
+        return this;
     }
 
     public String getJobCenterUserId() {
         return jobCenterUserId;
     }
 
-    public void setJobCenterUserId(String jobCenterUserId) {
+    public RejectionDto setJobCenterUserId(String jobCenterUserId) {
         this.jobCenterUserId = jobCenterUserId;
+        return this;
     }
 }

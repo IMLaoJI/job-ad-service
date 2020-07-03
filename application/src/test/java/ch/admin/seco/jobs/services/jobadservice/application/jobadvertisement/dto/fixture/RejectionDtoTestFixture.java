@@ -1,19 +1,21 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture;
 
-import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationServiceForAvamTest.STELLENNUMMER_AVAM;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
+
 import java.time.LocalDate;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
+import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationServiceForAvamTest.STELLENNUMMER_AVAM;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobAdvertisementIdFixture.job01;
 
 public class RejectionDtoTestFixture {
     public static RejectionDto testRejectionDto() {
-        return new RejectionDto(
-                job01.id().getValue(),
-                STELLENNUMMER_AVAM,
-                LocalDate.of(2018, 1, 1), "code",
-                "reason",
-                "jobcenterid",
-                "14711");
+        return new RejectionDto()
+                .setStellennummerEgov(job01.id().getValue())
+                .setStellennummerAvam(STELLENNUMMER_AVAM)
+                .setDate(LocalDate.of(2018, 1, 1))
+                .setCode("code")
+                .setReason("reason")
+                .setJobCenterCode("jobcenterid")
+                .setJobCenterUserId("14711");
     }
 }

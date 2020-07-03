@@ -186,6 +186,7 @@ public class AvamEndpointTest {
     @Test
     public void assembleCancellationJobAdDtoFromAvamCancellationDto() throws IOException {
 
+
         //given
         mockWebServiceClient.sendRequest(withPayload(getAsResource("soap/messages/insertOste-cancel-1.xml")))
                 .andExpect(ResponseMatchers.noFault())
