@@ -2,24 +2,19 @@ package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
 import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
-import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
-import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromAvamDto;
 import ch.admin.seco.jobs.services.jobadservice.core.domain.events.DomainEventMockUtils;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Employment;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
-import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Publication;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
 import org.junit.After;
@@ -39,7 +34,6 @@ import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisem
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.CreateJobAdvertisementFromAvamDtoTestFixture.testCreateJobAdvertisementDtoWithCompanyAnonymous;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.PublicationDtoTestFixture.testPublicationDtoWithCompanyAnonymous;
 import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.RejectionDtoTestFixture.testRejectionDto;
-import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.fixture.UpdateJobAdvertisementFromAvamDtoTestFixture.testUpdateJobAdvertisementFromAvamDto;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_APPROVED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_REJECTED;
@@ -76,13 +70,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
     private LocationService locationService;
 
     @Autowired
-    private ProfessionService professionService;
-
-    @Autowired
     private JobCenterService jobCenterService;
-
-    @Autowired
-    private ReportingObligationService reportingObligationService;
 
     @Autowired
     private JobAdvertisementRepository jobAdvertisementRepository;
@@ -110,7 +98,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
     @Test
     public void createFromAvam() {
         //given
-        AvamCreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto();
+        CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto();
 
         //when
         JobAdvertisementId jobAdvertisementId = sut.createFromAvam(createJobAdvertisementDto);
@@ -125,6 +113,9 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         assertThat(jobAdvertisement.getPublication().isCompanyAnonymous()).isFalse();
 
         assertThat(jobAdvertisement.isReportingObligation()).isTrue();
+        assertThat(jobAdvertisement.getReportingObligationEndDate()).isEqualTo(LocalDate.of(2018, 1, 1));
+        assertThat(jobAdvertisement.getJobCenterCode()).isEqualTo("jobCenter");
+        assertThat(jobAdvertisement.getApprovalDate()).isEqualTo(LocalDate.of(2017, 12, 26));
         assertThat(jobAdvertisement.getJobContent().getDisplayCompany()).isEqualTo(testCompany().build());
         assertThat(jobAdvertisement.getJobContent().getDisplayApplyChannel()).isEqualTo(testApplyChannel().build());
 
@@ -150,7 +141,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
     @Test
     public void createFromAvamWithCompanyAnonymous() {
         //given
-        AvamCreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDtoWithCompanyAnonymous();
+        CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDtoWithCompanyAnonymous();
 
         //when
         JobAdvertisementId jobAdvertisementId = sut.createFromAvam(createJobAdvertisementDto);
@@ -181,7 +172,7 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         when(jobCenterService.findJobCenterByCode(any())).thenReturn(testJobCenterWithUserDetail("jobCenter-name"));
         when(jobCenterService.findJobCenterUserByJobCenterUserId(any())).thenReturn(createJobCenterUser());
         String jobCenterUserName = "Markus Meier";
-        AvamCreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(testCompany().build(), testPublicationDtoWithCompanyAnonymous());
+        CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(testCompany().build(), testPublicationDtoWithCompanyAnonymous());
 
         JobAdvertisementId jobAdvertisementId = sut.createFromAvam(createJobAdvertisementDto);
 
@@ -195,6 +186,67 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         assertThat(jobAdvertisement.isReportingObligation()).isTrue();
         assertThat(jobAdvertisement.getJobContent().getDisplayCompany().getName()).isEqualTo(testJobCenter(jobCenterUserName).getAddress().getName());
 
+    }
+
+    @Test
+    public void updateFromAvam() {
+        // given
+        JobAdvertisement inspectingJobAd = jobAdvertisementRepository.save(
+                testJobAdvertisement()
+                        .setStatus(PUBLISHED_PUBLIC)
+                        .setJobContent(JobContentFixture.of(job01.id()).build())
+                        .setStellennummerAvam(STELLENNUMMER_AVAM)
+                        .setJobCenterCode("blahblah")
+                        .setRejectionDate(null)
+                        .setRejectionCode(null)
+                        .setRejectionReason(null)
+                        .setCancellationDate(null)
+                        .setCancellationCode(null)
+                        .build()
+        );
+        CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto();
+
+        // when
+        sut.createFromAvam(createJobAdvertisementDto);
+
+        // then
+        JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
+        assertThat(repoJobAd.getJobCenterCode()).isEqualTo(createJobAdvertisementDto.getJobCenterCode());
+        assertThat(repoJobAd.getJobCenterUserId()).isEqualTo(createJobAdvertisementDto.getJobCenterUserId());
+    }
+
+    @Test
+    public void updateFromAvamWithRefining() {
+        // given
+        JobAdvertisement inspectingJobAd = jobAdvertisementRepository.save(
+                testJobAdvertisement()
+                        .setStatus(ARCHIVED)
+                        .setJobContent(JobContentFixture.of(job01.id()).build())
+                        .setStellennummerAvam(STELLENNUMMER_AVAM)
+                        .setRejectionDate(null)
+                        .setRejectionCode(null)
+                        .setRejectionReason(null)
+                        .setCancellationDate(null)
+                        .setCancellationCode(null)
+                        .setPublication(testPublicationEmpty()
+                                .setStartDate(now().minusDays(10))
+                                .setEndDate(now().minusDays(2))
+                                .build())
+                        .build()
+        );
+        CreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(
+                inspectingJobAd.getJobContent().getCompany(),
+                new PublicationDto()
+                        .setStartDate(now().plusDays(10))
+                        .setEndDate(now().plusDays(22))
+        );
+
+        // when
+        sut.createFromAvam(createJobAdvertisementDto);
+
+        // then
+        JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
+        assertThat(repoJobAd.getStatus()).isEqualTo(JobAdvertisementStatus.REFINING);
     }
 
     @Test
@@ -225,29 +277,30 @@ public class JobAdvertisementApplicationServiceForAvamTest {
 
 
     @Test
-    public void shouldUpdate() {
+    public void shouldApproveWithUpdate() {
         // given
         JobAdvertisement inspectingJobAd = jobAdvertisementRepository.save(
                 testJobAdvertisement()
                         .setStatus(INSPECTING)
                         .setJobContent(JobContentFixture.of(job01.id()).build())
                         .build());
-        UpdateJobAdvertisementFromAvamDto updateJobAdvertisementFromAvamDto = testUpdateJobAdvertisementFromAvamDto(inspectingJobAd);
-        updateJobAdvertisementFromAvamDto.setDescription("OTHER VALUE");
+        ApprovalDto approvalDto = testApprovalDto(inspectingJobAd);
+        approvalDto.getUpdateJobAdvertisement().setDescription("OTHER VALUE");
 
         // when
-        sut.update(updateJobAdvertisementFromAvamDto);
+        sut.approve(approvalDto);
 
         // then
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(inspectingJobAd.getId());
-        assertThat(jobAdvertisement.getStellennummerAvam()).isEqualTo(updateJobAdvertisementFromAvamDto.getStellennummerAvam());
-        assertThat(jobAdvertisement.isReportingObligation()).isEqualTo(updateJobAdvertisementFromAvamDto.isReportingObligation());
-        assertThat(jobAdvertisement.getReportingObligationEndDate()).isEqualTo(updateJobAdvertisementFromAvamDto.getReportingObligationEndDate());
-        assertThat(jobAdvertisement.getJobCenterCode()).isEqualTo(updateJobAdvertisementFromAvamDto.getJobCenterCode());
-        assertThat(jobAdvertisement.getJobCenterUserId()).isEqualTo(updateJobAdvertisementFromAvamDto.getJobCenterUserId());
-        assertThat(jobAdvertisement.getStatus()).isEqualTo(INSPECTING);
+        assertThat(jobAdvertisement.getStellennummerAvam()).isEqualTo(approvalDto.getStellennummerAvam());
+        assertThat(jobAdvertisement.getApprovalDate()).isEqualTo(approvalDto.getDate());
+        assertThat(jobAdvertisement.isReportingObligation()).isEqualTo(approvalDto.isReportingObligation());
+        assertThat(jobAdvertisement.getReportingObligationEndDate()).isEqualTo(approvalDto.getReportingObligationEndDate());
+        assertThat(jobAdvertisement.getJobCenterCode()).isEqualTo(approvalDto.getJobCenterCode());
+        assertThat(jobAdvertisement.getJobCenterUserId()).isEqualTo(approvalDto.getJobCenterUserId());
+        assertThat(jobAdvertisement.getStatus()).isEqualTo(APPROVED);
         assertThat(jobAdvertisement.getJobContent().getJobDescriptions().get(0).getDescription()).isEqualTo("OTHER VALUE");
-        domainEventMockUtils.assertMultipleDomainEventPublished(1, JOB_ADVERTISEMENT_UPDATED.getDomainEventType());
+        domainEventMockUtils.assertMultipleDomainEventPublished(2, JOB_ADVERTISEMENT_UPDATED.getDomainEventType());
     }
 
     @Test
@@ -273,138 +326,5 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         assertThat(repoJobAd.getJobCenterUserId()).isEqualTo("14711");
         assertThat(repoJobAd.getStatus()).isEqualTo(REJECTED);
         domainEventMockUtils.assertSingleDomainEventPublished(JOB_ADVERTISEMENT_REJECTED.getDomainEventType());
-    }
-
-    @Test
-    public void shouldAdjournPublicationFromRefining() {
-        // given
-        JobAdvertisement inspectingJobAd = jobAdvertisementRepository.save(
-                testJobAdvertisement()
-                        .setStatus(REFINING)
-                        .setJobContent(JobContentFixture.of(job01.id()).build())
-                        .setStellennummerAvam(STELLENNUMMER_AVAM)
-                        .setRejectionDate(null)
-                        .setRejectionCode(null)
-                        .setRejectionReason(null)
-                        .setCancellationDate(null)
-                        .setCancellationCode(null)
-                        .setPublication(testPublicationEmpty()
-                                .setStartDate(now().plusDays(10))
-                                .setEndDate(now().plusDays(22))
-                                .build())
-                        .build()
-        );
-        JobAdvertisementUpdater updater = new JobAdvertisementUpdater.Builder(null)
-                .setPublication(
-                        new Publication.Builder()
-                                .setStartDate(LocalDate.of(2019, 1, 20))
-                                .setEndDate(LocalDate.of(2019, 1, 25))
-                                .build()
-                )
-                .build();
-        // when
-        inspectingJobAd.update(updater);
-
-        // then
-        JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
-        assertThat(repoJobAd.getStatus()).isEqualTo(JobAdvertisementStatus.REFINING);
-    }
-
-    @Test
-    public void shouldIgnoreAdjournPublicationFromCancelled() {
-        // given
-        JobAdvertisement inspectingJobAd = jobAdvertisementRepository.save(
-                testJobAdvertisement()
-                        .setStatus(CANCELLED)
-                        .setJobContent(JobContentFixture.of(job01.id()).build())
-                        .setStellennummerAvam(STELLENNUMMER_AVAM)
-                        .setRejectionDate(null)
-                        .setRejectionCode(null)
-                        .setRejectionReason(null)
-                        .setCancellationDate(null)
-                        .setCancellationCode(null)
-                        .setPublication(testPublicationEmpty()
-                                .setStartDate(now().plusDays(10))
-                                .setEndDate(now().plusDays(22))
-                                .build())
-                        .build()
-        );
-
-        // when
-        JobAdvertisementUpdater updater = new JobAdvertisementUpdater.Builder(null)
-                .setPublication(
-                        new Publication.Builder()
-                                .setStartDate(LocalDate.of(2019, 1, 20))
-                                .setEndDate(LocalDate.of(2019, 1, 25))
-                                .build()
-                )
-                .build();
-        // when
-        inspectingJobAd.update(updater);
-
-        // then
-        JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
-        assertThat(repoJobAd.getStatus()).isEqualTo(CANCELLED);
-    }
-
-    @Test
-    public void updateFromAvam() {
-        // given
-        JobAdvertisement inspectingJobAd = jobAdvertisementRepository.save(
-                testJobAdvertisement()
-                        .setStatus(PUBLISHED_PUBLIC)
-                        .setJobContent(JobContentFixture.of(job01.id()).build())
-                        .setStellennummerAvam(STELLENNUMMER_AVAM)
-                        .setJobCenterCode("blahblah")
-                        .setRejectionDate(null)
-                        .setRejectionCode(null)
-                        .setRejectionReason(null)
-                        .setCancellationDate(null)
-                        .setCancellationCode(null)
-                        .build()
-        );
-        AvamCreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto();
-
-        // when
-        sut.createFromAvam(createJobAdvertisementDto);
-
-        // then
-        JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
-        assertThat(repoJobAd.getJobCenterCode()).isEqualTo(createJobAdvertisementDto.getJobCenterCode());
-        assertThat(repoJobAd.getJobCenterUserId()).isEqualTo(createJobAdvertisementDto.getJobCenterUserId());
-    }
-
-    @Test
-    public void updateFromAvamWithRefining() {
-        // given
-        JobAdvertisement inspectingJobAd = jobAdvertisementRepository.save(
-                testJobAdvertisement()
-                        .setStatus(ARCHIVED)
-                        .setJobContent(JobContentFixture.of(job01.id()).build())
-                        .setStellennummerAvam(STELLENNUMMER_AVAM)
-                        .setRejectionDate(null)
-                        .setRejectionCode(null)
-                        .setRejectionReason(null)
-                        .setCancellationDate(null)
-                        .setCancellationCode(null)
-                        .setPublication(testPublicationEmpty()
-                                .setStartDate(now().minusDays(10))
-                                .setEndDate(now().minusDays(2))
-                                .build())
-                        .build()
-        );
-        AvamCreateJobAdvertisementDto createJobAdvertisementDto = testCreateJobAdvertisementDto(
-                inspectingJobAd.getJobContent().getCompany(),
-                new PublicationDto()
-                        .setStartDate(now().plusDays(10))
-                        .setEndDate(now().plusDays(22))
-        );
-
-        // when
-        sut.createFromAvam(createJobAdvertisementDto);
-
-        // then
-        JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
-        assertThat(repoJobAd.getStatus()).isEqualTo(JobAdvertisementStatus.REFINING);
     }
 }
