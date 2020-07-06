@@ -29,6 +29,7 @@ public class AvamEndpoint {
 	private static final String NAMESPACE_URI = "http://valueobjects.common.avam.bit.admin.ch";
 
 	private final AvamSource avamSource;
+
 	private final JobAdvertisementFromAvamAssembler jobAdvertisementFromAvamAssembler;
 
 	public AvamEndpoint(AvamSource avamSource, JobAdvertisementFromAvamAssembler jobAdvertisementFromAvamAssembler) {
@@ -55,7 +56,7 @@ public class AvamEndpoint {
 					}
 					else {
 						LOG.info("Creating JobAdvertisement from AVAM with EVENT: {}", avamJobAdvertisement.getEvent());
-						avamSource.create(jobAdvertisementFromAvamAssembler.createCreateJobAdvertisementAvamDto(avamJobAdvertisement));
+						avamSource.create(jobAdvertisementFromAvamAssembler.assembleAvamCreateJobAdvertisementDto(avamJobAdvertisement));
 						break;
 					}
 				}
