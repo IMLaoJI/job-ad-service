@@ -7,7 +7,7 @@
         <osteEgovId>900000</osteEgovId>
         <abSofort>1</abSofort>
         <abgelehnt>0</abgelehnt>
-        <abmeldeDatum></abmeldeDatum>
+        <abmeldeDatum>2018-03-03-00.00.00.0</abmeldeDatum>
         <abmeldeGrundCode></abmeldeGrundCode>
         <alterBis>50</alterBis>
         <alterVon>20</alterVon>
@@ -22,13 +22,13 @@
         <arbeitsOrtLand>CH</arbeitsOrtLand>
         <arbeitzeitStd>42</arbeitzeitStd>
         <benutzerDetailId></benutzerDetailId>
-        <beschreibung>Test Description</beschreibung>
+        <beschreibung>Dies ist nur ein Test</beschreibung>
         <bewerAngaben></bewerAngaben>
         <bewerElektronisch>1</bewerElektronisch>
         <bewerPersoenlich>0</bewerPersoenlich>
         <bewerSchriftlich>0</bewerSchriftlich>
         <bewerTelefonisch>0</bewerTelefonisch>
-        <bezeichnung>Test Title</bezeichnung>
+        <bezeichnung>Dies ist ein Test (Florist)</bezeichnung>
         <bq1AusbildungCode></bq1AusbildungCode>
         <bq1AvamBerufNr>17202</bq1AvamBerufNr>
         <bq1AvamBerufMDe></bq1AvamBerufMDe>
@@ -84,7 +84,7 @@
         <pensumBis>100</pensumBis>
         <pensumVon>80</pensumVon>
         <privFahrzeug>0</privFahrzeug>
-        <quelleCode>RAV</quelleCode>
+        <quelleCode>Job-Room</quelleCode>
         <sk1Aufenthalt>0</sk1Aufenthalt>
         <sk1MuendlichCode>1</sk1MuendlichCode>
         <sk1Muttersprache>0</sk1Muttersprache>
@@ -114,13 +114,12 @@
         <ssiAnonym>0</ssiAnonym>
         <ssiPublikation>0</ssiPublikation>
         <stellenantritt></stellenantritt>
-        <stellennummerAvam>AVAM-0003</stellennummerAvam>
-        <stellennummerEgov></stellennummerEgov>
+        <stellennummerAvam>AVAM-0001</stellennummerAvam>
         <teletextAnonym>0</teletextAnonym>
         <teletext>0</teletext>
         <teletextKanalCode></teletextKanalCode>
         <teletextZusatztext></teletextZusatztext>
-        <fristTyp>BEFR</fristTyp>
+        <fristTyp>UNBEFR</fristTyp>
         <untHausNr>31</untHausNr>
         <untLand></untLand>
         <untName>SECO</untName>
@@ -135,11 +134,11 @@
         <untTelefon></untTelefon>
         <untEmail></untEmail>
         <untUrl></untUrl>
-        <vertragsdauer>2012-03-01-00.00.00.0</vertragsdauer>
+        <vertragsdauer></vertragsdauer>
         <waehrungCode></waehrungCode>
         <anonym>0</anonym>
         <publikation>1</publikation>
         <behindert>0</behindert>
-        <event>AKTIVIERT</event>
+        <event>REAKTIVIERT</event>
     </oste>
 </val:insertOste>

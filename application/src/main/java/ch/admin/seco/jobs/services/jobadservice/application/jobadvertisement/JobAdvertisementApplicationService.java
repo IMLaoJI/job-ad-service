@@ -394,6 +394,7 @@ public class JobAdvertisementApplicationService {
 		jobAdvertisement.inspect();
 	}
 
+
 	public void approve(ApprovalDto approvalDto) {
 		Condition.notNull(approvalDto.getStellennummerEgov(), "StellennummerEgov can't be null");
 		JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerEgov(approvalDto.getStellennummerEgov());
@@ -402,10 +403,12 @@ public class JobAdvertisementApplicationService {
 			jobAdvertisement.approve(approvalDto.getStellennummerAvam(), approvalDto.getDate(), approvalDto.isReportingObligation(),
 					approvalDto.getReportingObligationEndDate(), approvalDto.getJobCenterCode(), approvalDto.getJobCenterUserId());
 		}
-		// FIXME This is a workaround when updating after approval, until AVAM add an actionType on there message.
+    }
+
+    public void update(UpdateJobAdvertisementFromAvamDto updateJobAdvertisementFromAvamDto){
+        JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerAvam(updateJobAdvertisementFromAvamDto.getStellennummerAvam());
 		LOG.debug("Starting UPDATE for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
-		UpdateJobAdvertisementFromAvamDto updateJobAdvertisement = approvalDto.getUpdateJobAdvertisement();
-		jobAdvertisement.update(prepareUpdaterFromAvam(updateJobAdvertisement));
+        jobAdvertisement.update(prepareUpdaterFromAvam(updateJobAdvertisementFromAvamDto));
 	}
 
 	public void updateJobCenters() {
@@ -578,21 +581,18 @@ public class JobAdvertisementApplicationService {
 		this.jobAdvertisementRepository
 				.findAllWherePublicationShouldStart(TimeMachine.now().toLocalDate())
 				.forEach(this::publish);
-
 	}
 
 	public void checkBlackoutPolicyExpiration() {
 		this.jobAdvertisementRepository
 				.findAllWhereBlackoutNeedToExpire(TimeMachine.now().toLocalDate())
 				.forEach(JobAdvertisement::expireBlackout);
-
 	}
 
 	public void checkPublicationExpiration() {
 		this.jobAdvertisementRepository
 				.findAllWherePublicationNeedToExpire(TimeMachine.now().toLocalDate())
 				.forEach(JobAdvertisement::expirePublication);
-
 	}
 
 	private void checkIfJobAdvertisementAlreadyExists(CreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {

@@ -9,7 +9,14 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.changes.
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.*;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
 
-import javax.persistence.*;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
