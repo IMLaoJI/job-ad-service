@@ -14,7 +14,9 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementUpdater;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Occupation;
+import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Publication;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.SourceSystem;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.JobContentFixture;
 import org.junit.After;
@@ -37,7 +39,6 @@ import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisem
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.*;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_APPROVED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_REJECTED;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvents.JOB_ADVERTISEMENT_UPDATED;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.ApplyChannelFixture.testApplyChannel;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.ApplyChannelFixture.testDisplayApplyChannel;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.CompanyFixture.testCompany;
@@ -275,34 +276,6 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         domainEventMockUtils.assertSingleDomainEventPublished(JOB_ADVERTISEMENT_APPROVED.getDomainEventType());
     }
 
-
-    @Test
-    public void shouldApproveWithUpdate() {
-        // given
-        JobAdvertisement inspectingJobAd = jobAdvertisementRepository.save(
-                testJobAdvertisement()
-                        .setStatus(INSPECTING)
-                        .setJobContent(JobContentFixture.of(job01.id()).build())
-                        .build());
-        ApprovalDto approvalDto = testApprovalDto(inspectingJobAd);
-        approvalDto.getUpdateJobAdvertisement().setDescription("OTHER VALUE");
-
-        // when
-        sut.approve(approvalDto);
-
-        // then
-        JobAdvertisement jobAdvertisement = jobAdvertisementRepository.getOne(inspectingJobAd.getId());
-        assertThat(jobAdvertisement.getStellennummerAvam()).isEqualTo(approvalDto.getStellennummerAvam());
-        assertThat(jobAdvertisement.getApprovalDate()).isEqualTo(approvalDto.getDate());
-        assertThat(jobAdvertisement.isReportingObligation()).isEqualTo(approvalDto.isReportingObligation());
-        assertThat(jobAdvertisement.getReportingObligationEndDate()).isEqualTo(approvalDto.getReportingObligationEndDate());
-        assertThat(jobAdvertisement.getJobCenterCode()).isEqualTo(approvalDto.getJobCenterCode());
-        assertThat(jobAdvertisement.getJobCenterUserId()).isEqualTo(approvalDto.getJobCenterUserId());
-        assertThat(jobAdvertisement.getStatus()).isEqualTo(APPROVED);
-        assertThat(jobAdvertisement.getJobContent().getJobDescriptions().get(0).getDescription()).isEqualTo("OTHER VALUE");
-        domainEventMockUtils.assertMultipleDomainEventPublished(2, JOB_ADVERTISEMENT_UPDATED.getDomainEventType());
-    }
-
     @Test
     public void shouldReject() {
         // given
@@ -327,4 +300,77 @@ public class JobAdvertisementApplicationServiceForAvamTest {
         assertThat(repoJobAd.getStatus()).isEqualTo(REJECTED);
         domainEventMockUtils.assertSingleDomainEventPublished(JOB_ADVERTISEMENT_REJECTED.getDomainEventType());
     }
+
+    @Test
+    public void shouldAdjournPublicationFromRefining() {
+        // given
+        JobAdvertisement inspectingJobAd = jobAdvertisementRepository.save(
+                testJobAdvertisement()
+                        .setStatus(REFINING)
+                        .setJobContent(JobContentFixture.of(job01.id()).build())
+                        .setStellennummerAvam(STELLENNUMMER_AVAM)
+                        .setRejectionDate(null)
+                        .setRejectionCode(null)
+                        .setRejectionReason(null)
+                        .setCancellationDate(null)
+                        .setCancellationCode(null)
+                        .setPublication(testPublicationEmpty()
+                                .setStartDate(now().plusDays(10))
+                                .setEndDate(now().plusDays(22))
+                                .build())
+                        .build()
+        );
+        JobAdvertisementUpdater updater = new JobAdvertisementUpdater.Builder(null)
+                .setPublication(
+                        new Publication.Builder()
+                                .setStartDate(LocalDate.of(2019, 1, 20))
+                                .setEndDate(LocalDate.of(2019, 1, 25))
+                                .build()
+                )
+                .build();
+        // when
+        inspectingJobAd.update(updater);
+
+        // then
+        JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
+        assertThat(repoJobAd.getStatus()).isEqualTo(JobAdvertisementStatus.REFINING);
+    }
+
+    @Test
+    public void shouldIgnoreAdjournPublicationFromCancelled() {
+        // given
+        JobAdvertisement inspectingJobAd = jobAdvertisementRepository.save(
+                testJobAdvertisement()
+                        .setStatus(CANCELLED)
+                        .setJobContent(JobContentFixture.of(job01.id()).build())
+                        .setStellennummerAvam(STELLENNUMMER_AVAM)
+                        .setRejectionDate(null)
+                        .setRejectionCode(null)
+                        .setRejectionReason(null)
+                        .setCancellationDate(null)
+                        .setCancellationCode(null)
+                        .setPublication(testPublicationEmpty()
+                                .setStartDate(now().plusDays(10))
+                                .setEndDate(now().plusDays(22))
+                                .build())
+                        .build()
+        );
+
+        // when
+        JobAdvertisementUpdater updater = new JobAdvertisementUpdater.Builder(null)
+                .setPublication(
+                        new Publication.Builder()
+                                .setStartDate(LocalDate.of(2019, 1, 20))
+                                .setEndDate(LocalDate.of(2019, 1, 25))
+                                .build()
+                )
+                .build();
+        // when
+        inspectingJobAd.update(updater);
+
+        // then
+        JobAdvertisement repoJobAd = jobAdvertisementRepository.getOne(job01.id());
+        assertThat(repoJobAd.getStatus()).isEqualTo(CANCELLED);
+    }
+
 }
