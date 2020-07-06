@@ -10,7 +10,6 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.OccupationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicContactDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.PublicationDto;
-
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
@@ -34,7 +33,12 @@ import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,7 +66,7 @@ public class JobAdvertisementFromAvamAssembler {
         return Objects.toString(value, null);
     }
 
-    AvamCreateJobAdvertisementDto createCreateJobAdvertisementAvamDto(WSOsteEgov avamJobAdvertisement) {
+    AvamCreateJobAdvertisementDto assembleAvamCreateJobAdvertisementDto(WSOsteEgov avamJobAdvertisement) {
         return new AvamCreateJobAdvertisementDto()
                 .setStellennummerAvam(safeTrimOrNull(avamJobAdvertisement.getStellennummerAvam()))
                 .setTitle(safeTrimOrNull(avamJobAdvertisement.getBezeichnung()))
