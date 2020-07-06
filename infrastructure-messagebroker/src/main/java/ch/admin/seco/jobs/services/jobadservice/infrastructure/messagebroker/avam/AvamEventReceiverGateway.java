@@ -4,7 +4,6 @@ import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementAlreadyExistsException;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.JobAdvertisementDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
@@ -57,9 +56,9 @@ public class AvamEventReceiverGateway {
 	}
 
 	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CREATE_FROM_AVAM_CONDITION)
-	public void handleCreateAction(CreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
+	public void handleCreateAction(AvamCreateJobAdvertisementDto avamCreateJobAdvertisementDto) {
 		try {
-			jobAdvertisementApplicationService.createFromAvam(createJobAdvertisementFromAvamDto);
+			jobAdvertisementApplicationService.createFromAvam(AvamCreateJobAdvertisementDto.toDto(avamCreateJobAdvertisementDto));
 		} catch (JobAdvertisementAlreadyExistsException e) {
 			LOG.debug(e.getMessage());
 		}
