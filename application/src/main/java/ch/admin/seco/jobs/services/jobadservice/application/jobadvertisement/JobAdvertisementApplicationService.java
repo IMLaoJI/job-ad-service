@@ -837,7 +837,7 @@ public class JobAdvertisementApplicationService {
 				toCompany(createJobAdvertisementFromAvamDto.getCompany()),
 				createJobAdvertisementFromAvamDto.getPublication().isCompanyAnonymous(),
 				createJobAdvertisementFromAvamDto.getJobCenterCode(),
-				createJobAdvertisementFromAvamDto.getNullsafeJobCenterUserId()
+				createJobAdvertisementFromAvamDto.nullSafeJobCenterUserId()
 		);
 	}
 
