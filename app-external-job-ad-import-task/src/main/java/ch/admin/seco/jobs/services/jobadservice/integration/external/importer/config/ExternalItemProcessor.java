@@ -29,7 +29,7 @@ public class ExternalItemProcessor implements ItemProcessor<Oste, CreateJobAdver
     public CreateJobAdvertisementDto process(Oste item) {
         ExternalCreateJobAdvertisementDto createItem = externalJobAdvertisementAssembler.createJobAdvertisementFromExternalDto(item);
         final CreateJobAdvertisementDto createJobAdvertisementDto = createItem.toDto(createItem);
-        Set<ConstraintViolation<ExternalCreateJobAdvertisementDto>> violations = validator.validate(createItem);
+        Set<ConstraintViolation<CreateJobAdvertisementDto>> violations = validator.validate(createJobAdvertisementDto);
         if (violations.isEmpty()) {
             return createJobAdvertisementDto;
         }
