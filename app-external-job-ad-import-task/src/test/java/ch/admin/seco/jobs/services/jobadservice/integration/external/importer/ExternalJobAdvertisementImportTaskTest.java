@@ -1,7 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.integration.external.importer;
 
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromExternalDto;
-import ch.admin.seco.jobs.services.jobadservice.integration.external.importer.config.dto.ExternalCreateJobAdvertisementDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Rule;
@@ -66,7 +66,7 @@ public class ExternalJobAdvertisementImportTaskTest {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
-    private JacksonTester<ExternalCreateJobAdvertisementDto> createJobAdvertisementExternalDtoJacksonTester;
+    private JacksonTester<CreateJobAdvertisementDto> createJobAdvertisementExternalDtoJacksonTester;
 
     private JacksonTester<UpdateJobAdvertisementFromExternalDto> updateJobAdvertisementFromExternalDtoJacksonTester;
 
