@@ -832,12 +832,12 @@ public class JobAdvertisementApplicationService {
 				.build();
 	}
 
-	private Company determineDisplayCompany(CreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
+	private Company determineDisplayCompany(CreateJobAdvertisementDto createJobAdvertisementDto) {
 		return this.determineDisplayCompany(
-				toCompany(createJobAdvertisementFromAvamDto.getCompany()),
-				createJobAdvertisementFromAvamDto.getPublication().isCompanyAnonymous(),
-				createJobAdvertisementFromAvamDto.getJobCenterCode(),
-				createJobAdvertisementFromAvamDto.nullSafeJobCenterUserId()
+				toCompany(createJobAdvertisementDto.getCompany()),
+				createJobAdvertisementDto.getPublication().isCompanyAnonymous(),
+				createJobAdvertisementDto.getJobCenterCode(),
+				createJobAdvertisementDto.getJobCenterUserId()
 		);
 	}
 

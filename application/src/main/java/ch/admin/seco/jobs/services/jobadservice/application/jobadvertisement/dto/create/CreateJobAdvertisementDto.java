@@ -258,13 +258,6 @@ public class CreateJobAdvertisementDto {
         return this;
     }
 
-    public String nullSafeJobCenterUserId() {
-        if (jobCenterUserId == null) {
-            return null;
-        }
-        return jobCenterUserId;
-    }
-
     public String getJobCenterUserId() {
         return jobCenterUserId;
     }
