@@ -502,8 +502,8 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
 		    jobContent.setDisplayApplyChannel(applyChannel);
 	    }
 	    if (hasChanged(jobContent.getDisplayCompany(), company)) {
-		    changeLog.add("displayApplyChannel", jobContent.getDisplayCompany(), applyChannel);
-		    jobContent.setDisplayApplyChannel(applyChannel);
+		    changeLog.add("displayCompany", jobContent.getDisplayCompany(), company);
+		    jobContent.setDisplayCompany(company);
 	    }
         return changeLog;
     }
