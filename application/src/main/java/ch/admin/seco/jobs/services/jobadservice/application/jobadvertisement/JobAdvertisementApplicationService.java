@@ -413,12 +413,6 @@ public class JobAdvertisementApplicationService {
 					determineApplyChannel(updateJobAdvertisement),
 					determineDisplayCompany(updateJobAdvertisement));
 		}
-
-		//		DomainEventPublisher.publish(new JobAdvertisementUpdatedEvent(this, changeLog));
-		// FIXME This is a workaround when updating after approval, until AVAM add an actionType on there message.
-		LOG.debug("Starting UPDATE for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
-		UpdateJobAdvertisementFromAvamDto updateJobAdvertisement = approvalDto.getUpdateJobAdvertisement();
-		jobAdvertisement.update(prepareUpdaterFromAvam(updateJobAdvertisement));
     }
 
     public void update(UpdateJobAdvertisementFromAvamDto updateJobAdvertisementFromAvamDto){
