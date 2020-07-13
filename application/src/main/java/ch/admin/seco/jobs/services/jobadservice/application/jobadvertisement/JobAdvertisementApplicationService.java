@@ -400,9 +400,25 @@ public class JobAdvertisementApplicationService {
 		JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerEgov(approvalDto.getStellennummerEgov());
 		if (jobAdvertisement.getStatus().equals(INSPECTING) || jobAdvertisement.getStatus().equals(REJECTED)) {
 			LOG.debug("Starting approve for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
-			jobAdvertisement.approve(approvalDto.getStellennummerAvam(), approvalDto.getDate(), approvalDto.isReportingObligation(),
-					approvalDto.getReportingObligationEndDate(), approvalDto.getJobCenterCode(), approvalDto.getJobCenterUserId());
+
+
+			UpdateJobAdvertisementFromAvamDto updateJobAdvertisement = approvalDto.getUpdateJobAdvertisement();
+
+			jobAdvertisement.approve(approvalDto.getStellennummerAvam(),
+					approvalDto.getDate(),
+					approvalDto.isReportingObligation(),
+					approvalDto.getReportingObligationEndDate(),
+					approvalDto.getJobCenterCode(),
+					approvalDto.getJobCenterUserId(),
+					toApplyChannel(updateJobAdvertisement.getApplyChannel()),
+					toCompany(updateJobAdvertisement.getCompany()));
 		}
+
+		//		DomainEventPublisher.publish(new JobAdvertisementUpdatedEvent(this, changeLog));
+		// FIXME This is a workaround when updating after approval, until AVAM add an actionType on there message.
+		LOG.debug("Starting UPDATE for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
+		UpdateJobAdvertisementFromAvamDto updateJobAdvertisement = approvalDto.getUpdateJobAdvertisement();
+		jobAdvertisement.update(prepareUpdaterFromAvam(updateJobAdvertisement));
     }
 
     public void update(UpdateJobAdvertisementFromAvamDto updateJobAdvertisementFromAvamDto){

@@ -284,7 +284,7 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
     }
 
     public void approve(String stellennummerAvam, LocalDate date, boolean reportingObligation,
-                        LocalDate reportingObligationEndDate, String jobCenterCode, String jobCenterUserId) {
+                        LocalDate reportingObligationEndDate, String jobCenterCode, String jobCenterUserId, ApplyChannel applyChannel, Company company) {
 
         if (reportingObligation) {
             Condition.notNull(reportingObligationEndDate, "Reporting obligation end date is missing");
@@ -298,7 +298,7 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
         this.cancellationCode = null;
         this.cancellationDate = null;
 
-        ChangeLog changeLog = applyApprove(reportingObligation, reportingObligationEndDate, jobCenterCode, jobCenterUserId);
+        ChangeLog changeLog = applyApprove(reportingObligation, reportingObligationEndDate, jobCenterCode, jobCenterUserId, applyChannel, company);
         this.status = status.validateTransitionTo(JobAdvertisementStatus.APPROVED);
         this.updatedTime = TimeMachine.now();
 
@@ -479,9 +479,8 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
         Condition.isTrue(violations.isEmpty(), String.valueOf(violations.getMessages()));
     }
 
-    private ChangeLog applyApprove(boolean reportingObligation, LocalDate reportingObligationEndDate, String jobCenterCode, String jobCenterUserId) {
+    private ChangeLog applyApprove(boolean reportingObligation, LocalDate reportingObligationEndDate, String jobCenterCode, String jobCenterUserId, ApplyChannel applyChannel, Company company) {
         ChangeLog changeLog = new ChangeLog();
-
         if (hasChanged(this.reportingObligation, reportingObligation)) {
             changeLog.add("reportingObligation", this.reportingObligation, reportingObligation);
             this.reportingObligation = reportingObligation;
@@ -494,14 +493,21 @@ public class JobAdvertisement implements Aggregate<JobAdvertisement, JobAdvertis
             changeLog.add("jobCenterCode", this.jobCenterCode, jobCenterCode);
             this.jobCenterCode = jobCenterCode;
         }
-
         if (hasChanged(this.jobCenterUserId, jobCenterUserId)) {
             changeLog.add("jobCenterUserId", this.jobCenterUserId, jobCenterUserId);
             this.jobCenterUserId = jobCenterUserId;
         }
-
+	    if (hasChanged(jobContent.getDisplayApplyChannel(), applyChannel)) {
+		    changeLog.add("displayApplyChannel", jobContent.getDisplayApplyChannel(), applyChannel);
+		    jobContent.setDisplayApplyChannel(applyChannel);
+	    }
+	    if (hasChanged(jobContent.getDisplayCompany(), company)) {
+		    changeLog.add("displayApplyChannel", jobContent.getDisplayCompany(), applyChannel);
+		    jobContent.setDisplayApplyChannel(applyChannel);
+	    }
         return changeLog;
     }
+
 
     private ChangeLog applyUpdates(JobAdvertisementUpdater updater) {
         ChangeLog changeLog = new ChangeLog();
