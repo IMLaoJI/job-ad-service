@@ -410,8 +410,8 @@ public class JobAdvertisementApplicationService {
 					approvalDto.getReportingObligationEndDate(),
 					approvalDto.getJobCenterCode(),
 					approvalDto.getJobCenterUserId(),
-					toApplyChannel(updateJobAdvertisement.getApplyChannel()),
-					toCompany(updateJobAdvertisement.getCompany()));
+					determineApplyChannel(updateJobAdvertisement),
+					determineDisplayCompany(updateJobAdvertisement));
 		}
 
 		//		DomainEventPublisher.publish(new JobAdvertisementUpdatedEvent(this, changeLog));
