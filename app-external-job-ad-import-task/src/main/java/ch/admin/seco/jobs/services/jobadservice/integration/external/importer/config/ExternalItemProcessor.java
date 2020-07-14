@@ -5,6 +5,7 @@ import ch.admin.seco.jobs.services.jobadservice.integration.external.importer.co
 import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadimport.Oste;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.batch.item.ItemProcessor;
 
 import javax.validation.ConstraintViolation;
