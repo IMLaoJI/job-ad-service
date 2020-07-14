@@ -135,38 +135,4 @@ public class ExternalJobAdvertisementAdapterTest {
                 .build();
     }
 
-    private ExternalJobAdvertisementDto createJobAdvertisementFromExternalDto() {
-        return new ExternalJobAdvertisementDto()
-                .setStellennummerEgov("stellennummerEgov")
-                .setStellennummerAvam("stellennummerAvam")
-                .setTitle("title")
-                .setDescription("description")
-                .setNumberOfJobs("numberOfJobs")
-                .setFingerprint("fingerprint")
-                .setExternalUrl("externalUrl")
-                .setJobCenterCode("jobCenterCode")
-                .setContact(new ExternalContactDto(Salutation.MR, "firstName", "lastName", "phone", "email", "de"))
-                .setEmployment(
-                        new EmploymentDto()
-                                .setStartDate(LocalDate.of(2018, 1, 1))
-                                .setEndDate(LocalDate.of(2018, 12, 31))
-                                .setShortEmployment(false)
-                                .setImmediately(false)
-                                .setPermanent(false)
-                                .setWorkloadPercentageMin(100)
-                                .setWorkloadPercentageMax(100)
-                                .setWorkForms(null))
-                .setCompany(new ExternalCompanyDto("companyName", "companyStreet", "companyHouseNumber", "companyPostalCode", "companyCity", "CH", null, null, null, "companyPhone", "companyEmail", "companyWebside", false))
-                .setLocation(new ExternalLocationDto(null, "locationCity", "locationPostalCode", "CH"))
-                .setOccupations(Collections.singletonList(new ExternalOccupationDto().setAvamOccupationCode("avamOccupationCode")
-                        .setWorkExperience(WorkExperience.MORE_THAN_1_YEAR)
-                        .setEducationCode("educationCode")
-                        .setQualificationCode(Qualification.SKILLED)))
-                .setProfessionCodes("professionCodes")
-                .setLanguageSkills(Collections.singletonList(new ExternalLanguageSkillDto("de", LanguageLevel.PROFICIENT, LanguageLevel.INTERMEDIATE)))
-                .setPublicationStartDate(LocalDate.of(2018, 1, 1))
-                .setPublicationEndDate(LocalDate.of(2018, 12, 31))
-                .setCompanyAnonymous(false);
-    }
-
 }

@@ -38,9 +38,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalJobAdvertisementDto;
-import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadimport.Oste;
-import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadimport.OsteList;
 
 @Configuration
 public class ExternalJobAdvertisementImportTaskConfig {
