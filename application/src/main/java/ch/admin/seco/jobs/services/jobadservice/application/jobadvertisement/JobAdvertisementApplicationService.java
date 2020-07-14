@@ -400,8 +400,18 @@ public class JobAdvertisementApplicationService {
 		JobAdvertisement jobAdvertisement = getJobAdvertisementByStellennummerEgov(approvalDto.getStellennummerEgov());
 		if (jobAdvertisement.getStatus().equals(INSPECTING) || jobAdvertisement.getStatus().equals(REJECTED)) {
 			LOG.debug("Starting approve for JobAdvertisementId: '{}'", jobAdvertisement.getId().getValue());
-			jobAdvertisement.approve(approvalDto.getStellennummerAvam(), approvalDto.getDate(), approvalDto.isReportingObligation(),
-					approvalDto.getReportingObligationEndDate(), approvalDto.getJobCenterCode(), approvalDto.getJobCenterUserId());
+
+
+			UpdateJobAdvertisementFromAvamDto updateJobAdvertisement = approvalDto.getUpdateJobAdvertisement();
+
+			jobAdvertisement.approve(approvalDto.getStellennummerAvam(),
+					approvalDto.getDate(),
+					approvalDto.isReportingObligation(),
+					approvalDto.getReportingObligationEndDate(),
+					approvalDto.getJobCenterCode(),
+					approvalDto.getJobCenterUserId(),
+					determineApplyChannel(updateJobAdvertisement),
+					determineDisplayCompany(updateJobAdvertisement));
 		}
     }
 
