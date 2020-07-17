@@ -47,6 +47,7 @@
         <module>web</module>
         <module>app-external-job-ad-export-task</module>
         <module>app-external-job-ad-import-task</module>
+        <module>app-ws-avam-sink</module>
     </modules>
 
     <dependencyManagement>
