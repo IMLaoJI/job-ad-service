@@ -52,11 +52,11 @@ class ExternalJobAdvertisementAssembler {
     public ExternalJobAdvertisementAssembler() {
     }
 
-    ExternalJobAdvertisementDto createJobAdvertisementFromExternalDto(Oste externalJobAdvertisement) {
+    ExternalCreateJobAdvertisementDto createJobAdvertisementFromExternalDto(Oste externalJobAdvertisement) {
         LocalDate publicationStartDate = parseDate(externalJobAdvertisement.getAnmeldeDatum());
         LocalDate publicationEndDate = parseDate(externalJobAdvertisement.getGueltigkeit());
 
-        return new ExternalJobAdvertisementDto()
+        return new ExternalCreateJobAdvertisementDto()
                 .setStellennummerEgov(externalJobAdvertisement.getStellennummerEGov())
                 .setStellennummerAvam(externalJobAdvertisement.getStellennummerAvam())
                 .setTitle(sanitize(externalJobAdvertisement.getBezeichnung()))

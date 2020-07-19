@@ -11,7 +11,7 @@ import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.ApprovalDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.CancellationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.RejectionDto;
@@ -54,7 +54,6 @@ import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.J
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REFINING;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REJECTED;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.springframework.util.StringUtils.hasText;
 
 @Service
@@ -127,7 +126,7 @@ public class JobAdvertisementApplicationService {
         LOG.debug("Start creating new job ad from API");
         Condition.notNull(createJobAdvertisementDto, "CreateJobAdvertisementDto can't be null");
         String avamOccupationCode = createJobAdvertisementDto.getOccupation().getAvamOccupationCode();
-        if (isDeprecatedAvamCode(avamOccupationCode)) {
+        if(isDeprecatedAvamCode(avamOccupationCode)) {
             LOG.info("The ApiUser with the ID: '{}' and the E-Mail: '{}' is using a deprecated avam code '{}'", currentUserContext.getCurrentUser().getUserId(), currentUserContext.getCurrentUser().getEmail(), avamOccupationCode);
         }
         Condition.isTrue(professionService.isKnownAvamCode(avamOccupationCode),
@@ -201,47 +200,52 @@ public class JobAdvertisementApplicationService {
         return jobAdvertisement.getId();
     }
 
-    public JobAdvertisementId createFromExtern(ExternalJobAdvertisementDto externalJobAdvertisementDto) {
+    public JobAdvertisementId createFromExtern(ExternalCreateJobAdvertisementDto createJobAdvertisementFromExternalDto) {
         LOG.debug("Start creating new job ad from external");
 
-        Condition.notNull(externalJobAdvertisementDto, "CreateJobAdvertisementFromExternalDto can't be null");
-        LOG.debug("Create '{}'", externalJobAdvertisementDto.getTitle());
+        Condition.notNull(createJobAdvertisementFromExternalDto, "CreateJobAdvertisementFromExternalDto can't be null");
+        LOG.debug("Create '{}'", createJobAdvertisementFromExternalDto.getTitle());
 
-        checkIfJobAdvertisementAlreadyExists(externalJobAdvertisementDto);
+        checkIfJobAdvertisementAlreadyExists(createJobAdvertisementFromExternalDto);
 
-        Location location = toLocation(externalJobAdvertisementDto.toCreateLocationDto());
+        Location location = toLocation(createJobAdvertisementFromExternalDto.toCreateLocationDto());
         location = locationService.enrichCodes(location);
 
-        List<Occupation> occupations = enrichAndToOccupations(externalJobAdvertisementDto.toOccupationDtos());
+        List<Occupation> occupations = enrichAndToOccupations(createJobAdvertisementFromExternalDto.toOccupationDtos());
 
-        Company company = toCompany(externalJobAdvertisementDto.toCompanyDto());
+        Company company = toCompany(createJobAdvertisementFromExternalDto.toCompanyDto());
         JobContent jobContent = new JobContent.Builder()
-                .setNumberOfJobs(externalJobAdvertisementDto.getNumberOfJobs())
+                .setNumberOfJobs(createJobAdvertisementFromExternalDto.getNumberOfJobs())
                 .setJobDescriptions(Collections.singletonList(
                         new JobDescription.Builder()
                                 .setLanguage(Locale.GERMAN)
-                                .setTitle(externalJobAdvertisementDto.getTitle())
-                                .setDescription(externalJobAdvertisementDto.getDescription())
+                                .setTitle(createJobAdvertisementFromExternalDto.getTitle())
+                                .setDescription(createJobAdvertisementFromExternalDto.getDescription())
                                 .build()
                 ))
-                .setExternalUrl(externalJobAdvertisementDto.getExternalUrl())
+                .setExternalUrl(createJobAdvertisementFromExternalDto.getExternalUrl())
                 .setLocation(location)
                 .setOccupations(occupations)
-                .setX28OccupationCodes(externalJobAdvertisementDto.getProfessionCodes())
-                .setEmployment(toEmployment(externalJobAdvertisementDto.getEmployment()))
-                .setDisplayCompany(determineDisplayCompany(externalJobAdvertisementDto))
+                .setX28OccupationCodes(createJobAdvertisementFromExternalDto.getProfessionCodes())
+                .setEmployment(toEmployment(createJobAdvertisementFromExternalDto.getEmployment()))
+                .setDisplayCompany(determineDisplayCompany(createJobAdvertisementFromExternalDto))
                 .setCompany(company)
-                .setPublicContact(toPublicContact(externalJobAdvertisementDto.toPublicContactDto()))
-                .setLanguageSkills(toLanguageSkills(externalJobAdvertisementDto.toLanguageSkillDtos()))
+                .setPublicContact(toPublicContact(createJobAdvertisementFromExternalDto.toPublicContactDto()))
+                .setLanguageSkills(toLanguageSkills(createJobAdvertisementFromExternalDto.toLanguageSkillDtos()))
                 .build();
 
-        LocalDate publicationStartDate = defaultIfNull(externalJobAdvertisementDto.getPublicationStartDate(), TimeMachine.now().toLocalDate());
-        LocalDate publicationEndDate = defaultIfNull(externalJobAdvertisementDto.getPublicationEndDate(), publicationStartDate.plusDays(PUBLICATION_MAX_DAYS));
-
+        LocalDate publicationStartDate = createJobAdvertisementFromExternalDto.getPublicationStartDate();
+        if (publicationStartDate == null) {
+            publicationStartDate = TimeMachine.now().toLocalDate();
+        }
+        LocalDate publicationEndDate = createJobAdvertisementFromExternalDto.getPublicationEndDate();
+        if (publicationEndDate == null) {
+            publicationEndDate = publicationStartDate.plusDays(PUBLICATION_MAX_DAYS);
+        }
         final JobAdvertisementCreator creator = new JobAdvertisementCreator.Builder(currentUserContext.getAuditUser())
-                .setFingerprint(externalJobAdvertisementDto.getFingerprint())
+                .setFingerprint(createJobAdvertisementFromExternalDto.getFingerprint())
                 .setJobContent(jobContent)
-                .setContact(toContact(externalJobAdvertisementDto.toContactDto()))
+                .setContact(toContact(createJobAdvertisementFromExternalDto.toContactDto()))
                 .setPublication(
                         new Publication.Builder()
                                 .setStartDate(publicationStartDate)
@@ -250,7 +254,7 @@ public class JobAdvertisementApplicationService {
                                 .setEuresAnonymous(false)
                                 .setPublicDisplay(true)
                                 .setRestrictedDisplay(true)
-                                .setCompanyAnonymous(externalJobAdvertisementDto.isCompanyAnonymous())
+                                .setCompanyAnonymous(createJobAdvertisementFromExternalDto.isCompanyAnonymous())
                                 .build()
                 )
                 .build();
@@ -259,33 +263,15 @@ public class JobAdvertisementApplicationService {
         return jobAdvertisement.getId();
     }
 
-    public JobAdvertisementId updateFromExtern(JobAdvertisementId jobAdvertisementId, ExternalJobAdvertisementDto externalJobAdvertisementDto) {
+    public JobAdvertisementId updateFromExtern(JobAdvertisementId jobAdvertisementId, ExternalCreateJobAdvertisementDto createFromExternal) {
         LOG.debug("Update JobAdvertisement '{}' from Extern", jobAdvertisementId);
 
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.findById(jobAdvertisementId)
                 .orElseThrow(() -> new EntityNotFoundException("JobAdvertisement not found. JobAdvertisementId: " + jobAdvertisementId.getValue()));
 
-        Location location = toLocation(externalJobAdvertisementDto.toCreateLocationDto());
-        location = locationService.enrichCodes(location);
-        LocalDate publicationStartDate = defaultIfNull(externalJobAdvertisementDto.getPublicationStartDate(), TimeMachine.now().toLocalDate());
-        LocalDate publicationEndDate = defaultIfNull(externalJobAdvertisementDto.getPublicationEndDate(), publicationStartDate.plusDays(PUBLICATION_MAX_DAYS));
-
         JobAdvertisementUpdater updater = new JobAdvertisementUpdater.Builder(currentUserContext.getAuditUser())
-                .setJobDescription(externalJobAdvertisementDto.getTitle(), externalJobAdvertisementDto.getDescription())
-                .setX28OccupationCodes(externalJobAdvertisementDto.getProfessionCodes())
-                .setPublication(new Publication.Builder()
-                        .setStartDate(publicationStartDate)
-                        .setEndDate(publicationEndDate)
-                        .setEuresDisplay(false)
-                        .setEuresAnonymous(false)
-                        .setPublicDisplay(true)
-                        .setRestrictedDisplay(true)
-                        .setCompanyAnonymous(jobAdvertisement.getPublication().isCompanyAnonymous())
-                        .build())
-                .setEmployment(toEmployment(externalJobAdvertisementDto.getEmployment()))
-                .setLocation(location)
-                .setContact(toContact(externalJobAdvertisementDto.toContactDto()))
-                .setX28OccupationCodes(externalJobAdvertisementDto.getProfessionCodes())
+                .setJobDescription(createFromExternal.getTitle(), createFromExternal.getDescription())
+                .setX28OccupationCodes(createFromExternal.getProfessionCodes())
                 .build();
 
         jobAdvertisement.update(updater);
@@ -603,7 +589,7 @@ public class JobAdvertisementApplicationService {
 
     }
 
-    private void checkIfJobAdvertisementAlreadyExists(ExternalJobAdvertisementDto createJobAdvertisementFromExternalDto) {
+    private void checkIfJobAdvertisementAlreadyExists(ExternalCreateJobAdvertisementDto createJobAdvertisementFromExternalDto) {
         Optional<JobAdvertisement> jobAdvertisement = jobAdvertisementRepository.findByFingerprint(createJobAdvertisementFromExternalDto.getFingerprint());
         jobAdvertisement.ifPresent(jobAd -> {
             String message = String.format("JobAdvertisement '%s' with fingerprint '%s' already exists", jobAd.getId().getValue(), jobAd.getFingerprint());
@@ -851,7 +837,7 @@ public class JobAdvertisementApplicationService {
         );
     }
 
-    private Company determineDisplayCompany(ExternalJobAdvertisementDto createJobAdvertisementFromExternalDto) {
+    private Company determineDisplayCompany(ExternalCreateJobAdvertisementDto createJobAdvertisementFromExternalDto) {
         return this.determineDisplayCompany(
                 toCompany(createJobAdvertisementFromExternalDto.toCompanyDto()),
                 createJobAdvertisementFromExternalDto.isCompanyAnonymous(),

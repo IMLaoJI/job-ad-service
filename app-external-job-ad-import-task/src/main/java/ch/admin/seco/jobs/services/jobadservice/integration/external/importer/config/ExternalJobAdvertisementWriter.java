@@ -18,10 +18,10 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.messages.JobAdvertisementAction;
 
-public class ExternalJobAdvertisementWriter implements ItemWriter<ExternalJobAdvertisementDto> {
+public class ExternalJobAdvertisementWriter implements ItemWriter<ExternalCreateJobAdvertisementDto> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExternalJobAdvertisementWriter.class);
 
@@ -32,12 +32,12 @@ public class ExternalJobAdvertisementWriter implements ItemWriter<ExternalJobAdv
     }
 
     @Override
-    public void write(List<? extends ExternalJobAdvertisementDto> items) {
+    public void write(List<? extends ExternalCreateJobAdvertisementDto> items) {
         LOG.debug("Send external JobAdvertisements ({}) to JobAd service", items.size());
         items.forEach(item -> send(item, item.getFingerprint()));
     }
 
-    private void send(ExternalJobAdvertisementDto createFromExternal, String key) {
+    private void send(ExternalCreateJobAdvertisementDto createFromExternal, String key) {
         output.send(MessageBuilder
                 .withPayload(createFromExternal)
                 .setHeader(PARTITION_KEY, key)

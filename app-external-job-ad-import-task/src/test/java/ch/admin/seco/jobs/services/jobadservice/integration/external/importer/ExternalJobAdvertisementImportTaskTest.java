@@ -39,7 +39,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.update.UpdateJobAdvertisementFromExternalDto;
 
 @RunWith(SpringRunner.class)
@@ -68,7 +68,7 @@ public class ExternalJobAdvertisementImportTaskTest {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
-    private JacksonTester<ExternalJobAdvertisementDto> createJobAdvertisementExternalDtoJacksonTester;
+    private JacksonTester<ExternalCreateJobAdvertisementDto> createJobAdvertisementExternalDtoJacksonTester;
 
     private JacksonTester<UpdateJobAdvertisementFromExternalDto> updateJobAdvertisementFromExternalDtoJacksonTester;
 

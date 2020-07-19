@@ -53,7 +53,7 @@ public class ExternalJobAdvertisementAdapterTest {
         when(jobAdvertisementRepository.findByStellennummerEgov(any())).thenReturn(Optional.empty());
         when(jobAdvertisementRepository.findByStellennummerAvam(any())).thenReturn(Optional.empty());
         when(jobAdvertisementRepository.findByFingerprint(any())).thenReturn(Optional.empty());
-        ExternalJobAdvertisementDto externalDto = createJobAdvertisementFromExternalDto();
+        ExternalCreateJobAdvertisementDto externalDto = createJobAdvertisementFromExternalDto();
 
         sut.handleCreateFromExternalAction(externalDto);
 
@@ -66,7 +66,7 @@ public class ExternalJobAdvertisementAdapterTest {
     public void shouldEnrichJobroomJobAdvertisementFromExternal() {
         when(jobAdvertisementRepository.findByStellennummerEgov(any())).thenReturn(Optional.of(createJobRoomJobAdvertisement(job01.id())));
         when(jobAdvertisementRepository.findByStellennummerAvam(any())).thenReturn(Optional.empty());
-        ExternalJobAdvertisementDto externalDto = createJobAdvertisementFromExternalDto();
+        ExternalCreateJobAdvertisementDto externalDto = createJobAdvertisementFromExternalDto();
 
         sut.handleCreateFromExternalAction(externalDto);
 
@@ -79,7 +79,7 @@ public class ExternalJobAdvertisementAdapterTest {
     public void shouldEnrichAVAMJobAdvertisementFromExternal() {
         when(jobAdvertisementRepository.findByStellennummerEgov(any())).thenReturn(Optional.empty());
         when(jobAdvertisementRepository.findByStellennummerAvam(any())).thenReturn(Optional.of(createAVAMJobAdvertisement(job01.id())));
-        ExternalJobAdvertisementDto externalDto = createJobAdvertisementFromExternalDto();
+        ExternalCreateJobAdvertisementDto externalDto = createJobAdvertisementFromExternalDto();
 
         sut.handleCreateFromExternalAction(externalDto);
 
@@ -93,7 +93,7 @@ public class ExternalJobAdvertisementAdapterTest {
         when(jobAdvertisementRepository.findByStellennummerEgov(any())).thenReturn(Optional.empty());
         when(jobAdvertisementRepository.findByStellennummerAvam(any())).thenReturn(Optional.empty());
         when(jobAdvertisementRepository.findByFingerprint(any())).thenReturn(Optional.of(createExternalJobAdvertisement(job01.id(), "fingerprint")));
-        ExternalJobAdvertisementDto externalDto = createJobAdvertisementFromExternalDto();
+        ExternalCreateJobAdvertisementDto externalDto = createJobAdvertisementFromExternalDto();
 
         sut.handleCreateFromExternalAction(externalDto);
 
@@ -129,8 +129,8 @@ public class ExternalJobAdvertisementAdapterTest {
                 .build();
     }
 
-    private ExternalJobAdvertisementDto createJobAdvertisementFromExternalDto() {
-        return new ExternalJobAdvertisementDto()
+    private ExternalCreateJobAdvertisementDto createJobAdvertisementFromExternalDto() {
+        return new ExternalCreateJobAdvertisementDto()
                 .setStellennummerEgov("stellennummerEgov")
                 .setStellennummerAvam("stellennummerAvam")
                 .setTitle("title")

@@ -10,10 +10,10 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.batch.item.ItemProcessor;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadimport.Oste;
 
-public class ExternalItemProcessor implements ItemProcessor<Oste, ExternalJobAdvertisementDto> {
+public class ExternalItemProcessor implements ItemProcessor<Oste, ExternalCreateJobAdvertisementDto> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalItemProcessor.class);
 
@@ -28,9 +28,9 @@ public class ExternalItemProcessor implements ItemProcessor<Oste, ExternalJobAdv
     }
 
     @Override
-    public ExternalJobAdvertisementDto process(Oste item) {
-        ExternalJobAdvertisementDto createItem = externalJobAdvertisementAssembler.createJobAdvertisementFromExternalDto(item);
-        Set<ConstraintViolation<ExternalJobAdvertisementDto>> violations = validator.validate(createItem);
+    public ExternalCreateJobAdvertisementDto process(Oste item) {
+        ExternalCreateJobAdvertisementDto createItem = externalJobAdvertisementAssembler.createJobAdvertisementFromExternalDto(item);
+        Set<ConstraintViolation<ExternalCreateJobAdvertisementDto>> violations = validator.validate(createItem);
         if (violations.isEmpty()) {
             return createItem;
         }
