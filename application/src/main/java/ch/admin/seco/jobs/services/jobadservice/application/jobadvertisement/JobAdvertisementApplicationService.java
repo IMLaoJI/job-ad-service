@@ -285,7 +285,6 @@ public class JobAdvertisementApplicationService {
                 .setEmployment(toEmployment(externalJobAdvertisementDto.getEmployment()))
                 .setLocation(location)
                 .setContact(toContact(externalJobAdvertisementDto.toContactDto()))
-                .setX28OccupationCodes(externalJobAdvertisementDto.getProfessionCodes())
                 .build();
 
         jobAdvertisement.update(updater);
