@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalCreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.integration.external.jobadimport.Oste;
 
 @SpringBootTest
@@ -28,7 +28,7 @@ public class ExternalItemProcessorTest {
         Oste oste = new Oste();
 
         //when
-        ExternalCreateJobAdvertisementDto result = this.externalItemProcessor.process(oste);
+        ExternalJobAdvertisementDto result = this.externalItemProcessor.process(oste);
 
         //then
         assertThat(result).isNull();

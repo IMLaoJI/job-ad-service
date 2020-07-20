@@ -1,7 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.external;
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalCreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
@@ -42,7 +42,7 @@ public class ExternalJobAdvertisementAdapter {
     }
 
     @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CREATE_FROM_EXTERNAL_CONDITION)
-    public void handleCreateFromExternalAction(ExternalCreateJobAdvertisementDto createFromExternal) {
+    public void handleCreateFromExternalAction(ExternalJobAdvertisementDto createFromExternal) {
         StopWatch stopWatch = new StopWatch();
         LOG.trace(".start handleCreateFromExternalAction [fingerprint = {}]", createFromExternal.getFingerprint());
 

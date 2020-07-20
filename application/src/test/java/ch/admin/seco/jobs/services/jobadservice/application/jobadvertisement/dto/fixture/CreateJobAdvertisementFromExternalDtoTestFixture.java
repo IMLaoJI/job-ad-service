@@ -2,7 +2,7 @@ package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dt
 
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.EmploymentDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalCompanyDto;
-import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalCreateJobAdvertisementDto;
+import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalLanguageSkillDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalLocationDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalOccupationDto;
@@ -18,8 +18,8 @@ import static ch.admin.seco.jobs.services.jobadservice.application.jobadvertisem
 
 public class CreateJobAdvertisementFromExternalDtoTestFixture {
 
-    public static ExternalCreateJobAdvertisementDto createCreateJobAdvertisementDto(ExternalCompanyDto externalCompanyDto) {
-        return new ExternalCreateJobAdvertisementDto()
+    public static ExternalJobAdvertisementDto createCreateJobAdvertisementDto(ExternalCompanyDto externalCompanyDto) {
+        return new ExternalJobAdvertisementDto()
                 .setStellennummerEgov(null)
                 .setStellennummerAvam(null)
                 .setTitle("title")
@@ -53,7 +53,7 @@ public class CreateJobAdvertisementFromExternalDtoTestFixture {
                 .setCompanyAnonymous(false);
     }
 
-    public static ExternalCreateJobAdvertisementDto testCreateJobAdvertisementFromExternalDto() {
+    public static ExternalJobAdvertisementDto testCreateJobAdvertisementFromExternalDto() {
         return createCreateJobAdvertisementDto(testExternalCompanyDto());
     }
 }
