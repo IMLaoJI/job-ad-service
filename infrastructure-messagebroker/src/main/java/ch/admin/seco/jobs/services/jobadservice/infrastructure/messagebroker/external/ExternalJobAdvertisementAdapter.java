@@ -73,7 +73,8 @@ public class ExternalJobAdvertisementAdapter {
                 stopTask(stopWatch);
             }
         }
-        LOG.trace("........finished handleCreateFromExternalAction [fingerprint = {}] in {}", createFromExternal.getFingerprint(), stopWatch.getTotalTimeMillis());
+
+        LOG.trace("........finished handleCreateFromExternalAction [fingerprint = {}] in {} ms", createFromExternal.getFingerprint(), stopWatch.getTotalTimeMillis());
     }
 
     @Nullable
@@ -123,6 +124,6 @@ public class ExternalJobAdvertisementAdapter {
 
     private void stopTask(StopWatch stopWatch) {
         stopWatch.stop();
-        LOG.trace("finished: {} in {}", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
+        LOG.trace("finished: {} in {} ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
     }
 }

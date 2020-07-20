@@ -117,6 +117,6 @@ class DefaultJobCenterService implements JobCenterService {
 
     private void stopTask(StopWatch stopWatch) {
         stopWatch.stop();
-        LOG.trace("finished: {} in {}", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
+        LOG.trace("finished: {} in {} ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
     }
 }

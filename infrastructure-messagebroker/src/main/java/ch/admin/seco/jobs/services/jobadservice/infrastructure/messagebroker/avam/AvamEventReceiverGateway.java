@@ -25,81 +25,94 @@ import static ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebro
 
 public class AvamEventReceiverGateway {
 
-	private final Logger LOG = LoggerFactory.getLogger(AvamEventReceiverGateway.class);
+    private final Logger LOG = LoggerFactory.getLogger(AvamEventReceiverGateway.class);
 
-	private final JobCenterService jobCenterService;
+    private final JobCenterService jobCenterService;
 
-	private final JobAdvertisementApplicationService jobAdvertisementApplicationService;
+    private final JobAdvertisementApplicationService jobAdvertisementApplicationService;
 
-	private final AvamMailSender avamMailSender;
+    private final AvamMailSender avamMailSender;
 
-	public AvamEventReceiverGateway(JobAdvertisementApplicationService jobAdvertisementApplicationService,
-			JobCenterService jobCenterService,
-			AvamMailSender avamMailSender) {
-		this.jobAdvertisementApplicationService = jobAdvertisementApplicationService;
-		this.jobCenterService = jobCenterService;
-		this.avamMailSender = avamMailSender;
-	}
+    public AvamEventReceiverGateway(JobAdvertisementApplicationService jobAdvertisementApplicationService,
+                                    JobCenterService jobCenterService,
+                                    AvamMailSender avamMailSender) {
+        this.jobAdvertisementApplicationService = jobAdvertisementApplicationService;
+        this.jobCenterService = jobCenterService;
+        this.avamMailSender = avamMailSender;
+    }
 
-	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = APPROVE_CONDITION)
-	public void handleApprovedAction(ApprovalDto approvalDto) {
+    @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = APPROVE_CONDITION)
+    public void handleApprovedAction(ApprovalDto approvalDto) {
+        StopWatch stopWatch = new StopWatch();
         LOG.trace(".start handleApprovedAction [stellennummerEgov = {}, stellennummerAvam = {}]", approvalDto.getStellennummerEgov(), approvalDto.getStellennummerEgov());
 
-		JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.getByStellennummerEgovOrAvam(approvalDto.getStellennummerEgov(), approvalDto.getStellennummerAvam());
+        startTask("..", "jobAdvertisementApplicationService.getByStellennummerEgovOrAvam", stopWatch);
+        JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.getByStellennummerEgovOrAvam(approvalDto.getStellennummerEgov(), approvalDto.getStellennummerAvam());
+        stopTask(stopWatch);
 
-        LOG.trace("..(jobAdvertisementApplicationService.approve)");
+        notNull(jobAdvertisementDto, "Couldn't find the jobAdvertisement to approve for stellennummerEgov %s nor stellennummerAvam %s", approvalDto.getStellennummerEgov(), approvalDto.getStellennummerAvam());
 
-		notNull(jobAdvertisementDto, "Couldn't find the jobAdvertisement to approve for stellennummerEgov %s nor stellennummerAvam %s", approvalDto.getStellennummerEgov(), approvalDto.getStellennummerAvam());
-		jobAdvertisementApplicationService.approve(approvalDto);
+        startTask("...", "jobAdvertisementApplicationService.approve", stopWatch);
+        jobAdvertisementApplicationService.approve(approvalDto);
+        stopTask(stopWatch);
 
-        LOG.trace("...finished handleApprovedAction [stellennummerEgov = {}, stellennummerAvam = {}]", approvalDto.getStellennummerEgov(), approvalDto.getStellennummerEgov());
-	}
+        LOG.trace("...finished handleApprovedAction [stellennummerEgov = {}, stellennummerAvam = {}] in {} ms",
+                approvalDto.getStellennummerEgov(), approvalDto.getStellennummerEgov(), stopWatch.getTotalTimeMillis());
+    }
 
-	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = REJECT_CONDITION)
-	public void handleRejectAction(RejectionDto rejectionDto) {
+    @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = REJECT_CONDITION)
+    public void handleRejectAction(RejectionDto rejectionDto) {
+        StopWatch stopWatch = new StopWatch();
         LOG.trace(".start handleRejectAction [stellennummerEgov = {}]", rejectionDto.getStellennummerEgov());
 
-		jobAdvertisementApplicationService.reject(rejectionDto);
+        startTask("..", "jobAdvertisementApplicationService.reject", stopWatch);
+        jobAdvertisementApplicationService.reject(rejectionDto);
+        stopTask(stopWatch);
 
-        LOG.trace("..finished handleRejectAction [stellennummerEgov = {}]", rejectionDto.getStellennummerEgov());
-	}
+        LOG.trace("..finished handleRejectAction [stellennummerEgov = {}] in {} ms",
+                rejectionDto.getStellennummerEgov(), stopWatch.getTotalTimeMillis());
+    }
 
-	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CREATE_FROM_AVAM_CONDITION)
-	public void handleCreateAction(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
+    @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CREATE_FROM_AVAM_CONDITION)
+    public void handleCreateAction(AvamCreateJobAdvertisementDto createJobAdvertisementFromAvamDto) {
+        StopWatch stopWatch = new StopWatch();
         LOG.trace(".start handleCreateAction [stellennummerAvam = {}]", createJobAdvertisementFromAvamDto.getStellennummerAvam());
 
-		try {
-			jobAdvertisementApplicationService.createFromAvam(createJobAdvertisementFromAvamDto);
-		} catch (JobAdvertisementAlreadyExistsException e) {
-			LOG.debug(e.getMessage());
-		}
+        try {
+            startTask("..", "jobAdvertisementApplicationService.createFromAvam", stopWatch);
+            jobAdvertisementApplicationService.createFromAvam(createJobAdvertisementFromAvamDto);
+            stopTask(stopWatch);
+        } catch (JobAdvertisementAlreadyExistsException e) {
+            LOG.debug(e.getMessage());
+        }
 
-        LOG.trace("..finished handleCreateAction [stellennummerAvam = {}]", createJobAdvertisementFromAvamDto.getStellennummerAvam());
-	}
+        LOG.trace("..finished handleCreateAction [stellennummerAvam = {}] in {} ms",
+                createJobAdvertisementFromAvamDto.getStellennummerAvam(), stopWatch.getTotalTimeMillis());
+    }
 
-	@StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CANCEL_CONDITION)
-	public void handleCancelAction(AvamCancellationDto avamCancellationDto) {
-	    StopWatch stopWatch = new StopWatch();
+    @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CANCEL_CONDITION)
+    public void handleCancelAction(AvamCancellationDto avamCancellationDto) {
+        StopWatch stopWatch = new StopWatch();
 
         LOG.trace(".start handleCancelAction [stellennummerEgov = {}, stellennummerAvam = {}]", avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerEgov());
 
-        startTask(".", "jobAdvertisementApplicationService.findByStellennummerEgovOrAvam", stopWatch);
-		JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerEgovOrAvam(avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerAvam());
+        startTask("..", "jobAdvertisementApplicationService.findByStellennummerEgovOrAvam", stopWatch);
+        JobAdvertisementDto jobAdvertisementDto = jobAdvertisementApplicationService.findByStellennummerEgovOrAvam(avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerAvam());
         stopTask(stopWatch);
 
-		if ((jobAdvertisementDto == null) && (avamCancellationDto.getSourceSystem() == SourceSystem.RAV)) {
+        if ((jobAdvertisementDto == null) && (avamCancellationDto.getSourceSystem() == SourceSystem.RAV)) {
 
-            LOG.trace("..");
+            LOG.trace("...");
 
             if (avamCancellationDto.getContactEmail() != null) {
 
                 LOG.info("Cancellation of an unknown jobAdvertisement from AVAM with stellennummerAvam {}", avamCancellationDto.getStellennummerAvam());
 
-                startTask("...", "jobCenterService.findJobCenterByCode", stopWatch);
+                startTask("....", "jobCenterService.findJobCenterByCode", stopWatch);
                 final JobCenter jobCenter = jobCenterService.findJobCenterByCode(avamCancellationDto.getJobCenterCode());
                 stopTask(stopWatch);
 
-                startTask("....", "jobCenterService.findJobCenterByCode", stopWatch);
+                startTask(".....", "jobCenterService.findJobCenterByCode", stopWatch);
                 avamMailSender.sendCancellation(avamCancellationDto, jobCenter);
                 stopTask(stopWatch);
 
@@ -108,23 +121,23 @@ public class AvamEventReceiverGateway {
                 LOG.info("No cancellation mail sent of unknown JobAdvertisement from AVAM with stellennummerAvam {}", avamCancellationDto.getStellennummerAvam());
                 return;
             }
-		}
+        }
 
-		notNull(jobAdvertisementDto, "Couldn't find the jobAdvertisement to cancel for stellennummerEgov %s nor stellennummerAvam %s", avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerAvam());
+        notNull(jobAdvertisementDto, "Couldn't find the jobAdvertisement to cancel for stellennummerEgov %s nor stellennummerAvam %s", avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerAvam());
 
-		CancellationDto cancellationDto = AvamCancellationDto.toDto(avamCancellationDto);
+        CancellationDto cancellationDto = AvamCancellationDto.toDto(avamCancellationDto);
 
-        startTask(".......", "jobAdvertisementApplicationService.cancel", stopWatch);
-		jobAdvertisementApplicationService.cancel(
-				new JobAdvertisementId(jobAdvertisementDto.getId()),
-				cancellationDto,
-				null
-		);
+        startTask("........", "jobAdvertisementApplicationService.cancel", stopWatch);
+        jobAdvertisementApplicationService.cancel(
+                new JobAdvertisementId(jobAdvertisementDto.getId()),
+                cancellationDto,
+                null
+        );
         stopTask(stopWatch);
 
-        LOG.trace("........finished handleCancelAction [stellennummerEgov = {}, stellennummerAvam = {}] in {}",
+        LOG.trace(".........finished handleCancelAction [stellennummerEgov = {}, stellennummerAvam = {}] in {} ms",
                 avamCancellationDto.getStellennummerEgov(), avamCancellationDto.getStellennummerEgov(), stopWatch.getTotalTimeMillis());
-	}
+    }
 
     private void startTask(String prefix, String task, StopWatch stopWatch) {
         LOG.trace(prefix + " start: {}", task);
@@ -133,7 +146,7 @@ public class AvamEventReceiverGateway {
 
     private void stopTask(StopWatch stopWatch) {
         stopWatch.stop();
-        LOG.trace("finished: {} in {}", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
+        LOG.trace("finished: {} in {} ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
     }
 
 }
