@@ -1,28 +1,21 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.service.reference.location;
 
 import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
+import ch.admin.seco.jobs.services.jobadservice.application.TraceHelper;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LocationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.GeoPoint;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Location;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.apache.commons.lang3.StringUtils.upperCase;
 import static org.springframework.util.StringUtils.hasText;
 
 @Service
 public class DefaultLocationService implements LocationService {
-    private final Logger LOG = LoggerFactory.getLogger(DefaultLocationService.class);
 
     private static final String COUNTRY_ISO_CODE_SWITZERLAND = "CH";
 
@@ -42,12 +35,12 @@ public class DefaultLocationService implements LocationService {
 
     @Override
     public Optional<LocationDto> findById(String id) {
-        StopWatch stopWatch = new StopWatch();
-        startTask(".", "this.locationApiClient.getLocationById", stopWatch);
+        StopWatch stopWatch = TraceHelper.stopWatch();
+        TraceHelper.startTask(".", "this.locationApiClient.getLocationById", stopWatch);
 
         Optional<LocationDto> locationDto = this.locationApiClient.getLocationById(UUID.fromString(id))
                 .map(this::toLocation);
-        stopTask(stopWatch);
+        TraceHelper.stopTask(stopWatch);
 
         return locationDto;
     }
@@ -71,13 +64,13 @@ public class DefaultLocationService implements LocationService {
     }
 
     private Optional<LocationResource> findLocationIfHasPostalCode(Location location) {
-        StopWatch stopWatch = new StopWatch();
-        startTask(".", "locationApiClient.findLocationByPostalCodeAndCity", stopWatch);
+        StopWatch stopWatch = TraceHelper.stopWatch();
+        TraceHelper.startTask(".", "locationApiClient.findLocationByPostalCodeAndCity", stopWatch);
 
         Optional<LocationResource> locationResource = (hasText(location.getPostalCode()) && hasText(location.getCity())) ?
                 locationApiClient.findLocationByPostalCodeAndCity(location.getPostalCode(), location.getCity())
                 : Optional.empty();
-        stopTask(stopWatch);
+        TraceHelper.stopTask(stopWatch);
 
         return locationResource;
     }
@@ -115,15 +108,5 @@ public class DefaultLocationService implements LocationService {
     private GeoPoint toGeoPoint(LocationResource locationResource) {
         GeoPointResource geoPoint = locationResource.getGeoPoint();
         return geoPoint == null ? null : new GeoPoint(geoPoint.getLongitude(), geoPoint.getLatitude());
-    }
-
-    private void startTask(String prefix, String task, StopWatch stopWatch) {
-        LOG.trace(prefix + " start: {}", task);
-        stopWatch.start(task);
-    }
-
-    private void stopTask(StopWatch stopWatch) {
-        stopWatch.stop();
-        LOG.trace("finished: {} in {}", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
     }
 }

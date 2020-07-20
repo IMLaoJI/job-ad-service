@@ -1,5 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.messagebroker.external;
 
+import ch.admin.seco.jobs.services.jobadservice.application.TraceHelper;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.JobAdvertisementApplicationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.external.ExternalCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
@@ -43,34 +44,34 @@ public class ExternalJobAdvertisementAdapter {
 
     @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CREATE_FROM_EXTERNAL_CONDITION)
     public void handleCreateFromExternalAction(ExternalCreateJobAdvertisementDto createFromExternal) {
-        StopWatch stopWatch = new StopWatch();
+        StopWatch stopWatch = TraceHelper.stopWatch();
         LOG.trace(".start handleCreateFromExternalAction [fingerprint = {}]", createFromExternal.getFingerprint());
 
-        startTask("..", "logLastExternalMessageDate", stopWatch);
+        TraceHelper.startTask("..", "logLastExternalMessageDate", stopWatch);
         logLastExternalMessageDate(createFromExternal.getFingerprint());
-        stopTask(stopWatch);
+        TraceHelper.stopTask(stopWatch);
 
-        startTask("...", "determineJobAdvertisementId", stopWatch);
+        TraceHelper.startTask("...", "determineJobAdvertisementId", stopWatch);
         final JobAdvertisementId jobAdvertisementId = determineJobAdvertisementId(createFromExternal.getStellennummerEgov(), createFromExternal.getStellennummerAvam());
-        stopTask(stopWatch);
+        TraceHelper.stopTask(stopWatch);
 
         if (jobAdvertisementId != null) {
-            startTask("....", "jobAdvertisementApplicationService.enrichFromExtern", stopWatch);
+            TraceHelper.startTask("....", "jobAdvertisementApplicationService.enrichFromExtern", stopWatch);
             jobAdvertisementApplicationService.enrichFromExtern(jobAdvertisementId, createFromExternal.getFingerprint(), createFromExternal.getProfessionCodes());
-            stopTask(stopWatch);
+            TraceHelper.stopTask(stopWatch);
         } else {
-            startTask(".....", "findJobAdvertisementIdByFingerprint", stopWatch);
+            TraceHelper.startTask(".....", "findJobAdvertisementIdByFingerprint", stopWatch);
             final JobAdvertisementId externalJobAdvertisementId = findJobAdvertisementIdByFingerprint(createFromExternal.getFingerprint());
-            stopTask(stopWatch);
+            TraceHelper.stopTask(stopWatch);
 
             if (externalJobAdvertisementId != null) {
-                startTask("......", "jobAdvertisementApplicationService.updateFromExtern", stopWatch);
+                TraceHelper.startTask("......", "jobAdvertisementApplicationService.updateFromExtern", stopWatch);
                 jobAdvertisementApplicationService.updateFromExtern(externalJobAdvertisementId, createFromExternal);
-                stopTask(stopWatch);
+                TraceHelper.stopTask(stopWatch);
             } else {
-                startTask(".......", "jobAdvertisementApplicationService.createFromExtern", stopWatch);
+                TraceHelper.startTask(".......", "jobAdvertisementApplicationService.createFromExtern", stopWatch);
                 jobAdvertisementApplicationService.createFromExtern(createFromExternal);
-                stopTask(stopWatch);
+                TraceHelper.stopTask(stopWatch);
             }
         }
 
@@ -115,15 +116,5 @@ public class ExternalJobAdvertisementAdapter {
     private void logLastExternalMessageDate(String fingerprint) {
         ExternalJobAdvertisementMessageLog externalJobAdvertisementMessageLog = new ExternalJobAdvertisementMessageLog(fingerprint, TimeMachine.now().toLocalDate());
         externalMessageLogRepository.save(externalJobAdvertisementMessageLog);
-    }
-
-    private void startTask(String prefix, String task, StopWatch stopWatch) {
-        LOG.trace(prefix + " start: {}", task);
-        stopWatch.start(task);
-    }
-
-    private void stopTask(StopWatch stopWatch) {
-        stopWatch.stop();
-        LOG.trace("finished: {} in {} ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
     }
 }

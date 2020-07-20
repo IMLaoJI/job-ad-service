@@ -1,11 +1,10 @@
 package ch.admin.seco.jobs.services.jobadservice.infrastructure.service.reference.jobcenter;
 
 import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
+import ch.admin.seco.jobs.services.jobadservice.application.TraceHelper;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenter;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenterAddress;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobcenter.JobCenterUser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
@@ -17,8 +16,6 @@ import java.util.stream.Collectors;
 @Service
 class DefaultJobCenterService implements JobCenterService {
 
-    private final Logger LOG = LoggerFactory.getLogger(DefaultJobCenterService.class);
-
     private final JobCenterApiClient jobCenterApiClient;
 
     DefaultJobCenterService(JobCenterApiClient jobCenterApiClient) {
@@ -27,10 +24,10 @@ class DefaultJobCenterService implements JobCenterService {
 
     @Override
     public String findJobCenterCode(String countryCode, String postalCode) {
-        StopWatch stopWatch = new StopWatch();
-        startTask(".", "jobCenterApiClient.searchJobCenterByLocation", stopWatch);
+        StopWatch stopWatch = TraceHelper.stopWatch();
+        TraceHelper.startTask(".", "jobCenterApiClient.searchJobCenterByLocation", stopWatch);
         JobCenterResource jobCenterResource = jobCenterApiClient.searchJobCenterByLocation(countryCode, postalCode);
-        stopTask(stopWatch);
+        TraceHelper.stopTask(stopWatch);
         return (jobCenterResource != null) ? jobCenterResource.getCode() : null;
     }
 
@@ -43,10 +40,10 @@ class DefaultJobCenterService implements JobCenterService {
     public JobCenter findJobCenterByCode(String code, Locale language) {
         String languageKey = language == null ? Locale.GERMAN.getLanguage() : language.getLanguage();
 
-        StopWatch stopWatch = new StopWatch();
-        startTask(".", "jobCenterApiClient.searchJobCenterByCode", stopWatch);
+        StopWatch stopWatch = TraceHelper.stopWatch();
+        TraceHelper.startTask(".", "jobCenterApiClient.searchJobCenterByCode", stopWatch);
         JobCenterResource jobCenterResource = jobCenterApiClient.searchJobCenterByCode(code, languageKey);
-        stopTask(stopWatch);
+        TraceHelper.stopTask(stopWatch);
 
         if (jobCenterResource == null) {
             return null;
@@ -56,23 +53,23 @@ class DefaultJobCenterService implements JobCenterService {
 
     @Override
     public List<JobCenter> findAllJobCenters() {
-        StopWatch stopWatch = new StopWatch();
-        startTask(".", "jobCenterApiClient.findAllJobCenters", stopWatch);
+        StopWatch stopWatch = TraceHelper.stopWatch();
+        TraceHelper.startTask(".", "jobCenterApiClient.findAllJobCenters", stopWatch);
         List<JobCenter> jobCenters = jobCenterApiClient.findAllJobCenters().stream()
                 .map(this::toJobCenter)
                 .collect(Collectors.toList());
-        stopTask(stopWatch);
+        TraceHelper.stopTask(stopWatch);
 
         return jobCenters;
     }
 
     @Override
     public Optional<JobCenterUser> findJobCenterUserByJobCenterUserId(String jobCenterUserId) {
-        StopWatch stopWatch = new StopWatch();
-        startTask(".", "jobCenterApiClient.findJobCenterUserByJobCenterUseId", stopWatch);
+        StopWatch stopWatch = TraceHelper.stopWatch();
+        TraceHelper.startTask(".", "jobCenterApiClient.findJobCenterUserByJobCenterUseId", stopWatch);
         Optional<JobCenterUser> jobCenterUser = jobCenterApiClient.findJobCenterUserByJobCenterUseId(jobCenterUserId)
                 .map(this::toJobCenterUser);
-        stopTask(stopWatch);
+        TraceHelper.stopTask(stopWatch);
         return jobCenterUser;
     }
 
@@ -108,15 +105,5 @@ class DefaultJobCenterService implements JobCenterService {
                 .setHouseNumber(jobCenterAddressResource.getHouseNumber())
                 .setZipCode(jobCenterAddressResource.getZipCode())
                 .build();
-    }
-
-    private void startTask(String prefix, String task, StopWatch stopWatch) {
-        LOG.trace(prefix + " start: {}", task);
-        stopWatch.start(task);
-    }
-
-    private void stopTask(StopWatch stopWatch) {
-        stopWatch.stop();
-        LOG.trace("finished: {} in {} ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
     }
 }
