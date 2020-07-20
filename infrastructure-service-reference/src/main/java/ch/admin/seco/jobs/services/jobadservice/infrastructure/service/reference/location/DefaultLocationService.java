@@ -17,12 +17,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import ch.admin.seco.jobs.services.jobadservice.application.TraceHelper;
 import static org.apache.commons.lang3.StringUtils.upperCase;
 import static org.springframework.util.StringUtils.hasText;
 
 @Service
 public class DefaultLocationService implements LocationService {
-    private final Logger LOG = LoggerFactory.getLogger(DefaultLocationService.class);
 
     private static final String COUNTRY_ISO_CODE_SWITZERLAND = "CH";
 
@@ -42,12 +42,12 @@ public class DefaultLocationService implements LocationService {
 
     @Override
     public Optional<LocationDto> findById(String id) {
-        StopWatch stopWatch = new StopWatch();
-        startTask(".", "this.locationApiClient.getLocationById", stopWatch);
+        StopWatch stopWatch = TraceHelper.stopWatch();
+        TraceHelper.startTask(".", "this.locationApiClient.getLocationById", stopWatch);
 
         Optional<LocationDto> locationDto = this.locationApiClient.getLocationById(UUID.fromString(id))
                 .map(this::toLocation);
-        stopTask(stopWatch);
+        TraceHelper.stopTask(stopWatch);
 
         return locationDto;
     }
@@ -72,12 +72,12 @@ public class DefaultLocationService implements LocationService {
 
     private Optional<LocationResource> findLocationIfHasPostalCode(Location location) {
         StopWatch stopWatch = new StopWatch();
-        startTask(".", "locationApiClient.findLocationByPostalCodeAndCity", stopWatch);
+        TraceHelper.startTask(".", "locationApiClient.findLocationByPostalCodeAndCity", stopWatch);
 
         Optional<LocationResource> locationResource = (hasText(location.getPostalCode()) && hasText(location.getCity())) ?
                 locationApiClient.findLocationByPostalCodeAndCity(location.getPostalCode(), location.getCity())
                 : Optional.empty();
-        stopTask(stopWatch);
+        TraceHelper.stopTask(stopWatch);
 
         return locationResource;
     }
@@ -115,15 +115,5 @@ public class DefaultLocationService implements LocationService {
     private GeoPoint toGeoPoint(LocationResource locationResource) {
         GeoPointResource geoPoint = locationResource.getGeoPoint();
         return geoPoint == null ? null : new GeoPoint(geoPoint.getLongitude(), geoPoint.getLatitude());
-    }
-
-    private void startTask(String prefix, String task, StopWatch stopWatch) {
-        LOG.trace(prefix + " start: {}", task);
-        stopWatch.start(task);
-    }
-
-    private void stopTask(StopWatch stopWatch) {
-        stopWatch.stop();
-        LOG.trace("finished: {} in {}", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
     }
 }

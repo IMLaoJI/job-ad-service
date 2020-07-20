@@ -1,12 +1,6 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
-import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEvent;
-import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogger;
-import ch.admin.seco.jobs.services.jobadservice.application.IsSysAdmin;
-import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
-import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
-import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
-import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
+import ch.admin.seco.jobs.services.jobadservice.application.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.AvamCreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
@@ -39,6 +33,7 @@ import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.StopWatch;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
@@ -262,11 +257,19 @@ public class JobAdvertisementApplicationService {
     public JobAdvertisementId updateFromExtern(JobAdvertisementId jobAdvertisementId, ExternalJobAdvertisementDto externalJobAdvertisementDto) {
         LOG.debug("Update JobAdvertisement '{}' from Extern", jobAdvertisementId);
 
+        StopWatch stopWatch = TraceHelper.stopWatch();
+
+        TraceHelper.startTask(".", "jobAdvertisementRepository.findById", stopWatch);
         JobAdvertisement jobAdvertisement = jobAdvertisementRepository.findById(jobAdvertisementId)
                 .orElseThrow(() -> new EntityNotFoundException("JobAdvertisement not found. JobAdvertisementId: " + jobAdvertisementId.getValue()));
+        TraceHelper.stopTask(stopWatch);
 
         Location location = toLocation(externalJobAdvertisementDto.toCreateLocationDto());
+
+        TraceHelper.startTask("..", "locationService.enrichCodes", stopWatch);
         location = locationService.enrichCodes(location);
+        TraceHelper.stopTask(stopWatch);
+
         LocalDate publicationStartDate = defaultIfNull(externalJobAdvertisementDto.getPublicationStartDate(), TimeMachine.now().toLocalDate());
         LocalDate publicationEndDate = defaultIfNull(externalJobAdvertisementDto.getPublicationEndDate(), publicationStartDate.plusDays(PUBLICATION_MAX_DAYS));
 
@@ -287,9 +290,15 @@ public class JobAdvertisementApplicationService {
                 .setContact(toContact(externalJobAdvertisementDto.toContactDto()))
                 .build();
 
+        TraceHelper.startTask("...", "jobAdvertisement.update", stopWatch);
         jobAdvertisement.update(updater);
+        TraceHelper.stopTask(stopWatch);
 
+        TraceHelper.startTask("....", "republishIfArchived", stopWatch);
         republishIfArchived(jobAdvertisementId);
+        TraceHelper.stopTask(stopWatch);
+
+        LOG.trace("....finished updateFromExtern [jobAdvertisementId = {}] in {} ms", jobAdvertisementId.getValue(), stopWatch.getTotalTimeMillis());
 
         return jobAdvertisement.getId();
     }
