@@ -4,8 +4,11 @@ import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.LocationDto;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.GeoPoint;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.Location;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,6 +22,7 @@ import static org.springframework.util.StringUtils.hasText;
 
 @Service
 public class DefaultLocationService implements LocationService {
+    private final Logger LOG = LoggerFactory.getLogger(DefaultLocationService.class);
 
     private static final String COUNTRY_ISO_CODE_SWITZERLAND = "CH";
 
@@ -38,8 +42,14 @@ public class DefaultLocationService implements LocationService {
 
     @Override
     public Optional<LocationDto> findById(String id) {
-        return this.locationApiClient.getLocationById(UUID.fromString(id))
+        StopWatch stopWatch = new StopWatch();
+        startTask(".", "this.locationApiClient.getLocationById", stopWatch);
+
+        Optional<LocationDto> locationDto = this.locationApiClient.getLocationById(UUID.fromString(id))
                 .map(this::toLocation);
+        stopTask(stopWatch);
+
+        return locationDto;
     }
 
     @Override
@@ -61,9 +71,15 @@ public class DefaultLocationService implements LocationService {
     }
 
     private Optional<LocationResource> findLocationIfHasPostalCode(Location location) {
-        return (hasText(location.getPostalCode()) && hasText(location.getCity())) ?
+        StopWatch stopWatch = new StopWatch();
+        startTask(".", "locationApiClient.findLocationByPostalCodeAndCity", stopWatch);
+
+        Optional<LocationResource> locationResource = (hasText(location.getPostalCode()) && hasText(location.getCity())) ?
                 locationApiClient.findLocationByPostalCodeAndCity(location.getPostalCode(), location.getCity())
                 : Optional.empty();
+        stopTask(stopWatch);
+
+        return locationResource;
     }
 
     private boolean isManagedLocation(Location location) {
@@ -99,5 +115,15 @@ public class DefaultLocationService implements LocationService {
     private GeoPoint toGeoPoint(LocationResource locationResource) {
         GeoPointResource geoPoint = locationResource.getGeoPoint();
         return geoPoint == null ? null : new GeoPoint(geoPoint.getLongitude(), geoPoint.getLatitude());
+    }
+
+    private void startTask(String prefix, String task, StopWatch stopWatch) {
+        LOG.trace(prefix + " start: {}", task);
+        stopWatch.start(task);
+    }
+
+    private void stopTask(StopWatch stopWatch) {
+        stopWatch.stop();
+        LOG.trace("finished: {} in {}", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
     }
 }
