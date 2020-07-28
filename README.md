@@ -17,6 +17,10 @@ curl -H 'Content-Type: application/json' -H 'Accept: application/json' -H 'Autho
 ```
 The payload scripts can be found under ```/src/test-data```. Be aware of already existing job advertisement data and if there is such a need remove the old one.
 
+## Relevant Links
+
+* [How to debug JobAlert / JobAdService locally & Statistical analysis](https://alv-ch.atlassian.net/wiki/spaces/JR2/pages/955580417/How+to+debug+JobAlert+JobAdService+locally+Statistical+analysis)
+
 
 
 [JHipster Homepage and latest documentation]: http://www.jhipster.tech
