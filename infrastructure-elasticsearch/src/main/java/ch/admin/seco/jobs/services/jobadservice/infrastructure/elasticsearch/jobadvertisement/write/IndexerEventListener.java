@@ -43,7 +43,7 @@ public class IndexerEventListener {
 
             TraceHelper.startTask(".", "index JobAdvertisement",  stopWatch);
             this.jobAdvertisementElasticsearchRepository.save(new JobAdvertisementDocument(jobAdvertisementOptional.get()));
-            TraceHelper.startTask(".", "index JobAdvertisement",  stopWatch);
+            TraceHelper.stopTask(stopWatch);
 
             DomainEventPublisher.publish(new JobAdvertisementDocumentIndexedEvent(event));
         } else {
