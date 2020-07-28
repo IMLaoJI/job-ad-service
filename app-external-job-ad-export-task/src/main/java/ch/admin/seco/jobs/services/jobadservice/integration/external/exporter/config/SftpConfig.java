@@ -12,25 +12,25 @@ import static java.util.Objects.nonNull;
 import static org.springframework.util.StringUtils.quote;
 
 @Configuration
-@EnableConfigurationProperties(ExternalJobAdvertisementProperties.class)
+@EnableConfigurationProperties(SftpProperties.class)
 public class SftpConfig {
 
-    private final ExternalJobAdvertisementProperties externalJobAdvertisementProperties;
+    private final SftpProperties sftpProperties;
 
-    public SftpConfig(ExternalJobAdvertisementProperties externalJobAdvertisementProperties) {
-        this.externalJobAdvertisementProperties = externalJobAdvertisementProperties;
+    public SftpConfig(SftpProperties sftpProperties) {
+        this.sftpProperties = sftpProperties;
     }
 
     @Bean
     public DefaultSftpSessionFactory externalSftpSessionFactory() {
         DefaultSftpSessionFactory factory = new DefaultSftpSessionFactory();
-        factory.setHost(externalJobAdvertisementProperties.getHost());
-        if (nonNull(externalJobAdvertisementProperties.getPort())) {
-            factory.setPort(externalJobAdvertisementProperties.getPort());
+        factory.setHost(sftpProperties.getHost());
+        if (nonNull(sftpProperties.getPort())) {
+            factory.setPort(sftpProperties.getPort());
         }
-        factory.setUser(externalJobAdvertisementProperties.getUsername());
-        factory.setPassword(externalJobAdvertisementProperties.getPassword());
-        factory.setAllowUnknownKeys(externalJobAdvertisementProperties.getAllowUnknownKeys());
+        factory.setUser(sftpProperties.getUsername());
+        factory.setPassword(sftpProperties.getPassword());
+        factory.setAllowUnknownKeys(sftpProperties.getAllowUnknownKeys());
         factory.setSessionConfig(defaultSessionConfig());
         factory.setClientVersion("SSH-2.0-SFTP");
 
@@ -40,7 +40,7 @@ public class SftpConfig {
     @Bean
     public SftpMessageHandler sftpMessageHandler() {
         SftpMessageHandler sftpMessageHandler = new SftpMessageHandler(this.externalSftpSessionFactory());
-        sftpMessageHandler.setRemoteDirectoryExpressionString(quote(this.externalJobAdvertisementProperties.getRemoteDirectory()));
+        sftpMessageHandler.setRemoteDirectoryExpressionString(quote(this.sftpProperties.getRemoteDirectory()));
         return sftpMessageHandler;
     }
 

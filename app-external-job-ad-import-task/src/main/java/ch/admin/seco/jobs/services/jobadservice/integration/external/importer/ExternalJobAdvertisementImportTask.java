@@ -8,13 +8,13 @@ import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.cloud.task.configuration.EnableTask;
 
-import ch.admin.seco.jobs.services.jobadservice.integration.external.importer.config.ExternalJobAdvertisementProperties;
+import ch.admin.seco.jobs.services.jobadservice.integration.external.importer.config.SftpProperties;
 
 @SpringBootApplication
 @EnableTask
 @EnableBatchProcessing
 @EnableBinding(Source.class)
-@EnableConfigurationProperties(ExternalJobAdvertisementProperties.class)
+@EnableConfigurationProperties(SftpProperties.class)
 public class ExternalJobAdvertisementImportTask {
 
     public static void main(String[] args) {
