@@ -7,6 +7,8 @@ import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdver
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.events.JobAdvertisementEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,14 +21,14 @@ import java.util.Optional;
 public class IndexerEventListener {
     private static Logger LOG = LoggerFactory.getLogger(IndexerEventListener.class);
 
-    private JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository;
+    private final ElasticsearchTemplate elasticsearchTemplate;
 
-    private JobAdvertisementRepository jobAdvertisementJpaRepository;
+    private final JobAdvertisementRepository jobAdvertisementJpaRepository;
 
     public IndexerEventListener(
-            JobAdvertisementElasticsearchRepository jobAdvertisementElasticsearchRepository,
+            ElasticsearchTemplate elasticsearchTemplate,
             JobAdvertisementRepository jobAdvertisementJpaRepository) {
-        this.jobAdvertisementElasticsearchRepository = jobAdvertisementElasticsearchRepository;
+        this.elasticsearchTemplate = elasticsearchTemplate;
         this.jobAdvertisementJpaRepository = jobAdvertisementJpaRepository;
     }
 
@@ -41,13 +43,20 @@ public class IndexerEventListener {
         Optional<JobAdvertisement> jobAdvertisementOptional = this.jobAdvertisementJpaRepository.findById(event.getAggregateId());
         if (jobAdvertisementOptional.isPresent()) {
 
-            TraceHelper.startTask(".", "index JobAdvertisement",  stopWatch);
-            this.jobAdvertisementElasticsearchRepository.save(new JobAdvertisementDocument(jobAdvertisementOptional.get()));
+            TraceHelper.startTask(".", "index JobAdvertisement", stopWatch);
+            this.elasticsearchTemplate.index(createIndexQuery(new JobAdvertisementDocument(jobAdvertisementOptional.get())));
             TraceHelper.stopTask(stopWatch);
 
             DomainEventPublisher.publish(new JobAdvertisementDocumentIndexedEvent(event));
         } else {
             LOG.warn("JobAdvertisement not found for the given id: {}", event.getAggregateId());
         }
+    }
+
+    private IndexQuery createIndexQuery(JobAdvertisementDocument jobAdvertisementDocument) {
+        IndexQuery query = new IndexQuery();
+        query.setObject(jobAdvertisementDocument);
+        query.setId(jobAdvertisementDocument.getId());
+        return query;
     }
 }
