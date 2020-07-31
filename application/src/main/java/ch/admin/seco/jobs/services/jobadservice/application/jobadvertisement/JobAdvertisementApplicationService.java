@@ -126,12 +126,7 @@ public class JobAdvertisementApplicationService {
     public CreatedJobAdvertisementIdWithTokenDto createFromApi(CreateJobAdvertisementDto createJobAdvertisementDto) {
         LOG.debug("Start creating new job ad from API");
         Condition.notNull(createJobAdvertisementDto, "CreateJobAdvertisementDto can't be null");
-        String avamOccupationCode = createJobAdvertisementDto.getOccupation().getAvamOccupationCode();
-        if (isDeprecatedAvamCode(avamOccupationCode)) {
-            LOG.info("The ApiUser with the ID: '{}' and the E-Mail: '{}' is using a deprecated avam code '{}'", currentUserContext.getCurrentUser().getUserId(), currentUserContext.getCurrentUser().getEmail(), avamOccupationCode);
-        }
-        Condition.isTrue(professionService.isKnownAvamCode(avamOccupationCode),
-                String.format("Unknown AVAM Occupation Code: %s", avamOccupationCode));
+
         LOG.debug("Create '{}'", createJobAdvertisementDto.getJobDescriptions().get(0).getTitle());
 
         final JobAdvertisementCreator creator = getJobAdvertisementCreatorFromInternal(createJobAdvertisementDto);
@@ -1065,9 +1060,4 @@ public class JobAdvertisementApplicationService {
                 && ((jobAdvertisement.getReportingObligationEndDate() == null) || TimeMachine.isAfterToday(jobAdvertisement.getReportingObligationEndDate()));
     }
 
-    private boolean isDeprecatedAvamCode(String avamOccupationCode) {
-        CurrentUser currentUser = currentUserContext.getCurrentUser();
-        return Integer.parseInt(avamOccupationCode) < START_RANGE_OF_NEW_AVAMCODES
-                && currentUser.getDisplayName() != null && currentUser.getUserId() != null;
-    }
 }
