@@ -1,7 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.application.favouriteitem;
 
-import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEvent;
-import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogger;
+import ch.admin.seco.alv.shared.logger.business.BusinessLogData;
+import ch.admin.seco.alv.shared.logger.business.BusinessLogger;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.FavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.create.CreateFavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.update.UpdateFavouriteItemDto;
@@ -31,9 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogConstants.STATUS_ADDITIONAL_DATA;
-import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEventType.JOB_ADVERTISEMENT_FAVORITE_EVENT;
-import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogObjectType.JOB_ADVERTISEMENT_LOG;
+import static ch.admin.seco.jobs.services.jobadservice.application.common.logging.BusinessLogConstants.STATUS_ADDITIONAL_DATA;
+import static ch.admin.seco.jobs.services.jobadservice.application.common.logging.BusinessLogEventType.JOB_ADVERTISEMENT_FAVORITE_EVENT;
+import static ch.admin.seco.jobs.services.jobadservice.application.common.logging.BusinessLogObjectType.JOB_ADVERTISEMENT_LOG;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.FavouriteItemIdFixture.FAV_ID_5;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.FavouriteItemIdFixture.UNKNOWN;
 import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.fixture.LocationFixture.testLocation;
@@ -102,13 +102,13 @@ public class FavouriteItemApplicationServiceTest {
         assertThat(createdFavouriteItem.get().getNote()).isEqualTo(createFavouriteItemDto.getNote());
         domainEventMockUtils.assertSingleDomainEventPublished(FavouriteItemEvents.FAVOURITE_ITEM_CREATED.getDomainEventType());
 
-        ArgumentCaptor<BusinessLogEvent> argumentCaptor = ArgumentCaptor.forClass(BusinessLogEvent.class);
+        ArgumentCaptor<BusinessLogData> argumentCaptor = ArgumentCaptor.forClass(BusinessLogData.class);
         verify(businessLogger, times(1)).log(argumentCaptor.capture());
-        BusinessLogEvent businessLogEvent = argumentCaptor.getValue();
-        assertThat(businessLogEvent.getEventType()).isEqualTo(JOB_ADVERTISEMENT_FAVORITE_EVENT);
-        assertThat(businessLogEvent.getObjectType()).isEqualTo(JOB_ADVERTISEMENT_LOG);
-        assertThat(businessLogEvent.getObjectId()).isEqualTo(jobAdId.getValue());
-        assertThat(businessLogEvent.getAdditionalData().get(STATUS_ADDITIONAL_DATA)).isEqualTo(jobAdvertisement.getStatus());
+        BusinessLogData businessLogData = argumentCaptor.getValue();
+        assertThat(businessLogData.getEventType()).isEqualTo(JOB_ADVERTISEMENT_FAVORITE_EVENT.enumName());
+        assertThat(businessLogData.getObjectType()).isEqualTo(JOB_ADVERTISEMENT_LOG.enumName());
+        assertThat(businessLogData.getObjectId()).isEqualTo(jobAdId.getValue());
+        assertThat(businessLogData.getAdditionalData().get(STATUS_ADDITIONAL_DATA)).isEqualTo(jobAdvertisement.getStatus());
         // Testing the user role is not straight forward:
         // the user role is inserted by the LogstashBusinessLogger, based on the Spring context.
         // There's an integration test for this case, please see FavouriteItemRestControllerIntTest

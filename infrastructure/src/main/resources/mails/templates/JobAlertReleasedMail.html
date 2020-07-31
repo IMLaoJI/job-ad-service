@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="color-scheme" content="dark light">
     <style>
         * {
             font-family: Arial, sans-serif;
@@ -9,7 +11,7 @@
         h3 {
             font-weight: 100;
             margin: auto;
-            font-size:24px
+            font-size: 24px
         }
 
         .jobads {
@@ -18,7 +20,7 @@
             padding-left: 0px;
         }
 
-        .jobads a{
+        .jobads a {
             color: inherit;
             text-decoration: none;
         }
@@ -45,6 +47,7 @@
         .badge {
             padding: .25em .4em;
             font-size: 14px;
+            color: #333;
         }
 
         .immediatly {
@@ -70,6 +73,29 @@
         .jobad-content {
             color: #333;
             font-size: 1.5em;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .immediatly {
+                background-color: #ffe8a0;
+            }
+
+            .workload {
+                background-color: #f0f0f0;
+            }
+
+            .location {
+                background-color: #fee0de;
+            }
+
+            .permanent {
+                background-color: #e3f1dc;
+            }
+            .jobad-content {
+                color: white;
+                font-size: 1.5em;
+            }
+
         }
     </style>
 </head>

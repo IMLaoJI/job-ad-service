@@ -1,7 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice.application.favouriteitem;
 
-import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEvent;
-import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogger;
+import ch.admin.seco.alv.shared.logger.business.BusinessLogData;
+import ch.admin.seco.alv.shared.logger.business.BusinessLogger;
 import ch.admin.seco.jobs.services.jobadservice.application.IsSysAdmin;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.FavouriteItemDto;
 import ch.admin.seco.jobs.services.jobadservice.application.favouriteitem.dto.create.CreateFavouriteItemDto;
@@ -27,9 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogConstants.STATUS_ADDITIONAL_DATA;
-import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEventType.JOB_ADVERTISEMENT_FAVORITE_EVENT;
-import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogObjectType.JOB_ADVERTISEMENT_LOG;
+import static ch.admin.seco.jobs.services.jobadservice.application.common.logging.BusinessLogConstants.STATUS_ADDITIONAL_DATA;
+import static ch.admin.seco.jobs.services.jobadservice.application.common.logging.BusinessLogEventType.JOB_ADVERTISEMENT_FAVORITE_EVENT;
+import static ch.admin.seco.jobs.services.jobadservice.application.common.logging.BusinessLogObjectType.JOB_ADVERTISEMENT_LOG;
 
 @Service
 @Transactional
@@ -81,7 +81,8 @@ public class FavouriteItemApplicationService {
     private void createBusinessLogEntry(FavouriteItem newFavouriteItem) {
         JobAdvertisementId jobAdvertisementId = newFavouriteItem.getJobAdvertisementId();
         JobAdvertisementStatus jobAdStatus = getJobAdvertisement(jobAdvertisementId).getStatus();
-        BusinessLogEvent logData = new BusinessLogEvent(JOB_ADVERTISEMENT_FAVORITE_EVENT, JOB_ADVERTISEMENT_LOG)
+        BusinessLogData logData = BusinessLogData.of(JOB_ADVERTISEMENT_FAVORITE_EVENT)
+                .withObjectType(JOB_ADVERTISEMENT_LOG)
                 .withObjectId(jobAdvertisementId.getValue())
                 .withAdditionalData(STATUS_ADDITIONAL_DATA, jobAdStatus);
         this.businessLogger.log(logData);

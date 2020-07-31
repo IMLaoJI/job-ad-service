@@ -1,11 +1,7 @@
 package ch.admin.seco.jobs.services.jobadservice;
 
-import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogger;
-import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
-import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
-import ch.admin.seco.jobs.services.jobadservice.application.MailSenderService;
-import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
-import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
+import ch.admin.seco.alv.shared.logger.business.BusinessLogger;
+import ch.admin.seco.jobs.services.jobadservice.application.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.ExternalJobAdvertisementArchiverService;
 import ch.admin.seco.jobs.services.jobadservice.application.security.TestingCurrentUserContext;
 import ch.admin.seco.jobs.services.jobadservice.domain.LanguageProvider;
