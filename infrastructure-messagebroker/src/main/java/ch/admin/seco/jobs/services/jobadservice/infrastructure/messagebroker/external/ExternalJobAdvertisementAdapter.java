@@ -6,6 +6,7 @@ import ch.admin.seco.jobs.services.jobadservice.core.time.TimeMachine;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisement;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementId;
 import ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementRepository;
+import io.micrometer.core.annotation.Timed;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -36,6 +37,7 @@ public class ExternalJobAdvertisementAdapter {
         this.externalMessageLogRepository = externalMessageLogRepository;
     }
 
+    @Timed
     @StreamListener(target = JOB_AD_INT_ACTION_CHANNEL, condition = CREATE_FROM_EXTERNAL_CONDITION)
     public void handleCreateFromExternalAction(ExternalJobAdvertisementDto createFromExternal) {
         logLastExternalMessageDate(createFromExternal.getFingerprint());

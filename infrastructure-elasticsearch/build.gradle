@@ -5,6 +5,7 @@ dependencies {
     compile 'org.springframework:spring-tx'
     compile 'io.projectreactor:reactor-core'
     compile 'org.apache.commons:commons-io'
+    compile "io.micrometer:micrometer-core"
 
     compile 'org.hibernate.validator:hibernate-validator'
 
