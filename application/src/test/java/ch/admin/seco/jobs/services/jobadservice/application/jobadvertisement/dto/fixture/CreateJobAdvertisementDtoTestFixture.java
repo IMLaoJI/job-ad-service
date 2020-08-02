@@ -70,7 +70,7 @@ public class CreateJobAdvertisementDtoTestFixture {
                         .setCountryIsoCode("CH"))
                 .setOccupations(singletonList(
                         new OccupationDto()
-                                .setAvamOccupationCode("avamCode")
+                                .setAvamOccupationCode("101970")
                                 .setWorkExperience(WorkExperience.MORE_THAN_1_YEAR)
                                 .setEducationCode("educationCode")
                                 .setQualificationCode(Qualification.SKILLED)))

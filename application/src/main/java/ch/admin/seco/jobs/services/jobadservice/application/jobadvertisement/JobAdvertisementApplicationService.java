@@ -1,12 +1,8 @@
 package ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement;
 
-import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEvent;
-import ch.admin.seco.jobs.services.jobadservice.application.BusinessLogger;
-import ch.admin.seco.jobs.services.jobadservice.application.IsSysAdmin;
-import ch.admin.seco.jobs.services.jobadservice.application.JobCenterService;
-import ch.admin.seco.jobs.services.jobadservice.application.LocationService;
-import ch.admin.seco.jobs.services.jobadservice.application.ProfessionService;
-import ch.admin.seco.jobs.services.jobadservice.application.ReportingObligationService;
+import ch.admin.seco.alv.shared.logger.business.BusinessLogData;
+import ch.admin.seco.alv.shared.logger.business.BusinessLogger;
+import ch.admin.seco.jobs.services.jobadservice.application.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.*;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateJobAdvertisementDto;
 import ch.admin.seco.jobs.services.jobadservice.application.jobadvertisement.dto.create.CreateLocationDto;
@@ -45,12 +41,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogConstants.STATUS_ADDITIONAL_DATA;
-import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogEventType.JOB_ADVERTISEMENT_ACCESS_EVENT;
-import static ch.admin.seco.jobs.services.jobadservice.application.BusinessLogObjectType.JOB_ADVERTISEMENT_LOG;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.INSPECTING;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REFINING;
-import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.REJECTED;
+import static ch.admin.seco.jobs.services.jobadservice.application.common.logging.BusinessLogConstants.STATUS_ADDITIONAL_DATA;
+import static ch.admin.seco.jobs.services.jobadservice.application.common.logging.BusinessLogEventType.JOB_ADVERTISEMENT_ACCESS_EVENT;
+import static ch.admin.seco.jobs.services.jobadservice.application.common.logging.BusinessLogObjectType.JOB_ADVERTISEMENT_LOG;
+import static ch.admin.seco.jobs.services.jobadservice.domain.jobadvertisement.JobAdvertisementStatus.*;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.springframework.util.StringUtils.hasText;
@@ -344,7 +338,8 @@ public class JobAdvertisementApplicationService {
 	@PreAuthorize("@jobAdvertisementAuthorizationService.canViewJob(#jobAdvertisementId)")
 	public JobAdvertisementDto getById(JobAdvertisementId jobAdvertisementId) throws AggregateNotFoundException {
 		JobAdvertisement jobAdvertisement = getJobAdvertisement(jobAdvertisementId);
-		BusinessLogEvent logData = new BusinessLogEvent(JOB_ADVERTISEMENT_ACCESS_EVENT, JOB_ADVERTISEMENT_LOG)
+        BusinessLogData logData = BusinessLogData.of(JOB_ADVERTISEMENT_ACCESS_EVENT)
+                .withObjectType(JOB_ADVERTISEMENT_LOG)
 				.withObjectId(jobAdvertisementId.getValue())
 				.withAdditionalData(STATUS_ADDITIONAL_DATA, jobAdvertisement.getStatus());
 		this.businessLogger.log(logData);
